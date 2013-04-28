@@ -1,0 +1,10 @@
+<article>
+	<h1>[rewrite:content]title[/rewrite]</h1>
+	<p>[rewrite:content]message[/rewrite]</p>
+[if:settings:pas_core_dev_mode == 1][if:content:details != ]
+	<details>
+		<summary>[rewrite:l10n]core_title_error_details[/rewrite]</summary>
+		<pre>[rewrite:content]details[/rewrite]</pre>
+	</details>
+[/if][/if]
+</article>

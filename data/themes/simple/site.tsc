@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="[rewrite:l10n]lang_charset[/rewrite]" ?><!DOCTYPE html SYSTEM "about:legacy-compat">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="[rewrite:l10n]lang_iso_domain[/rewrite]">
+
+<head>
+<title>[rewrite:content]page_title[/rewrite]</title>
+[if:content:p3purl != ]<link rel="P3Pv1" href="[rewrite:content]p3purl[/rewrite]" />[/if]
+<meta name="author" content="direct Netware Group" />
+<meta name="creator" content="direct PAS" />
+<style type="text/css"><![CDATA[
+div, p, td, th { cursor: default }
+
+a { cursor: pointer }
+a:link { text-decoration: underline }
+a:active { text-decoration: none }
+a:visited { text-decoration: underline }
+a:hover { text-decoration: none }
+a:focus { text-decoration: underline }
+
+body { margin: 0; padding: 0 31px; background-color: #FFFFFF }
+body { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 90%; font-style: normal; line-height: normal; font-weight: normal }
+form { margin: 0; padding: 0 }
+h1, h2, h3, h4, h5, h6, summary { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 130%; font-style: normal; font-weight: bold }
+img { border: none }
+table { margin: 0; table-layout: fixed; border: none; border-collapse: collapse; border-spacing: 0 }
+
+td, th { padding: 0 }
+td:first-child, th:first-child { border-left: none }
+td:last-child, th:last-child { border-right: none }
+
+.designcopyright { height:50px;background-color:#808080;text-align:center;vertical-align:middle }
+.designcopyright { font-family:Verdana,Arial,Helvetica,sans-serif;font-size:70%;color:#DDDDDD }
+.designcopyright a, .designcopyright a:link, .designcopyright a:active, .designcopyright a:visited, .designcopyright a:hover, .designcopyright a:focus { color:#FFFFFF }
+
+.pagemainmenu { margin: 0 -12px 0 -12px; padding: 0 12px 8px 12px; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(55, 90, 157, 0.2) 100%); border-bottom: 1px solid #375A9D }
+.pagemainmenu { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 105%; font-weight: bold; color: #375A9D }
+.pagemainmenu ul { margin: 0; padding: 0; list-style: none }
+.pagemainmenu li { display: inline-block; white-space: nowrap }
+.pagemainmenu a, .pagemainmenu a:link, .pagemainmenu a:visited { color:#375A9D; text-decoration: none }
+.pagemainmenu a:active, .pagemainmenu a:hover, .pagemainmenu a:focus { color:#000000; text-decoration: underline }
+
+.designpage { padding: 10px 12px; background-color: #FFFFFF; border: 1px solid #375A9D; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2); text-align: left; vertical-align: middle }
+.designpage > :first-child { margin-top: 0 }
+.designpage > :last-child { margin-bottom: 0 }
+
+.designpagemenu { list-style:none;border:1px solid #193879;border-radius:3px 3px;padding:5px;text-align:center }
+.designpagemenu { font-family:Verdana,Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:#222222 }
+.designpagemenu > li { display:inline-block;white-space:nowrap }
+.designpagemenu > li > a, .designpagemenu > li > a:link, .designpagemenu > li > a:visited { color:#000000;text-decoration:underline }
+.designpagemenu > li > a:active, .designpagemenu > li > a:hover, .designpagemenu > li > a:focus { color:#444444;text-decoration:none }
+
+.designtitle:before, .designtitle:after { position: absolute; top: 100%; width: 0; height: 0; border: 1px solid transparent; content: " " }
+.designtitle:before { left: 50%; margin-top: -9px; margin-left: -10px; border: 1px solid transparent; border-bottom-color: #375A9D; border-width: 10px }
+.designtitle:after { left: 50%; margin-top: -7px; margin-left: -9px; border: 1px solid transparent; border-bottom-color: #FFFFFF; border-width: 9px }
+
+.designtitle { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 225%; font-weight: bold; color: #000000 }
+]]></style>
+[each:content:css_files:file]
+<link href="[rewrite:settings]http_path_mmedia_versioned[/rewrite]/[rewrite:content]css_files.file.name[/rewrite]" rel="stylesheet" type="text/css" />
+[/each][each:content:js_files:file]
+<script src="[rewrite:settings]http_path_mmedia_versioned[/rewrite]/[rewrite:content]js_files.file.name[/rewrite]" type="text/javascript"></script>
+[/each]
+</head>
+
+<body>
+<header style='margin: 10px 0; text-align: right'><div style='display: inline-block; position: relative'>
+[if:content:site_title != ]
+	<span class='designtitle'>[rewrite:content]site_title[/rewrite]</span>
+[/if][if:content:site_title == ]
+	<span class='designtitle'><i>direct</i> Netware Group</span>
+[/if]
+</div></header>
+<div class='designpage ui-corner-all'>
+[block]output.menu.main.render[/block]
+[block]output.menu.service.render_primary[/block]
+[rewrite:content]page_content[/rewrite]
+[block]output.menu.service.render_secondary[/block]
+</div>
+</body>
+
+</html>
