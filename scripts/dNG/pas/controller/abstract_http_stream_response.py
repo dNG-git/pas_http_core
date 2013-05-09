@@ -128,6 +128,8 @@ Returns an already defined header.
 :since:  v0.1.00
 		"""
 
+		name = name.upper()
+
 		if (name in self.headers): var_return = self.headers[name]
 		elif (name_as_key and name in self.headers_indexed): var_return = self.headers[self.headers_indexed[name]]
 		else: var_return = None
@@ -193,6 +195,8 @@ Sets a header.
 
 :since: v0.1.00
 		"""
+
+		name = name.upper()
 
 		if (name_as_key and name == "HTTP/1.1"):
 		#

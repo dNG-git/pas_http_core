@@ -67,12 +67,14 @@ Configures the server
 :since: v0.1.00
 		"""
 
-		self.hostname = direct_settings.get("pas_http_standalone_server_host", self.socket_hostname)
+		listener_host = direct_settings.get("pas_http_standalone_server_host", self.socket_hostname)
 		self.port = int(direct_settings.get("pas_http_standalone_server_port", 8080))
 
-		self.server = make_server(self.hostname, self.port, direct_http_wsgi1_request)
+		if (listener_host == ""): self.host = direct_settings.get("pas_http_standalone_server_preferred_hostname", self.socket_hostname)
+
+		self.server = make_server(listener_host, self.port, direct_http_wsgi1_request)
 		self.server.socket.settimeout(5)
-		if (self.log_handler != None): self.log_handler.info("pas.http.core wsgiref server starts at '{0}:{1:d}'".format(self.hostname, self.port))
+		if (self.log_handler != None): self.log_handler.info("pas.http.core wsgiref server starts at '{0}:{1:d}'".format(self.host, self.port))
 
 		"""
 Configure common paths and settings
@@ -108,7 +110,7 @@ Stop the server
 		"""
 
 		if (self.server != None): self.server.shutdown()
-		return None
+		return last_return
 	#
 #
 

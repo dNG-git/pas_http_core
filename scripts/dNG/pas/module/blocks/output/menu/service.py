@@ -42,7 +42,7 @@ class direct_service(direct_abstract_block):
 	def execute_render(self):
 	#
 		"""
-Action for "index"
+Action for "render"
 
 :since: v0.1.00
 		"""

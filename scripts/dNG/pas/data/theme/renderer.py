@@ -23,6 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+from copy import copy
 from os import path
 import os, re
 
@@ -70,6 +71,14 @@ Cache instance
 		"""
 Content cache for OSet template replacements
 		"""
+		self.css_files = [ ]
+		"""
+CSS files to be added.
+		"""
+		self.js_files = [ ]
+		"""
+JavaScript files to be added.
+		"""
 		self.log_handler = direct_named_loader.get_singleton("dNG.pas.data.logging.log_handler", False)
 		"""
 The log_handler is called whenever debug messages should be logged or errors
@@ -103,6 +112,49 @@ Destructor __del__(direct_renderer)
 
 		if (self.cache_instance != None): self.cache_instance.return_instance()
 		if (direct_abstract_impl != None): direct_abstract_impl.__del__(self)
+	#
+
+	def add_js_file(self, js_file):
+	#
+		"""
+Add the defined javascript file to the output.
+
+:param js_file: JS file name
+
+:since: v0.1.00
+		"""
+
+		if (js_file not in self.js_files): self.js_files.append({ "name": js_file })
+	#
+
+	def get_unique_filelist(self, raw_list):
+	#
+		"""
+Sets the theme to use.
+
+:param theme: Output theme
+
+:access: protected
+:return: (list) List with unique file entries
+:since: v0.1.00
+		"""
+
+		var_return = [ ]
+		names_list = [ ]
+
+		if (len(raw_list) > 0):
+		#
+			for entry in raw_list:
+			#
+				if (entry['name'] not in names_list):
+				#
+					names_list.append(entry['name'])
+					var_return.append(entry)
+				#
+			#
+		#
+
+		return var_return
 	#
 
 	def is_supported(self, theme, subtype = None):
@@ -149,7 +201,7 @@ Change data according to the matched tag.
 
 		if (tag_definition['tag'] == "block"):
 		#
-			re_result = re.match("^\[block(:(\w+):(\w+):(\w+)){0,1}\]", data[tag_position:data_position])
+			re_result = re.match("^\[block(:(\w+):([\w\.]+):([\w\.]+)){0,1}\]", data[tag_position:data_position])
 
 			if (re_result != None):
 			#
@@ -170,7 +222,7 @@ Change data according to the matched tag.
 		#
 		elif (tag_definition['tag'] == "each"):
 		#
-			re_result = re.match("^\[each:(\w+):(\w+):(\w+)\]", data[tag_position:data_position])
+			re_result = re.match("^\[each:(\w+):([\w\.]+):([\w\.]+)\]", data[tag_position:data_position])
 
 			source = (None if (re_result == None) else re_result.group(1))
 
@@ -187,7 +239,7 @@ Change data according to the matched tag.
 		#
 		elif (tag_definition['tag'] == "if"):
 		#
-			re_result = re.match("^\[if:(\w+):(\w+)(\s*)(\!=|==)(.*)\]", data[tag_position:data_position])
+			re_result = re.match("^\[if:(\w+):([\w\.]+)(\s*)(\!=|==)(.*)\]", data[tag_position:data_position])
 
 			source = (None if (re_result == None) else re_result.group(1))
 
@@ -246,17 +298,17 @@ Check if a possible tag match is a false positive.
 			#
 				if (data_match == "block"):
 				#
-					re_result = re_result = re.match("^\[block(:\w+:\w+:\w+){0,1}\]", data)
+					re_result = re_result = re.match("^\[block(:\w+:[\w\.]+:[\w\.]+){0,1}\]", data)
 					if (re_result != None): var_return = { "tag": "block", "tag_end": "[/block]", "type": "top_down" }
 				#
 				elif (data_match == "each"):
 				#
-					re_result = re.match("^\[each:(\w+):(\w+):(\w+)\]", data)
+					re_result = re.match("^\[each:\w+:[\w\.]+:[\w\.]+\]", data)
 					if (re_result != None): var_return = { "tag": "each", "tag_end": "[/each]", "type": "top_down" }
 				#
 				elif (data_match == "if"):
 				#
-					re_result = re.match("^\[if:(\w+):(\w+)(\s*)(\!=|==)(.*)\]", data)
+					re_result = re.match("^\[if:\w+:[\w\.]+\s*(\!=|==).*\]", data)
 					if (re_result != None): var_return = { "tag": "if", "tag_end": "[/if]", "type": "top_down" }
 				#
 				elif (data_match == "rewrite"):
@@ -338,17 +390,26 @@ Read corresponding theme configuration
 		if (self.title == None): self.title = direct_settings.get("pas_html_title", "Unconfigured site")
 
 		self.content = {
-		"page_title": self.title,
-		"page_content": content
+			"page_title": self.title,
+			"page_content": content
 		}
 
 		theme_settings = direct_settings.get("pas_http_theme_{0}".format(theme))
 
+		css_files = (self.css_files.copy() if (hasattr(self.css_files, "copy")) else copy(self.css_files))
+		js_files = (self.js_files.copy() if (hasattr(self.js_files, "copy")) else copy(self.js_files))
+
 		if (theme_settings != None and theme_subtype in theme_settings):
 		#
-			if ("css_files" in theme_settings[theme_subtype]): self.content['css_files'] = theme_settings[theme_subtype]['css_files']
-			if ("js_files" in theme_settings[theme_subtype]): self.content['js_files'] = theme_settings[theme_subtype]['js_files']
+			if ("css_files" in theme_settings[theme_subtype]): css_files += theme_settings[theme_subtype]['css_files']
+			if ("js_files" in theme_settings[theme_subtype]): js_files += theme_settings[theme_subtype]['js_files']
 		#
+
+		css_files = self.get_unique_filelist(css_files)
+		if (len(css_files) > 0): self.content['css_files'] = css_files
+
+		js_files = self.get_unique_filelist(js_files)
+		if (len(js_files) > 0): self.content['js_files'] = js_files
 
 		return self.parser(theme_data)
 	#

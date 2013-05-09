@@ -77,6 +77,21 @@ Output theme subtype
 		"""
 	#
 
+	def add_js_file(self, js_file):
+	#
+		"""
+Add the defined javascript file to the output.
+
+:param js_file: JS file name
+
+:since: v0.1.00
+		"""
+
+		common_names = direct_settings.get("pas_http_theme_oset_js_aliases", { "jquery/jquery.min.js": "jquery/jquery-2.0.0.min.js" })
+		if (js_file in common_names): js_file= common_names[js_file]
+		self.theme_renderer.add_js_file(js_file)
+	#
+
 	def add_oset_content(self, template_name, content = None):
 	#
 		"""
@@ -111,7 +126,6 @@ Returns the OSet in use.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.get_oset()- (#echo(__LINE__)#)")
 		return self.oset
 	#
 
@@ -124,7 +138,6 @@ Returns the theme to use.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.get_theme()- (#echo(__LINE__)#)")
 		return self.theme
 	#
 
@@ -138,7 +151,6 @@ theme if plugins changed the selected theme renderer.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.get_theme_active()- (#echo(__LINE__)#)")
 		return self.theme_active
 	#
 
@@ -180,6 +192,13 @@ Set up theme framework
 		self.theme_renderer.set(self.theme_active)
 		self.theme_renderer.set_log_handler(self.log_handler)
 		self.theme_renderer.set_subtype(self.theme_subtype)
+
+		"""
+Get the corresponding OSet name
+		"""
+
+		self.oset = direct_settings.get("pas_http_theme_{0}_oset".format(re.sub("\W", "_", self.theme)))
+		if (self.oset == None): self.oset = direct_settings.get("pas_http_theme_oset_default", "xhtml5")
 	#
 
 	def send(self):
@@ -210,7 +229,7 @@ Sends the prepared response.
 
 			self.send()
 		#
-		elif (not self.headers_sent):
+		elif (not self.are_headers_sent()):
 		#
 			"""
 If raw data are send using "send_raw_data()" headers will be sent. An error
@@ -275,7 +294,6 @@ Sets the OSet to use.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_oset({0})- (#echo(__LINE__)#)".format(oset))
 		self.oset = oset
 	#
 
@@ -288,8 +306,6 @@ Sets the theme to use.
 
 :since: v0.1.00
 		"""
-
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_theme()- (#echo(__LINE__)#)".format(theme))
 
 		self.theme = re.sub("\\W", "", theme)
 		if (self.theme_renderer != None and self.theme_renderer.is_supported(theme)): self.theme_renderer.set(theme)

@@ -170,6 +170,22 @@ Return the title set for the response.
 		else: self.errors.append({ "title": direct_l10n.get("core_title_error_critical"), "message": message })
 	#
 
+	def handle_error(self, message):
+	#
+		"""
+"handle_error()" is called to send a error message.
+
+:param message: Message (will be translated if possible)
+
+:since: v0.1.00
+		"""
+
+		message = direct_l10n.get("errors_{0}".format(message), message)
+
+		if (self.errors == None): self.errors = [ { "title": direct_l10n.get("core_title_error"), "message": message } ]
+		else: self.errors.append({ "title": direct_l10n.get("core_title_error"), "message": message })
+	#
+
 	def handle_exception_error(self, message, exception):
 	#
 		"""

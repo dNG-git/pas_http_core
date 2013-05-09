@@ -56,9 +56,9 @@ Constructor __init__(direct_server)
 
 		Thread.__init__(self)
 
-		self.hostname = None
+		self.host = None
 		"""
-Configured server hostname
+Configured server host
 		"""
 		self.log_handler = direct_named_loader.get_singleton("dNG.pas.data.logging.log_handler", False)
 		"""
@@ -74,7 +74,7 @@ Socket server hostname
 Configured server port
 		"""
 
-		direct_hooks.register("dNG.pas.http.server.get_host", self.get_hostname)
+		direct_hooks.register("dNG.pas.http.server.get_host", self.get_host)
 		direct_hooks.register("dNG.pas.http.server.get_port", self.get_port)
 	#
 
@@ -87,7 +87,7 @@ Destructor __del__(direct_server)
 		"""
 
 		if (self.log_handler != None): self.log_handler.return_instance()
-		direct_hooks.unregister("dNG.pas.http.server.get_host", self.get_hostname)
+		direct_hooks.unregister("dNG.pas.http.server.get_host", self.get_host)
 		direct_hooks.unregister("dNG.pas.http.server.get_port", self.get_port)
 	#
 
@@ -115,10 +115,10 @@ Configures the server
 		direct_hooks.call("dNG.pas.http.server.configured", server = self)
 	#
 
-	def get_hostname(self, params = None, last_return = None):
+	def get_host(self, params = None, last_return = None):
 	#
 		"""
-Returns the configured server hostname.
+Returns the configured server host.
 
 :param params: Parameter specified
 :param last_return: The return value from the last hook called.
@@ -126,7 +126,7 @@ Returns the configured server hostname.
 :since: v0.1.00
 		"""
 
-		return (self.hostname if (last_return == None) else last_return)
+		return (self.host if (last_return == None) else last_return)
 	#
 
 	def get_port(self, params = None, last_return = None):

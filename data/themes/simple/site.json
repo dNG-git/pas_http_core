@@ -1,7 +1,10 @@
 {
  "pas_http_theme_simple": {
   "site": {
-   "css_files": [ { "name": "jqueryui/smoothness/jquery-ui-1.10.1.min.css" } ]
+   "css_files": [
+    { "name": "themes/simple/site.min.css" },
+    { "name": "jqueryui/smoothness/jquery-ui-1.10.1.min.css" }
+   ]
   }
  }
 }

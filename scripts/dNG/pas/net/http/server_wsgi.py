@@ -35,8 +35,7 @@ from .server import direct_server
 class direct_server_wsgi(direct_server):
 #
 	"""
-"direct_server_fastcgi" is responsible to start an HTTP aware FastCGI
-interface.
+"direct_server_wsgi" takes requests from WSGI aware servers.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -61,6 +60,10 @@ Constructor __init__(direct_server_wsgi)
 		self.cache_instance = direct_named_loader.get_singleton("dNG.pas.data.cache", False)
 		"""
 Cache instance
+		"""
+		self.host = None
+		"""
+Configured server host
 		"""
 		self.log_handler = direct_named_loader.get_singleton("dNG.pas.data.logging.log_handler", False)
 		"""

@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.request_headers_mixin
+dNG.pas.data.xhtml.form.input
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,13 +23,16 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-class direct_request_headers_mixin(object):
+from dNG.pas.controller.abstract_request import direct_abstract_request
+from dNG.pas.data.text.input_form import direct_input_form
+
+class direct_input(direct_input_form):
 #
 	"""
-This request mixin provides header specific methods.
+"direct_input" provides form methods based on (X)HTML.
 
 :author:     direct Netware Group
-:copyright:  (C) direct Netware Group - All rights reserved
+:copyright:  direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
 :since:      v0.1.00
@@ -37,64 +40,55 @@ This request mixin provides header specific methods.
              Mozilla Public License, v. 2.0
 	"""
 
-	def __init__(self):
+	def get_data(self, flush = True):
 	#
 		"""
-Constructor __init__(direct_request_headers_mixin)
+Returns all defined fields.
 
-:since: v0.1.00
-		"""
+:param flush: Flush the cache
 
-		self.headers = { }
-		"""
-HTTP request headers
-		"""
-	#
-
-	def get_accepted_formats(self):
-	#
-		"""
-Returns the formats the client accepts.
-
-:return: (list) Accepted formats
+:return: (list) Field data
 :since:  v0.1.00
 		"""
 
-		var_return = [ ]
-		accepted_formats = self.get_header("accept")
-		accepted_formats = (accepted_formats.split(";")[0] if (accepted_formats != None) else "")
+		var_return = direct_input_form.get_data(self, flush)
 
-		for accepted_format in accepted_formats.split(","): var_return.append(accepted_format.strip())
+		for section in var_return:
+		#
+			for field_data in section['fields']:
+			#
+				if (field_data['error'] != None): field_data['error'] = self.error_get_message(field_data['error'])
+			#
+		#
+
 		return var_return
 	#
 
-	def get_header(self, name):
+	def get_input(self, name):
 	#
 		"""
-Returns the request header if defined.
+"get_input()" should be used to read the input value for the field from a
+source (e.g. from a HTTP POST request parameter).
 
-:param name: Header name
+:param name: Field and parameter name
 
-:return: (str) Header value if set; None otherwise
+:return: (mixed) Value; None if not set
 :since:  v0.1.00
 		"""
 
-		name = name.upper()
-
-		if (name in self.headers): return self.headers[name]
-		else: return None
+		return (direct_abstract_request.get_instance().get_parameter(name) if (self.form_has_input) else None)
 	#
 
-	def get_headers(self):
+	def set_input_available(self):
 	#
 		"""
-Returns the request headers as dict.
+Sets the flag for available input. Input values can be read with
+"get_input()".
 
-:return: (dict) Headers
 :since:  v0.1.00
 		"""
 
-		return self.headers.copy()
+		self.form_has_input = True
 	#
 #
 

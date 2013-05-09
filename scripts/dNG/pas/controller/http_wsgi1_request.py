@@ -84,14 +84,20 @@ Request path after the script
 
 		for key in wsgi_env:
 		#
-			if (key.startswith("HTTP_")): self.set_header(key[5:], wsgi_env[key])
-			elif (key == "CONTENT_LENGTH" or key == "CONTENT_TYPE"): self.set_header(key, wsgi_env[key])
-			elif (key == "REQUEST_METHOD"): self.type = wsgi_env[key]
-			elif (key == "SCRIPT_NAME"): self.script_pathname = wsgi_env[key]
-			elif (key == "QUERY_STRING"): self.query_string = wsgi_env[key]
-			elif (key == "PATH_INFO"): self.virtual_pathname = wsgi_env[key]
-			elif (key == "SERVER_NAME"): self.server_host = wsgi_env[key]
-			elif (key == "SERVER_PORT"): self.server_port = int(wsgi_env[key])
+			if (wsgi_env[key] != ""):
+			#
+				if (key.startswith("HTTP_")): self.set_header(key[5:].replace("_", "-"), wsgi_env[key])
+				elif (key == "CONTENT_LENGTH" or key == "CONTENT_TYPE"): self.set_header(key.replace("_", "-"), wsgi_env[key])
+				elif (key == "REMOTE_ADDR" and self.client_host == None): self.client_host = wsgi_env[key]
+				elif (key == "REMOTE_HOST"): self.client_host = wsgi_env[key]
+				elif (key == "REMOTE_PORT"): self.client_port = wsgi_env[key]
+				elif (key == "REQUEST_METHOD"): self.type = wsgi_env[key]
+				elif (key == "SCRIPT_NAME"): self.script_pathname = wsgi_env[key]
+				elif (key == "QUERY_STRING"): self.query_string = wsgi_env[key]
+				elif (key == "PATH_INFO"): self.virtual_pathname = wsgi_env[key]
+				elif (key == "SERVER_NAME"): self.server_host = wsgi_env[key]
+				elif (key == "SERVER_PORT"): self.server_port = int(wsgi_env[key])
+			#
 		#
 
 		self.body_fp = wsgi_env['wsgi.input']
@@ -144,6 +150,8 @@ Request path after the script
 
 		if (isinstance(inner_request, direct_abstract_inner_request)):
 		#
+			inner_request.set_client_host(self.client_host)
+			inner_request.set_client_port(self.client_port)
 			inner_request.set_server_scheme(self.server_scheme)
 			inner_request.set_server_host(self.server_host)
 			inner_request.set_server_port(self.server_port)

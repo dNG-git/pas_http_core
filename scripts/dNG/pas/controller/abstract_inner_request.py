@@ -51,6 +51,14 @@ Constructor __init__(direct_abstract_inner_request)
 		"""
 Requested action
 		"""
+		self.client_host = None
+		"""
+Client host
+		"""
+		self.client_port = None
+		"""
+Client port
+		"""
 		self.dsd = None
 		"""
 Data transmitted with the request
@@ -58,6 +66,10 @@ Data transmitted with the request
 		self.module = "services"
 		"""
 Requested module block
+		"""
+		self.parameters = { }
+		"""
+Request parameters
 		"""
 		self.script_name = None
 		"""
@@ -69,7 +81,7 @@ Request path to the script
 		"""
 		self.server_host = None
 		"""
-Server hostname
+Server host
 		"""
 		self.server_port = None
 		"""
@@ -101,6 +113,30 @@ Returns the requested action.
 		return self.action
 	#
 
+	def get_client_host(self):
+	#
+		"""
+Returns the client host if any.
+
+:return: (str) Client host; None if unknown or not applicable
+:since:  v0.1.00
+		"""
+
+		return self.client_host
+	#
+
+	def get_client_port(self):
+	#
+		"""
+Returns the client port if any.
+
+:return: (int) Client port; None if unknown or not applicable
+:since:  v0.1.00
+		"""
+
+		return self.client_port
+	#
+
 	def get_dsd(self, key, default = None):
 	#
 		"""
@@ -116,6 +152,30 @@ Returns the DSD value for the specified parameter.
 		return (self.dsd[key] if (self.dsd != None and key in self.dsd) else default)
 	#
 
+	def get_dsd_dict(self):
+	#
+		"""
+Return all DSD parameters received.
+
+:return: (mixed) Request DSD values
+:since:  v0.1.00
+		"""
+
+		return self.dsd.copy()
+	#
+
+	def get_inner_request(self):
+	#
+		"""
+Returns the inner request instance.
+
+:return: (object) Request instance; None if not available
+:since:  v0.1.00
+		"""
+
+		return None
+	#
+
 	def get_module(self):
 	#
 		"""
@@ -126,6 +186,33 @@ Returns the requested module.
 		"""
 
 		return self.module
+	#
+
+	def get_parameter(self, name, default = None):
+	#
+		"""
+Returns the value for the specified parameter.
+
+:param key: Parameter name
+:param default: Default value if not set
+
+:return: (mixed) Requested value or default one if undefined
+:since:  v0.1.00
+		"""
+
+		return (self.parameters[name] if (name in self.parameters) else default)
+	#
+
+	def get_parameters(self):
+	#
+		"""
+Return all parameters received.
+
+:return: (mixed) Request parameters
+:since:  v0.1.00
+		"""
+
+		return self.parameters.copy()
 	#
 
 	def get_output_format(self):
@@ -167,7 +254,7 @@ Returns the script path and name of the request.
 	def get_server_host(self):
 	#
 		"""
-Returns the server hostname if any.
+Returns the server host if any.
 
 :return: (str) Server host; None if unknown or not applicable
 :since:  v0.1.00
@@ -212,6 +299,32 @@ Returns the requested service.
 		return self.service
 	#
 
+	def set_client_host(self, host):
+	#
+		"""
+Sets the client host for the inner request.
+
+:param host: Client host
+
+:since: v0.1.00
+		"""
+
+		self.client_host = host
+	#
+
+	def set_client_port(self, port):
+	#
+		"""
+Sets the client port.
+
+:param port: Client port
+
+:since: v0.1.00
+		"""
+
+		self.client_port = port
+	#
+
 	def set_dsd(self, key, value):
 	#
 		"""
@@ -244,9 +357,9 @@ Sets the script path and name of the request.
 	def set_server_host(self, host):
 	#
 		"""
-Sets the server hostname for the inner request.
+Sets the server host for the inner request.
 
-:param host: Server hostname
+:param host: Server host
 
 :since: v0.1.00
 		"""

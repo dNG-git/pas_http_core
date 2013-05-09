@@ -86,12 +86,12 @@ Configures the server
 
 		if (listener_host == ""):
 		#
-			self.hostname = direct_settings.get("pas_http_tornado_server_preferred_hostname", self.socket_hostname)
+			self.host = direct_settings.get("pas_http_tornado_server_preferred_hostname", self.socket_hostname)
 			self.server.listen(self.port)
 		#
 		else:
 		#
-			self.hostname = listener_host
+			self.host = listener_host
 			self.server.listen(self.port, listener_host)
 		#
 
@@ -131,7 +131,7 @@ Stop the server
 		"""
 
 		if (self.server != None): IOLoop.instance().stop()
-		return None
+		return last_return
 	#
 #
 

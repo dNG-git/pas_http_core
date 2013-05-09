@@ -1,0 +1,14 @@
+.pasformbutton { margin: 0.2%; padding: 0.1% 0.2%; font-size: 110% }
+.pasformfield { width: 73%; margin 0; float: right; padding: 0.4%; text-align: center }
+
+.pasformelement { overflow: auto; clear: both; border-bottom: 1px solid #EEEEEE; box-shadow: 0 2px 5px -5px rgba(0, 0, 0, 0.2) }
+.pasformelement .pasformerror { display: inline-block; margin-top: 10px }
+
+.pasformerror { clear: both; border: 1px solid #FF0000; padding: 0.25% }
+
+.pasformlabel { width: 25%; margin 0; float: left; padding: 0.6% 0.4% 0.6% 0.4%; text-align: right; font-weight: bold }
+
+.pasformradio { display: inline-block; list-style-type: none; text-align: left }
+.pasformradio > li { margin 0; padding: 0 }
+
+.pasformtextnpassword { border: 1px solid #EEEEEE; border-bottom: 1px solid #375A9D; padding: 0.1% 0.4%; font-size: 110% }

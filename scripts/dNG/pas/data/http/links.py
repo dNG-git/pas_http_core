@@ -29,7 +29,7 @@ try: from urllib.parse import quote, urlsplit
 except ImportError:
 #
 	from urllib import quote
-	from urlparse import urlparse
+	from urlparse import urlsplit
 #
 
 from dNG.pas.controller.abstract_request import direct_abstract_request
@@ -64,7 +64,7 @@ Relative URLs like "index.py?..."
 	"""
 
 	@staticmethod
-	def build_url(type, parameters):
+	def build_url(type, parameters, py_escape = None):
 	#
 		"""
 Adds a link. You may use internal links "index.py?...", external links like
@@ -85,7 +85,7 @@ source for parameters.
 		if ("?" not in var_return): var_return += "?"
 		elif (var_return[-1:] != ";"): var_return += ";"
 
-		var_return += direct_links.build_url_formatted("{0}={1}", ";", parameters)
+		var_return += direct_links.build_url_formatted("{0}={1}", ";", parameters, py_escape = None)
 
 		if (type & direct_links.TYPE_OPTICAL == direct_links.TYPE_OPTICAL):
 		#
@@ -183,48 +183,8 @@ more depending on the string length
 					if (len(query_fragment) < 3 + length_available): var_return += query_fragment
 					else: var_return += " ... {0}".format(query_fragment[-1 * length_available:])
 				#
-				"""else
-			{
-				$f_length_available = $direct_settings['swg_url_opticalmaxlength'];
-				$f_one_sixth = floor ($f_length_available / 6);
-				$f_one_third = ($f_one_sixth * 2);
-
-/* -------------------------------------------------------------------------
-Now we will find out, how to remove unimportant parts of the given URL
-------------------------------------------------------------------------- */
-
-				if (strlen ($f_url_array['url']) < (3 + $f_one_third + $f_one_sixth))
-				{
-/* -------------------------------------------------------------------------
-The URL (excluding the file name) is small enough. We will add the whole
-string to our result
-------------------------------------------------------------------------- */
-
-					$f_return = $f_url_array['url'];
-					$f_length_available -= strlen ($f_url_array['url']);
-				}
-				else
-				{
-/* -------------------------------------------------------------------------
-The source URL is too large - we will strip everything, that's larger than
-our projected size
-------------------------------------------------------------------------- */
-
-					$f_return = (substr ($f_url_array['url'],0,$f_one_third))." ... ".(substr ($f_url_array['url'],(-1 * $f_one_sixth)));
-					$f_length_available -= (3 + $f_one_third + $f_one_sixth);
-				}
-
-/* -------------------------------------------------------------------------
-The next two lines will check the size of the filename and remove parts of
-it if required
-------------------------------------------------------------------------- */
-
-				$f_return .= ((strlen ($f_pathinfo['basename']) < (3 + $f_length_available)) ? $f_pathinfo['basename'] : " ... ".(substr ($f_pathinfo['basename'],(-1 * $f_length_available))));
-			}
-		}
-		else { $f_return = $f_data; }
+			#
 		#
-		"""
 
 		return var_return
 	#
@@ -253,8 +213,13 @@ This method removes all parameters marked as "__remove__".
 
 			if (key == "dsd"):
 			#
-				if (var_return != ""): var_return += link_separator
-				var_return += direct_links.build_url_dsd_formatted(parameters[key], py_escape)
+				dsd_value = direct_links.build_url_dsd_formatted(parameters[key], py_escape)
+
+				if (len(dsd_value) > 0):
+				#
+					if (var_return != ""): var_return += link_separator
+					var_return += link_template.format("dsd", dsd_value)
+				#
 			#
 			elif (value_type == dict):
 			#
@@ -308,13 +273,14 @@ This method removes all parameters marked as "__remove__".
 		#
 			for key in parameters:
 			#
-				escaped_key = py_escape(key)
-				escaped_value = py_escape(parameters[key])
+				if (len(parameters[key]) > 0):
+				#
+					escaped_key = py_escape(key)
+					escaped_value = py_escape(parameters[key])
 
-				if (var_return == ""): var_return = "dsd="
-				else: var_return += "++"
-
-				var_return += "{0}+{1}".format(escaped_key, escaped_value)
+					if (var_return != ""): var_return += "++"
+					var_return += "{0}+{1}".format(escaped_key, escaped_value)
+				#
 			#
 		#
 
@@ -396,6 +362,8 @@ This method removes all parameters marked as "__remove__".
 					if (key not in var_return['dsd']): var_return['dsd'][key] = dsd_dict[key]
 				#
 			#
+
+			del(var_return['__request__'])
 		#
 
 		return direct_links.build_url_remove_requested(var_return)

@@ -42,9 +42,13 @@ class direct_common(direct_links):
              Mozilla Public License, v. 2.0
 	"""
 
-	TYPE_FORM = 8
+	TYPE_FORM_FIELDS = 8
 	"""
 Hidden input fields
+	"""
+	TYPE_FORM_URL = 16
+	"""
+Form action URL
 	"""
 
 	store = local()
@@ -75,7 +79,7 @@ source for parameters.
 		#	uuid = (((isset ($direct_globals['input']))&&($f_withuuid)) ? $direct_globals['input']->uuidGet () : "");
 		#	var_return = str_replace ("[uuid]",((($f_uuid)&&(!$direct_globals['kernel']->vUuidIsCookied ())&&($direct_globals['kernel']->vUuidCheckUsage ())) ? $f_uuid : ""),$f_data);
 		#
-		if (type == direct_common.TYPE_FORM):
+		if (type & direct_common.TYPE_FORM_FIELDS == direct_common.TYPE_FORM_FIELDS):
 		#
 			"""
 Get all form data in a string like "<input type='hidden' name='lang'
@@ -91,165 +95,16 @@ value='de' />". Automatically add language, theme and uuid fields.
 			#	if (($f_uuid)&&(!$direct_globals['kernel']->vUuidIsCookied ())&&($direct_globals['kernel']->vUuidCheckUsage ())) { $f_return .= "<input type='hidden' name='uuid' value='$f_uuid' />"; }
 			#}
 
-			var_return = direct_common.build_url_formatted("<input type='hidden' name=\"{0}\" value=\"{1}\" />", "", parameters, True)
+			var_return = direct_common.build_url_formatted("<input type='hidden' name=\"{0}\" value=\"{1}\" />", "", parameters, False)
 		#
-		else: var_return = direct_common.build_url_formatted("{0}={1}", ";", parameters, escape)
-		"""
-	elseif ($f_type == "optical")
-	{
-/* -------------------------------------------------------------------------
-A filter is required for really long URLs. First we will have a look at the
-"optical maximal length" setting, then if the URL is larger than the setting
-------------------------------------------------------------------------- */
-
-		if (strlen ($f_data) > $direct_settings['swg_url_opticalmaxlength'])
-		{
-			$f_url_array = parse_url ($f_data);
-
-			$f_url_array['url'] = $f_url_array['scheme']."://";
-			if ((isset ($f_url_array['user']))||(isset ($f_url_array['pass']))) { $f_url_array['url'] .= $f_url_array['user'].":{$f_url_array['pass']}@"; }
-			$f_url_array['url'] .= $f_url_array['host'];
-
-			if (isset ($f_url_array['port'])) { $f_url_array['url'] .= ":".$f_url_array['port']; }
-
-			if (isset ($f_url_array['path']))
-			{
-				$f_pathinfo = pathinfo ($f_url_array['path']);
-				if (substr ($f_url_array['path'],-1) == "/") { $f_pathinfo['basename'] .= "/"; }
-				$f_url_array['url'] .= preg_replace ("#{$f_pathinfo['basename']}$#","",$f_url_array['path']);
-			}
-			else { $f_pathinfo = array ("basename" => ""); }
-
-			if ((isset ($f_url_array['query']))||(isset ($f_url_array['fragment'])))
-			{
-				$f_length_available = $direct_settings['swg_url_opticalmaxlength'];
-				$f_one_eighth = floor (($f_length_available - 3) / 8);
-				$f_one_fourth = ($f_one_eighth * 2);
-				$f_three_eigths = ($f_length_available - ($f_one_fourth * 2) - $f_one_eighth);
-
-/* -------------------------------------------------------------------------
-Now we will find out, how to remove unimportant parts of the given URL
-------------------------------------------------------------------------- */
-
-				if (strlen ($f_url_array['url']) < (3 + $f_three_eigths + $f_one_eighth))
-				{
-/* -------------------------------------------------------------------------
-The URL (excluding the file name) is small enough. We will add the whole
-string to our result
-------------------------------------------------------------------------- */
-
-					$f_return = $f_url_array['url'];
-					$f_length_available -= strlen ($f_url_array['url']);
-				}
-				else
-				{
-/* -------------------------------------------------------------------------
-The source URL is too large - we will strip everything, that's larger than
-our projected size
-------------------------------------------------------------------------- */
-
-					$f_return = (substr ($f_url_array['url'],0,$f_three_eigths))." ... ".(substr ($f_url_array['url'],(-1 * $f_one_eighth)));
-					$f_length_available -= (3 + $f_three_eigths + $f_one_eighth);
-				}
-
-/* -------------------------------------------------------------------------
-The next few lines will check the size of the filename and remove parts of
-it if required
-------------------------------------------------------------------------- */
-
-				if (strlen ($f_pathinfo['basename']) < (3 + $f_one_fourth))
-				{
-/* -------------------------------------------------------------------------
-Again, the filename is small enough - no action is required (add it 1 to 1)
-------------------------------------------------------------------------- */
-
-					$f_return .= $f_pathinfo['basename'];
-					$f_length_available -= strlen ($f_pathinfo['basename']);
-				}
-				else
-				{
-/* -------------------------------------------------------------------------
-Unfortunately, the filename is too long - we will remove the first part
-------------------------------------------------------------------------- */
-
-					$f_return .= " ... ".(substr ($f_pathinfo['basename'],(-1 * $f_one_fourth)));
-					$f_length_available -= (3 + $f_one_fourth);
-				}
-
-/* -------------------------------------------------------------------------
-Our last step is to add the whole or the last part of the query string, once
-more depending on the string length
-------------------------------------------------------------------------- */
-
-				$f_query = "";
-				if (isset ($f_url_array['query'])) { $f_query .= "?".$f_url_array['query']; }
-				if (isset ($f_url_array['fragment'])) { $f_query .= "#".$f_url_array['fragment']; }
-
-				if (strlen ($f_query) < (3 + $f_length_available)) { $f_return .= $f_query; }
-				else { $f_return .= " ... ".(substr ($f_query,(-1 * $f_length_available))); }
-			}
-			else
-			{
-				$f_length_available = $direct_settings['swg_url_opticalmaxlength'];
-				$f_one_sixth = floor ($f_length_available / 6);
-				$f_one_third = ($f_one_sixth * 2);
-
-/* -------------------------------------------------------------------------
-Now we will find out, how to remove unimportant parts of the given URL
-------------------------------------------------------------------------- */
-
-				if (strlen ($f_url_array['url']) < (3 + $f_one_third + $f_one_sixth))
-				{
-/* -------------------------------------------------------------------------
-The URL (excluding the file name) is small enough. We will add the whole
-string to our result
-------------------------------------------------------------------------- */
-
-					$f_return = $f_url_array['url'];
-					$f_length_available -= strlen ($f_url_array['url']);
-				}
-				else
-				{
-/* -------------------------------------------------------------------------
-The source URL is too large - we will strip everything, that's larger than
-our projected size
-------------------------------------------------------------------------- */
-
-					$f_return = (substr ($f_url_array['url'],0,$f_one_third))." ... ".(substr ($f_url_array['url'],(-1 * $f_one_sixth)));
-					$f_length_available -= (3 + $f_one_third + $f_one_sixth);
-				}
-
-/* -------------------------------------------------------------------------
-The next two lines will check the size of the filename and remove parts of
-it if required
-------------------------------------------------------------------------- */
-
-				$f_return .= ((strlen ($f_pathinfo['basename']) < (3 + $f_length_available)) ? $f_pathinfo['basename'] : " ... ".(substr ($f_pathinfo['basename'],(-1 * $f_length_available))));
-			}
-		}
-		else { $f_return = $f_data; }
-
-		$f_return = direct_html_encode_special ($f_return);
-	}
-		"""
+		elif (type & direct_common.TYPE_FORM_URL == direct_common.TYPE_FORM_URL):
+		#
+			if (type == direct_common.TYPE_FORM_URL): type = direct_common.TYPE_RELATIVE
+			var_return = direct_links.build_url(type, { }, (direct_common.escape if (escape) else direct_links.escape))
+		#
+		else: var_return = direct_links.build_url(type, parameters, (direct_common.escape if (escape) else direct_links.escape))
 
 		return var_return
-	#
-
-	@staticmethod
-	def build_url_escape(data):
-	#
-		"""
-Escape the given data for embedding into (X)HTML.
-
-:param parameters: Parameters dict
-
-:access: protected
-:return: (dict) Filtered parameters dict
-:since:  v0.1.00
-		"""
-
-		return direct_links.build_url_escape(direct_formatting.escape(data))
 	#
 
 	@staticmethod
@@ -265,7 +120,23 @@ This method removes all parameters marked as "__remove__".
 :since:  v0.1.00
 		"""
 
-		return direct_links.build_url_formatted(link_template, link_separator, parameters, (direct_common.build_url_escape if (escape) else direct_links.build_url_escape))
+		return direct_links.build_url_formatted(link_template, link_separator, parameters, (direct_common.escape if (escape) else direct_links.escape))
+	#
+
+	@staticmethod
+	def escape(data):
+	#
+		"""
+Escape the given data for embedding into (X)HTML.
+
+:param parameters: Parameters dict
+
+:access: protected
+:return: (dict) Filtered parameters dict
+:since:  v0.1.00
+		"""
+
+		return direct_links.escape(direct_formatting.escape(data))
 	#
 
 	@staticmethod

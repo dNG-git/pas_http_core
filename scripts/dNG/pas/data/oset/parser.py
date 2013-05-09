@@ -93,7 +93,7 @@ Change data according to the matched tag.
 
 		if (tag_definition['tag'] == "block"):
 		#
-			re_result = re.match("^\[block(:(\w+):(\w+):(\w+)){0,1}\]", data[tag_position:data_position])
+			re_result = re.match("^\[block(:(\w+):([\w\.]+):([\w\.]+)){0,1}\]", data[tag_position:data_position])
 
 			if (re_result != None):
 			#
@@ -114,7 +114,7 @@ Change data according to the matched tag.
 		#
 		elif (tag_definition['tag'] == "each"):
 		#
-			re_result = re.match("^\[each:(\w+):(\w+):(\w+)\]", data[tag_position:data_position])
+			re_result = re.match("^\[each:(\w+):([\w\.]+):([\w\.]+)\]", data[tag_position:data_position])
 
 			source = (None if (re_result == None) else re_result.group(1))
 
@@ -131,7 +131,7 @@ Change data according to the matched tag.
 		#
 		elif (tag_definition['tag'] == "if"):
 		#
-			re_result = re.match("^\[if:(\w+):(\w+)(\s*)(\!=|==)(.*)\]", data[tag_position:data_position])
+			re_result = re.match("^\[if:(\w+):([\w\.]+)(\s*)(\!=|==)(.*)\]", data[tag_position:data_position])
 
 			source = (None if (re_result == None) else re_result.group(1))
 
@@ -190,17 +190,17 @@ Check if a possible tag match is a false positive.
 			#
 				if (data_match == "block"):
 				#
-					re_result = re_result = re.match("^\[block(:\w+:\w+:\w+){0,1}\]", data)
+					re_result = re_result = re.match("^\[block(:\w+:[\w\.]+:[\w\.]+){0,1}\]", data)
 					if (re_result != None): var_return = { "tag": "block", "tag_end": "[/block]", "type": "top_down" }
 				#
 				elif (data_match == "each"):
 				#
-					re_result = re.match("^\[each:(\w+):(\w+):(\w+)\]", data)
+					re_result = re.match("^\[each:\w+:[\w\.]+:[\w\.]+\]", data)
 					if (re_result != None): var_return = { "tag": "each", "tag_end": "[/each]", "type": "top_down" }
 				#
 				elif (data_match == "if"):
 				#
-					re_result = re.match("^\[if:(\w+):(\w+)(\s*)(\!=|==)(.*)\]", data)
+					re_result = re.match("^\[if:\w+:[\w\.]+\s*(\!=|==).*\]", data)
 					if (re_result != None): var_return = { "tag": "if", "tag_end": "[/if]", "type": "top_down" }
 				#
 				elif (data_match == "rewrite"):

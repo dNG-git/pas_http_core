@@ -26,8 +26,7 @@ NOTE_END //n"""
 from unicodedata import category as unicode_category
 import re
 
-from dNG.pas.pythonback import direct_str, direct_unicode
-from dNG.pas.pythonback import direct_settings as direct_pythonback_settings
+from dNG.pas.pythonback import direct_str, direct_unicode, PY_UNICODE_TYPE
 
 class direct_input_filter(object):
 #
@@ -59,7 +58,7 @@ characters.
 
 		if (data != None): data = direct_unicode(data)
 
-		if (type(data) == direct_pythonback_settings['unicode_type']):
+		if (type(data) == PY_UNICODE_TYPE):
 		#
 			data_position = 0
 			data_length = len(data)

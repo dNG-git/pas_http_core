@@ -70,10 +70,10 @@ Action for "login"
 
 		code = direct_input_filter.filter_int(self.request.get_dsd("code", "500"))
 
-		if (direct_l10n.is_defined("pas_http_error_{0:d}".format(code))):
+		if (direct_l10n.is_defined("errors_pas_http_core_{0:d}".format(code))):
 		#
 			if (self.response.supports_headers()): self.response.set_header("HTTP/1.1", ("HTTP/1.1 {0:d} {1}".format(code, self.error_messages[code]) if (code in self.error_messages) else "HTTP/1.1 500 Internal Server Error"), True)
-			self.response.handle_critical_error("pas_http_error_{0:d}".format(code))
+			self.response.handle_critical_error("pas_http_core_{0:d}".format(code))
 		#
 		else:
 		#

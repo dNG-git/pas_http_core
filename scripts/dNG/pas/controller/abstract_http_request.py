@@ -23,6 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+from dNG.pas.data.text.input_filter import direct_input_filter
 from dNG.pas.net.http.request_headers_mixin import direct_request_headers_mixin
 from .abstract_request import direct_abstract_request
 
@@ -59,6 +60,23 @@ Request type
 		self.server_scheme = "http"
 	#
 
+	def parse_parameters(self):
+	#
+		"""
+Parses request parameters.
+
+:since: v0.1.00
+		"""
+
+		if (self.lang == ""):
+		#
+			lang = direct_input_filter.filter_control_chars(self.get_header("Accept-Language"))
+			if (lang != None): self.lang = lang.lower().split(",", 1)[0]
+		#
+
+		direct_abstract_request.parse_parameters(self)
+	#
+
 	def get_type(self):
 	#
 		"""
@@ -82,7 +100,7 @@ Returns the request header if defined.
 :since:  v0.1.00
 		"""
 
-		name = name.lower().replace("-", "_")
+		name = name.upper()
 
 		if (name in self.headers): self.headers[name] = "{0},{1}".format(self.headers[name], value)
 		else: self.headers[name] = value
