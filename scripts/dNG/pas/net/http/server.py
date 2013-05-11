@@ -24,7 +24,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from threading import Thread
-from socket import gethostname
+from socket import getfqdn
 
 from dNG.pas.data.settings import direct_settings
 from dNG.pas.data.logging.log_line import direct_log_line
@@ -65,7 +65,7 @@ Configured server host
 The log_handler is called whenever debug messages should be logged or errors
 happened.
 		"""
-		self.socket_hostname = gethostname().lower()
+		self.socket_hostname = getfqdn().lower()
 		"""
 Socket server hostname
 		"""

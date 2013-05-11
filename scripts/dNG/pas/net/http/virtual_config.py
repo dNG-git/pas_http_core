@@ -65,20 +65,19 @@ Return the config for the given virtual path.
 
 		if (len(pathname) > 0):
 		#
-			direct_virtual_config.synchronized.acquire()
-
-			pathname = pathname.lower()
-
-			for virtual_path_config in direct_virtual_config.virtuals:
+			with direct_virtual_config.synchronized:
 			#
-				if (pathname.startswith(virtual_path_config['path'])):
+				pathname = pathname.lower()
+
+				for virtual_path_config in direct_virtual_config.virtuals:
 				#
-					var_return = virtual_path_config['config']
-					break
+					if (pathname.startswith(virtual_path_config['path'])):
+					#
+						var_return = virtual_path_config['config']
+						break
+					#
 				#
 			#
-
-			direct_virtual_config.synchronized.release()
 		#
 
 		return var_return
@@ -100,9 +99,7 @@ Set the config for the given virtual path.
 		if (py_setup_function != None): config['setup_function'] = py_setup_function
 		virtual_config = { "path": path.lower(), "config": config }
 
-		direct_virtual_config.synchronized.acquire()
 		direct_virtual_config.virtuals.append(virtual_config)
-		direct_virtual_config.synchronized.release()
 	#
 
 	@staticmethod
@@ -116,21 +113,20 @@ Remove the config for the given virtual path.
 :since: v0.1.00
 		"""
 
-		direct_virtual_config.synchronized.acquire()
-
-		index = 0
-
-		for virtual_config in direct_virtual_config.virtuals:
+		with direct_virtual_config.synchronized:
 		#
-			if (path == virtual_config['path']):
-			#
-				direct_virtual_config.virtuals.pop(index)
-				break
-			#
-			else: index += 1
-		#
+			index = 0
 
-		direct_virtual_config.synchronized.release()
+			for virtual_config in direct_virtual_config.virtuals:
+			#
+				if (path == virtual_config['path']):
+				#
+					direct_virtual_config.virtuals.pop(index)
+					break
+				#
+				else: index += 1
+			#
+		#
 	#
 #
 
