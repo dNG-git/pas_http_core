@@ -25,7 +25,7 @@ NOTE_END //n"""
 
 from collections import Iterator
 
-from dNG.pas.pythonback import direct_bytes
+from dNG.pas.data.binary import direct_binary
 from .abstract_http_stream_response import direct_abstract_http_stream_response
 
 class direct_http_wsgi1_stream_response(direct_abstract_http_stream_response, Iterator):
@@ -179,7 +179,7 @@ Writes the given data.
 		#
 			if (self.active and self.wsgi_write != None):
 			#
-				data = direct_bytes(data)
+				data = direct_binary.bytes(data)
 				self.wsgi_write(data)
 			#
 		#

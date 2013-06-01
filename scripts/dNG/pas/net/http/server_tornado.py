@@ -30,7 +30,7 @@ from tornado.wsgi import WSGIContainer
 from dNG.pas.data.settings import direct_settings
 from dNG.pas.controller.http_wsgi1_request import direct_http_wsgi1_request
 from dNG.pas.module.named_loader import direct_named_loader
-from .server import direct_server
+from . import direct_server
 
 class direct_server_tornado(direct_server):
 #
@@ -131,7 +131,7 @@ Stop the server
 		"""
 
 		if (self.server != None): IOLoop.instance().stop()
-		return last_return
+		return direct_server.stop(self, params, last_return)
 	#
 #
 

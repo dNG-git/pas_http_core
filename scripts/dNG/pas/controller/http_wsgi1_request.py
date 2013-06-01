@@ -28,7 +28,7 @@ import re
 
 from dNG.data.rfc.http import direct_http
 from dNG.pas.controller.abstract_inner_request import direct_abstract_inner_request
-from dNG.pas.controller.predefined_request import direct_predefined_request
+from dNG.pas.controller.predefined_http_request import direct_predefined_http_request
 from dNG.pas.data.http.request_body import direct_request_body
 from dNG.pas.data.http.request_body_urlencoded import direct_request_body_urlencoded
 from dNG.pas.data.text.input_filter import direct_input_filter
@@ -102,12 +102,25 @@ Request path after the script
 
 		self.body_fp = wsgi_env['wsgi.input']
 		self.server_scheme = wsgi_env['wsgi.url_scheme']
-		if ("HTTP_HOST" in wsgi_env): self.server_host = wsgi_env['HTTP_HOST']
+
+		if ("HTTP_HOST" in wsgi_env):
+		#
+			host_parts = wsgi_env['HTTP_HOST'].rsplit(":", 2)
+
+			if (len(host_parts) < 2 or host_parts[1][-1:] == "]"): self.server_host = wsgi_env['HTTP_HOST']
+			else:
+			#
+				self.server_host = host_parts[0]
+				self.server_port = int(host_parts[1])
+			#
+		#
+
 		if (self.script_pathname == None): self.script_pathname = ""
 
 		self.http_wsgi_stream_response = direct_http_wsgi1_stream_response(wsgi_header_response)
 		if ("SERVER_PROTOCOL" in wsgi_env and wsgi_env['SERVER_PROTOCOL'] == "HTTP/1.0"): self.http_wsgi_stream_response.set_http_version(1)
 
+		self.init()
 		virtual_config = direct_virtual_config.get_config(self.virtual_pathname)
 
 		if (virtual_config == None and (self.virtual_pathname != "" or self.virtual_pathname == "/")):
@@ -122,7 +135,7 @@ Request path after the script
 		#
 			if ("uri" in virtual_config):
 			#
-				uri = (re.sub("^" + re.escape(virtual_config['uri_prefix']), "", virtual_pathname.lower()) if ("uri_prefix" in virtual_config) else virtual_pathname)
+				uri = (virtual_pathname[len(virtual_config['uri_prefix']):] if ("uri_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['uri_prefix'])) else virtual_pathname)
 				self.set_dsd(virtual_config['uri'], uri)
 			#
 
@@ -130,7 +143,7 @@ Request path after the script
 		#
 		elif ("m" in virtual_config or "s" in virtual_config or "a" in virtual_config or "uri" in virtual_config):
 		#
-			inner_request = direct_predefined_request()
+			inner_request = direct_predefined_http_request()
 
 			if ("m" in virtual_config): inner_request.set_module(virtual_config['m'])
 			if ("s" in virtual_config): inner_request.set_service(virtual_config['s'])
@@ -143,24 +156,17 @@ Request path after the script
 
 			if ("uri" in virtual_config):
 			#
-				uri = (re.sub("^" + re.escape(virtual_config['uri_prefix']), "", virtual_pathname.lower()) if ("uri_prefix" in virtual_config) else virtual_pathname)
+				uri = (virtual_pathname[len(virtual_config['uri_prefix']):] if ("uri_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['uri_prefix'])) else virtual_pathname)
 				inner_request.set_dsd(virtual_config['uri'], uri)
 			#
 		#
 
 		if (isinstance(inner_request, direct_abstract_inner_request)):
 		#
-			inner_request.set_client_host(self.client_host)
-			inner_request.set_client_port(self.client_port)
-			inner_request.set_server_scheme(self.server_scheme)
-			inner_request.set_server_host(self.server_host)
-			inner_request.set_server_port(self.server_port)
-			inner_request.set_script_pathname(self.script_pathname)
-
+			inner_request.init(self)
 			self.set_inner_request(inner_request)
 		#
 
-		self.init()
 		self.execute()
 	#
 
@@ -267,7 +273,7 @@ Do preparations for request handling.
 :since: v0.1.00
 		"""
 
-		if ("accept_language" in self.headers): self.lang = self.headers['accept_language']
+		if ("ACCEPT-LANGUAGE" in self.headers): self.lang = self.headers['ACCEPT-LANGUAGE']
 		self.script_name = path.basename(self.script_pathname)
 
 		direct_abstract_http_request.init(self)

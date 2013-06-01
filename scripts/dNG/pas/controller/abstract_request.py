@@ -162,8 +162,8 @@ Executes the given request.
 
 		direct_settings.set_log_handler(self.log_handler)
 
-		direct_l10n.set_default_lang(self.lang)
 		direct_l10n.set_log_handler(self.log_handler)
+		direct_l10n.set_thread_lang(self.lang)
 
 		direct_l10n.init("core")
 		direct_l10n.init("pas_http_core")
@@ -186,6 +186,12 @@ Executes the given request.
 			#
 				accepted_formats = self.get_accepted_formats()
 				if (len(accepted_formats) > 0): response.set_accepted_formats(accepted_formats)
+			#
+
+			if (self.supports_compression()):
+			#
+				compression_formats = self.get_compression_formats()
+				if (len(compression_formats) > 0): response.set_compression_formats(compression_formats)
 			#
 
 			requested_module = request.get_module()
@@ -638,8 +644,20 @@ Sets the log_handler.
 		"""
 Returns false if accepted formats can not be identified.
 
-:return: (bool) True accepted formats are supported.
+:return: (bool) True if accepted formats are identified.
 :since:  v0.1.00
+		"""
+
+		return False
+	#
+
+	def supports_compression(self):
+	#
+		"""
+Returns false if supported compression formats can not be identified.
+
+:return: (bool) True if compression formats are identified.
+:since:  v0.1.01
 		"""
 
 		return False

@@ -26,7 +26,7 @@ NOTE_END //n"""
 from unicodedata import category as unicode_category
 import re
 
-from dNG.pas.pythonback import direct_str, direct_unicode, PY_UNICODE_TYPE
+from dNG.pas.data.binary import direct_binary
 
 class direct_input_filter(object):
 #
@@ -56,9 +56,9 @@ characters.
 :since:  v0.1.00
 		"""
 
-		if (data != None): data = direct_unicode(data)
+		data = direct_binary.utf8(data)
 
-		if (type(data) == PY_UNICODE_TYPE):
+		if (type(data) == direct_binary.UNICODE_TYPE):
 		#
 			data_position = 0
 			data_length = len(data)
@@ -76,7 +76,7 @@ characters.
 				else: data_position += 1
 			#
 
-			data = direct_str(data)
+			data = direct_binary.str(data)
 		#
 		else: data = None
 

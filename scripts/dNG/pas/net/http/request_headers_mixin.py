@@ -23,6 +23,8 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+from dNG.data.rfc.http import direct_http
+
 class direct_request_headers_mixin(object):
 #
 	"""
@@ -60,11 +62,28 @@ Returns the formats the client accepts.
 :since:  v0.1.00
 		"""
 
-		var_return = [ ]
-		accepted_formats = self.get_header("accept")
-		accepted_formats = (accepted_formats.split(";")[0] if (accepted_formats != None) else "")
+		var_return = self.get_header("Accept")
+		if (var_return != None): var_return = direct_http.header_field_list(var_return)
+		if (var_return == None): var_return = [ ]
 
-		for accepted_format in accepted_formats.split(","): var_return.append(accepted_format.strip())
+		for position in range(0, len(var_return)): var_return[position] = var_return[position].split(";")[0]
+		return var_return
+	#
+
+	def get_compression_formats(self):
+	#
+		"""
+Returns the compression formats the client accepts.
+
+:return: (list) Accepted compression formats
+:since:  v0.1.01
+		"""
+
+		var_return = self.get_header("Accept-Encoding")
+		if (var_return != None): var_return = direct_http.header_field_list(var_return)
+		if (var_return == None): var_return = [ ]
+
+		for position in range(0, len(var_return)): var_return[position] = var_return[position].split(";")[0]
 		return var_return
 	#
 

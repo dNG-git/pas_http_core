@@ -28,7 +28,7 @@ import re
 try: from urllib.parse import parse_qsl
 except ImportError: from urlparse import parse_qsl
 
-from dNG.pas.pythonback import direct_str
+from dNG.pas.data.binary import direct_binary
 from .request_body import direct_request_body
 
 class direct_request_body_urlencoded(direct_request_body):
@@ -127,7 +127,7 @@ Sets a given pointer for the streamed post instance.
 		post_data = direct_request_body.get(self, timeout)
 
 		field_arrays = { }
-		parsed_data = parse_qsl(direct_str(post_data.read()), True, True)
+		parsed_data = parse_qsl(direct_binary.str(post_data.read()), True, True)
 		self.parsed_data = { }
 
 		for parsed_field in parsed_data:

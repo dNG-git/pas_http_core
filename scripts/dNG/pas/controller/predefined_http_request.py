@@ -23,13 +23,12 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.net.http.request_headers_mixin import direct_request_headers_mixin
-from .abstract_inner_request import direct_abstract_inner_request
+from .abstract_inner_http_request import direct_abstract_inner_http_request
 
-class direct_predefined_request(direct_abstract_inner_request, direct_request_headers_mixin):
+class direct_predefined_http_request(direct_abstract_inner_http_request):
 #
 	"""
-"direct_predefined_request" implements predefined requests.
+"direct_predefined_http_request" implements predefined requests.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -39,18 +38,6 @@ class direct_predefined_request(direct_abstract_inner_request, direct_request_he
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
-
-	def __init__(self):
-	#
-		"""
-Constructor __init__(direct_predefined_request)
-
-:since: v0.1.00
-		"""
-
-		direct_abstract_inner_request.__init__(self)
-		direct_request_headers_mixin.__init__(self)
-	#
 
 	def set_action(self, action):
 	#
@@ -89,19 +76,6 @@ Sets the output format.
 		self.output_format = output_format
 	#
 
-	def set_script_name(self, script_name):
-	#
-		"""
-Sets the script name.
-
-:param script_name: Script name
-
-:since:  v0.1.00
-		"""
-
-		self.script_name = script_name
-	#
-
 	def set_service(self, service):
 	#
 		"""
@@ -113,30 +87,6 @@ Sets the requested service.
 		"""
 
 		self.service = service
-	#
-
-	def supports_accepted_formats(self):
-	#
-		"""
-Sets false if accepted formats can not be identified.
-
-:return: (bool) True accepted formats are supported.
-:since:  v0.1.00
-		"""
-
-		return (False if (self.headers == None) else True)
-	#
-
-	def supports_headers(self):
-	#
-		"""
-Sets false if the script name is not needed for execution.
-
-:return: (bool) True if the request contains headers.
-:since:  v0.1.00
-		"""
-
-		return (False if (self.headers == None) else True)
 	#
 #
 

@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.pythonback import direct_str
+from dNG.pas.data.binary import direct_binary
 from .source_value_mixin import direct_source_value_mixin
 
 class direct_rewrite_mixin(direct_source_value_mixin):
@@ -57,7 +57,7 @@ Checks and renders the rewrite statement.
 		var_return = self.source_get_value(source, key)
 
 		if (var_return == None): var_return = " {0} ".format(key)
-		else: var_return = direct_str(var_return)
+		else: var_return = direct_binary.str(var_return)
 
 		if (type(var_return) != str): var_return = str(var_return)
 

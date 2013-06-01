@@ -23,8 +23,12 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from .abstract_stream_response import direct_abstract_stream_response
+from zlib import compressobj, Z_SYNC_FLUSH
+
 from dNG.pas.net.http.chunked_mixin import direct_chunked_mixin
+from dNG.pas.data.binary import direct_binary
+from dNG.pas.data.http.gzip_compressor import direct_gzip_compressor
+from .abstract_stream_response import direct_abstract_stream_response
 
 class direct_abstract_http_stream_response(direct_abstract_stream_response, direct_chunked_mixin):
 #
@@ -60,6 +64,18 @@ Constructor __init__(direct_abstract_http_stream_response)
 
 		direct_abstract_stream_response.__init__(self)
 
+		self.compressor = None
+		"""
+Compression object or file
+		"""
+		self.compressor_buffer = None
+		"""
+Buffer to read compressed object
+		"""
+		self.compression_formats = None
+		"""
+Compression formats the client accepts
+		"""
 		self.headers = { }
 		"""
 Headers are used by the final node
@@ -116,6 +132,18 @@ Finish transmission and cleanup resources.
 		#
 	#
 
+	def get_compression_formats(self):
+	#
+		"""
+Returns the compression formats the client accepts.
+
+:return: (list) Compression formats supported
+:since:  v0.1.01
+		"""
+
+		return self.compression_formats
+	#
+
 	def get_header(self, name, name_as_key = True):
 	#
 		"""
@@ -167,6 +195,7 @@ Sends response data.
 				self.send_headers()
 			#
 
+			if (self.compressor != None): data = self.compressor.compress(direct_binary.bytes(data)) + self.compressor.flush(Z_SYNC_FLUSH)
 			if (self.stream_mode == direct_abstract_http_stream_response.STREAM_CHUNKED): data = self.chunkify(data)
 			direct_abstract_stream_response.send_data(self, data)
 		#
@@ -181,6 +210,44 @@ Sends the prepared response headers.
 		"""
 
 		raise RuntimeError("Not implemented", 38)
+	#
+
+	def set_compression(self, compress):
+	#
+		"""
+Sets the compression formats the client accepts.
+
+:param compression_formats: List of accepted compression formats
+
+:since: v0.1.01
+		"""
+
+		if (compress == True and self.compression_formats != None):
+		#
+			if ("deflate" in self.compression_formats):
+			#
+				self.compressor = compressobj()
+				self.set_header("Content-Encoding", "deflate")
+			#
+			elif ("gzip" in self.compression_formats):
+			#
+				self.compressor = direct_gzip_compressor()
+				self.set_header("Content-Encoding", "gzip")
+			#
+		#
+	#
+
+	def set_compression_formats(self, compression_formats):
+	#
+		"""
+Sets the compression formats the client accepts.
+
+:param compression_formats: List of accepted compression formats
+
+:since: v0.1.01
+		"""
+
+		if (isinstance(compression_formats, list)): self.compression_formats = compression_formats
 	#
 
 	def set_header(self, name, value, name_as_key = False, value_append = False):
@@ -291,6 +358,18 @@ Sets the stream response object used to send data to.
 			self.stream_mode = direct_abstract_http_stream_response.STREAM_NONE
 			if (self.stream_mode_supported == direct_abstract_http_stream_response.STREAM_CHUNKED): self.set_header("Transfer-Encoding", None)
 		#
+	#
+
+	def supports_compression(self):
+	#
+		"""
+Returns false if data can not be compressed before being send.
+
+:return: (bool) True if the response can be compressed.
+:since:  v0.1.00
+		"""
+
+		return True
 	#
 
 	def supports_headers(self):

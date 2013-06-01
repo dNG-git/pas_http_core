@@ -29,11 +29,11 @@ import os, re
 
 from dNG.data.file import direct_file
 from dNG.data.rfc.basics import direct_basics as direct_rfc_basics
+from dNG.pas.data.binary import direct_binary
 from dNG.pas.data.settings import direct_settings
 from dNG.pas.data.text.input_filter import direct_input_filter
-from dNG.pas.data.text.tag_parser.mmedia_text_file import direct_mmedia_text_file
+from dNG.pas.data.xhtml.mmedia_text_file import direct_mmedia_text_file
 from dNG.pas.module.named_loader import direct_named_loader
-from dNG.pas.pythonback import direct_bytes
 from .module import direct_module
 
 class direct_cache(direct_module):
@@ -168,6 +168,8 @@ Action for "index"
 				elif (file_extension == "svg"): self.response.set_header("Content-Type", "text/svg+xml")
 
 				parser = direct_mmedia_text_file()
+
+				self.response.init(True)
 				self.response.set_raw_data(parser.render(file_pathname))
 			#
 			elif (re_result != None):
@@ -283,11 +285,13 @@ File is not cached. Read and send data.
 					if (file_cacheable): range_size = file_size
 					elif (range_start > 0): file_obj.seek(range_start)
 
-					timeout_time = time() + int(direct_settings.get("pas_server_socket_data_timeout", 30))
+					timeout_time = int(direct_settings.get("pas_server_socket_data_timeout", 0))
+					if (timeout_time < 1): timeout_time = int(direct_settings.get("pas_global_socket_data_timeout", 30))
+					timeout_time += time()
 
 					if (file_obj.open(file_pathname, True, file_mode)):
 					#
-						file_data = (direct_bytes("") if (is_binary) else "")
+						file_data = (direct_binary.BYTES_TYPE() if (is_binary) else "")
 						self.response.init(True)
 
 						while (range_size > 0 and (not file_obj.eof_check()) and time() < timeout_time):

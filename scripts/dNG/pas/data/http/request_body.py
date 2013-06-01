@@ -29,7 +29,7 @@ from zlib import decompressobj, MAX_WBITS
 
 from dNG.pas.data.byte_buffer import direct_byte_buffer
 from dNG.pas.data.settings import direct_settings
-from dNG.pas.pythonback import direct_bytes
+from dNG.pas.data.binary import direct_binary
 
 class direct_request_body(dict, Thread):
 #
@@ -84,7 +84,7 @@ True if reading should happen in a separate thread.
 		"""
 Event called after all data has been received.
 		"""
-		self.socket_data_timeout = int(direct_settings.get("pas_server_socket_data_timeout", 30))
+		self.socket_data_timeout = int(direct_settings.get("pas_server_socket_data_timeout", 0))
 		"""
 Timeout for each network read.
 		"""
@@ -93,6 +93,7 @@ Timeout for each network read.
 Absolute timeout to receive the request body.
 		"""
 
+		if (self.socket_data_timeout < 1): self.socket_data_timeout = int(direct_settings.get("pas_global_socket_data_timeout", 30))
 		self.received_event.set()
 	#
 
@@ -188,6 +189,7 @@ Sets a given pointer for the streamed post instance.
 
 		try:
 		#
+			binary_newline = direct_binary.bytes("\r\n")
 			chunk_buffer = None
 			chunk_size = 0
 			input_data = direct_byte_buffer()
@@ -223,8 +225,8 @@ Get size for next chunk
 
 					if (chunk_size < 1):
 					#
-						if (chunk_buffer == None): newline_position = part_data.find(direct_bytes("\r\n"))
-						else: newline_position = (chunk_buffer + part_data).find(direct_bytes("\r\n"))
+						if (chunk_buffer == None): newline_position = part_data.find(binary_newline)
+						else: newline_position = (chunk_buffer + part_data).find(binary_newline)
 
 						chunk_octets = None
 

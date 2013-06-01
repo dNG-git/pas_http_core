@@ -2,8 +2,13 @@
  "pas_http_theme_simple": {
   "site": {
    "css_files": [
-    { "name": "themes/simple/site.min.css" },
-    { "name": "jqueryui/smoothness/jquery-ui-1.10.1.min.css" }
+    { "name": "jqueryui/smoothness/jquery-ui-1.10.1.min.css" },
+    { "name": "themes/simple/site.min.css" }
+   ],
+   "js_files": [
+    { "name": "requirejs/pas.config.tsc.js" },
+    { "name": "requirejs/jqueryui-1.10.1.config.js" },
+    { "name": "requirejs/require-2.1.6.min.js" }
    ]
   }
  }

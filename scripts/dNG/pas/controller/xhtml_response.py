@@ -25,6 +25,7 @@ NOTE_END //n"""
 
 import re
 
+from dNG.pas.data.binary import direct_binary
 from dNG.pas.data.settings import direct_settings
 from dNG.pas.data.text.l10n import direct_l10n
 from dNG.pas.module.named_loader import direct_named_loader
@@ -170,35 +171,41 @@ compression setting and information about P3P.
 
 		direct_abstract_http_response.init(self, cache, compress)
 
-		"""
+		if (self.theme_renderer == None):
+		#
+			"""
 Set up theme framework
-		"""
+			"""
 
-		direct_settings.read_file("{0}/settings/pas_http_theme.json".format(direct_settings.get("path_data")))
-		theme = (direct_hooks.call("dNG.pas.http.theme.check_candidates", theme = self.theme) if (direct_settings.get("pas_http_theme_plugins_supported", True)) else None)
-		self.theme_renderer = direct_named_loader.get_instance("dNG.pas.data.theme.renderer")
+			direct_settings.read_file("{0}/settings/pas_http_theme.json".format(direct_settings.get("path_data")))
+			theme = (direct_hooks.call("dNG.pas.http.theme.check_candidates", theme = self.theme) if (direct_settings.get("pas_http_theme_plugins_supported", True)) else None)
+			self.theme_renderer = direct_named_loader.get_instance("dNG.pas.data.theme.renderer")
 
-		if (theme != None):
+			if (theme != None):
+			#
+				theme = re.sub("\W", "", theme)
+
+				if (self.theme_renderer.is_supported(theme)): self.theme_active = theme
+				else: theme = None
+			#
+
+			if (theme == None and (not self.theme_renderer.is_supported(self.theme))): self.theme = direct_settings.get("pas_http_theme_default", "simple")
+
+			if (self.theme_active == None): self.theme_active = self.theme
+			self.theme_renderer.set(self.theme_active)
+			self.theme_renderer.set_log_handler(self.log_handler)
+			self.theme_renderer.set_subtype(self.theme_subtype)
 		#
-			theme = re.sub("\W", "", theme)
 
-			if (self.theme_renderer.is_supported(theme)): self.theme_active = theme
-			else: theme = None
+		if (self.oset == None):
 		#
-
-		if (theme == None and (not self.theme_renderer.is_supported(self.theme))): self.theme = direct_settings.get("pas_http_theme_default", "simple")
-
-		if (self.theme_active == None): self.theme_active = self.theme
-		self.theme_renderer.set(self.theme_active)
-		self.theme_renderer.set_log_handler(self.log_handler)
-		self.theme_renderer.set_subtype(self.theme_subtype)
-
-		"""
+			"""
 Get the corresponding OSet name
-		"""
+			"""
 
-		self.oset = direct_settings.get("pas_http_theme_{0}_oset".format(re.sub("\W", "_", self.theme)))
-		if (self.oset == None): self.oset = direct_settings.get("pas_http_theme_oset_default", "xhtml5")
+			self.oset = direct_settings.get("pas_http_theme_{0}_oset".format(re.sub("\W", "_", self.theme)))
+			if (self.oset == None): self.oset = direct_settings.get("pas_http_theme_oset_default", "xhtml5")
+		#
 	#
 
 	def send(self):
@@ -209,16 +216,14 @@ Sends the prepared response.
 :since: v0.1.00
 		"""
 
-		if (not self.initialized): self.init()
-
 		if (self.data != None): self.send_raw_data()
 		elif (self.content != None):
 		#
 			if (self.title != None): self.theme_renderer.set_title(self.title)
 
-			self.data = self.theme_renderer.render(self.content)
+			self.data = direct_binary.utf8_bytes(self.theme_renderer.render(self.content))
 
-			if ("application/xhtml+xml" in self.get_accepted_formats()):
+			if ("application/xhtml+xml" in self.stream_response.get_accepted_formats()):
 			#
 				if (self.get_content_type() == None): self.set_content_type("application/xhtml+xml; charset={0}".format(self.charset))
 			#
@@ -236,13 +241,14 @@ If raw data are send using "send_raw_data()" headers will be sent. An error
 occurred if they are not sent and all buffers are "None".
 			"""
 
-			header = self.get_header("HTTP/1.1", True)
-			if (header == None): self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
-
+			self.init(False, True)
 			self.content = ""
 
 			if (self.errors == None):
 			#
+				header = self.get_header("HTTP/1.1", True)
+				if (header == None): self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+
 				error = { "title": direct_l10n.get("core_title_error_critical"), "message": (direct_l10n.get("errors_core_unknown_error") if (header == None) else header) }
 
 				self.add_oset_content("core.error", error)

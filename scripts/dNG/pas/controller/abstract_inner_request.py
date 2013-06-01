@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.abstract_request
+dNG.pas.controller.abstract_inner_request
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -47,6 +47,10 @@ Constructor __init__(direct_abstract_inner_request)
 :since: v0.1.00
 		"""
 
+		self.accepted_formats = None
+		"""
+Formats the client accepts
+		"""
 		self.action = "index"
 		"""
 Requested action
@@ -99,6 +103,18 @@ Requested service
 		"""
 Requested response format name
 		"""
+	#
+
+	def get_accepted_formats(self):
+	#
+		"""
+Returns the formats the client accepts.
+
+:return: (list) Accepted formats
+:since:  v0.1.00
+		"""
+
+		return self.accepted_formats
 	#
 
 	def get_action(self):
@@ -299,6 +315,38 @@ Returns the requested service.
 		return self.service
 	#
 
+	def init(self, request):
+	#
+		"""
+Initializes default values from the original request.
+
+:param request: (object) Request instance
+
+:since: v0.1.00
+		"""
+
+		self.accepted_formats = request.get_accepted_formats()
+		self.client_host = request.get_client_host()
+		self.client_port = request.get_client_port()
+		self.server_scheme = request.get_server_scheme()
+		self.server_host = request.get_server_host()
+		self.server_port = request.get_server_port()
+		self.set_script_pathname(request.get_script_pathname())
+	#
+
+	def set_accepted_formats(self, accepted_formats):
+	#
+		"""
+Sets the formats the client accepts.
+
+:param accepted_formats: List of accepted formats
+
+:since: v0.1.01
+		"""
+
+		if (isinstance(accepted_formats, list)): self.accepted_formats = accepted_formats
+	#
+
 	def set_client_host(self, host):
 	#
 		"""
@@ -350,8 +398,11 @@ Sets the script path and name of the request.
 :since: v0.1.00
 		"""
 
-		self.script_name = path.basename(script_pathname)
-		self.script_pathname = script_pathname
+		if (script_pathname != None):
+		#
+			self.script_name = path.basename(script_pathname)
+			self.script_pathname = script_pathname
+		#
 	#
 
 	def set_server_host(self, host):
@@ -398,8 +449,20 @@ Sets the underlying server scheme.
 		"""
 Returns false if accepted formats can not be identified.
 
-:return: (bool) True accepted formats are supported.
+:return: (bool) True if accepted formats are identified.
 :since:  v0.1.00
+		"""
+
+		return (False if (self.accepted_formats == None) else True)
+	#
+
+	def supports_compression(self):
+	#
+		"""
+Returns false if supported compression formats can not be identified.
+
+:return: (bool) True if compression formats are identified.
+:since:  v0.1.01
 		"""
 
 		return False

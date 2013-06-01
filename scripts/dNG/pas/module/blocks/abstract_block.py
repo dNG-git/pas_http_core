@@ -115,8 +115,6 @@ Initialize block from the given request and response.
 		"""
 Execute the requested action.
 
-:param log_handler: log_handler to use
-
 :since: v0.1.00
 		"""
 

@@ -33,8 +33,8 @@ except ImportError:
 #
 
 from dNG.pas.controller.abstract_request import direct_abstract_request
+from dNG.pas.data.binary import direct_binary
 from dNG.pas.data.settings import direct_settings
-from dNG.pas.pythonback import direct_str
 
 class direct_links(object):
 #
@@ -78,14 +78,16 @@ source for parameters.
 :since: v0.1.00
 		"""
 
+		var_return = direct_links.get_url(type, parameters)
 		parameters = direct_links.filter_parameters(parameters)
 
-		var_return = direct_links.get_url(type, parameters)
+		if (len(parameters) > 0):
+		#
+			if ("?" not in var_return): var_return += "?"
+			elif (var_return[-1:] != ";"): var_return += ";"
 
-		if ("?" not in var_return): var_return += "?"
-		elif (var_return[-1:] != ";"): var_return += ";"
-
-		var_return += direct_links.build_url_formatted("{0}={1}", ";", parameters, py_escape = None)
+			var_return += direct_links.build_url_formatted("{0}={1}", ";", parameters, py_escape = None)
+		#
 
 		if (type & direct_links.TYPE_OPTICAL == direct_links.TYPE_OPTICAL):
 		#
@@ -291,7 +293,7 @@ This method removes all parameters marked as "__remove__".
 	def build_url_remove_requested(parameters):
 	#
 		"""
-This method removes all parameters marked as "__remove__".
+This method removes all parameters marked as "__remove__" or special ones.
 
 :param parameters: Parameters dict
 
@@ -308,6 +310,11 @@ This method removes all parameters marked as "__remove__".
 			elif (parameters[key] == "__remove__"): del(var_return[key])
 		#
 
+		if ("__host__" in parameters): del(var_return['__host__'])
+		if ("__path__" in parameters): del(var_return['__path__'])
+		if ("__port__" in parameters): del(var_return['__port__'])
+		if ("__scheme__" in parameters): del(var_return['__scheme__'])
+
 		return var_return
 	#
 
@@ -323,7 +330,7 @@ Escape the given data for embedding into (X)HTML.
 :since:  v0.1.00
 		"""
 
-		return quote(data)
+		return quote(data, "")
 	#
 
 	@staticmethod
@@ -340,7 +347,6 @@ This method removes all parameters marked as "__remove__".
 		"""
 
 		var_return = parameters.copy()
-		if ("dsd" not in var_return): var_return['dsd'] = { }
 
 		if ("__request__" in var_return and var_return['__request__']):
 		#
@@ -356,6 +362,7 @@ This method removes all parameters marked as "__remove__".
 				if ("a" not in var_return): var_return['a'] = request.get_action()
 
 				dsd_dict = request.get_dsd_dict()
+				if (len(dsd_dict) and "dsd" not in var_return): var_return['dsd'] = { }
 
 				for key in dsd_dict:
 				#
@@ -385,10 +392,10 @@ Adds a link.
 
 		if ("__scheme__" in parameters and "__path__" in parameters):
 		#
-			var_return = "{0}://".format(direct_str(parameters['__scheme__']))
-			if ("__host__" in parameters): var_return += direct_str(parameters['__host__'])
-			if ("__port__" in parameters): var_return += ":{0}".format(direct_str(parameters['__port__']))
-			var_return += direct_str(parameters['__path__'])
+			var_return = "{0}://".format(direct_binary.str(parameters['__scheme__']))
+			if ("__host__" in parameters): var_return += direct_binary.str(parameters['__host__'])
+			if ("__port__" in parameters): var_return += ":{0}".format(direct_binary.str(parameters['__port__']))
+			var_return += direct_binary.str(parameters['__path__'])
 		#
 		else:
 		#
@@ -396,8 +403,12 @@ Adds a link.
 
 			if (type == direct_links.TYPE_RELATIVE):
 			#
-				script_name = request.get_script_name()
-				if (script_name != None): var_return = script_name
+				if ("__path__" in parameters): var_return = direct_binary.str(parameters['__path__'])
+				else:
+				#
+					script_name = request.get_script_name()
+					if (script_name != None): var_return = direct_binary.str(script_name)
+				#
 			#
 			else:
 			#
@@ -406,12 +417,12 @@ Adds a link.
 				port = request.get_server_port()
 				script_pathname = request.get_script_pathname()
 
-				if (scheme == None or script_pathname == None): raise RuntimeError("Can't construct a full URL from the received request if it is not provided", 5)
+				if (scheme == None or ("__path__" not in parameters and script_pathname == None)): raise RuntimeError("Can't construct a full URL from the received request if it is not provided", 5)
 
-				var_return = "{0}://".format(direct_str(scheme))
-				if (host != None): var_return += direct_str(host)
+				var_return = "{0}://".format(direct_binary.str(scheme))
+				if (host != None): var_return += direct_binary.str(host)
 				if (port != None): var_return += ":{0:d}".format(port)
-				var_return += direct_str(script_pathname)
+				var_return += (direct_binary.str(parameters['__path__']) if ("__path__" in parameters) else "/" + direct_binary.str(script_pathname))
 			#
 		#
 

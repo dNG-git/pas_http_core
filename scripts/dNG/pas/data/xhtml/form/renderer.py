@@ -65,6 +65,7 @@ Javascript init function
 		"""
 OSet requested
 		"""
+	#
 
 	def render(self, form_id = None, section = None):
 	#

@@ -27,8 +27,8 @@ from threading import local
 from time import time
 from weakref import proxy
 
+from dNG.pas.data.binary import direct_binary
 from dNG.pas.data.exception import direct_exception
-from dNG.pas.pythonback import direct_str
 from dNG.pas.data.text.l10n import direct_l10n
 
 class direct_abstract_response(object):
@@ -58,10 +58,6 @@ Constructor __init__(direct_abstract_response)
 :since: v0.1.00
 		"""
 
-		self.accepted_formats = None
-		"""
-Formats the client accepts
-		"""
 		self.charset = "utf-8"
 		"""
 Charset used for response
@@ -124,8 +120,7 @@ Returns the formats the client accepts.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.get_accepted_formats()- (#echo(__LINE__)#)")
-		return self.accepted_formats
+		return self.stream_response.get_accepted_formats()
 	#
 
 	def get_charset(self):
@@ -137,8 +132,19 @@ Gets the charset defined for the response.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.get_charset()- (#echo(__LINE__)#)")
 		return self.charset
+	#
+
+	def get_compression_formats(self):
+	#
+		"""
+Returns the compression formats the client accepts.
+
+:return: (list) Compression formats supported
+:since:  v0.1.01
+		"""
+
+		return self.stream_response.get_compression_formats()
 	#
 
 	def get_title(self):
@@ -150,7 +156,6 @@ Return the title set for the response.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.get_title()- (#echo(__LINE__)#)")
 		return self.title
 	#
 
@@ -202,7 +207,7 @@ send.
 		if (message == None): message = direct_l10n.get("errors_core_unknown_error")
 		else: message = direct_l10n.get("errors_{0}".format(message), message)
 
-		exception = direct_str(exception)
+		exception = direct_binary.str(exception)
 
 		if (exception == str): details = exception
 		else:
@@ -233,6 +238,7 @@ Initialize runtime parameters for response.
 			if (self.expires < 1): self.expires = time()
 			if (self.last_modified < 1): self.last_modified = time()
 		#
+		elif (self.expires < 1): self.expires = time() + 63072000
 
 		if (self.stream_response.supports_compression()): self.stream_response.set_compression(compress)
 
@@ -287,7 +293,7 @@ Sets the formats the client accepts.
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_accepted_formats(accepted_formats)- (#echo(__LINE__)#)")
-		if (isinstance(accepted_formats, list)): self.accepted_formats = accepted_formats
+		self.stream_response.set_accepted_formats(accepted_formats)
 	#
 
 	def set_charset(self, charset):
@@ -302,6 +308,20 @@ Sets the charset used for the response.
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_charset({0})- (#echo(__LINE__)#)".format(charset))
 		self.charset = charset
+	#
+
+	def set_compression_formats(self, compression_formats):
+	#
+		"""
+Sets the compression formats the client accepts.
+
+:param compression_formats: List of accepted compression formats
+
+:since: v0.1.01
+		"""
+
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_compression_formats(accepted_formats)- (#echo(__LINE__)#)")
+		if (self.stream_response.supports_compression()): self.stream_response.set_compression_formats(compression_formats)
 	#
 
 	def set_content(self, content):

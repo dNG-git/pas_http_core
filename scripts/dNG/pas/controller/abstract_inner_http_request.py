@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.abstract_http_request
+dNG.pas.controller.abstract_inner_http_request
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,14 +23,13 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.text.input_filter import direct_input_filter
 from dNG.pas.net.http.request_headers_mixin import direct_request_headers_mixin
-from .abstract_request import direct_abstract_request
+from .abstract_inner_request import direct_abstract_inner_request
 
-class direct_abstract_http_request(direct_abstract_request, direct_request_headers_mixin):
+class direct_abstract_inner_http_request(direct_abstract_inner_request, direct_request_headers_mixin):
 #
 	"""
-"direct_abstract_http_request" implements header related methods.
+This abstract class contains common methods for inner requests.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -44,78 +43,71 @@ class direct_abstract_http_request(direct_abstract_request, direct_request_heade
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_abstract_http_request)
+Constructor __init__(direct_abstract_inner_request)
 
 :since: v0.1.00
 		"""
 
-		direct_abstract_request.__init__(self)
+		direct_abstract_inner_request.__init__(self)
 		direct_request_headers_mixin.__init__(self)
 
-		self.type = None
+		self.compression_formats = None
 		"""
-Request type
+Compression formats the client accepts
 		"""
-
-		self.server_scheme = "http"
 	#
 
-	def get_type(self):
+	def get_compression_formats(self):
 	#
 		"""
-Returns the request type.
+Returns the compression formats the client accepts.
 
-:return: (str) Request type
-:since:  v0.1.00
+:return: (list) Compression formats supported
+:since:  v0.1.01
 		"""
 
-		return self.type
+		return self.compression_formats
 	#
 
-	def parse_parameters(self):
+	def init(self, request):
 	#
 		"""
-Parses request parameters.
+Initializes default values from the original request.
+
+:param request: (object) Request instance
 
 :since: v0.1.00
 		"""
 
-		if (self.lang == ""):
-		#
-			lang = direct_input_filter.filter_control_chars(self.get_header("Accept-Language"))
-			if (lang != None): self.lang = lang.lower().split(",", 1)[0]
-		#
+		direct_abstract_inner_request.init(self, request)
 
-		direct_abstract_request.parse_parameters(self)
+		if (request.supports_compression()): self.compression_formats = request.get_compression_formats()
+		if (request.supports_headers()): self.headers = request.get_headers()
 	#
 
-	def set_header(self, name, value):
+	def set_compression_formats(self, compression_formats):
 	#
 		"""
-Returns the request header if defined.
+Sets the compression formats the client accepts.
 
-:param name: Header name
+:param compression_formats: List of accepted compression formats
 
-:return: (str) Header value if set; None otherwise
-:since:  v0.1.00
+:since: v0.1.01
 		"""
 
-		name = name.upper()
-
-		if (name in self.headers): self.headers[name] = "{0},{1}".format(self.headers[name], value)
-		else: self.headers[name] = value
+		if (isinstance(compression_formats, list)): self.compression_formats = compression_formats
 	#
 
 	def supports_accepted_formats(self):
 	#
 		"""
-Returns false if accepted formats can not be identified.
+Sets false if accepted formats can not be identified.
 
-:return: (bool) True if accepted formats are identified.
+:return: (bool) True accepted formats are supported.
 :since:  v0.1.00
 		"""
 
-		return True
+		return (False if (self.headers == None) else True)
 	#
 
 	def supports_compression(self):
@@ -127,31 +119,19 @@ Returns false if supported compression formats can not be identified.
 :since:  v0.1.01
 		"""
 
-		return True
+		return (False if (self.compression_formats == None) else True)
 	#
 
 	def supports_headers(self):
 	#
 		"""
-Returns false if the script name is not needed for execution.
+Sets false if the script name is not needed for execution.
 
 :return: (bool) True if the request contains headers.
 :since:  v0.1.00
 		"""
 
-		return True
-	#
-
-	def supports_listener_data(self):
-	#
-		"""
-Returns false if the server address is unknown.
-
-:return: (bool) True if listener are known.
-:since:  v0.1.00
-		"""
-
-		return True
+		return (False if (self.headers == None) else True)
 	#
 #
 

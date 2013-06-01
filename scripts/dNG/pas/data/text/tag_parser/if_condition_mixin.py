@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.pythonback import direct_str
+from dNG.pas.data.binary import direct_binary
 from .source_value_mixin import direct_source_value_mixin
 
 class direct_if_condition_mixin(direct_source_value_mixin):
@@ -62,7 +62,7 @@ Checks and renders the content of the "if" condition.
 		is_valid = False
 		source_value = self.source_get_value(source, key)
 
-		source_value = ("" if (source_value == None) else direct_str(source_value))
+		source_value = ("" if (source_value == None) else direct_binary.str(source_value))
 		if (type(source_value) != str): source_value = str(source_value)
 
 		if (operator == "==" and source_value == value): is_valid = True

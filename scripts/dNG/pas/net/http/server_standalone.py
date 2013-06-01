@@ -27,7 +27,7 @@ from wsgiref.simple_server import make_server
 
 from dNG.pas.data.settings import direct_settings
 from dNG.pas.controller.http_wsgi1_request import direct_http_wsgi1_request
-from .server import direct_server
+from . import direct_server
 
 class direct_server_standalone(direct_server):
 #
@@ -110,7 +110,7 @@ Stop the server
 		"""
 
 		if (self.server != None): self.server.shutdown()
-		return last_return
+		return direct_server.stop(self, params, last_return)
 	#
 #
 

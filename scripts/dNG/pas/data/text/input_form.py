@@ -881,7 +881,7 @@ Returns all defined fields.
 		return var_return
 	#
 
-	def get_value(self, name, section = None):
+	def get_value(self, name, section = None, raw_input = False):
 	#
 		"""
 Returns the field value given or transmitted.
@@ -903,7 +903,7 @@ Returns the field value given or transmitted.
 			if (name in section['positions']):
 			#
 				field = section['fields'][section['positions'][name]]
-				var_return = (field['content_result'] if ("content_result" in field) else field['content'])
+				var_return = (field['content_result'] if ("content_result" in field and (not raw_input)) else field['content'])
 				break
 			#
 		#

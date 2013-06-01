@@ -30,7 +30,7 @@ from dNG.pas.controller.http_wsgi1_request import direct_http_wsgi1_request
 from dNG.pas.data.settings import direct_settings
 from dNG.pas.module.named_loader import direct_named_loader
 from dNG.pas.plugins.hooks import direct_hooks
-from .server import direct_server
+from . import direct_server
 
 class direct_server_wsgi(direct_server):
 #
@@ -107,6 +107,7 @@ python.org: Return an iterator object.
 		http_wsgi1_request = self.http_wsgi1_request
 
 		self.http_wsgi1_request = None
+		direct_hooks.call("dNG.pas.http.shutdown")
 		direct_hooks.call("dNG.pas.status.shutdown")
 		if (self.cache_instance != None): self.cache_instance.return_instance()
 

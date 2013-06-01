@@ -28,7 +28,7 @@ from cgi import escape as html_escape
 try: from html.parser import HTMLParser
 except ImportError: from HTMLParser import HTMLParser
 
-from dNG.pas.pythonback import direct_str
+from dNG.pas.data.binary import direct_binary
 
 class direct_formatting(object):
 #
@@ -56,7 +56,22 @@ Escapes given data for (X)HTML output.
 :since:  v0.1.00
 		"""
 
-		return html_escape(direct_str(data))
+		return html_escape(direct_binary.str(data), True)
+	#
+
+	@staticmethod
+	def unescape(data):
+	#
+		"""
+Unescapes given (X)HTML data.
+
+:param data: Input string
+
+:return: Output string
+:since:  v0.1.00
+		"""
+
+		return HTMLParser().unescape(direct_binary.str(data))
 	#
 #
 

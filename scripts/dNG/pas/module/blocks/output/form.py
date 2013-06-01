@@ -57,7 +57,6 @@ Action for "render"
 			form_url = direct_links.build_url(direct_links.TYPE_FORM_URL, self.context['url_parameters'])
 
 			self.set_action_result("<form action=\"{0}\" method='post' enctype='application/x-www-form-urlencoded' target='_self'>{1}{2}</form>".format(form_url, form_parameters, self.parse()))
-			self.response.add_js_file("jquery/jquery.min.js")
 		#
 	#
 

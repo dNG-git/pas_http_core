@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.pythonback import direct_bytes
+from dNG.pas.data.binary import direct_binary
 
 class direct_chunked_mixin(object):
 #
@@ -39,7 +39,7 @@ This response mixin provides the "chunkify()" method.
              Mozilla Public License, v. 2.0
 	"""
 
-	CRLF = direct_bytes("\r\n")
+	BINARY_NEWLINE = direct_binary.bytes("\r\n")
 
 	def chunkify(self, data):
 	#
@@ -50,11 +50,11 @@ Returns the formats the client accepts.
 :since:  v0.1.00
 		"""
 
-		data = direct_bytes(data)
+		data = direct_binary.bytes(data)
 
-		if (data == None): var_return = direct_bytes("0\r\n\r\n")
-		elif (type(data) == type(direct_chunked_mixin.CRLF) and len(data) > 0): var_return = direct_bytes("{0:d}\r\n".format(len(data))) + data + direct_chunked_mixin.CRLF
-		else: var_return = direct_bytes("")
+		if (data == None): var_return = direct_binary.bytes("0\r\n\r\n")
+		elif (type(data) == type(direct_chunked_mixin.BINARY_NEWLINE) and len(data) > 0): var_return = direct_binary.bytes("{0:d}\r\n".format(len(data))) + data + direct_chunked_mixin.BINARY_NEWLINE
+		else: var_return = direct_binary.BYTES_TYPE()
 
 		return var_return
 	#

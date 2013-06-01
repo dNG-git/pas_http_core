@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.pythonback import direct_bytes
+from dNG.pas.data.binary import direct_binary
 
 class direct_abstract_stream_response(object):
 #
@@ -52,6 +52,10 @@ Constructor __init__(direct_abstract_http_stream_response)
 :since: v0.1.00
 		"""
 
+		self.accepted_formats = [ ]
+		"""
+Formats the client accepts
+		"""
 		self.active = True
 		"""
 True if ready for output.
@@ -92,6 +96,18 @@ Finish transmission and cleanup resources.
 		#
 	#
 
+	def get_accepted_formats(self):
+	#
+		"""
+Returns the formats the client accepts.
+
+:return: (list) Accepted formats
+:since:  v0.1.01
+		"""
+
+		return self.accepted_formats
+	#
+
 	def is_active(self):
 	#
 		"""
@@ -111,17 +127,30 @@ Constructor __init__(direct_server_fascti)
 @since v0.1.00
 		"""
 
-		data = direct_bytes(data)
+		data = direct_binary.bytes(data)
 
 		if (self.active):
 		#
 			if (self.stream_mode == direct_abstract_stream_response.STREAM_NONE):
 			#
-				if (self.data == None): self.data = direct_bytes("")
+				if (self.data == None): self.data = direct_binary.BYTES_TYPE()
 				self.data += data
 			#
 			else: self.write(data)
 		#
+	#
+
+	def set_accepted_formats(self, accepted_formats):
+	#
+		"""
+Sets the formats the client accepts.
+
+:param accepted_formats: List of accepted formats
+
+:since: v0.1.01
+		"""
+
+		if (isinstance(accepted_formats, list)): self.accepted_formats = accepted_formats
 	#
 
 	def set_active(self, is_active = True):
