@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.xhtml_response
+dNG.pas.controller.abstract_http_response
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -150,7 +150,7 @@ compression setting and information about P3P.
 
 		if (self.stream_response.supports_headers()):
 		#
-			output_headers = ({ "Cache-Control": "public" } if (cache) else { "Cache-Control": "no-cache, must-revalidate", "Pragma": "no-cache" })
+			output_headers = ({ "Cache-Control": "public" } if (cache) else { "Cache-Control": "no-cache, no-store, must-revalidate" })
 			if (self.expires > 0): output_headers['Expires'] = direct_rfc_basics.get_rfc1123_datetime(self.expires)
 			if (self.last_modified > 0): output_headers['Last-Modified'] = direct_rfc_basics.get_rfc1123_datetime(self.last_modified)
 
@@ -226,6 +226,19 @@ Sets a header.
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_header({0}, +value, +name_as_key, +value_append)- (#echo(__LINE__)#)".format(name))
 		if (self.stream_response.supports_headers()): self.stream_response.set_header(name, value, name_as_key, value_append)
+	#
+
+	def set_send_headers_only(self, headers_only):
+	#
+		"""
+Set to true to send headers only.
+
+:param headers_only: Usually true for HEAD requests
+
+:since: v0.1.01
+		"""
+
+		if (self.stream_response.supports_headers()): self.stream_response.set_send_headers_only(headers_only)
 	#
 
 	def supports_headers(self):

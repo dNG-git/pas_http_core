@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.chunked_mixin
+dNG.pas.data.http.chunked_mixin
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -53,7 +53,7 @@ Returns the formats the client accepts.
 		data = direct_binary.bytes(data)
 
 		if (data == None): var_return = direct_binary.bytes("0\r\n\r\n")
-		elif (type(data) == type(direct_chunked_mixin.BINARY_NEWLINE) and len(data) > 0): var_return = direct_binary.bytes("{0:d}\r\n".format(len(data))) + data + direct_chunked_mixin.BINARY_NEWLINE
+		elif (type(data) == type(direct_chunked_mixin.BINARY_NEWLINE) and len(data) > 0): var_return = direct_binary.bytes("{0:x}\r\n".format(len(data))) + data + direct_chunked_mixin.BINARY_NEWLINE
 		else: var_return = direct_binary.BYTES_TYPE()
 
 		return var_return

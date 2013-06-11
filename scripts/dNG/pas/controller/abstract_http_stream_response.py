@@ -23,11 +23,11 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from zlib import compressobj, Z_SYNC_FLUSH
+from zlib import compressobj
 
-from dNG.pas.net.http.chunked_mixin import direct_chunked_mixin
+from dNG.pas.data.http.chunked_mixin import direct_chunked_mixin
 from dNG.pas.data.binary import direct_binary
-from dNG.pas.data.http.gzip_compressor import direct_gzip_compressor
+from dNG.pas.data.gzip import direct_gzip
 from .abstract_stream_response import direct_abstract_stream_response
 
 class direct_abstract_http_stream_response(direct_abstract_stream_response, direct_chunked_mixin):
@@ -44,12 +44,12 @@ A HTTP headers aware stream response.
              Mozilla Public License, v. 2.0
 	"""
 
-	STREAM_DIRECT = 1
+	STREAM_DIRECT = 2
 	"""
 Do not set Transfer-Encoding but output content directly as soon as it is
 available.
 	"""
-	STREAM_CHUNKED = 2
+	STREAM_CHUNKED = 4
 	"""
 Set Transfer-Encoding to chunked and encode output.
 	"""
@@ -68,10 +68,6 @@ Constructor __init__(direct_abstract_http_stream_response)
 		"""
 Compression object or file
 		"""
-		self.compressor_buffer = None
-		"""
-Buffer to read compressed object
-		"""
 		self.compression_formats = None
 		"""
 Compression formats the client accepts
@@ -79,6 +75,10 @@ Compression formats the client accepts
 		self.headers = { }
 		"""
 Headers are used by the final node
+		"""
+		self.headers_only = False
+		"""
+Send headers only (usually HEAD requests)s
 		"""
 		self.headers_index = 0
 		"""
@@ -100,10 +100,6 @@ HTTP result code
 		"""
 HTTP request version
 		"""
-		self.stream_mode_supported = 2
-		"""
-Support chunked streaming
-		"""
 	#
 
 	def are_headers_sent(self):
@@ -117,6 +113,22 @@ Sends the prepared response headers.
 		return self.headers_sent
 	#
 
+	def filter_headers(self):
+	#
+		"""
+Filter response headers to remove conflicting ones.
+
+:access: protected
+:return: (dict) Filtered headers
+:since:  v0.1.01
+		"""
+
+		var_return = self.headers.copy()
+		if (self.compressor != None and "CONTENT-LENGTH" in var_return): del(var_return['CONTENT-LENGTH'])
+
+		return var_return
+	#
+
 	def finish(self):
 	#
 		"""
@@ -127,7 +139,16 @@ Finish transmission and cleanup resources.
 
 		if (self.active):
 		#
-			if (self.stream_mode == direct_abstract_http_stream_response.STREAM_CHUNKED): self.send_data(self.chunkify(None))
+			is_chunked_response = False
+
+			if (self.stream_mode & direct_abstract_http_stream_response.STREAM_CHUNKED == direct_abstract_http_stream_response.STREAM_CHUNKED):
+			#
+				is_chunked_response = True
+				self.send()
+			#
+
+			if (is_chunked_response or self.compressor != None): self.send_data(None)
+
 			direct_abstract_stream_response.finish(self)
 		#
 	#
@@ -177,6 +198,44 @@ Returns the HTTP response code.
 		return self.http_code
 	#
 
+	def is_compressing(self):
+	#
+		"""
+Returns true if the response will be compressed.
+
+:return: (bool) True if compression is used for the response
+:since:  v0.1.01
+		"""
+
+		return (self.compressor != None)
+	#
+
+	def prepare_output_data(self, data):
+	#
+		"""
+Prepare data for output. Compress and transform it if required.
+
+:param data: Data for output
+
+:access: protected
+:return: (bytes) Transformed data
+:since:  v0.1.01
+		"""
+
+		if (self.compressor != None):
+		#
+			if (data == None):
+			#
+				if (self.streamer == None): data = self.compressor.flush()
+			#
+			elif (len(data) > 0): data = self.compressor.compress(direct_binary.bytes(data))
+		#
+
+		if (self.stream_mode & direct_abstract_http_stream_response.STREAM_CHUNKED == direct_abstract_http_stream_response.STREAM_CHUNKED): data = self.chunkify(data)
+
+		return data
+	#
+
 	def send_data(self, data):
 	#
 		"""
@@ -195,9 +254,7 @@ Sends response data.
 				self.send_headers()
 			#
 
-			if (self.compressor != None): data = self.compressor.compress(direct_binary.bytes(data)) + self.compressor.flush(Z_SYNC_FLUSH)
-			if (self.stream_mode == direct_abstract_http_stream_response.STREAM_CHUNKED): data = self.chunkify(data)
-			direct_abstract_stream_response.send_data(self, data)
+			if (not self.headers_only): direct_abstract_stream_response.send_data(self, self.prepare_output_data(data))
 		#
 	#
 
@@ -212,17 +269,18 @@ Sends the prepared response headers.
 		raise RuntimeError("Not implemented", 38)
 	#
 
-	def set_compression(self, compress):
+	def set_compression(self, var_compress):
 	#
 		"""
 Sets the compression formats the client accepts.
 
-:param compression_formats: List of accepted compression formats
+:param var_compress: List of accepted compression formats
 
 :since: v0.1.01
 		"""
 
-		if (compress == True and self.compression_formats != None):
+		if (var_compress == False): self.set_header("Content-Encoding", None)
+		elif (self.compression_formats != None):
 		#
 			if ("deflate" in self.compression_formats):
 			#
@@ -231,7 +289,7 @@ Sets the compression formats the client accepts.
 			#
 			elif ("gzip" in self.compression_formats):
 			#
-				self.compressor = direct_gzip_compressor()
+				self.compressor = direct_gzip()
 				self.set_header("Content-Encoding", "gzip")
 			#
 		#
@@ -263,6 +321,7 @@ Sets a header.
 :since: v0.1.00
 		"""
 
+		if (self.headers_sent): raise RuntimeError("Headers are already sent", 1)
 		name = name.upper()
 
 		if (name_as_key and name == "HTTP/1.1"):
@@ -337,27 +396,35 @@ Sets the HTTP protocol version.
 		self.http_version = http_version
 	#
 
-	def set_stream_mode(self, active):
+	def set_send_headers_only(self, headers_only):
 	#
 		"""
-Sets the stream response object used to send data to.
+Set to true to send headers only.
 
-:param active: True if streaming response
+:param headers_only: Usually true for HEAD requests
+
+:since: v0.1.01
+		"""
+
+		self.headers_only = headers_only
+		self.set_header("Content-Length", ("0" if (headers_only) else None))
+	#
+
+	def set_stream_mode(self):
+	#
+		"""
+Sets the stream mode to send output as soon as available instead of caching
+it.
+
 :since: v0.1.00
 		"""
 
-		if (self.headers_sent): raise RuntimeError("Can't change streaming mode after headers are sent", 38)
-
-		if (active and self.stream_mode == direct_abstract_http_stream_response.STREAM_NONE):
+		if (self.stream_mode_supported & direct_abstract_http_stream_response.STREAM_CHUNKED == direct_abstract_http_stream_response.STREAM_CHUNKED and self.http_version > 1):
 		#
-			self.stream_mode = self.stream_mode_supported
-			if (self.stream_mode_supported == direct_abstract_http_stream_response.STREAM_CHUNKED): self.set_header("Transfer-Encoding", "chunked")
+			self.set_header("Transfer-Encoding", "chunked")
+			self.stream_mode |= direct_abstract_http_stream_response.STREAM_CHUNKED
 		#
-		elif (self.stream_mode != direct_abstract_http_stream_response.STREAM_NONE):
-		#
-			self.stream_mode = direct_abstract_http_stream_response.STREAM_NONE
-			if (self.stream_mode_supported == direct_abstract_http_stream_response.STREAM_CHUNKED): self.set_header("Transfer-Encoding", None)
-		#
+		elif (self.stream_mode_supported & direct_abstract_http_stream_response.STREAM_DIRECT == direct_abstract_http_stream_response.STREAM_DIRECT): self.stream_mode |= direct_abstract_http_stream_response.STREAM_DIRECT
 	#
 
 	def supports_compression(self):

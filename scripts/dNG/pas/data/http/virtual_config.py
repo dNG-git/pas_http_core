@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.tornado_handler
+dNG.pas.data.http.virtual_config
 """
 """n// NOTE
 ----------------------------------------------------------------------------

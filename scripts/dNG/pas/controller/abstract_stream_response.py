@@ -39,6 +39,11 @@ A stream response writes given data threadsafe to a underlying stream.
              Mozilla Public License, v. 2.0
 	"""
 
+	STREAM_CALLBACK = 1
+	"""
+Do not set Transfer-Encoding but output content directly as soon as it is
+available.
+	"""
 	STREAM_NONE = 0
 	"""
 Do not stream content
@@ -68,6 +73,14 @@ Data buffer
 		"""
 Stream response instead of holding it in a buffer
 		"""
+		self.stream_mode_supported = 0
+		"""
+Supported streaming mode
+		"""
+		self.streamer = None
+		"""
+Streamer implementation
+		"""
 	#
 
 	def __del__(self):
@@ -91,7 +104,7 @@ Finish transmission and cleanup resources.
 
 		if (self.active):
 		#
-			if (self.data != None): self.write(self.data)
+			self.send()
 			self.active = False
 		#
 	#
@@ -119,6 +132,51 @@ Constructor __init__(direct_server_fascti)
 		return self.active
 	#
 
+	def is_streamer_set(self):
+	#
+		"""
+Returns true if a streamer has been set.
+
+:return: (bool) True if set
+:since:  v0.1.01
+		"""
+
+		return (self.streamer != None)
+	#
+
+	def send(self):
+	#
+		"""
+Send data in cache.
+
+:since: v0.1.01
+		"""
+
+		if (self.active):
+		#
+			if (self.streamer != None and self.stream_mode_supported & direct_abstract_stream_response.STREAM_CALLBACK != direct_abstract_stream_response.STREAM_CALLBACK):
+			#
+				is_valid = True
+
+				while (is_valid and (not self.streamer.eof_check())):
+				#
+					data = self.streamer.read()
+
+					if (data == False or data == None): is_valid = False
+					else: self.send_data(data)
+				#
+
+				self.streamer.close()
+				self.streamer = None
+			#
+			elif (self.data != None):
+			#
+				self.write(self.data)
+				self.data = None
+			#
+		#
+	#
+
 	def send_data(self, data):
 	#
 		"""
@@ -127,10 +185,10 @@ Constructor __init__(direct_server_fascti)
 @since v0.1.00
 		"""
 
-		data = direct_binary.bytes(data)
-
 		if (self.active):
 		#
+			data = direct_binary.bytes(data)
+
 			if (self.stream_mode == direct_abstract_stream_response.STREAM_NONE):
 			#
 				if (self.data == None): self.data = direct_binary.BYTES_TYPE()
@@ -163,6 +221,24 @@ Constructor __init__(direct_server_fascti)
 
 		self.active = is_active
 		if (not is_active): self.data = None
+	#
+
+	def set_streamer(self, streamer):
+	#
+		"""
+Sets the streamer to create response data when requested.
+
+:since: v0.1.01
+		"""
+
+		if (hasattr(streamer, "read")):
+		#
+			self.streamer = streamer
+
+			if (self.stream_mode_supported & direct_abstract_stream_response.STREAM_CALLBACK == direct_abstract_stream_response.STREAM_CALLBACK): self.stream_mode |= direct_abstract_stream_response.STREAM_CALLBACK
+			elif (self.supports_streaming()): self.set_stream_mode()
+		#
+		else: raise RuntimeError("Given streaming object is not supported.", 95)
 	#
 
 	def supports_compression(self):

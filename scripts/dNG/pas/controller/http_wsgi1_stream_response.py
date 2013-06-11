@@ -26,6 +26,7 @@ NOTE_END //n"""
 from collections import Iterator
 
 from dNG.pas.data.binary import direct_binary
+from dNG.pas.data.streamer.http_compressed import direct_http_compressed as direct_http_compressed_streamer
 from .abstract_http_stream_response import direct_abstract_http_stream_response
 
 class direct_http_wsgi1_stream_response(direct_abstract_http_stream_response, Iterator):
@@ -43,21 +44,26 @@ implementation.
              Mozilla Public License, v. 2.0
 	"""
 
-	def __init__(self, wsgi_header_response):
+	def __init__(self, wsgi_header_response, wsgi_file_wrapper = None):
 	#
 		"""
 Constructor __init__(direct_http_wsgi1_stream_response)
 
 :param wsgi_header_response: WSGI header response callback
+:param wsgi_file_wrapper: The WSGI file wrapper callback
 
 :since: v0.1.00
 		"""
 
 		direct_abstract_http_stream_response.__init__(self)
 
-		self.stream_mode_supported = direct_abstract_http_stream_response.STREAM_DIRECT
+		self.stream_mode_supported = direct_abstract_http_stream_response.STREAM_CALLBACK | direct_abstract_http_stream_response.STREAM_DIRECT
 		"""
 Support chunked streaming
+		"""
+		self.wsgi_file_wrapper = wsgi_file_wrapper
+		"""
+The WSGI file wrapper callback
 		"""
 		self.wsgi_header_response = wsgi_header_response
 		"""
@@ -78,7 +84,8 @@ python.org: Return an iterator object.
 :since:  v0.1.00
 		"""
 
-		return self
+		if (self.streamer != None and self.wsgi_file_wrapper != None): return (self.wsgi_file_wrapper(self.streamer) if (self.compressor == None) else direct_http_compressed_streamer(self.streamer, self.compressor))
+		else: return self
 	#
 
 	def __next__(self):
@@ -90,22 +97,40 @@ python.org: Return the next item from the container.
 :since:  v0.1.00
 		"""
 
-		if (self.active and self.data != None):
-		#
-			var_return = self.data
-			self.data = None
+		var_return = None
 
-			self.finish()
-			return var_return
+		if (self.active):
 		#
-		else: raise StopIteration()
+			if (self.streamer != None):
+			#
+				var_return = (None if (self.streamer.eof_check()) else self.streamer.read())
+
+				if (var_return == False): var_return = None
+				elif (var_return != None): var_return = self.prepare_output_data(var_return)
+			#
+			elif (self.data != None):
+			#
+				var_return = self.data
+				self.data = None
+			#
+		#
+
+		if (var_return == None):
+		#
+			self.finish()
+			raise StopIteration()
+		#
+		else: return var_return
 	#
 	next = __next__
 
 	def close(self):
 	#
 		"""
-Finish transmission and cleanup resources.
+PEP 333: If the iterable returned by the application has a close() method,
+the server or gateway must call that method upon completion of the current
+request, whether the request was completed normally, or terminated early due
+to an error.
 
 :since: v0.1.00
 		"""
@@ -141,7 +166,7 @@ Sends the prepared response headers.
 		headers = [ ]
 		headers_indexed = dict([( value, key ) for ( key, value ) in self.headers_indexed.items()])
 
-		for header_name in self.headers:
+		for header_name in self.filter_headers():
 		#
 			header_value = str(self.headers[header_name])
 

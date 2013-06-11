@@ -265,21 +265,8 @@ Sends the prepared response.
 :since: v0.1.00
 		"""
 
-		raise RuntimeError("Not implemented", 38)
-	#
-
-	def send_raw_data(self, data = None):
-	#
-		"""
-"send_raw_data()" ignores any protocol specification and send the data as
-given.
-
-:param data: Data to be send (buffer will be appended)
-
-:since: v0.1.00
-		"""
-
-		raise RuntimeError("Not implemented", 38)
+		if (self.data == None): self.stream_response.send()
+		else: self.stream_response.send_data(self.data)
 	#
 
 	def set_accepted_formats(self, accepted_formats):
@@ -292,7 +279,6 @@ Sets the formats the client accepts.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_accepted_formats(accepted_formats)- (#echo(__LINE__)#)")
 		self.stream_response.set_accepted_formats(accepted_formats)
 	#
 
@@ -320,7 +306,6 @@ Sets the compression formats the client accepts.
 :since: v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_compression_formats(accepted_formats)- (#echo(__LINE__)#)")
 		if (self.stream_response.supports_compression()): self.stream_response.set_compression_formats(compression_formats)
 	#
 
@@ -334,8 +319,9 @@ Sets the content for the response.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_content(data)- (#echo(__LINE__)#)")
 		if (self.data != None): raise RuntimeError("Can't combine content and raw data in one response.", 95)
+		if (self.stream_response.is_streamer_set()): raise RuntimeError("Can't combine a streaming object with content.", 95)
+
 		self.content = content
 	#
 
@@ -376,36 +362,10 @@ given.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_raw_data(data)- (#echo(__LINE__)#)")
-		if (self.content != None): raise RuntimeError("Can't combine content and raw data in one response.", 95)
+		if (self.content != None): raise RuntimeError("Can't combine raw data and content in one response.", 95)
+		if (self.stream_response.is_streamer_set()): raise RuntimeError("Can't combine a streaming object with raw data.", 95)
 
 		self.data = data
-	#
-
-	def set_stream_mode(self, active):
-	#
-		"""
-Sets the stream response object used to send data to.
-
-:param active: True if streaming response
-:since: v0.1.00
-		"""
-
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_stream_mode(active)- (#echo(__LINE__)#)")
-		if (self.stream_response.supports_streaming()): self.stream_response.set_stream_mode(active)
-	#
-
-	def set_stream_response(self, stream_response):
-	#
-		"""
-Sets the stream response object used to send data to.
-
-:param stream_response: Stream response
-:since: v0.1.00
-		"""
-
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_stream_response(stream_response)- (#echo(__LINE__)#)")
-		self.stream_response = stream_response
 	#
 
 	def set_script_name(self, script_name):
@@ -419,6 +379,41 @@ Sets the called script name.
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_script_name({0})- (#echo(__LINE__)#)".format(script_name))
 		self.script_name = script_name
+	#
+
+	def set_stream_mode(self):
+	#
+		"""
+Sets the stream mode to send output as soon as available instead of caching
+it.
+
+:since: v0.1.00
+		"""
+
+		if (self.stream_response.supports_streaming()): self.stream_response.set_stream_mode()
+	#
+
+	def set_stream_response(self, stream_response):
+	#
+		"""
+Sets the stream response object used to send data to.
+
+:param stream_response: Stream response
+:since: v0.1.00
+		"""
+
+		self.stream_response = stream_response
+	#
+
+	def set_streamer(self, streamer):
+	#
+		"""
+Sets the streamer to create response data when requested.
+
+:since: v0.1.01
+		"""
+
+		self.stream_response.set_streamer(streamer)
 	#
 
 	def set_title(self, title):

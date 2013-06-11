@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.input_filter
+dNG.pas.data.text.url
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -25,13 +25,13 @@ NOTE_END //n"""
 
 from dNG.pas.data.text.input_filter import direct_input_filter
 
-try: from urllib import parse as urlparse
-except ImportError: import urllib as urlparse
+try: from urllib.parse import quote, unquote
+except ImportError: from urllib import quote, unquote
 
 class direct_url(object):
 #
 	"""
-"direct_input_filter" provides basic input filter functions.
+"direct_url" provides basic URL decoding / encoding methods.
 
 :author:     direct Netware Group
 :copyright:  direct Netware Group - All rights reserved
@@ -54,7 +54,7 @@ Decode special characters from a RFC 2396 compliant URI.
 :since:  v0.1.00
 		"""
 
-		data = urlparse.unquote(data)
+		data = unquote(data)
 		return direct_input_filter.filter_control_chars(data).strip()
 	#
 
@@ -71,7 +71,7 @@ Encode special characters for a RFC 2396 compliant URI.
 		"""
 
 		data = direct_input_filter.filter_control_chars(data).strip()
-		return urlparse.quote(data, "")
+		return quote(data, "")
 	#
 #
 

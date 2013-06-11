@@ -24,7 +24,6 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from dNG.pas.module.named_loader import direct_named_loader
-from dNG.pas.controller.xhtml_response import direct_xhtml_response
 from .mapped_element_mixin import direct_mapped_element_mixin
 from .source_value_mixin import direct_source_value_mixin
 

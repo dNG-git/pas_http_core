@@ -71,6 +71,7 @@ Configures the server
 		self.port = int(direct_settings.get("pas_http_standalone_server_port", 8080))
 
 		if (listener_host == ""): self.host = direct_settings.get("pas_http_standalone_server_preferred_hostname", self.socket_hostname)
+		else: self.host = listener_host
 
 		self.server = make_server(listener_host, self.port, direct_http_wsgi1_request)
 		self.server.socket.settimeout(5)

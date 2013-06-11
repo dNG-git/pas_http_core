@@ -24,6 +24,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from binascii import hexlify
+from copy import copy
 from os import urandom
 
 try: import hashlib
@@ -693,8 +694,8 @@ Checks the size for a given string.
 		data_length = (0 if (data == None) else len(data))
 
 		if (required and data_length < 1): var_return = "required_element"
-		elif (min != None and min > data_length): var_return = ( "string_min", "{0:d}".format(min) )
-		elif (max != None and max < data_length): var_return = ( "string_max", "{0:d}".format(max) )
+		elif (min != None and min > data_length): var_return = ( "string_min", str(min) )
+		elif (max != None and max < data_length): var_return = ( "string_max", str(max) )
 		else: var_return = None
 
 		return var_return
@@ -750,8 +751,8 @@ Checks the size for a given string.
 
 			if (number != None):
 			#
-				if (min != None and min > number): var_return = ( "number_min", "{0:d}".format(min) )
-				elif (max != None and max < number): var_return = ( "number_max", "{0:d}".format(max) )
+				if (min != None and min > number): var_return = ( "number_min", str(min) )
+				elif (max != None and max < number): var_return = ( "number_max", str(max) )
 			#
 			else: var_return = "format_invalid"
 		#
@@ -859,7 +860,7 @@ Returns all defined fields.
 :since:  v0.1.00
 		"""
 
-		var_return = self.cache.copy()
+		var_return = (self.cache.copy() if (hasattr(self.cache, "copy")) else copy(self.cache))
 
 		if (self.form_is_valid == None or (not self.form_has_input)):
 		#

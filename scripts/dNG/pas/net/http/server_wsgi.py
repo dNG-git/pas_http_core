@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.server_fastcgi
+dNG.pas.net.http.server_wsgi
 """
 """n// NOTE
 ----------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.server_tornado
+dNG.pas.net.http.server_cherrypy
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,25 +23,25 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from tornado.ioloop import IOLoop
-from tornado.httpserver import HTTPServer
-from tornado.wsgi import WSGIContainer
+from cherrypy import log
+from cherrypy.wsgiserver import CherryPyWSGIServer
+import socket
 
 from dNG.pas.data.settings import direct_settings
 from dNG.pas.controller.http_wsgi1_request import direct_http_wsgi1_request
 from dNG.pas.module.named_loader import direct_named_loader
 from . import direct_server
 
-class direct_server_tornado(direct_server):
+class direct_server_cherrypy(direct_server):
 #
 	"""
-"direct_server_tornado" is responsible to start the HTTP tornado server.
+"direct_server_cherrypy" is responsible to start the HTTP CherryPy server.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.1.00
+:since:      v0.1.01
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -49,24 +49,23 @@ class direct_server_tornado(direct_server):
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_server_tornado)
+Constructor __init__(direct_server_cherrypy)
 
-:since: v0.1.00
+:since: v0.1.01
 		"""
 
 		direct_server.__init__(self)
 
 		self.server = None
 		"""
-Tornado server
+cherrypy server
 		"""
 
 		log_handler = direct_named_loader.get_singleton("dNG.pas.data.logging.log_handler", False)
 
 		if (log_handler != None):
 		#
-			log_handler.add_logger("tornado.application")
-			log_handler.add_logger("tornado.general")
+			log_handler.add_logger("{0}.error.{1}".format(log.logger_root, log.appid))
 			log_handler.return_instance()
 		#
 	#
@@ -76,26 +75,23 @@ Tornado server
 		"""
 Configures the server
 
-:since: v0.1.00
+:since: v0.1.01
 		"""
 
-		listener_host = direct_settings.get("pas_http_tornado_server_host", self.socket_hostname)
-		self.port = int(direct_settings.get("pas_http_tornado_server_port", 8080))
-
-		self.server = HTTPServer(WSGIContainer(direct_http_wsgi1_request))
+		listener_host = direct_settings.get("pas_http_cherrypy_server_host", self.socket_hostname)
+		self.port = int(direct_settings.get("pas_http_cherrypy_server_port", 8080))
 
 		if (listener_host == ""):
 		#
-			self.host = direct_settings.get("pas_http_tornado_server_preferred_hostname", self.socket_hostname)
-			self.server.listen(self.port)
+			listener_host = ("::" if (socket.has_ipv6) else "0.0.0.0")
+			self.host = direct_settings.get("pas_http_cherrypy_server_preferred_hostname", self.socket_hostname)
 		#
-		else:
-		#
-			self.host = listener_host
-			self.server.listen(self.port, listener_host)
-		#
+		else: self.host = listener_host
 
-		if (self.log_handler != None): self.log_handler.info("pas.http.core tornado server starts at '{0}:{1:d}'".format(listener_host, self.port))
+		listener_data = ( listener_host, self.port )
+		self.server = CherryPyWSGIServer(listener_data, direct_http_wsgi1_request, server_name = "directPAS/#echo(pasHttpCoreIVersion)# [direct Netware Group]")
+
+		if (self.log_handler != None): self.log_handler.info("pas.http.core cherrypy server starts at '{0}:{1:d}'".format(listener_host, self.port))
 
 		"""
 Configure common paths and settings
@@ -109,10 +105,10 @@ Configure common paths and settings
 		"""
 Runs the server
 
-:since: v0.1.00
+:since: v0.1.01
 		"""
 
-		try: IOLoop.instance().start()
+		try: self.server.start()
 		except Exception as handled_exception:
 		#
 			if (self.log_handler != None): self.log_handler.error(handled_exception)
@@ -127,10 +123,10 @@ Stop the server
 :param params: Parameter specified
 :param last_return: The return value from the last hook called.
 
-:since: v0.1.00
+:since: v0.1.01
 		"""
 
-		if (self.server != None): IOLoop.instance().stop()
+		if (self.server != None): self.server.stop()
 		return direct_server.stop(self, params, last_return)
 	#
 #

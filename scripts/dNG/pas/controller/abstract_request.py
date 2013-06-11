@@ -35,8 +35,8 @@ from dNG.pas.data.text.l10n import direct_l10n
 from dNG.pas.module.named_loader import direct_named_loader
 from .stdout_stream_response import direct_stdout_stream_response
 
-try: from urllib import parse as urlparse
-except ImportError: import urllib as urlparse
+try: from urllib.parse import quote, unquote
+except ImportError: from urllib import quote, unquote
 
 class direct_abstract_request(object):
 #
@@ -131,7 +131,7 @@ Requested service
 		"""
 Source timezone
 		"""
-		self.output_format = "xhtml"
+		self.output_format = "http_xhtml"
 		"""
 Requested response format name
 		"""
@@ -159,13 +159,12 @@ Executes the given request.
 		"""
 
 		self.log_handler = direct_named_loader.get_singleton("dNG.pas.data.logging.log_handler", False)
-
 		direct_settings.set_log_handler(self.log_handler)
 
-		direct_l10n.set_log_handler(self.log_handler)
 		direct_l10n.set_thread_lang(self.lang)
 
 		direct_l10n.init("core")
+		direct_l10n.init("pas_core")
 		direct_l10n.init("pas_http_core")
 
 		if (self.inner_request != None):
@@ -175,10 +174,7 @@ Executes the given request.
 		#
 		else: request = self
 
-		response = direct_named_loader.get_instance("dNG.pas.controller.{0}_response".format(self.output_format))
-		if (self.log_handler != None): response.set_log_handler(self.log_handler)
-		response.set_charset(direct_l10n.get("lang_charset", "UTF-8"))
-		response.set_stream_response(self.get_stream_response())
+		response = self.init_response()
 
 		try:
 		#
@@ -497,6 +493,23 @@ logged in and/or its timezone is identified.
 		self.timezone = float(direct_settings.get("core_timezone", (timezone / 3600)))
 	#
 
+	def init_response(self):
+	#
+		"""
+Initializes the matching response instance.
+
+:return: (object) Response object
+:since:  v0.1.01
+		"""
+
+		response = direct_named_loader.get_instance("dNG.pas.controller.{0}_response".format(self.output_format))
+		if (self.log_handler != None): response.set_log_handler(self.log_handler)
+		response.set_charset(direct_l10n.get("lang_charset", "UTF-8"))
+		response.set_stream_response(self.get_stream_response())
+
+		return response
+	#
+
 	def parse_dsd (self, dsd):
 	#
 		"""
@@ -511,7 +524,7 @@ news, topics, ... Take care for injection attacks!
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -request.parse_dsd(+dsd)- (#echo(__LINE__)#)")
 
-		if (" " in dsd): dsd = urlparse.quote(dsd)
+		if (" " in dsd): dsd = quote(dsd)
 		dsd = re.sub("[\+]{3,}", "++", dsd, flags = re.I)
 
 		dsd_list = dsd.split("++")
@@ -521,7 +534,7 @@ news, topics, ... Take care for injection attacks!
 		#
 			dsd_element = dsd.strip().split("+", 1)
 
-			if (len(dsd_element) > 1): var_return[dsd_element[0]] = direct_input_filter.filter_control_chars(urlparse.unquote(dsd_element[1]))
+			if (len(dsd_element) > 1): var_return[dsd_element[0]] = direct_input_filter.filter_control_chars(unquote(dsd_element[1]))
 			elif (len(dsd_element[0]) > 0): var_return[dsd_element[0]] = ""
 		#
 
@@ -538,12 +551,12 @@ Parses request parameters.
 
 		self.parameters = self.iline_parse()
 
-		self.action = (re.sub("[;\/\\\?:@\=\&\. \+]", "", urlparse.unquote(self.parameters['a'])) if ("a" in self.parameters) else "")
+		self.action = (re.sub("[;\/\\\?:@\=\&\. \+]", "", unquote(self.parameters['a'])) if ("a" in self.parameters) else "")
 		self.module = (re.sub("[;\/\\\?:@\=\&\. \+]", "", self.parameters['m']) if ("m" in self.parameters) else "")
 
 		if ("s" in self.parameters):
 		#
-			if (" " in self.parameters): self.parameters['s'] = urlparse.quote(self.parameters['s'])
+			if (" " in self.parameters): self.parameters['s'] = quote(self.parameters['s'])
 			self.service = re.sub("[\+]", " ", self.parameters['s'])
 			self.service = re.sub("^\W+", "", self.service)
 			self.service = re.sub("[\/\\\?:@\=\&\.]", "", self.service)
@@ -559,7 +572,7 @@ Parses request parameters.
 Initialize l10n
 		"""
 
-		if ("lang" in self.parameters and os.access(path.normpath("{0}/{1}/core.json".format(direct_settings.get("path_lang"), self.lang)), os.R_OK)): self.lang = self.parameters['lang']
+		if ("lang" in self.parameters and os.access(path.normpath("{0}/{1}/core.json".format(direct_settings.get("path_lang"), self.parameters['lang'])), os.R_OK)): self.lang = self.parameters['lang']
 		else:
 		#
 			if (self.lang == ""): lang_iso = direct_settings.get("core_lang", "en_US")

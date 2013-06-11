@@ -27,10 +27,10 @@ from threading import Thread
 from socket import getfqdn
 
 from dNG.pas.data.settings import direct_settings
+from dNG.pas.data.http.virtual_config import direct_virtual_config
 from dNG.pas.data.logging.log_line import direct_log_line
 from dNG.pas.module.named_loader import direct_named_loader
 from dNG.pas.plugins.hooks import direct_hooks
-from .virtual_config import direct_virtual_config
 
 class direct_server(Thread):
 #
@@ -219,8 +219,8 @@ Returns an HTTP server instance based on the configuration set.
 
 		try:
 		#
-			if (http_server_mode == "django"): var_return = direct_named_loader.get_instance("dNG.pas.net.http.server_django")
-			elif (http_server_mode == "tornado"): var_return = direct_named_loader.get_instance("dNG.pas.net.http.server_tornado")
+			if (http_server_mode == "cherrypy"): var_return = direct_named_loader.get_instance("dNG.pas.net.http.server_cherrypy")
+			elif (http_server_mode == "waitress"): var_return = direct_named_loader.get_instance("dNG.pas.net.http.server_waitress")
 		#
 		except Exception as handled_exception:
 		#

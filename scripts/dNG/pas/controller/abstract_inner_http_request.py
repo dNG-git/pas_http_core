@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.net.http.request_headers_mixin import direct_request_headers_mixin
+from dNG.pas.data.http.request_headers_mixin import direct_request_headers_mixin
 from .abstract_inner_request import direct_abstract_inner_request
 
 class direct_abstract_inner_http_request(direct_abstract_inner_request, direct_request_headers_mixin):

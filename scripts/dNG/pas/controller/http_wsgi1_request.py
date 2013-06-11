@@ -26,17 +26,13 @@ NOTE_END //n"""
 from os import path
 import re
 
-from dNG.data.rfc.http import direct_http
 from dNG.pas.controller.abstract_inner_request import direct_abstract_inner_request
-from dNG.pas.controller.predefined_http_request import direct_predefined_http_request
-from dNG.pas.data.http.request_body import direct_request_body
 from dNG.pas.data.http.request_body_urlencoded import direct_request_body_urlencoded
-from dNG.pas.data.text.input_filter import direct_input_filter
-from dNG.pas.net.http.virtual_config import direct_virtual_config
+from dNG.pas.data.http.virtual_config import direct_virtual_config
 from .abstract_http_request import direct_abstract_http_request
 from .http_wsgi1_stream_response import direct_http_wsgi1_stream_response
 
-class direct_http_wsgi1_request(direct_abstract_http_request, direct_virtual_config):
+class direct_http_wsgi1_request(direct_abstract_http_request):
 #
 	"""
 "direct_http_server" is responsible to start an HTTP aware server.
@@ -71,7 +67,7 @@ Request query string
 		"""
 		self.http_wsgi_stream_response = None
 		"""
-The WSGI header response callback
+The WSGI stream response instance
 		"""
 		self.query_string = ""
 		"""
@@ -100,9 +96,6 @@ Request path after the script
 			#
 		#
 
-		self.body_fp = wsgi_env['wsgi.input']
-		self.server_scheme = wsgi_env['wsgi.url_scheme']
-
 		if ("HTTP_HOST" in wsgi_env):
 		#
 			host_parts = wsgi_env['HTTP_HOST'].rsplit(":", 2)
@@ -115,10 +108,17 @@ Request path after the script
 			#
 		#
 
-		if (self.script_pathname == None): self.script_pathname = ""
+		re_result = (None if (self.client_host == None) else re.match("^::ffff:(\d+)\.(\d+)\.(\d+)\.(\d+)$", self.client_host))
+		if (re_result != None): self.client_host = "{0}.{1}.{2}.{3}".format(re_result.group(1), re_result.group(2), re_result.group(3), re_result.group(4))
 
-		self.http_wsgi_stream_response = direct_http_wsgi1_stream_response(wsgi_header_response)
+		wsgi_file_wrapper = (wsgi_env['wsgi.file_wrapper'] if ("wsgi.file_wrapper" in wsgi_env) else None)
+
+		self.http_wsgi_stream_response = direct_http_wsgi1_stream_response(wsgi_header_response, wsgi_file_wrapper)
 		if ("SERVER_PROTOCOL" in wsgi_env and wsgi_env['SERVER_PROTOCOL'] == "HTTP/1.0"): self.http_wsgi_stream_response.set_http_version(1)
+
+		self.body_fp = wsgi_env['wsgi.input']
+		self.server_scheme = wsgi_env['wsgi.url_scheme']
+		if (self.script_pathname == None): self.script_pathname = ""
 
 		self.init()
 		virtual_config = direct_virtual_config.get_config(self.virtual_pathname)
@@ -130,42 +130,8 @@ Request path after the script
 		#
 		else: virtual_pathname = self.virtual_pathname
 
-		if (virtual_config == None): inner_request = None
-		elif ("setup_function" in virtual_config):
-		#
-			if ("uri" in virtual_config):
-			#
-				uri = (virtual_pathname[len(virtual_config['uri_prefix']):] if ("uri_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['uri_prefix'])) else virtual_pathname)
-				self.set_dsd(virtual_config['uri'], uri)
-			#
-
-			inner_request = virtual_config['setup_function'](self, virtual_config)
-		#
-		elif ("m" in virtual_config or "s" in virtual_config or "a" in virtual_config or "uri" in virtual_config):
-		#
-			inner_request = direct_predefined_http_request()
-
-			if ("m" in virtual_config): inner_request.set_module(virtual_config['m'])
-			if ("s" in virtual_config): inner_request.set_service(virtual_config['s'])
-			if ("a" in virtual_config): inner_request.set_action(virtual_config['a'])
-
-			if ("dsd" in virtual_config):
-			#
-				for key in virtual_config['dsd']: inner_request.set_dsd(key, virtual_config['dsd'][key])
-			#
-
-			if ("uri" in virtual_config):
-			#
-				uri = (virtual_pathname[len(virtual_config['uri_prefix']):] if ("uri_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['uri_prefix'])) else virtual_pathname)
-				inner_request.set_dsd(virtual_config['uri'], uri)
-			#
-		#
-
-		if (isinstance(inner_request, direct_abstract_inner_request)):
-		#
-			inner_request.init(self)
-			self.set_inner_request(inner_request)
-		#
+		inner_request = self.parse_virtual_config(virtual_config, virtual_pathname)
+		if (isinstance(inner_request, direct_abstract_inner_request)): self.set_inner_request(inner_request)
 
 		self.execute()
 	#
@@ -182,46 +148,7 @@ python.org: Return an iterator object.
 		http_wsgi_stream_response = self.http_wsgi_stream_response
 		self.http_wsgi_stream_response = None
 
-		return http_wsgi_stream_response
-	#
-
-	def configure_request_body(self, request_body, content_type_expected = None):
-	#
-		"""
-Parse the input variables given as an URI query string.
-
-:param iline: Input query string with ";" delimiter.
-
-:return: (dict) Parsed query string
-:since:  v0.1.00
-		"""
-
-		var_return = None
-
-		if (isinstance(request_body, direct_request_body)):
-		#
-			if (content_type_expected != None):
-			#
-				content_type = direct_input_filter.filter_control_chars(self.get_header("Content-Type"))
-				if (content_type != None): content_type = content_type.lower().split(";", 1)[0]
-			#
-
-			content_length = direct_input_filter.filter_int(self.get_header("Content-Length"))
-
-			if (self.body_fp != None and (content_type_expected == None or (content_type != None and content_type == content_type_expected)) and ((content_length != None and content_length > 0) or "chunked" in direct_http.header_field_list(self.get_header("Transfer-Encoding")))):
-			#
-				if (content_length != None): request_body.set_input_size(content_length)
-				else: request_body.define_input_chunk_encoded(True)
-
-				content_encoding = self.get_header("Content-Encoding")
-				if (content_encoding != None): request_body.define_input_compression(content_encoding)
-
-				request_body.set_input_ptr(self.body_fp)
-				var_return = request_body
-			#
-		#
-
-		return var_return
+		return iter(http_wsgi_stream_response)
 	#
 
 	def get_stream_response(self):

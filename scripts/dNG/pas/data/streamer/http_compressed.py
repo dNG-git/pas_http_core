@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.gzip_compressor
+dNG.pas.data.streamer.http_compressed
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,76 +23,68 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from struct import pack
-from zlib import compress, crc32, Z_FINISH
-
 from dNG.pas.data.binary import direct_binary
+from dNG.pas.data.logging.log_line import direct_log_line
+from .abstract_encapsulated import direct_abstract_encapsulated
 
-class direct_gzip_compressor(object):
+class direct_http_compressed(direct_abstract_encapsulated):
 #
 	"""
-"direct_gzip_compressor" creates a new Gzip member for each "compress()"
-call.
+Throttles streamer based on the given bandwidth limitation.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.1.01
+:since:      v0.1.00
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
 
-	def __init__(self, level = 6):
+	def __init__(self, streamer, compressor):
 	#
 		"""
-Constructor __init__(direct_gzip_compressor)
+Constructor __init__(direct_http_compressed)
 
-:since: v0.1.01
+:param streamer: Encapsulated streamer instance
+:param compressor: Compression function
+
+:since: v0.1.00
 		"""
 
-		self.level = level
+		direct_abstract_encapsulated.__init__(self, streamer)
+
+		self.compressor = compressor
 		"""
-Deflate compression level
+Compression function
 		"""
 	#
 
-	def compress(self, string):
+	def read(self, var_bytes = 1048576):
 	#
 		"""
-python.org: Compress string, returning a string containing compressed data
-for at least part of the data in string.
+Reads from the current streamer session.
 
-:param string: Original string
+:param var_bytes: How many bytes to read from the current position (0 means
+                  until EOF)
 
-:since: v0.1.01
+:return: (mixed) Data; False on error
+:since:  v0.1.00
 		"""
 
-		data = direct_binary.bytes(string)
+		data = direct_abstract_encapsulated.read(self, var_bytes)
 
-		if (self.level == 9): deflate_flag = 2
-		elif (self.level == 1): deflate_flag = 4
-		else: deflate_flag = 0
+		if (self.compressor != None):
+		#
+			if (data == None or data == False):
+			#
+				data = self.compressor.flush()
+				self.compressor = None
+			#
+			elif (len(data) > 0): data = self.compressor.compress(direct_binary.bytes(data))
+		#
 
-		var_return = pack("<8s2B", direct_binary.bytes("\x1f\x8b" + ("\x00" if (self.level == 0) else "\x08") + "\x00\x00\x00\x00\x00"), deflate_flag, 255)
-		var_return += compress(data, self.level)[2:-4]
-		var_return += pack("<2L", crc32(data), int(len(data) % 4294967296))
-
-		return var_return
-	#
-
-	def flush(self, mode = Z_FINISH):
-	#
-		"""
-python.org: All pending input is processed, and a string containing the
-remaining compressed output is returned.
-
-:param mode: Flush mode
-
-:since: v0.1.01
-		"""
-
-		return direct_binary.BYTES_TYPE()
+		return data
 	#
 #
 

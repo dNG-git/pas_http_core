@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.oset.parser
+dNG.pas.data.theme.renderer
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ from dNG.pas.module.named_loader import direct_named_loader
 class direct_renderer(direct_abstract_impl, direct_block_mixin, direct_each_mixin, direct_if_condition_mixin, direct_mapped_element_mixin, direct_rewrite_mixin):
 #
 	"""
-The OSet parser takes a template string to render the output.
+The theme renderer parses and renders a template file.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved

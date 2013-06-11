@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.oset.file_parser
+dNG.pas.data.xhtml.mmedia_parser
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -33,10 +33,11 @@ from dNG.pas.data.text.l10n import direct_l10n
 from dNG.pas.data.text.tag_parser.rewrite_mixin import direct_rewrite_mixin
 from dNG.pas.module.named_loader import direct_named_loader
 
-class direct_mmedia_text_file(direct_abstract_impl, direct_rewrite_mixin):
+class direct_mmedia_parser(direct_abstract_impl, direct_rewrite_mixin):
 #
 	"""
-The OSet file parser takes a file to render the output.
+Parses files in the "mmedia" directory to set configured values and replace
+language placeholders.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -50,7 +51,7 @@ The OSet file parser takes a file to render the output.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_file_parser)
+Constructor __init__(direct_mmedia_parser)
 
 :since: v0.1.00
 		"""
@@ -64,7 +65,7 @@ Constructor __init__(direct_file_parser)
 	def __del__(self):
 	#
 		"""
-Destructor __del__(direct_file_parser)
+Destructor __del__(direct_mmedia_parser)
 
 :since: v0.1.00
 		"""
@@ -146,15 +147,14 @@ Check if a possible tag match is a false positive.
 	def render(self, file_pathname):
 	#
 		"""
-Renders content ready for output from the given OSet template.
+Renders content ready for output from the given "mmedia" file.
 
-:param template_name: OSet template name
-:param content: Content object
+:param file_pathname: mmedia file path and name
 
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -mmediaTextFile.render({0})- (#echo(__LINE__)#)".format(file_pathname))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -mmediaParser.render({0})- (#echo(__LINE__)#)".format(file_pathname))
 
 		file_pathname = path.normpath(file_pathname)
 		file_content = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_pathname))

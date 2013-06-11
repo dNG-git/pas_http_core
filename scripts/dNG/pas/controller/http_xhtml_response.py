@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.xhtml_response
+dNG.pas.controller.http_xhtml_response
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ from dNG.pas.module.named_loader import direct_named_loader
 from dNG.pas.plugins.hooks import direct_hooks
 from .abstract_http_response import direct_abstract_http_response
 
-class direct_xhtml_response(direct_abstract_http_response):
+class direct_http_xhtml_response(direct_abstract_http_response):
 #
 	"""
 The following class implements the response object for XHTML content.
@@ -49,7 +49,7 @@ The following class implements the response object for XHTML content.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_xhtml_response)
+Constructor __init__(direct_http_xhtml_response)
 
 :since: v0.1.00
 		"""
@@ -216,7 +216,13 @@ Sends the prepared response.
 :since: v0.1.00
 		"""
 
-		if (self.data != None): self.send_raw_data()
+		if (self.data != None or self.stream_response.is_streamer_set()):
+		#
+			if (not self.initialized): self.init()
+			self.send_headers()
+
+			if (self.data != None): direct_abstract_http_response.send(self)
+		#
 		elif (self.content != None):
 		#
 			if (self.title != None): self.theme_renderer.set_title(self.title)
@@ -265,29 +271,6 @@ occurred if they are not sent and all buffers are "None".
 
 			self.send()
 		#
-	#
-
-	def send_raw_data(self, data = None):
-	#
-		"""
-"send_raw_data()" ignores any protocol specification and send the data as
-given.
-
-:param data: Data to be send (buffer will be appended)
-
-:since: v0.1.00
-		"""
-
-		if (not self.initialized): self.init()
-		self.send_headers()
-
-		if (self.data != None):
-		#
-			self.stream_response.send_data(self.data)
-			self.data = None
-		#
-
-		if (data != None): self.stream_response.send_data(data)
 	#
 
 	def set_oset(self, oset):
