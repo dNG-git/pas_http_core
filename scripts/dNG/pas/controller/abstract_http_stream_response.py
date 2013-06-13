@@ -224,7 +224,7 @@ Prepare data for output. Compress and transform it if required.
 
 		if (self.compressor != None):
 		#
-			if (data == None): data = (self.compressor.flush() if (self.stream_mode_supported & AbstractStreamResponse.STREAM_CALLBACK != AbstractStreamResponse.STREAM_CALLBACK) else Binary.BYTES_TYPE())
+			if (data == None): data = (Binary.BYTES_TYPE() if (self.stream_mode_supported & AbstractStreamResponse.STREAM_CALLBACK == AbstractStreamResponse.STREAM_CALLBACK and self.streamer != None) else self.compressor.flush())
 			elif (len(data) > 0): data = self.compressor.compress(Binary.bytes(data))
 		#
 
