@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.services.cache
+dNG.pas.module.blocks.services.Cache
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -26,16 +26,16 @@ NOTE_END //n"""
 from os import path
 import os, re
 
-from dNG.data.file import direct_file
-from dNG.data.rfc.basics import direct_basics as direct_rfc_basics
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.data.http.streaming import direct_streaming
-from dNG.pas.data.text.input_filter import direct_input_filter
-from dNG.pas.data.xhtml.mmedia_parser import direct_mmedia_parser
-from dNG.pas.module.named_loader import direct_named_loader
-from .module import direct_module
+from dNG.data.file import File
+from dNG.data.rfc.basics import Basics as RfcBasics
+from dNG.pas.data.settings import Settings
+from dNG.pas.data.http.streaming import Streaming
+from dNG.pas.data.text.input_filter import InputFilter
+from dNG.pas.data.xhtml.mmedia_parser import MmediaParser
+from dNG.pas.module.named_loader import NamedLoader
+from .module import Module
 
-class direct_cache(direct_module):
+class Cache(Module):
 #
 	"""
 Service for "m=services;s=cache"
@@ -57,12 +57,12 @@ Action for "index"
 :since: v0.1.00
 		"""
 
-		dfile = direct_input_filter.filter_file_path(self.request.get_dsd("dfile", ""))
+		dfile = InputFilter.filter_file_path(self.request.get_dsd("dfile", ""))
 		file_pathname = ""
 
 		if (dfile != None and dfile != ""):
 		#
-			file_pathname = path.abspath("{0}/mmedia/{1}".format(direct_settings.get("path_data"), dfile))
+			file_pathname = path.abspath("{0}/mmedia/{1}".format(Settings.get("path_data"), dfile))
 
 			if (path.exists(file_pathname) and os.access(file_pathname, os.R_OK)):
 			#
@@ -72,7 +72,7 @@ Action for "index"
 
 					if (file_content == None):
 					#
-						file_obj = direct_file()
+						file_obj = File()
 
 						if (file_obj.open(file_pathname, True, "r")):
 						#
@@ -87,7 +87,7 @@ Action for "index"
 			else: file_pathname = ""
 		#
 
-		is_last_modified_supported = (direct_settings.get("pas_http_cache_modification_check", "1") == "1")
+		is_last_modified_supported = (Settings.get("pas_http_cache_modification_check", "1") == "1")
 		is_modified = True
 		is_valid = False
 		last_modified_on_server = 0
@@ -98,7 +98,7 @@ Action for "index"
 
 			if (is_last_modified_supported and self.request.get_header("If-Modified-Since") != None):
 			#
-				last_modified_on_client = direct_rfc_basics.get_rfc2616_timestamp(self.request.get_header("If-Modified-Since"))
+				last_modified_on_client = RfcBasics.get_rfc2616_timestamp(self.request.get_header("If-Modified-Since"))
 
 				if (last_modified_on_client > -1):
 				#
@@ -137,17 +137,17 @@ Action for "index"
 				elif (file_extension == "js"): self.response.set_header("Content-Type", "text/javascript")
 				elif (file_extension == "svg"): self.response.set_header("Content-Type", "text/svg+xml")
 
-				parser = direct_mmedia_parser()
+				parser = MmediaParser()
 
 				self.response.init(True)
 				self.response.set_raw_data(parser.render(file_pathname))
 			#
 			elif (re_result != None):
 			#
-				streamer = direct_named_loader.get_instance("dNG.pas.data.streamer.file", False)
+				streamer = NamedLoader.get_instance("dNG.pas.data.streamer.File", False)
 
 				if (streamer == None): self.response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
-				else: direct_streaming.run(self.request, streamer, ("file://" if (file_pathname[:1] == "/") else "file:///") + file_pathname, self.response)
+				else: Streaming.run(self.request, streamer, ("file://" if (file_pathname[:1] == "/") else "file:///") + file_pathname, self.response)
 			#
 			else: self.response.set_header("HTTP/1.1", "HTTP/1.1 415 Unsupported Media Type", True)
 		#

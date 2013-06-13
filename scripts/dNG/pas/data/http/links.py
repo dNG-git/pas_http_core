@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.links
+dNG.pas.data.http.Links
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -32,14 +32,14 @@ except ImportError:
 	from urlparse import urlsplit
 #
 
-from dNG.pas.controller.abstract_request import direct_abstract_request
-from dNG.pas.data.binary import direct_binary
-from dNG.pas.data.settings import direct_settings
+from dNG.pas.controller.abstract_request import AbstractRequest
+from dNG.pas.data.binary import Binary
+from dNG.pas.data.settings import Settings
 
-class direct_links(object):
+class Links(object):
 #
 	"""
-"direct_links" provides common method for (X)HTML links.
+"Links" provides common method for (X)HTML links.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -64,7 +64,7 @@ Relative URLs like "index.py?..."
 	"""
 
 	@staticmethod
-	def build_url(type, parameters, py_escape = None):
+	def build_url(var_type, parameters, py_escape = None):
 	#
 		"""
 Adds a link. You may use internal links "index.py?...", external links like
@@ -73,30 +73,30 @@ parts of it if it's larger than x characters. This function uses "shadow"
 URLs to be search engine friendly if applicable and the request URI as a
 source for parameters.
 
-:param type: Link type (see constants)
+:param var_type: Link type (see constants)
 
 :since: v0.1.00
 		"""
 
-		var_return = direct_links.get_url(type, parameters)
-		parameters = direct_links.filter_parameters(parameters)
+		var_return = Links.get_url(var_type, parameters)
+		parameters = Links.filter_parameters(parameters)
 
 		if (len(parameters) > 0):
 		#
 			if ("?" not in var_return): var_return += "?"
 			elif (var_return[-1:] != ";"): var_return += ";"
 
-			var_return += direct_links.build_url_formatted("{0}={1}", ";", parameters, py_escape = None)
+			var_return += Links.build_url_formatted("{0}={1}", ";", parameters, py_escape = None)
 		#
 
-		if (type & direct_links.TYPE_OPTICAL == direct_links.TYPE_OPTICAL):
+		if (var_type & Links.TYPE_OPTICAL == Links.TYPE_OPTICAL):
 		#
 			"""
 A filter is required for really long URLs. First we will have a look at the
 "optical maximal length" setting, then if the URL is larger than the setting
 			"""
 
-			length_available = int(direct_settings.get("pas_html_url_optical_max_length", 100))
+			length_available = int(Settings.get("pas_html_url_optical_max_length", 100))
 
 			if (len(var_return) > length_available):
 			#
@@ -206,7 +206,7 @@ This method removes all parameters marked as "__remove__".
 
 		var_return = ""
 
-		if (py_escape == None): py_escape = direct_links.escape
+		if (py_escape == None): py_escape = Links.escape
 
 		for key in parameters:
 		#
@@ -215,7 +215,7 @@ This method removes all parameters marked as "__remove__".
 
 			if (key == "dsd"):
 			#
-				dsd_value = direct_links.build_url_dsd_formatted(parameters[key], py_escape)
+				dsd_value = Links.build_url_dsd_formatted(parameters[key], py_escape)
 
 				if (len(dsd_value) > 0):
 				#
@@ -306,7 +306,7 @@ This method removes all parameters marked as "__remove__" or special ones.
 
 		for key in parameters:
 		#
-			if (type(parameters[key]) == dict and len(parameters[key]) > 0): var_return[key] = direct_links.build_url_remove_requested(parameters[key])
+			if (type(parameters[key]) == dict and len(parameters[key]) > 0): var_return[key] = Links.build_url_remove_requested(parameters[key])
 			elif (parameters[key] == "__remove__"): del(var_return[key])
 		#
 
@@ -337,7 +337,7 @@ Escape the given data for embedding into (X)HTML.
 	def filter_parameters(parameters):
 	#
 		"""
-This method removes all parameters marked as "__remove__".
+This method filters all parameters of the type "__<KEYWORD>__".
 
 :param parameters: Parameters dict
 
@@ -348,9 +348,14 @@ This method removes all parameters marked as "__remove__".
 
 		var_return = parameters.copy()
 
-		if ("__request__" in var_return and var_return['__request__']):
+		if ("__query__" in var_return and len(var_return['__query__']) > 0):
 		#
-			request = direct_abstract_request.get_instance()
+			if (len(var_return) == 1): var_return = AbstractRequest.get_instance().iline_parse(var_return['__query__'])
+			else: del(var_return['__query__'])
+		#
+		elif ("__request__" in var_return and var_return['__request__']):
+		#
+			request = AbstractRequest.get_instance()
 			inner_request = request.get_inner_request()
 			if (inner_request != None): request = inner_request
 
@@ -373,16 +378,16 @@ This method removes all parameters marked as "__remove__".
 			del(var_return['__request__'])
 		#
 
-		return direct_links.build_url_remove_requested(var_return)
+		return Links.build_url_remove_requested(var_return)
 	#
 
 	@staticmethod
-	def get_url(type, parameters):
+	def get_url(var_type, parameters):
 	#
 		"""
 Adds a link.
 
-:param type: Link type (see constants)
+:param var_type: Link type (see constants)
 :param parameters: Link parameters
 
 :since: v0.1.00
@@ -392,22 +397,22 @@ Adds a link.
 
 		if ("__scheme__" in parameters and "__path__" in parameters):
 		#
-			var_return = "{0}://".format(direct_binary.str(parameters['__scheme__']))
-			if ("__host__" in parameters): var_return += direct_binary.str(parameters['__host__'])
-			if ("__port__" in parameters): var_return += ":{0}".format(direct_binary.str(parameters['__port__']))
-			var_return += direct_binary.str(parameters['__path__'])
+			var_return = "{0}://".format(Binary.str(parameters['__scheme__']))
+			if ("__host__" in parameters): var_return += Binary.str(parameters['__host__'])
+			if ("__port__" in parameters): var_return += ":{0}".format(Binary.str(parameters['__port__']))
+			var_return += Binary.str(parameters['__path__'])
 		#
 		else:
 		#
-			request = direct_abstract_request.get_instance(False)
+			request = AbstractRequest.get_instance(False)
 
-			if (type == direct_links.TYPE_RELATIVE):
+			if (var_type == Links.TYPE_RELATIVE):
 			#
-				if ("__path__" in parameters): var_return = direct_binary.str(parameters['__path__'])
+				if ("__path__" in parameters): var_return = Binary.str(parameters['__path__'])
 				else:
 				#
 					script_name = request.get_script_name()
-					if (script_name != None): var_return = direct_binary.str(script_name)
+					if (script_name != None): var_return = Binary.str(script_name)
 				#
 			#
 			else:
@@ -419,10 +424,10 @@ Adds a link.
 
 				if (scheme == None or ("__path__" not in parameters and script_pathname == None)): raise RuntimeError("Can't construct a full URL from the received request if it is not provided", 5)
 
-				var_return = "{0}://".format(direct_binary.str(scheme))
-				if (host != None): var_return += direct_binary.str(host)
+				var_return = "{0}://".format(Binary.str(scheme))
+				if (host != None): var_return += Binary.str(host)
 				if (port != None): var_return += ":{0:d}".format(port)
-				var_return += (direct_binary.str(parameters['__path__']) if ("__path__" in parameters) else "/" + direct_binary.str(script_pathname))
+				var_return += (Binary.str(parameters['__path__']) if ("__path__" in parameters) else "/" + Binary.str(script_pathname))
 			#
 		#
 

@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.tag_parser.mapped_element_mixin
+dNG.pas.data.text.tag_parser.MappedElementMixin
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-class direct_mapped_element_mixin(object):
+class MappedElementMixin(object):
 #
 	"""
 This tag parser mixin provides support for mapping elements for loops.
@@ -40,7 +40,7 @@ This tag parser mixin provides support for mapping elements for loops.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_mapped_element_mixin)
+Constructor __init__(MappedElementMixin)
 
 :access: protected
 :since:  v0.1.00

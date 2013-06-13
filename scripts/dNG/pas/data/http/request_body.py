@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.request_body
+dNG.pas.data.http.RequestBody
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -27,14 +27,14 @@ from threading import Event, Thread
 from time import time
 from zlib import decompressobj, MAX_WBITS
 
-from dNG.pas.data.byte_buffer import direct_byte_buffer
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.data.binary import direct_binary
+from dNG.pas.data.binary import Binary
+from dNG.pas.data.byte_buffer import ByteBuffer
+from dNG.pas.data.settings import Settings
 
-class direct_request_body(dict, Thread):
+class RequestBody(dict, Thread):
 #
 	"""
-"direct_common" provides common method for (X)HTML links.
+The class "RequestBody" implements method to read the request body.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -48,7 +48,7 @@ class direct_request_body(dict, Thread):
 	def __init__(self, receive_in_thread = False):
 	#
 		"""
-Constructor __init__(direct_request_body)
+Constructor __init__(RequestBody)
 
 :since: v0.1.00
 		"""
@@ -84,16 +84,16 @@ True if reading should happen in a separate thread.
 		"""
 Event called after all data has been received.
 		"""
-		self.socket_data_timeout = int(direct_settings.get("pas_server_socket_data_timeout", 0))
+		self.socket_data_timeout = int(Settings.get("pas_server_socket_data_timeout", 0))
 		"""
 Timeout for each network read.
 		"""
-		self.timeout = int(direct_settings.get("pas_http_request_body_timeout", 7200))
+		self.timeout = int(Settings.get("pas_http_request_body_timeout", 7200))
 		"""
 Absolute timeout to receive the request body.
 		"""
 
-		if (self.socket_data_timeout < 1): self.socket_data_timeout = int(direct_settings.get("pas_global_socket_data_timeout", 30))
+		if (self.socket_data_timeout < 1): self.socket_data_timeout = int(Settings.get("pas_global_socket_data_timeout", 30))
 		self.received_event.set()
 	#
 
@@ -160,7 +160,7 @@ Returns the request body.
 
 :param timeout: Attribute name
 
-:return: (direct_action) UPnP action callable
+:return: (str) Request body data
 :since:  v0.1.00
 		"""
 
@@ -189,10 +189,10 @@ Sets a given pointer for the streamed post instance.
 
 		try:
 		#
-			binary_newline = direct_binary.bytes("\r\n")
+			binary_newline = Binary.bytes("\r\n")
 			chunk_buffer = None
 			chunk_size = 0
-			input_data = direct_byte_buffer()
+			input_data = ByteBuffer()
 			is_last_chunk = False
 			if (self.input_size < 0): self.input_size = 5
 			size_unread = self.input_size
@@ -307,17 +307,17 @@ used to read the body it is started here as well.
 		#
 	#
 
-	def set_input_size(self, bytes):
+	def set_input_size(self, var_bytes):
 	#
 		"""
 Sets the expected input size.
 
-:param bytes: Size in bytes
+:param var_bytes: Size in bytes
 
 :since: v0.1.00
 		"""
 
-		self.input_size = bytes
+		self.input_size = var_bytes
 	#
 #
 

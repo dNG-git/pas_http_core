@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.request_body_urlencoded
+dNG.pas.data.http.RequestBodyUrlencoded
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -28,13 +28,13 @@ import re
 try: from urllib.parse import parse_qsl
 except ImportError: from urlparse import parse_qsl
 
-from dNG.pas.data.binary import direct_binary
-from .request_body import direct_request_body
+from dNG.pas.data.binary import Binary
+from .request_body import RequestBody
 
-class direct_request_body_urlencoded(direct_request_body):
+class RequestBodyUrlencoded(RequestBody):
 #
 	"""
-"direct_request_body_urlencoded" parses an incoming request body as
+"RequestBodyUrlencoded" parses an incoming request body as
 "application/x-www-form-urlencoded".
 
 :author:     direct Netware Group
@@ -51,12 +51,12 @@ class direct_request_body_urlencoded(direct_request_body):
 	def __init__(self, parse_in_thread = False):
 	#
 		"""
-Constructor __init__(direct_streamed_post)
+Constructor __init__(RequestBodyUrlencoded)
 
 :since: v0.1.00
 		"""
 
-		direct_request_body.__init__(self, parse_in_thread)
+		RequestBody.__init__(self, parse_in_thread)
 
 		self.parsed_data = None
 		"""
@@ -124,15 +124,15 @@ Sets a given pointer for the streamed post instance.
 :since: v0.1.00
 		"""
 
-		post_data = direct_request_body.get(self, timeout)
+		post_data = RequestBody.get(self, timeout)
 
 		field_arrays = { }
-		parsed_data = parse_qsl(direct_binary.str(post_data.read()), True, True)
+		parsed_data = parse_qsl(Binary.str(post_data.read()), True, True)
 		self.parsed_data = { }
 
 		for parsed_field in parsed_data:
 		#
-			re_result = direct_request_body_urlencoded.RE_ARRAY.search(parsed_field[0])
+			re_result = RequestBodyUrlencoded.RE_ARRAY.search(parsed_field[0])
 
 			if (re_result == None):
 			#

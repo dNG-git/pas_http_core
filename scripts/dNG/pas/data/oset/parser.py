@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.oset.parser
+dNG.pas.data.oset.Parser
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -25,17 +25,17 @@ NOTE_END //n"""
 
 import re
 
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.data.tag_parser.abstract_impl import direct_abstract_impl
-from dNG.pas.data.text.l10n import direct_l10n
-from dNG.pas.data.text.tag_parser.block_mixin import direct_block_mixin
-from dNG.pas.data.text.tag_parser.each_mixin import direct_each_mixin
-from dNG.pas.data.text.tag_parser.if_condition_mixin import direct_if_condition_mixin
-from dNG.pas.data.text.tag_parser.mapped_element_mixin import direct_mapped_element_mixin
-from dNG.pas.data.text.tag_parser.rewrite_mixin import direct_rewrite_mixin
-from dNG.pas.module.named_loader import direct_named_loader
+from dNG.pas.data.settings import Settings
+from dNG.pas.data.tag_parser.abstract import Abstract as AbstractTagParser
+from dNG.pas.data.text.l10n import L10n
+from dNG.pas.data.text.tag_parser.block_mixin import BlockMixin
+from dNG.pas.data.text.tag_parser.each_mixin import EachMixin
+from dNG.pas.data.text.tag_parser.if_condition_mixin import IfConditionMixin
+from dNG.pas.data.text.tag_parser.mapped_element_mixin import MappedElementMixin
+from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
+from dNG.pas.module.named_loader import NamedLoader
 
-class direct_parser(direct_abstract_impl, direct_block_mixin, direct_each_mixin, direct_if_condition_mixin, direct_mapped_element_mixin, direct_rewrite_mixin):
+class Parser(AbstractTagParser, BlockMixin, EachMixin, IfConditionMixin, MappedElementMixin, RewriteMixin):
 #
 	"""
 The OSet parser takes a template string to render the output.
@@ -52,19 +52,19 @@ The OSet parser takes a template string to render the output.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_parser)
+Constructor __init__(Parser)
 
 :since: v0.1.00
 		"""
 
-		direct_abstract_impl.__init__(self)
-		direct_mapped_element_mixin.__init__(self)
+		AbstractTagParser.__init__(self)
+		MappedElementMixin.__init__(self)
 
 		self.content = None
 		"""
 Content cache for OSet template replacements
 		"""
-		self.log_handler = direct_named_loader.get_singleton("dNG.pas.data.logging.log_handler", False)
+		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 		"""
 The log_handler is called whenever debug messages should be logged or errors
 happened.
@@ -107,7 +107,7 @@ Change data according to the matched tag.
 
 				if (source == None): var_return += self.render_block(data[data_position:tag_end_position])
 				elif (source == "content"): var_return += self.render_block(data[data_position:tag_end_position], "content", self.mapped_element_update("content", self.content), key, mapping_key)
-				elif (source == "settings"): var_return += self.render_block(data[data_position:tag_end_position], "settings", self.mapped_element_update("settings", direct_settings.get_instance()), key, mapping_key)
+				elif (source == "settings"): var_return += self.render_block(data[data_position:tag_end_position], "settings", self.mapped_element_update("settings", Settings.get_instance()), key, mapping_key)
 			#
 
 			var_return += data_closed
@@ -124,7 +124,7 @@ Change data according to the matched tag.
 				mapping_key = re_result.group(3)
 
 				if (source == "content"): var_return += self.render_each(data[data_position:tag_end_position], "content", self.mapped_element_update("content", self.content), key, mapping_key)
-				elif (source == "settings"): var_return += self.render_each(data[data_position:tag_end_position], "settings", self.mapped_element_update("settings", direct_settings.get_instance()), key, mapping_key)
+				elif (source == "settings"): var_return += self.render_each(data[data_position:tag_end_position], "settings", self.mapped_element_update("settings", Settings.get_instance()), key, mapping_key)
 			#
 
 			var_return += data_closed
@@ -142,7 +142,7 @@ Change data according to the matched tag.
 				value = re_result.group(5).strip()
 
 				if (source == "content"): var_return += self.render_if_condition(self.mapped_element_update("content", self.content), key, operator, value, data[data_position:tag_end_position])
-				elif (source == "settings"): var_return += self.render_if_condition(self.mapped_element_update("settings", direct_settings.get_instance()), key, operator, value, data[data_position:tag_end_position])
+				elif (source == "settings"): var_return += self.render_if_condition(self.mapped_element_update("settings", Settings.get_instance()), key, operator, value, data[data_position:tag_end_position])
 			#
 
 			var_return += data_closed
@@ -153,8 +153,8 @@ Change data according to the matched tag.
 			key = data[data_position:tag_end_position]
 
 			if (source == "content"): var_return += self.render_rewrite(self.mapped_element_update("content", self.content), key)
-			elif (source == "l10n"): var_return += self.render_rewrite(self.mapped_element_update("l10n", direct_l10n.get_instance()), key)
-			elif (source == "settings"): var_return += self.render_rewrite(self.mapped_element_update("settings", direct_settings.get_instance()), key)
+			elif (source == "l10n"): var_return += self.render_rewrite(self.mapped_element_update("l10n", L10n.get_instance()), key)
+			elif (source == "settings"): var_return += self.render_rewrite(self.mapped_element_update("settings", Settings.get_instance()), key)
 
 			var_return += data_closed
 		#

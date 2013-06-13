@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.http_wsgi1_stream_response
+dNG.pas.controller.HttpWsgi1StreamResponse
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -25,11 +25,11 @@ NOTE_END //n"""
 
 from collections import Iterator
 
-from dNG.pas.data.binary import direct_binary
-from dNG.pas.data.streamer.http_compressed import direct_http_compressed as direct_http_compressed_streamer
-from .abstract_http_stream_response import direct_abstract_http_stream_response
+from dNG.pas.data.binary import Binary
+from dNG.pas.data.streamer.http_compressed import HttpCompressed as HttpCompressedStreamer
+from .abstract_http_stream_response import AbstractHttpStreamResponse
 
-class direct_http_wsgi1_stream_response(direct_abstract_http_stream_response, Iterator):
+class HttpWsgi1StreamResponse(AbstractHttpStreamResponse, Iterator):
 #
 	"""
 This stream response instance will write all data to the underlying WSGI
@@ -47,7 +47,7 @@ implementation.
 	def __init__(self, wsgi_header_response, wsgi_file_wrapper = None):
 	#
 		"""
-Constructor __init__(direct_http_wsgi1_stream_response)
+Constructor __init__(HttpWsgi1StreamResponse)
 
 :param wsgi_header_response: WSGI header response callback
 :param wsgi_file_wrapper: The WSGI file wrapper callback
@@ -55,9 +55,9 @@ Constructor __init__(direct_http_wsgi1_stream_response)
 :since: v0.1.00
 		"""
 
-		direct_abstract_http_stream_response.__init__(self)
+		AbstractHttpStreamResponse.__init__(self)
 
-		self.stream_mode_supported = direct_abstract_http_stream_response.STREAM_CALLBACK | direct_abstract_http_stream_response.STREAM_DIRECT
+		self.stream_mode_supported = AbstractHttpStreamResponse.STREAM_CALLBACK | AbstractHttpStreamResponse.STREAM_DIRECT
 		"""
 Support chunked streaming
 		"""
@@ -84,8 +84,8 @@ python.org: Return an iterator object.
 :since:  v0.1.00
 		"""
 
-		if (self.streamer != None and self.wsgi_file_wrapper != None): return (self.wsgi_file_wrapper(self.streamer) if (self.compressor == None) else direct_http_compressed_streamer(self.streamer, self.compressor))
-		else: return self
+		if (self.streamer != None and self.wsgi_file_wrapper != None): return (self.wsgi_file_wrapper(self.streamer) if (self.compressor == None) else HttpCompressedStreamer(self.streamer, self.compressor))
+		else: return (self if (self.compressor == None or self.streamer == None) else HttpCompressedStreamer(self.streamer, self.compressor))
 	#
 
 	def __next__(self):
@@ -101,6 +101,10 @@ python.org: Return the next item from the container.
 
 		if (self.active):
 		#
+			"""
+This iterator is only called for uncompressed data.
+			"""
+
 			if (self.streamer != None):
 			#
 				var_return = (None if (self.streamer.eof_check()) else self.streamer.read())
@@ -148,7 +152,7 @@ Finish transmission and cleanup resources.
 
 		if (self.active):
 		#
-			direct_abstract_http_stream_response.finish(self)
+			AbstractHttpStreamResponse.finish(self)
 			self.wsgi_write = None
 		#
 	#
@@ -204,7 +208,7 @@ Writes the given data.
 		#
 			if (self.active and self.wsgi_write != None):
 			#
-				data = direct_binary.bytes(data)
+				data = Binary.bytes(data)
 				self.wsgi_write(data)
 			#
 		#

@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.http_wsgi1_request
+dNG.pas.controller.HttpWsgi1Request
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -26,16 +26,16 @@ NOTE_END //n"""
 from os import path
 import re
 
-from dNG.pas.controller.abstract_inner_request import direct_abstract_inner_request
-from dNG.pas.data.http.request_body_urlencoded import direct_request_body_urlencoded
-from dNG.pas.data.http.virtual_config import direct_virtual_config
-from .abstract_http_request import direct_abstract_http_request
-from .http_wsgi1_stream_response import direct_http_wsgi1_stream_response
+from dNG.pas.controller.abstract_inner_request import AbstractInnerRequest
+from dNG.pas.data.http.request_body_urlencoded import RequestBodyUrlencoded
+from dNG.pas.data.http.virtual_config import VirtualConfig
+from .abstract_http_request import AbstractHttpRequest
+from .http_wsgi1_stream_response import HttpWsgi1StreamResponse
 
-class direct_http_wsgi1_request(direct_abstract_http_request):
+class HttpWsgi1Request(AbstractHttpRequest):
 #
 	"""
-"direct_http_server" is responsible to start an HTTP aware server.
+"HttpWsgi1Request" takes a WSGI environment and the start response callback.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -49,7 +49,7 @@ class direct_http_wsgi1_request(direct_abstract_http_request):
 	def __init__(self, wsgi_env, wsgi_header_response):
 	#
 		"""
-Constructor __init__(direct_wsgi1_request)
+Constructor __init__(HttpWsgi1Request)
 
 :param wsgi_env: WSGI environment
 :param wsgi_header_response: WSGI header response callback
@@ -59,7 +59,7 @@ Constructor __init__(direct_wsgi1_request)
 
 		if ("wsgi.version" not in wsgi_env or (wsgi_env['wsgi.version'] != ( 1, 0 ) and wsgi_env['wsgi.version'] != ( 1, 1 ))): raise RuntimeError("WSGI protocol unsupported")
 
-		direct_abstract_http_request.__init__(self)
+		AbstractHttpRequest.__init__(self)
 
 		self.body_fp = None
 		"""
@@ -113,7 +113,7 @@ Request path after the script
 
 		wsgi_file_wrapper = (wsgi_env['wsgi.file_wrapper'] if ("wsgi.file_wrapper" in wsgi_env) else None)
 
-		self.http_wsgi_stream_response = direct_http_wsgi1_stream_response(wsgi_header_response, wsgi_file_wrapper)
+		self.http_wsgi_stream_response = HttpWsgi1StreamResponse(wsgi_header_response, wsgi_file_wrapper)
 		if ("SERVER_PROTOCOL" in wsgi_env and wsgi_env['SERVER_PROTOCOL'] == "HTTP/1.0"): self.http_wsgi_stream_response.set_http_version(1)
 
 		self.body_fp = wsgi_env['wsgi.input']
@@ -121,17 +121,17 @@ Request path after the script
 		if (self.script_pathname == None): self.script_pathname = ""
 
 		self.init()
-		virtual_config = direct_virtual_config.get_config(self.virtual_pathname)
+		virtual_config = VirtualConfig.get_config(self.virtual_pathname)
 
 		if (virtual_config == None and (self.virtual_pathname != "" or self.virtual_pathname == "/")):
 		#
-			virtual_config = direct_virtual_config.get_config(self.script_pathname)
+			virtual_config = VirtualConfig.get_config(self.script_pathname)
 			virtual_pathname = self.script_pathname
 		#
 		else: virtual_pathname = self.virtual_pathname
 
 		inner_request = self.parse_virtual_config(virtual_config, virtual_pathname)
-		if (isinstance(inner_request, direct_abstract_inner_request)): self.set_inner_request(inner_request)
+		if (isinstance(inner_request, AbstractInnerRequest)): self.set_inner_request(inner_request)
 
 		self.execute()
 	#
@@ -176,9 +176,9 @@ Parse the input variables given as an URI query string.
 		"""
 
 		if (iline == None): iline = self.query_string
-		var_return = direct_abstract_http_request.iline_parse(self, iline)
+		var_return = AbstractHttpRequest.iline_parse(self, iline)
 
-		request_body = direct_request_body_urlencoded()
+		request_body = RequestBodyUrlencoded()
 		request_body = self.configure_request_body(request_body, "application/x-www-form-urlencoded")
 
 		if (request_body != None):
@@ -203,7 +203,7 @@ Do preparations for request handling.
 		if ("ACCEPT-LANGUAGE" in self.headers): self.lang = self.headers['ACCEPT-LANGUAGE']
 		self.script_name = path.basename(self.script_pathname)
 
-		direct_abstract_http_request.init(self)
+		AbstractHttpRequest.init(self)
 	#
 #
 

@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.abstract_block
+dNG.pas.module.blocks.AbstractBlock
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -25,14 +25,14 @@ NOTE_END //n"""
 
 import re
 
-from dNG.pas.controller.abstract_request import direct_abstract_request
-from dNG.pas.controller.abstract_response import direct_abstract_response
-from dNG.pas.data.translatable_exception import direct_translatable_exception
+from dNG.pas.controller.abstract_request import AbstractRequest
+from dNG.pas.controller.abstract_response import AbstractResponse
+from dNG.pas.data.translatable_exception import TranslatableException
 
-class direct_abstract_block(object):
+class AbstractBlock(object):
 #
 	"""
-"direct_abstract_block" provides methods for module and service
+"AbstractBlock" provides methods for module and service
 implementations.
 
 :author:     direct Netware Group
@@ -47,7 +47,7 @@ implementations.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_abstract_block)
+Constructor __init__(AbstractBlock)
 
 :since: v0.1.00
 		"""
@@ -86,7 +86,7 @@ Response instance
 	def __del__(self):
 	#
 		"""
-Destructor __del__(direct_abstract_block)
+Destructor __del__(AbstractBlock)
 
 :since: v0.1.00
 		"""
@@ -129,10 +129,10 @@ Execute the requested action.
 		else:
 		#
 			if (self.primary_action and self.response.supports_headers()): self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
-			raise direct_translatable_exception("core_unsupported_command", "Identified action '{0}' is not supported".format(self.action))
+			raise TranslatableException("core_unsupported_command", "Identified action '{0}' is not supported".format(self.action))
 		#
 
-		return self.action_result
+		return ("" if (self.action_result == None) else self.action_result)
 	#
 
 	def set_action(self, action, context = None):
@@ -149,8 +149,8 @@ Sets an block action for execution.
 		self.action = action
 		self.context = context
 		self.primary_action = False
-		self.request = direct_abstract_request.get_instance()
-		self.response = direct_abstract_response.get_instance()
+		self.request = AbstractRequest.get_instance()
+		self.response = AbstractResponse.get_instance()
 	#
 
 	def set_action_result(self, result):

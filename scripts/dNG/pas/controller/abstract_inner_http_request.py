@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.abstract_inner_http_request
+dNG.pas.controller.AbstractInnerHttpRequest
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,10 +23,10 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.http.request_headers_mixin import direct_request_headers_mixin
-from .abstract_inner_request import direct_abstract_inner_request
+from dNG.pas.data.http.request_headers_mixin import RequestHeadersMixin
+from .abstract_inner_request import AbstractInnerRequest
 
-class direct_abstract_inner_http_request(direct_abstract_inner_request, direct_request_headers_mixin):
+class AbstractInnerHttpRequest(AbstractInnerRequest, RequestHeadersMixin):
 #
 	"""
 This abstract class contains common methods for inner requests.
@@ -43,13 +43,13 @@ This abstract class contains common methods for inner requests.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_abstract_inner_request)
+Constructor __init__(AbstractInnerRequest)
 
 :since: v0.1.00
 		"""
 
-		direct_abstract_inner_request.__init__(self)
-		direct_request_headers_mixin.__init__(self)
+		AbstractInnerRequest.__init__(self)
+		RequestHeadersMixin.__init__(self)
 
 		self.compression_formats = None
 		"""
@@ -79,7 +79,7 @@ Initializes default values from the original request.
 :since: v0.1.00
 		"""
 
-		direct_abstract_inner_request.init(self, request)
+		AbstractInnerRequest.init(self, request)
 
 		if (request.supports_compression()): self.compression_formats = request.get_compression_formats()
 		if (request.supports_headers()): self.headers = request.get_headers()

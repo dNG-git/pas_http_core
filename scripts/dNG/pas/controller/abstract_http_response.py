@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.abstract_http_response
+dNG.pas.controller.AbstractHttpResponse
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,13 +23,13 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.data.rfc.basics import direct_basics as direct_rfc_basics
-from dNG.pas.data.exception import direct_exception
-from dNG.pas.data.translatable_exception import direct_translatable_exception
-from dNG.pas.data.settings import direct_settings
-from .abstract_response import direct_abstract_response
+from dNG.data.rfc.basics import Basics as RfcBasics
+from dNG.pas.data.traced_exception import TracedException
+from dNG.pas.data.translatable_exception import TranslatableException
+from dNG.pas.data.settings import Settings
+from .abstract_response import AbstractResponse
 
-class direct_abstract_http_response(direct_abstract_response):
+class AbstractHttpResponse(AbstractResponse):
 #
 	"""
 The following class implements HTTP header specific methods.
@@ -46,12 +46,12 @@ The following class implements HTTP header specific methods.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_abstract_http_response)
+Constructor __init__(AbstractHttpResponse)
 
 :since: v0.1.00
 		"""
 
-		direct_abstract_response.__init__(self)
+		AbstractResponse.__init__(self)
 
 		self.headers_sent = False
 		"""
@@ -127,10 +127,10 @@ send.
 
 		if (self.get_header("HTTP/1.1", True) == None): self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
 
-		if (message == None and isinstance(exception, direct_translatable_exception)): message = "{0:l10n_message}".format(exception)
-		if (not isinstance(exception, direct_exception)): exception = direct_exception(str(exception), exception)
+		if (message == None and isinstance(exception, TranslatableException)): message = "{0:l10n_message}".format(exception)
+		if (not isinstance(exception, TracedException)): exception = TracedException(str(exception), exception)
 
-		direct_abstract_response.handle_exception_error(self, message, exception.get_printable_trace().replace("\n", "<br />\n"))
+		AbstractResponse.handle_exception_error(self, message, exception.get_printable_trace().replace("\n", "<br />\n"))
 	#
 
 	def init(self, cache = False, compress = True):
@@ -146,20 +146,20 @@ compression setting and information about P3P.
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.init(+cache, +compress)- (#echo(__LINE__)#)")
 
-		direct_abstract_response.init(self, cache, compress)
+		AbstractResponse.init(self, cache, compress)
 
 		if (self.stream_response.supports_headers()):
 		#
 			output_headers = ({ "Cache-Control": "public" } if (cache) else { "Cache-Control": "no-cache, no-store, must-revalidate" })
-			if (self.expires > 0): output_headers['Expires'] = direct_rfc_basics.get_rfc1123_datetime(self.expires)
-			if (self.last_modified > 0): output_headers['Last-Modified'] = direct_rfc_basics.get_rfc1123_datetime(self.last_modified)
+			if (self.expires > 0): output_headers['Expires'] = RfcBasics.get_rfc1123_datetime(self.expires)
+			if (self.last_modified > 0): output_headers['Last-Modified'] = RfcBasics.get_rfc1123_datetime(self.last_modified)
 
 			"""
 Send P3P header if defined
 			"""
 
-			p3p_cp = direct_settings.get("pas_core_p3p_cp", "")
-			p3p_url = direct_settings.get("pas_core_p3p_url", "").replace("&", "&amp;")
+			p3p_cp = Settings.get("pas_core_p3p_cp", "")
+			p3p_url = Settings.get("pas_core_p3p_url", "").replace("&", "&amp;")
 
 			if (p3p_cp + p3p_url != ""):
 			#
@@ -191,7 +191,7 @@ Sends the prepared response headers.
 
 		if (self.stream_response.supports_headers() and (not self.headers_sent)):
 		#
-			if (direct_settings.get("pas_core_cookies", True) and len(self.cookies)> 0): self.set_header("Set-Cookie", self.cookies)
+			if (Settings.get("pas_core_cookies", True) and len(self.cookies)> 0): self.set_header("Set-Cookie", self.cookies)
 			self.headers_sent = True
 			self.stream_response.send_headers()
 		#

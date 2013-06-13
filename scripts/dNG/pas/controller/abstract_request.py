@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.abstract_request
+dNG.pas.controller.AbstractRequest
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -27,18 +27,19 @@ from os import path
 from threading import local
 from time import timezone
 from weakref import proxy
-import os, re
+import os
+import re
 
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.data.text.input_filter import direct_input_filter
-from dNG.pas.data.text.l10n import direct_l10n
-from dNG.pas.module.named_loader import direct_named_loader
-from .stdout_stream_response import direct_stdout_stream_response
+from dNG.pas.data.settings import Settings
+from dNG.pas.data.text.input_filter import InputFilter
+from dNG.pas.data.text.l10n import L10n
+from dNG.pas.module.named_loader import NamedLoader
+from .stdout_stream_response import StdoutStreamResponse
 
 try: from urllib.parse import quote, unquote
 except ImportError: from urllib import quote, unquote
 
-class direct_abstract_request(object):
+class AbstractRequest(object):
 #
 	"""
 This abstract class contains common methods for request implementations.
@@ -60,7 +61,7 @@ Thread-local static object
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_abstract_request)
+Constructor __init__(AbstractRequest)
 
 :since: v0.1.00
 		"""
@@ -136,13 +137,13 @@ Source timezone
 Requested response format name
 		"""
 
-		direct_abstract_request.local.instance = proxy(self)
+		AbstractRequest.local.instance = proxy(self)
 	#
 
 	def __del__(self):
 	#
 		"""
-Destructor __del__(direct_abstract_request)
+Destructor __del__(AbstractRequest)
 
 :since: v0.1.00
 		"""
@@ -158,14 +159,14 @@ Executes the given request.
 :since: v0.1.00
 		"""
 
-		self.log_handler = direct_named_loader.get_singleton("dNG.pas.data.logging.log_handler", False)
-		direct_settings.set_log_handler(self.log_handler)
+		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
+		Settings.set_log_handler(self.log_handler)
 
-		direct_l10n.set_thread_lang(self.lang)
+		L10n.set_thread_lang(self.lang)
 
-		direct_l10n.init("core")
-		direct_l10n.init("pas_core")
-		direct_l10n.init("pas_http_core")
+		L10n.init("core")
+		L10n.init("pas_core")
+		L10n.init("pas_http_core")
 
 		if (self.inner_request != None):
 		#
@@ -193,20 +194,20 @@ Executes the given request.
 			requested_module = request.get_module()
 			if (response.supports_script_name()): response.set_script_name(request.get_script_name())
 
-			requested_service = request.get_service()
+			requested_service = "".join([word.capitalize() for word in request.get_service().split("_")])
 
-			if (direct_named_loader.is_defined("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))):
+			if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))):
 			#
-				instance = direct_named_loader.get_instance("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))
+				instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))
 				if (self.log_handler != None): instance.set_log_handler(self.log_handler)
 				instance.init(request, response)
 				instance.execute()
 			#
 			else:
 			#
-				if (direct_named_loader.is_defined("dNG.pas.module.blocks.{0}.module".format(requested_module))):
+				if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.module".format(requested_module))):
 				#
-					instance = direct_named_loader.get_instance("dNG.pas.module.blocks.{0}.module".format(requested_module));
+					instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.module".format(requested_module));
 					if (self.log_handler != None): instance.set_log_handler(self.log_handler)
 					instance.init(request, response)
 				#
@@ -444,7 +445,7 @@ Returns the stream object output should go to.
 :since:  v0.1.00
 		"""
 
-		return direct_stdout_stream_response()
+		return StdoutStreamResponse()
 	#
 
 	def iline_parse(self, iline = None):
@@ -490,7 +491,7 @@ logged in and/or its timezone is identified.
 		"""
 
 		self.parse_parameters()
-		self.timezone = float(direct_settings.get("core_timezone", (timezone / 3600)))
+		self.timezone = float(Settings.get("core_timezone", (timezone / 3600)))
 	#
 
 	def init_response(self):
@@ -502,9 +503,9 @@ Initializes the matching response instance.
 :since:  v0.1.01
 		"""
 
-		response = direct_named_loader.get_instance("dNG.pas.controller.{0}_response".format(self.output_format))
+		response = NamedLoader.get_instance("dNG.pas.controller.{0}Response".format("".join([word.capitalize() for word in self.output_format.split("_")])))
 		if (self.log_handler != None): response.set_log_handler(self.log_handler)
-		response.set_charset(direct_l10n.get("lang_charset", "UTF-8"))
+		response.set_charset(L10n.get("lang_charset", "UTF-8"))
 		response.set_stream_response(self.get_stream_response())
 
 		return response
@@ -534,7 +535,7 @@ news, topics, ... Take care for injection attacks!
 		#
 			dsd_element = dsd.strip().split("+", 1)
 
-			if (len(dsd_element) > 1): var_return[dsd_element[0]] = direct_input_filter.filter_control_chars(unquote(dsd_element[1]))
+			if (len(dsd_element) > 1): var_return[dsd_element[0]] = InputFilter.filter_control_chars(unquote(dsd_element[1]))
 			elif (len(dsd_element[0]) > 0): var_return[dsd_element[0]] = ""
 		#
 
@@ -556,12 +557,12 @@ Parses request parameters.
 
 		if ("s" in self.parameters):
 		#
-			if (" " in self.parameters): self.parameters['s'] = quote(self.parameters['s'])
-			self.service = re.sub("[\+]", " ", self.parameters['s'])
-			self.service = re.sub("^\W+", "", self.service)
-			self.service = re.sub("[\/\\\?:@\=\&\.]", "", self.service)
-			self.service = re.sub("\W+$", "", self.service)
-			self.service = re.sub("\\x20", ".", self.service)
+			if (" " in self.parameters['s']): self.parameters['s'] = quote(self.parameters['s'])
+			self.parameters['s'] = re.sub("[\+]", " ", self.parameters['s'])
+			self.parameters['s'] = re.sub("^\W+", "", self.parameters['s'])
+			self.parameters['s'] = re.sub("[\/\\\?:@\=\&\.]", "", self.parameters['s'])
+			self.parameters['s'] = re.sub("\W+$", "", self.parameters['s'])
+			self.service = re.sub("\\x20", ".", self.parameters['s'])
 		#
 		else: self.service = ""
 
@@ -572,21 +573,21 @@ Parses request parameters.
 Initialize l10n
 		"""
 
-		if ("lang" in self.parameters and os.access(path.normpath("{0}/{1}/core.json".format(direct_settings.get("path_lang"), self.parameters['lang'])), os.R_OK)): self.lang = self.parameters['lang']
+		if ("lang" in self.parameters and os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), self.parameters['lang'])), os.R_OK)): self.lang = self.parameters['lang']
 		else:
 		#
-			if (self.lang == ""): lang_iso = direct_settings.get("core_lang", "en_US")
+			if (self.lang == ""): lang_iso = Settings.get("core_lang", "en_US")
 			else: lang_iso = self.lang.lower()
 
 			lang_iso = re.sub("\\W", "", lang_iso)
 			lang_domain = lang_iso[:2]
 
-			if (direct_settings.is_defined("core_lang_{0}".format(lang_iso))): lang_iso = direct_settings.get("core_lang_{0}".format(lang_iso))
-			elif (direct_settings.is_defined("core_lang_{0}".format(lang_domain))): lang_domain = direct_settings.get("core_lang_{0}".format(lang_domain))
+			if (Settings.is_defined("core_lang_{0}".format(lang_iso))): lang_iso = Settings.get("core_lang_{0}".format(lang_iso))
+			elif (Settings.is_defined("core_lang_{0}".format(lang_domain))): lang_domain = Settings.get("core_lang_{0}".format(lang_domain))
 
-			if (os.access(path.normpath("{0}/{1}/core.json".format(direct_settings.get("path_lang"), lang_iso)), os.R_OK)): self.lang = lang_iso
-			elif (os.access(path.normpath("{0}/{1}/core.json".format(direct_settings.get("path_lang"), lang_domain)), os.R_OK)): self.lang = lang_domain
-			else: self.lang = direct_settings.get("core_lang", "en")
+			if (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_iso)), os.R_OK)): self.lang = lang_iso
+			elif (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_domain)), os.R_OK)): self.lang = lang_domain
+			else: self.lang = Settings.get("core_lang", "en")
 		#
 
 		"""
@@ -708,11 +709,11 @@ Get the abstract_request singleton.
 
 :param count: Count "get()" request
 
-:return: (direct_abstract_request) Object on success
+:return: (AbstractRequest) Object on success
 :since:  v0.1.00
 		"""
 
-		return (direct_abstract_request.local.instance if (hasattr(direct_abstract_request.local, "instance")) else None)
+		return (AbstractRequest.local.instance if (hasattr(AbstractRequest.local, "instance")) else None)
 	#
 #
 

@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.services.module
+dNG.pas.module.blocks.services.Module
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,12 +23,12 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.module.blocks.abstract_block import direct_abstract_block
+from dNG.pas.module.blocks.abstract_block import AbstractBlock
 
-class direct_module(direct_abstract_block):
+class Module(AbstractBlock):
 #
 	"""
-module for "services"
+Module for "services"
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved

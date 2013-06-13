@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.form.input
+dNG.pas.data.xhtml.form.Input
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,13 +23,13 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.controller.abstract_request import direct_abstract_request
-from dNG.pas.data.text.input_form import direct_input_form
+from dNG.pas.controller.abstract_request import AbstractRequest
+from dNG.pas.data.text.input_form import InputForm
 
-class direct_input(direct_input_form):
+class Input(InputForm):
 #
 	"""
-"direct_input" provides form methods based on (X)HTML.
+"Input" provides form methods based on (X)HTML.
 
 :author:     direct Netware Group
 :copyright:  direct Netware Group - All rights reserved
@@ -51,7 +51,7 @@ Returns all defined fields.
 :since:  v0.1.00
 		"""
 
-		var_return = direct_input_form.get_data(self, flush)
+		var_return = InputForm.get_data(self, flush)
 
 		for section in var_return:
 		#
@@ -76,7 +76,7 @@ source (e.g. from a HTTP POST request parameter).
 :since:  v0.1.00
 		"""
 
-		return (direct_abstract_request.get_instance().get_parameter(name) if (self.form_has_input) else None)
+		return (AbstractRequest.get_instance().get_parameter(name) if (self.form_has_input) else None)
 	#
 
 	def set_input_available(self):

@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.tag_parser.if_condition_mixin
+dNG.pas.data.text.tag_parser.IfConditionMixin
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,10 +23,10 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.binary import direct_binary
-from .source_value_mixin import direct_source_value_mixin
+from dNG.pas.data.binary import Binary
+from .source_value_mixin import SourceValueMixin
 
-class direct_if_condition_mixin(direct_source_value_mixin):
+class IfConditionMixin(SourceValueMixin):
 #
 	"""
 This tag parser mixin provides support for if conditions.
@@ -56,13 +56,13 @@ Checks and renders the content of the "if" condition.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -tagParser.render_if_condition(source, {0}, {1}, {2}, data)- (#echo(__LINE__)#)".format(key, operator, value))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -TagParser.render_if_condition(source, {0}, {1}, {2}, data)- (#echo(__LINE__)#)".format(key, operator, value))
 		var_return = ""
 
 		is_valid = False
 		source_value = self.source_get_value(source, key)
 
-		source_value = ("" if (source_value == None) else direct_binary.str(source_value))
+		source_value = ("" if (source_value == None) else Binary.str(source_value))
 		if (type(source_value) != str): source_value = str(source_value)
 
 		if (operator == "==" and source_value == value): is_valid = True

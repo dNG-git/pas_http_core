@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.abstract_inner_request
+dNG.pas.controller.AbstractInnerRequest
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -25,7 +25,7 @@ NOTE_END //n"""
 
 from os import path
 
-class direct_abstract_inner_request(object):
+class AbstractInnerRequest(object):
 #
 	"""
 This abstract class contains common methods for inner requests.
@@ -42,7 +42,7 @@ This abstract class contains common methods for inner requests.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_abstract_inner_request)
+Constructor __init__(AbstractInnerRequest)
 
 :since: v0.1.00
 		"""

@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.abstract_http_request
+dNG.pas.controller.AbstractHttpRequest
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,18 +23,18 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.data.rfc.http import direct_http
-from dNG.pas.controller.abstract_inner_request import direct_abstract_inner_request
-from dNG.pas.controller.predefined_http_request import direct_predefined_http_request
-from dNG.pas.data.http.request_body import direct_request_body
-from dNG.pas.data.http.request_headers_mixin import direct_request_headers_mixin
-from dNG.pas.data.text.input_filter import direct_input_filter
-from .abstract_request import direct_abstract_request
+from dNG.data.rfc.http import Http
+from dNG.pas.controller.abstract_inner_request import AbstractInnerRequest
+from dNG.pas.controller.predefined_http_request import PredefinedHttpRequest
+from dNG.pas.data.http.request_body import RequestBody
+from dNG.pas.data.http.request_headers_mixin import RequestHeadersMixin
+from dNG.pas.data.text.input_filter import InputFilter
+from .abstract_request import AbstractRequest
 
-class direct_abstract_http_request(direct_abstract_request, direct_request_headers_mixin):
+class AbstractHttpRequest(AbstractRequest, RequestHeadersMixin):
 #
 	"""
-"direct_abstract_http_request" implements header related methods.
+"AbstractHttpRequest" implements header related methods.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -48,13 +48,13 @@ class direct_abstract_http_request(direct_abstract_request, direct_request_heade
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_abstract_http_request)
+Constructor __init__(AbstractHttpRequest)
 
 :since: v0.1.00
 		"""
 
-		direct_abstract_request.__init__(self)
-		direct_request_headers_mixin.__init__(self)
+		AbstractRequest.__init__(self)
+		RequestHeadersMixin.__init__(self)
 
 		self.type = None
 		"""
@@ -77,17 +77,17 @@ Parse the input variables given as an URI query string.
 
 		var_return = None
 
-		if (isinstance(request_body, direct_request_body)):
+		if (isinstance(request_body, RequestBody)):
 		#
 			if (content_type_expected != None):
 			#
-				content_type = direct_input_filter.filter_control_chars(self.get_header("Content-Type"))
+				content_type = InputFilter.filter_control_chars(self.get_header("Content-Type"))
 				if (content_type != None): content_type = content_type.lower().split(";", 1)[0]
 			#
 
-			content_length = direct_input_filter.filter_int(self.get_header("Content-Length"))
+			content_length = InputFilter.filter_int(self.get_header("Content-Length"))
 
-			if (self.body_fp != None and (content_type_expected == None or (content_type != None and content_type == content_type_expected)) and ((content_length != None and content_length > 0) or "chunked" in direct_http.header_field_list(self.get_header("Transfer-Encoding")))):
+			if (self.body_fp != None and (content_type_expected == None or (content_type != None and content_type == content_type_expected)) and ((content_length != None and content_length > 0) or "chunked" in Http.header_field_list(self.get_header("Transfer-Encoding")))):
 			#
 				if (content_length != None): request_body.set_input_size(content_length)
 				else: request_body.define_input_chunk_encoded(True)
@@ -124,7 +124,7 @@ Initializes the matching response instance.
 :since:  v0.1.01
 		"""
 
-		response = direct_abstract_request.init_response(self)
+		response = AbstractRequest.init_response(self)
 		if (response.supports_headers() and self.type == "HEAD"): response.set_send_headers_only(True)
 		return response
 	#
@@ -139,11 +139,11 @@ Parses request parameters.
 
 		if (self.lang == ""):
 		#
-			lang = direct_input_filter.filter_control_chars(self.get_header("Accept-Language"))
+			lang = InputFilter.filter_control_chars(self.get_header("Accept-Language"))
 			if (lang != None): self.lang = lang.lower().split(",", 1)[0]
 		#
 
-		direct_abstract_request.parse_parameters(self)
+		AbstractRequest.parse_parameters(self)
 	#
 
 	def parse_virtual_config(self, virtual_config, virtual_pathname):
@@ -170,7 +170,7 @@ instance.
 		#
 		elif ("m" in virtual_config or "s" in virtual_config or "a" in virtual_config or "uri" in virtual_config):
 		#
-			inner_request = direct_predefined_http_request()
+			inner_request = PredefinedHttpRequest()
 
 			if ("m" in virtual_config): inner_request.set_module(virtual_config['m'])
 			if ("s" in virtual_config): inner_request.set_service(virtual_config['s'])
@@ -188,7 +188,7 @@ instance.
 			#
 		#
 
-		if (isinstance(inner_request, direct_abstract_inner_request)): inner_request.init(self)
+		if (isinstance(inner_request, AbstractInnerRequest)): inner_request.init(self)
 
 		return inner_request
 	#

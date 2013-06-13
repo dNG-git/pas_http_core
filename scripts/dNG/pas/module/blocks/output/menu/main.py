@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.output.menu.main
+dNG.pas.module.blocks.output.menu.Main
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,12 +23,14 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.module.blocks.abstract_block import direct_abstract_block
+from dNG.data.xml_parser import XmlParser
+from dNG.pas.data.text.url import Url
+from dNG.pas.module.blocks.abstract_block import AbstractBlock
 
-class direct_main(direct_abstract_block):
+class Main(AbstractBlock):
 #
 	"""
-"direct_main" implements a main menu view.
+The "Main" class implements a main menu view.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -47,7 +49,13 @@ Action for "render"
 :since: v0.1.00
 		"""
 
-		self.set_action_result("<nav class='pagemainmenu'><ul><li><a>Hello world</a></li></ul></nav>")
+		links = Url.store_get("mainmenu")
+		rendered_links = [ ]
+		xml_parser = XmlParser()
+
+		for link in links: rendered_links.append(xml_parser.dict2xml_item_encoder({ "tag": "a", "attributes": { "href": link['url'] }, "value": link['title'] }))
+
+		if (len(links) > 0): self.set_action_result("<nav class='pagemainmenu'><ul><li>{0}</li></ul></nav>".format("</li>\n<li>".join(rendered_links)))
 	#
 #
 

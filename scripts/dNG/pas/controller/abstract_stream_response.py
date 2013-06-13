@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.abstract_stream_response
+dNG.pas.controller.AbstractStreamResponse
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,9 +23,9 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.binary import direct_binary
+from dNG.pas.data.binary import Binary
 
-class direct_abstract_stream_response(object):
+class AbstractStreamResponse(object):
 #
 	"""
 A stream response writes given data threadsafe to a underlying stream.
@@ -52,7 +52,7 @@ Do not stream content
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_abstract_http_stream_response)
+Constructor __init__(AbstractStreamResponse)
 
 :since: v0.1.00
 		"""
@@ -86,7 +86,7 @@ Streamer implementation
 	def __del__(self):
 	#
 		"""
-Destructor __del__(direct_abstract_response)
+Destructor __del__(AbstractStreamResponse)
 
 @since v0.1.00
 		"""
@@ -124,9 +124,10 @@ Returns the formats the client accepts.
 	def is_active(self):
 	#
 		"""
-Constructor __init__(direct_server_fascti)
+Returns if the response stream is active.
 
-@since v0.1.00
+:return: (bool) True if active
+:since:  v0.1.00
 		"""
 
 		return self.active
@@ -154,7 +155,7 @@ Send data in cache.
 
 		if (self.active):
 		#
-			if (self.streamer != None and self.stream_mode_supported & direct_abstract_stream_response.STREAM_CALLBACK != direct_abstract_stream_response.STREAM_CALLBACK):
+			if (self.streamer != None and self.stream_mode_supported & AbstractStreamResponse.STREAM_CALLBACK != AbstractStreamResponse.STREAM_CALLBACK):
 			#
 				is_valid = True
 
@@ -180,18 +181,20 @@ Send data in cache.
 	def send_data(self, data):
 	#
 		"""
-Constructor __init__(direct_server_fascti)
+Sends the given data as part of the response.
 
-@since v0.1.00
+:param data: Data to send
+
+:since: v0.1.00
 		"""
 
 		if (self.active):
 		#
-			data = direct_binary.bytes(data)
+			data = Binary.bytes(data)
 
-			if (self.stream_mode == direct_abstract_stream_response.STREAM_NONE):
+			if (self.stream_mode == AbstractStreamResponse.STREAM_NONE):
 			#
-				if (self.data == None): self.data = direct_binary.BYTES_TYPE()
+				if (self.data == None): self.data = Binary.BYTES_TYPE()
 				self.data += data
 			#
 			else: self.write(data)
@@ -214,9 +217,11 @@ Sets the formats the client accepts.
 	def set_active(self, is_active = True):
 	#
 		"""
-Constructor __init__(direct_server_fascti)
+Sets the stream response active.
 
-@since v0.1.00
+:param is_active: True if active
+
+:since: v0.1.00
 		"""
 
 		self.active = is_active
@@ -235,7 +240,7 @@ Sets the streamer to create response data when requested.
 		#
 			self.streamer = streamer
 
-			if (self.stream_mode_supported & direct_abstract_stream_response.STREAM_CALLBACK == direct_abstract_stream_response.STREAM_CALLBACK): self.stream_mode |= direct_abstract_stream_response.STREAM_CALLBACK
+			if (self.stream_mode_supported & AbstractStreamResponse.STREAM_CALLBACK == AbstractStreamResponse.STREAM_CALLBACK): self.stream_mode |= AbstractStreamResponse.STREAM_CALLBACK
 			elif (self.supports_streaming()): self.set_stream_mode()
 		#
 		else: raise RuntimeError("Given streaming object is not supported.", 95)

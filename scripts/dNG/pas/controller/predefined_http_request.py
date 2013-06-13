@@ -23,12 +23,12 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from .abstract_inner_http_request import direct_abstract_inner_http_request
+from .abstract_inner_http_request import AbstractInnerHttpRequest
 
-class direct_predefined_http_request(direct_abstract_inner_http_request):
+class PredefinedHttpRequest(AbstractInnerHttpRequest):
 #
 	"""
-"direct_predefined_http_request" implements predefined requests.
+"PredefinedHttpRequest" implements predefined requests.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved

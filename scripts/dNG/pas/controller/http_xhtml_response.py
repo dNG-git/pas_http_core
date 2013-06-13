@@ -25,14 +25,14 @@ NOTE_END //n"""
 
 import re
 
-from dNG.pas.data.binary import direct_binary
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.data.text.l10n import direct_l10n
-from dNG.pas.module.named_loader import direct_named_loader
-from dNG.pas.plugins.hooks import direct_hooks
-from .abstract_http_response import direct_abstract_http_response
+from dNG.pas.data.binary import Binary
+from dNG.pas.data.settings import Settings
+from dNG.pas.data.text.l10n import L10n
+from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.plugins.hooks import Hooks
+from .abstract_http_response import AbstractHttpResponse
 
-class direct_http_xhtml_response(direct_abstract_http_response):
+class HttpXhtmlResponse(AbstractHttpResponse):
 #
 	"""
 The following class implements the response object for XHTML content.
@@ -49,12 +49,12 @@ The following class implements the response object for XHTML content.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_http_xhtml_response)
+Constructor __init__(HttpXhtmlResponse)
 
 :since: v0.1.00
 		"""
 
-		direct_abstract_http_response.__init__(self)
+		AbstractHttpResponse.__init__(self)
 
 		self.oset = None
 		"""
@@ -88,7 +88,7 @@ Add the defined javascript file to the output.
 :since: v0.1.00
 		"""
 
-		common_names = direct_settings.get("pas_http_theme_oset_js_aliases", { "jquery/jquery.min.js": "jquery/jquery-2.0.0.min.js" })
+		common_names = Settings.get("pas_http_theme_oset_js_aliases", { "jquery/jquery.min.js": "jquery/jquery-2.0.0.min.js" })
 		if (js_file in common_names): js_file= common_names[js_file]
 		self.theme_renderer.add_js_file(js_file)
 	#
@@ -106,7 +106,7 @@ Add output content from an OSet template.
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.add_oset_content({0}, content)- (#echo(__LINE__)#)".format(template_name))
 
-		parser = direct_named_loader.get_instance("dNG.pas.data.oset.file_parser")
+		parser = NamedLoader.get_instance("dNG.pas.data.oset.FileParser")
 		parser.set_oset(self.oset)
 
 		data = parser.render(template_name, content)
@@ -169,7 +169,7 @@ compression setting and information about P3P.
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.init(cache, compress)- (#echo(__LINE__)#)")
 
-		direct_abstract_http_response.init(self, cache, compress)
+		AbstractHttpResponse.init(self, cache, compress)
 
 		if (self.theme_renderer == None):
 		#
@@ -177,9 +177,9 @@ compression setting and information about P3P.
 Set up theme framework
 			"""
 
-			direct_settings.read_file("{0}/settings/pas_http_theme.json".format(direct_settings.get("path_data")))
-			theme = (direct_hooks.call("dNG.pas.http.theme.check_candidates", theme = self.theme) if (direct_settings.get("pas_http_theme_plugins_supported", True)) else None)
-			self.theme_renderer = direct_named_loader.get_instance("dNG.pas.data.theme.renderer")
+			Settings.read_file("{0}/settings/pas_http_theme.json".format(Settings.get("path_data")))
+			theme = (Hooks.call("dNG.pas.http.theme.check_candidates", theme = self.theme) if (Settings.get("pas_http_theme_plugins_supported", True)) else None)
+			self.theme_renderer = NamedLoader.get_instance("dNG.pas.data.theme.Renderer")
 
 			if (theme != None):
 			#
@@ -189,7 +189,7 @@ Set up theme framework
 				else: theme = None
 			#
 
-			if (theme == None and (not self.theme_renderer.is_supported(self.theme))): self.theme = direct_settings.get("pas_http_theme_default", "simple")
+			if (theme == None and (not self.theme_renderer.is_supported(self.theme))): self.theme = Settings.get("pas_http_theme_default", "simple")
 
 			if (self.theme_active == None): self.theme_active = self.theme
 			self.theme_renderer.set(self.theme_active)
@@ -203,8 +203,8 @@ Set up theme framework
 Get the corresponding OSet name
 			"""
 
-			self.oset = direct_settings.get("pas_http_theme_{0}_oset".format(re.sub("\W", "_", self.theme)))
-			if (self.oset == None): self.oset = direct_settings.get("pas_http_theme_oset_default", "xhtml5")
+			self.oset = Settings.get("pas_http_theme_{0}_oset".format(re.sub("\W", "_", self.theme)))
+			if (self.oset == None): self.oset = Settings.get("pas_http_theme_oset_default", "xhtml5")
 		#
 	#
 
@@ -221,13 +221,13 @@ Sends the prepared response.
 			if (not self.initialized): self.init()
 			self.send_headers()
 
-			if (self.data != None): direct_abstract_http_response.send(self)
+			if (self.data != None): AbstractHttpResponse.send(self)
 		#
 		elif (self.content != None):
 		#
 			if (self.title != None): self.theme_renderer.set_title(self.title)
 
-			self.data = direct_binary.utf8_bytes(self.theme_renderer.render(self.content))
+			self.data = Binary.utf8_bytes(self.theme_renderer.render(self.content))
 
 			if ("application/xhtml+xml" in self.stream_response.get_accepted_formats()):
 			#
@@ -255,7 +255,7 @@ occurred if they are not sent and all buffers are "None".
 				header = self.get_header("HTTP/1.1", True)
 				if (header == None): self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
 
-				error = { "title": direct_l10n.get("core_title_error_critical"), "message": (direct_l10n.get("errors_core_unknown_error") if (header == None) else header) }
+				error = { "title": L10n.get("core_title_error_critical"), "message": (L10n.get("errors_core_unknown_error") if (header == None) else header) }
 
 				self.add_oset_content("core.error", error)
 				self.set_title(error['title'])

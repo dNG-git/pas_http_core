@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.server_standalone
+dNG.pas.net.http.ServerStandalone
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -25,14 +25,14 @@ NOTE_END //n"""
 
 from wsgiref.simple_server import make_server
 
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.controller.http_wsgi1_request import direct_http_wsgi1_request
-from . import direct_server
+from dNG.pas.data.settings import Settings
+from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
+from . import Server
 
-class direct_server_standalone(direct_server):
+class ServerStandalone(Server):
 #
 	"""
-"direct_server_standalone" is responsible to start an HTTP aware server.
+"ServerStandalone" is responsible to start an HTTP aware server.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -46,12 +46,12 @@ class direct_server_standalone(direct_server):
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_server_standalone)
+Constructor __init__(ServerStandalone)
 
 :since: v0.1.00
 		"""
 
-		direct_server.__init__(self)
+		Server.__init__(self)
 
 		self.server = None
 		"""
@@ -67,13 +67,13 @@ Configures the server
 :since: v0.1.00
 		"""
 
-		listener_host = direct_settings.get("pas_http_standalone_server_host", self.socket_hostname)
-		self.port = int(direct_settings.get("pas_http_standalone_server_port", 8080))
+		listener_host = Settings.get("pas_http_standalone_server_host", self.socket_hostname)
+		self.port = int(Settings.get("pas_http_standalone_server_port", 8080))
 
-		if (listener_host == ""): self.host = direct_settings.get("pas_http_standalone_server_preferred_hostname", self.socket_hostname)
+		if (listener_host == ""): self.host = Settings.get("pas_http_standalone_server_preferred_hostname", self.socket_hostname)
 		else: self.host = listener_host
 
-		self.server = make_server(listener_host, self.port, direct_http_wsgi1_request)
+		self.server = make_server(listener_host, self.port, HttpWsgi1Request)
 		self.server.socket.settimeout(5)
 		if (self.log_handler != None): self.log_handler.info("pas.http.core wsgiref server starts at '{0}:{1:d}'".format(self.host, self.port))
 
@@ -81,7 +81,7 @@ Configures the server
 Configure common paths and settings
 		"""
 
-		direct_server.configure(self)
+		Server.configure(self)
 	#
 
 	def run(self):
@@ -111,7 +111,7 @@ Stop the server
 		"""
 
 		if (self.server != None): self.server.shutdown()
-		return direct_server.stop(self, params, last_return)
+		return Server.stop(self, params, last_return)
 	#
 #
 

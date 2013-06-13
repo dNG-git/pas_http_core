@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.mmedia_parser
+dNG.pas.data.xhtml.MmediaParser
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -26,14 +26,14 @@ NOTE_END //n"""
 from os import path
 import re
 
-from dNG.data.file import direct_file
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.data.tag_parser.abstract_impl import direct_abstract_impl
-from dNG.pas.data.text.l10n import direct_l10n
-from dNG.pas.data.text.tag_parser.rewrite_mixin import direct_rewrite_mixin
-from dNG.pas.module.named_loader import direct_named_loader
+from dNG.data.file import File
+from dNG.pas.data.settings import Settings
+from dNG.pas.data.tag_parser.abstract import Abstract as AbstractTagParser
+from dNG.pas.data.text.l10n import L10n
+from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
+from dNG.pas.module.named_loader import NamedLoader
 
-class direct_mmedia_parser(direct_abstract_impl, direct_rewrite_mixin):
+class MmediaParser(AbstractTagParser, RewriteMixin):
 #
 	"""
 Parses files in the "mmedia" directory to set configured values and replace
@@ -51,27 +51,27 @@ language placeholders.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_mmedia_parser)
+Constructor __init__(MmediaParser)
 
 :since: v0.1.00
 		"""
 
-		direct_abstract_impl.__init__(self)
+		AbstractTagParser.__init__(self)
 
-		self.cache_instance = direct_named_loader.get_singleton("dNG.pas.data.cache", False)
-		self.log_handler = direct_named_loader.get_singleton("dNG.pas.data.logging.log_handler", False)
+		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.Cache", False)
+		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 	#
 
 	def __del__(self):
 	#
 		"""
-Destructor __del__(direct_mmedia_parser)
+Destructor __del__(MmediaParser)
 
 :since: v0.1.00
 		"""
 
 		if (self.cache_instance != None): self.cache_instance.return_instance()
-		if (direct_abstract_impl != None): direct_abstract_impl.__del__(self)
+		if (AbstractTagParser != None): AbstractTagParser.__del__(self)
 	#
 
 	def parser_change(self, tag_definition, data, tag_position, data_position, tag_end_position):
@@ -99,8 +99,8 @@ Change data according to the matched tag.
 			source = re.match("^\[rewrite:(\w+)\]", data[tag_position:data_position]).group(1)
 			key = data[data_position:tag_end_position]
 
-			if (source == "l10n"): var_return += self.render_rewrite(direct_l10n.get_instance(), key)
-			else: var_return += self.render_rewrite(direct_settings.get_instance(), key)
+			if (source == "l10n"): var_return += self.render_rewrite(L10n.get_instance(), key)
+			else: var_return += self.render_rewrite(Settings.get_instance(), key)
 
 			var_return += data_closed
 		#
@@ -161,7 +161,7 @@ Renders content ready for output from the given "mmedia" file.
 
 		if (file_content == None):
 		#
-			file_obj = direct_file()
+			file_obj = File()
 
 			if (file_obj.open(file_pathname, True, "r")): file_content = file_obj.read()
 			else: raise RuntimeError("Failed to open mmedia file '{0}'".format(file_pathname), 77)

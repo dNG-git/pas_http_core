@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.theme.renderer
+dNG.pas.data.theme.Renderer
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -25,20 +25,21 @@ NOTE_END //n"""
 
 from copy import copy
 from os import path
-import os, re
+import os
+import re
 
-from dNG.data.file import direct_file
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.data.tag_parser.abstract_impl import direct_abstract_impl
-from dNG.pas.data.text.l10n import direct_l10n
-from dNG.pas.data.text.tag_parser.block_mixin import direct_block_mixin
-from dNG.pas.data.text.tag_parser.each_mixin import direct_each_mixin
-from dNG.pas.data.text.tag_parser.if_condition_mixin import direct_if_condition_mixin
-from dNG.pas.data.text.tag_parser.mapped_element_mixin import direct_mapped_element_mixin
-from dNG.pas.data.text.tag_parser.rewrite_mixin import direct_rewrite_mixin
-from dNG.pas.module.named_loader import direct_named_loader
+from dNG.data.file import File
+from dNG.pas.data.settings import Settings
+from dNG.pas.data.tag_parser.abstract import Abstract as AbstractTagParser
+from dNG.pas.data.text.l10n import L10n
+from dNG.pas.data.text.tag_parser.block_mixin import BlockMixin
+from dNG.pas.data.text.tag_parser.each_mixin import EachMixin
+from dNG.pas.data.text.tag_parser.if_condition_mixin import IfConditionMixin
+from dNG.pas.data.text.tag_parser.mapped_element_mixin import MappedElementMixin
+from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
+from dNG.pas.module.named_loader import NamedLoader
 
-class direct_renderer(direct_abstract_impl, direct_block_mixin, direct_each_mixin, direct_if_condition_mixin, direct_mapped_element_mixin, direct_rewrite_mixin):
+class Renderer(AbstractTagParser, BlockMixin, EachMixin, IfConditionMixin, MappedElementMixin, RewriteMixin):
 #
 	"""
 The theme renderer parses and renders a template file.
@@ -55,15 +56,15 @@ The theme renderer parses and renders a template file.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_renderer)
+Constructor __init__(Renderer)
 
 :since: v0.1.00
 		"""
 
-		direct_abstract_impl.__init__(self)
-		direct_mapped_element_mixin.__init__(self)
+		AbstractTagParser.__init__(self)
+		MappedElementMixin.__init__(self)
 
-		self.cache_instance = direct_named_loader.get_singleton("dNG.pas.data.cache", False)
+		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.Cache", False)
 		"""
 Cache instance
 		"""
@@ -79,12 +80,12 @@ CSS files to be added.
 		"""
 JavaScript files to be added.
 		"""
-		self.log_handler = direct_named_loader.get_singleton("dNG.pas.data.logging.log_handler", False)
+		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 		"""
 The log_handler is called whenever debug messages should be logged or errors
 happened.
 		"""
-		self.path = direct_settings.get("path_themes", "{0}/themes".format(direct_settings.get("path_data")))
+		self.path = Settings.get("path_themes", "{0}/themes".format(Settings.get("path_data")))
 		"""
 Path to the themes directory
 		"""
@@ -105,13 +106,13 @@ Page title
 	def __del__(self):
 	#
 		"""
-Destructor __del__(direct_renderer)
+Destructor __del__(Renderer)
 
 :since: v0.1.00
 		"""
 
 		if (self.cache_instance != None): self.cache_instance.return_instance()
-		if (direct_abstract_impl != None): direct_abstract_impl.__del__(self)
+		if (AbstractTagParser != None): AbstractTagParser.__del__(self)
 	#
 
 	def add_js_file(self, js_file):
@@ -215,7 +216,7 @@ Change data according to the matched tag.
 
 				if (source == None): var_return += self.render_block(data[data_position:tag_end_position])
 				elif (source == "content"): var_return += self.render_block(data[data_position:tag_end_position], "content", self.mapped_element_update("content", self.content), key, mapping_key)
-				elif (source == "settings"): var_return += self.render_block(data[data_position:tag_end_position], "settings", self.mapped_element_update("settings", direct_settings.get_instance()), key, mapping_key)
+				elif (source == "settings"): var_return += self.render_block(data[data_position:tag_end_position], "settings", self.mapped_element_update("settings", Settings.get_instance()), key, mapping_key)
 			#
 
 			var_return += data_closed
@@ -232,7 +233,7 @@ Change data according to the matched tag.
 				mapping_key = re_result.group(3)
 
 				if (source == "content"): var_return += self.render_each(data[data_position:tag_end_position], "content", self.mapped_element_update("content", self.content), key, mapping_key)
-				elif (source == "settings"): var_return += self.render_each(data[data_position:tag_end_position], "settings", self.mapped_element_update("settings", direct_settings.get_instance()), key, mapping_key)
+				elif (source == "settings"): var_return += self.render_each(data[data_position:tag_end_position], "settings", self.mapped_element_update("settings", Settings.get_instance()), key, mapping_key)
 			#
 
 			var_return += data_closed
@@ -250,7 +251,7 @@ Change data according to the matched tag.
 				value = re_result.group(5).strip()
 
 				if (source == "content"): var_return += self.render_if_condition(self.mapped_element_update("content", self.content), key, operator, value, data[data_position:tag_end_position])
-				elif (source == "settings"): var_return += self.render_if_condition(self.mapped_element_update("settings", direct_settings.get_instance()), key, operator, value, data[data_position:tag_end_position])
+				elif (source == "settings"): var_return += self.render_if_condition(self.mapped_element_update("settings", Settings.get_instance()), key, operator, value, data[data_position:tag_end_position])
 			#
 
 			var_return += data_closed
@@ -261,8 +262,8 @@ Change data according to the matched tag.
 			key = data[data_position:tag_end_position]
 
 			if (source == "content"): var_return += self.render_rewrite(self.mapped_element_update("content", self.content), key)
-			elif (source == "l10n"): var_return += self.render_rewrite(self.mapped_element_update("l10n", direct_l10n.get_instance()), key)
-			elif (source == "settings"): var_return += self.render_rewrite(self.mapped_element_update("settings", direct_settings.get_instance()), key)
+			elif (source == "l10n"): var_return += self.render_rewrite(self.mapped_element_update("l10n", L10n.get_instance()), key)
+			elif (source == "settings"): var_return += self.render_rewrite(self.mapped_element_update("settings", Settings.get_instance()), key)
 
 			var_return += data_closed
 		#
@@ -353,7 +354,7 @@ Retry with default theme
 
 		if (not os.access(file_pathname, os.R_OK)):
 		#
-			theme = direct_settings.get("pas_http_theme_default").replace(".", "/")
+			theme = Settings.get("pas_http_theme_default").replace(".", "/")
 			theme_subtype = self.theme_subtype
 
 			file_pathname = path.normpath("{0}/{1}/{2}.tsc".format(self.path, theme, theme_subtype))
@@ -369,7 +370,7 @@ Retry with default theme
 
 		if (theme_data == None):
 		#
-			file_obj = direct_file()
+			file_obj = File()
 
 			if (file_obj.open(file_pathname, True, "r")): theme_data = file_obj.read()
 			else: raise RuntimeError("Failed to open theme file for '{0}'".format(self.theme), 77)
@@ -385,16 +386,16 @@ Read corresponding theme configuration
 		"""
 
 		file_pathname = file_pathname[:-3] + "json"
-		direct_settings.read_file(file_pathname)
+		Settings.read_file(file_pathname)
 
-		if (self.title == None): self.title = direct_settings.get("pas_html_title", "Unconfigured site")
+		if (self.title == None): self.title = Settings.get("pas_html_title", "Unconfigured site")
 
 		self.content = {
 			"page_title": self.title,
 			"page_content": content
 		}
 
-		theme_settings = direct_settings.get("pas_http_theme_{0}".format(theme))
+		theme_settings = Settings.get("pas_http_theme_{0}".format(theme))
 
 		css_files = (self.css_files.copy() if (hasattr(self.css_files, "copy")) else copy(self.css_files))
 		js_files = (self.js_files.copy() if (hasattr(self.js_files, "copy")) else copy(self.js_files))

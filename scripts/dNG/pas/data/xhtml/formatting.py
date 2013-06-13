@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.formatting
+dNG.pas.data.xhtml.Formatting
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -28,12 +28,12 @@ from cgi import escape as html_escape
 try: from html.parser import HTMLParser
 except ImportError: from HTMLParser import HTMLParser
 
-from dNG.pas.data.binary import direct_binary
+from dNG.pas.data.binary import Binary
 
-class direct_formatting(object):
+class Formatting(object):
 #
 	"""
-"direct_formatting" is a helper library for (X)HTML related stuff.
+"Formatting" is a helper library for (X)HTML related stuff.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -56,7 +56,7 @@ Escapes given data for (X)HTML output.
 :since:  v0.1.00
 		"""
 
-		return html_escape(direct_binary.str(data), True)
+		return html_escape(Binary.str(data), True)
 	#
 
 	@staticmethod
@@ -71,7 +71,7 @@ Unescapes given (X)HTML data.
 :since:  v0.1.00
 		"""
 
-		return HTMLParser().unescape(direct_binary.str(data))
+		return HTMLParser().unescape(Binary.str(data))
 	#
 #
 

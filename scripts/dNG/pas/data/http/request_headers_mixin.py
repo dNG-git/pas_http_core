@@ -23,9 +23,9 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.data.rfc.http import direct_http
+from dNG.data.rfc.http import Http
 
-class direct_request_headers_mixin(object):
+class RequestHeadersMixin(object):
 #
 	"""
 This request mixin provides header specific methods.
@@ -42,7 +42,7 @@ This request mixin provides header specific methods.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_request_headers_mixin)
+Constructor __init__(RequestHeadersMixin)
 
 :since: v0.1.00
 		"""
@@ -63,7 +63,7 @@ Returns the formats the client accepts.
 		"""
 
 		var_return = self.get_header("Accept")
-		if (var_return != None): var_return = direct_http.header_field_list(var_return)
+		if (var_return != None): var_return = Http.header_field_list(var_return)
 		if (var_return == None): var_return = [ ]
 
 		for position in range(0, len(var_return)): var_return[position] = var_return[position].split(";")[0]
@@ -80,7 +80,7 @@ Returns the compression formats the client accepts.
 		"""
 
 		var_return = self.get_header("Accept-Encoding")
-		if (var_return != None): var_return = direct_http.header_field_list(var_return)
+		if (var_return != None): var_return = Http.header_field_list(var_return)
 		if (var_return == None): var_return = [ ]
 
 		for position in range(0, len(var_return)): var_return[position] = var_return[position].split(";")[0]

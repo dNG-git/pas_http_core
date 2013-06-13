@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.oset.file_parser
+dNG.pas.data.oset.FileParser
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -26,13 +26,13 @@ NOTE_END //n"""
 from os import path
 import os
 
-from dNG.data.file import direct_file
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.data.text.l10n import direct_l10n
-from dNG.pas.module.named_loader import direct_named_loader
-from .parser import direct_parser
+from dNG.data.file import File
+from dNG.pas.data.settings import Settings
+from dNG.pas.data.text.l10n import L10n
+from dNG.pas.module.named_loader import NamedLoader
+from .parser import Parser
 
-class direct_file_parser(direct_parser):
+class FileParser(Parser):
 #
 	"""
 The OSet file parser takes a file to render the output.
@@ -49,14 +49,14 @@ The OSet file parser takes a file to render the output.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_file_parser)
+Constructor __init__(FileParser)
 
 :since: v0.1.00
 		"""
 
-		direct_parser.__init__(self)
+		Parser.__init__(self)
 
-		self.cache_instance = direct_named_loader.get_singleton("dNG.pas.data.cache", False)
+		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.Cache", False)
 		"""
 Cache instance
 		"""
@@ -64,7 +64,7 @@ Cache instance
 		"""
 OSet requested
 		"""
-		self.path = direct_settings.get("path_osets", "{0}/osets".format(direct_settings.get("path_data")))
+		self.path = Settings.get("path_osets", "{0}/osets".format(Settings.get("path_data")))
 		"""
 Path to the osets directory
 		"""
@@ -73,13 +73,13 @@ Path to the osets directory
 	def __del__(self):
 	#
 		"""
-Destructor __del__(direct_file_parser)
+Destructor __del__(FileParser)
 
 :since: v0.1.00
 		"""
 
 		if (self.cache_instance != None): self.cache_instance.return_instance()
-		if (direct_parser != None): direct_parser.__del__(self)
+		if (Parser != None): Parser.__del__(self)
 	#
 
 	def render(self, template_name, content, default = None):
@@ -94,18 +94,18 @@ Renders content ready for output from the given OSet template.
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -osetParser.render({0}, +content)- (#echo(__LINE__)#)".format(template_name))
-		var_return = (direct_l10n.get("pas_http_core_oset_not_viewable") if (default == None) else default)
+		var_return = (L10n.get("pas_http_core_oset_not_viewable") if (default == None) else default)
 
 		try:
 		#
 			file_pathname = path.normpath("{0}/{1}/{2}.tsc".format(self.path, self.oset, template_name.replace(".", "/")))
-			if (not os.access(file_pathname, os.R_OK)): file_pathname = path.normpath("{0}/{1}/{2}.tsc".format(self.path, direct_settings.get("pas_http_theme_oset_default", "xhtml5"), template_name.replace(".", "/")))
+			if (not os.access(file_pathname, os.R_OK)): file_pathname = path.normpath("{0}/{1}/{2}.tsc".format(self.path, Settings.get("pas_http_theme_oset_default", "xhtml5"), template_name.replace(".", "/")))
 
 			template_data = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_pathname))
 
 			if (template_data == None):
 			#
-				file_obj = direct_file()
+				file_obj = File()
 
 				if (file_obj.open(file_pathname, True, "r")): template_data = file_obj.read()
 				else: raise RuntimeError("Failed to open OSet file for '{0}'".format(template_name), 77)
@@ -116,7 +116,7 @@ Renders content ready for output from the given OSet template.
 				elif (self.cache_instance != None): self.cache_instance.set_file(file_pathname, template_data)
 			#
 
-			var_return = direct_parser.render(self, template_data, content)
+			var_return = Parser.render(self, template_data, content)
 		#
 		except Exception as handled_exception:
 		#

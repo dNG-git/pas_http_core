@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.server_wsgi
+dNG.pas.net.http.ServerWsgi
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -26,16 +26,16 @@ NOTE_END //n"""
 from math import floor
 from time import time
 
-from dNG.pas.controller.http_wsgi1_request import direct_http_wsgi1_request
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.module.named_loader import direct_named_loader
-from dNG.pas.plugins.hooks import direct_hooks
-from . import direct_server
+from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
+from dNG.pas.data.settings import Settings
+from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.plugins.hooks import Hooks
+from . import Server
 
-class direct_server_wsgi(direct_server):
+class ServerWsgi(Server):
 #
 	"""
-"direct_server_wsgi" takes requests from WSGI aware servers.
+"ServerWsgi" takes requests from WSGI aware servers.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -49,15 +49,15 @@ class direct_server_wsgi(direct_server):
 	def __init__(self, wsgi_env, wsgi_header_response):
 	#
 		"""
-Constructor __init__(direct_server_wsgi)
+Constructor __init__(ServerWsgi)
 
 :since: v0.1.00
 		"""
 
-		direct_settings.read_file("{0}/settings/pas_core.json".format(direct_settings.get("path_data")), True)
-		direct_settings.read_file("{0}/settings/pas_http_server.json".format(direct_settings.get("path_data")), True)
+		Settings.read_file("{0}/settings/pas_core.json".format(Settings.get("path_data")), True)
+		Settings.read_file("{0}/settings/pas_http_server.json".format(Settings.get("path_data")), True)
 
-		self.cache_instance = direct_named_loader.get_singleton("dNG.pas.data.cache", False)
+		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.Cache", False)
 		"""
 Cache instance
 		"""
@@ -65,7 +65,7 @@ Cache instance
 		"""
 Configured server host
 		"""
-		self.log_handler = direct_named_loader.get_singleton("dNG.pas.data.logging.log_handler", False)
+		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 		"""
 The log_handler is called whenever debug messages should be logged or errors
 happened.
@@ -79,20 +79,20 @@ Server port
 Timestamp of service initialisation
 		"""
 
-		direct_hooks.load("http")
-		direct_hooks.register("dNG.pas.status.getUptime", self.get_uptime)
+		Hooks.load("http")
+		Hooks.register("dNG.pas.status.getUptime", self.get_uptime)
 
 		if (self.log_handler != None):
 		#
-			direct_hooks.set_log_handler(self.log_handler)
-			direct_named_loader.set_log_handler(self.log_handler)
+			Hooks.set_log_handler(self.log_handler)
+			NamedLoader.set_log_handler(self.log_handler)
 			self.log_handler.debug("#echo(__FILEPATH__)# -server.__init__()- (#echo(__LINE__)#)")
 		#
 
-		direct_hooks.call("dNG.pas.http.wsgi.startup")
+		Hooks.call("dNG.pas.http.wsgi.startup")
 
 		self.configure()
-		self.http_wsgi1_request = direct_http_wsgi1_request(wsgi_env, wsgi_header_response)
+		self.http_wsgi1_request = HttpWsgi1Request(wsgi_env, wsgi_header_response)
 	#
 
 	def __iter__(self):
@@ -107,8 +107,8 @@ python.org: Return an iterator object.
 		http_wsgi1_request = self.http_wsgi1_request
 
 		self.http_wsgi1_request = None
-		direct_hooks.call("dNG.pas.http.shutdown")
-		direct_hooks.call("dNG.pas.status.shutdown")
+		Hooks.call("dNG.pas.http.shutdown")
+		Hooks.call("dNG.pas.status.shutdown")
 		if (self.cache_instance != None): self.cache_instance.return_instance()
 
 		return iter(http_wsgi1_request)

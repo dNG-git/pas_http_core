@@ -25,9 +25,9 @@ NOTE_END //n"""
 
 import sys
 
-from .abstract_stream_response import direct_abstract_stream_response
+from .abstract_stream_response import AbstractStreamResponse
 
-class direct_stdout_stream_response(direct_abstract_stream_response):
+class StdoutStreamResponse(AbstractStreamResponse):
 #
 	"""
 This stream response instance will write all data to STDOUT.

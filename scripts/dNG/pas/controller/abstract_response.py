@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.abstract_response
+dNG.pas.controller.AbstractResponse
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -27,11 +27,11 @@ from threading import local
 from time import time
 from weakref import proxy
 
-from dNG.pas.data.binary import direct_binary
-from dNG.pas.data.exception import direct_exception
-from dNG.pas.data.text.l10n import direct_l10n
+from dNG.pas.data.binary import Binary
+from dNG.pas.data.traced_exception import TracedException
+from dNG.pas.data.text.l10n import L10n
 
-class direct_abstract_response(object):
+class AbstractResponse(object):
 #
 	"""
 This abstract class contains common methods for response implementations.
@@ -53,7 +53,7 @@ Thread-local static object
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_abstract_response)
+Constructor __init__(AbstractResponse)
 
 :since: v0.1.00
 		"""
@@ -103,12 +103,16 @@ Called script
 		"""
 Stream response object
 		"""
+		self.store = { }
+		"""
+Response specific generic cache
+		"""
 		self.title = None
 		"""
 Response title
 		"""
 
-		direct_abstract_response.local.instance = proxy(self)
+		AbstractResponse.local.instance = proxy(self)
 	#
 
 	def get_accepted_formats(self):
@@ -147,6 +151,18 @@ Returns the compression formats the client accepts.
 		return self.stream_response.get_compression_formats()
 	#
 
+	def get_store(self):
+	#
+		"""
+Return the generic store for the response.
+
+:return: (dict) Response store
+:since:  v0.1.00
+		"""
+
+		return self.store
+	#
+
 	def get_title(self):
 	#
 		"""
@@ -169,10 +185,10 @@ Return the title set for the response.
 :since: v0.1.00
 		"""
 
-		message = direct_l10n.get("errors_{0}".format(message), message)
+		message = L10n.get("errors_{0}".format(message), message)
 
-		if (self.errors == None): self.errors = [ { "title": direct_l10n.get("core_title_error_critical"), "message": message } ]
-		else: self.errors.append({ "title": direct_l10n.get("core_title_error_critical"), "message": message })
+		if (self.errors == None): self.errors = [ { "title": L10n.get("core_title_error_critical"), "message": message } ]
+		else: self.errors.append({ "title": L10n.get("core_title_error_critical"), "message": message })
 	#
 
 	def handle_error(self, message):
@@ -185,10 +201,10 @@ Return the title set for the response.
 :since: v0.1.00
 		"""
 
-		message = direct_l10n.get("errors_{0}".format(message), message)
+		message = L10n.get("errors_{0}".format(message), message)
 
-		if (self.errors == None): self.errors = [ { "title": direct_l10n.get("core_title_error"), "message": message } ]
-		else: self.errors.append({ "title": direct_l10n.get("core_title_error"), "message": message })
+		if (self.errors == None): self.errors = [ { "title": L10n.get("core_title_error"), "message": message } ]
+		else: self.errors.append({ "title": L10n.get("core_title_error"), "message": message })
 	#
 
 	def handle_exception_error(self, message, exception):
@@ -204,20 +220,20 @@ send.
 :since: v0.1.00
 		"""
 
-		if (message == None): message = direct_l10n.get("errors_core_unknown_error")
-		else: message = direct_l10n.get("errors_{0}".format(message), message)
+		if (message == None): message = L10n.get("errors_core_unknown_error")
+		else: message = L10n.get("errors_{0}".format(message), message)
 
-		exception = direct_binary.str(exception)
+		exception = Binary.str(exception)
 
 		if (exception == str): details = exception
 		else:
 		#
-			if (not isinstance(exception, direct_exception)): exception = direct_exception(str(exception), exception)
+			if (not isinstance(exception, TracedException)): exception = TracedException(str(exception), exception)
 			details = exception.get_printable_trace()
 		#
 
-		if (self.errors == None): self.errors = [ { "title": direct_l10n.get("core_title_error_critical"), "message": message, "details": details } ]
-		else: self.errors.append({ "title": direct_l10n.get("core_title_error_critical"), "message": message, "details": details })
+		if (self.errors == None): self.errors = [ { "title": L10n.get("core_title_error_critical"), "message": message, "details": details } ]
+		else: self.errors.append({ "title": L10n.get("core_title_error_critical"), "message": message, "details": details })
 	#
 
 	def init(self, cache = False, compress = True):
@@ -474,11 +490,26 @@ Get the abstract_response singleton.
 
 :param count: Count "get()" response
 
-:return: (direct_abstract_response) Object on success
+:return: (AbstractResponse) Object on success
 :since:  v0.1.00
 		"""
 
-		return (direct_abstract_response.local.instance if (hasattr(direct_abstract_response.local, "instance")) else None)
+		return (AbstractResponse.local.instance if (hasattr(AbstractResponse.local, "instance")) else None)
+	#
+
+	@staticmethod
+	def get_instance_store():
+	#
+		"""
+Get the abstract_response singleton.
+
+:param count: Count "get()" response
+
+:return: (AbstractResponse) Object on success
+:since:  v0.1.00
+		"""
+
+		return (AbstractResponse.local.instance.get_store() if (hasattr(AbstractResponse.local, "instance") and AbstractResponse.local.instance != None) else None)
 	#
 #
 

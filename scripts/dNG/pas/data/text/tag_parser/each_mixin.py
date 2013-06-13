@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.tag_parser.each_mixin
+dNG.pas.data.text.tag_parser.EachMixin
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,10 +23,10 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from .mapped_element_mixin import direct_mapped_element_mixin
-from .source_value_mixin import direct_source_value_mixin
+from .mapped_element_mixin import MappedElementMixin
+from .source_value_mixin import SourceValueMixin
 
-class direct_each_mixin(direct_mapped_element_mixin, direct_source_value_mixin):
+class EachMixin(MappedElementMixin, SourceValueMixin):
 #
 	"""
 This tag parser mixin provides support for each loop statements.
@@ -56,7 +56,7 @@ Checks and renders the each statement.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -tagParser.render_each(data, {0}, source, {1}, {2})- (#echo(__LINE__)#)".format(source_key, key, mapping_key))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -TagParser.render_each(data, {0}, source, {1}, {2})- (#echo(__LINE__)#)".format(source_key, key, mapping_key))
 		var_return = ""
 
 		elements = self.source_get_value(source, key)
@@ -69,7 +69,7 @@ Checks and renders the each statement.
 				self.mapped_element_set(element_mapped_key, element)
 
 				try: var_return += self.parser(data)
-				except Exception as handled_exception:
+				except:
 				#
 					self.mapped_element_remove(element_mapped_key)
 					raise

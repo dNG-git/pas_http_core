@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.chunked_mixin
+dNG.pas.data.http.ChunkedMixin
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,9 +23,9 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.binary import direct_binary
+from dNG.pas.data.binary import Binary
 
-class direct_chunked_mixin(object):
+class ChunkedMixin(object):
 #
 	"""
 This response mixin provides the "chunkify()" method.
@@ -39,7 +39,7 @@ This response mixin provides the "chunkify()" method.
              Mozilla Public License, v. 2.0
 	"""
 
-	BINARY_NEWLINE = direct_binary.bytes("\r\n")
+	BINARY_NEWLINE = Binary.bytes("\r\n")
 
 	def chunkify(self, data):
 	#
@@ -50,11 +50,11 @@ Returns the formats the client accepts.
 :since:  v0.1.00
 		"""
 
-		data = direct_binary.bytes(data)
+		data = Binary.bytes(data)
 
-		if (data == None): var_return = direct_binary.bytes("0\r\n\r\n")
-		elif (type(data) == type(direct_chunked_mixin.BINARY_NEWLINE) and len(data) > 0): var_return = direct_binary.bytes("{0:x}\r\n".format(len(data))) + data + direct_chunked_mixin.BINARY_NEWLINE
-		else: var_return = direct_binary.BYTES_TYPE()
+		if (data == None): var_return = Binary.bytes("0\r\n\r\n")
+		elif (type(data) == type(ChunkedMixin.BINARY_NEWLINE) and len(data) > 0): var_return = Binary.bytes("{0:x}\r\n".format(len(data))) + data + ChunkedMixin.BINARY_NEWLINE
+		else: var_return = Binary.BYTES_TYPE()
 
 		return var_return
 	#

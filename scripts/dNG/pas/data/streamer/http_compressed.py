@@ -23,11 +23,10 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.binary import direct_binary
-from dNG.pas.data.logging.log_line import direct_log_line
-from .abstract_encapsulated import direct_abstract_encapsulated
+from dNG.pas.data.binary import Binary
+from .abstract_encapsulated import AbstractEncapsulated
 
-class direct_http_compressed(direct_abstract_encapsulated):
+class HttpCompressed(AbstractEncapsulated):
 #
 	"""
 Throttles streamer based on the given bandwidth limitation.
@@ -44,15 +43,15 @@ Throttles streamer based on the given bandwidth limitation.
 	def __init__(self, streamer, compressor):
 	#
 		"""
-Constructor __init__(direct_http_compressed)
+Constructor __init__(HttpCompressed)
 
 :param streamer: Encapsulated streamer instance
-:param compressor: Compression function
+:param compressor: Compression object
 
 :since: v0.1.00
 		"""
 
-		direct_abstract_encapsulated.__init__(self, streamer)
+		AbstractEncapsulated.__init__(self, streamer)
 
 		self.compressor = compressor
 		"""
@@ -72,7 +71,7 @@ Reads from the current streamer session.
 :since:  v0.1.00
 		"""
 
-		data = direct_abstract_encapsulated.read(self, var_bytes)
+		data = AbstractEncapsulated.read(self, var_bytes)
 
 		if (self.compressor != None):
 		#
@@ -81,7 +80,7 @@ Reads from the current streamer session.
 				data = self.compressor.flush()
 				self.compressor = None
 			#
-			elif (len(data) > 0): data = self.compressor.compress(direct_binary.bytes(data))
+			elif (len(data) > 0): data = self.compressor.compress(Binary.bytes(data))
 		#
 
 		return data

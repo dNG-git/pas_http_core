@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.input_form
+dNG.pas.data.text.InputForm
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -30,16 +30,16 @@ from os import urandom
 try: import hashlib
 except ImportError: import md5 as hashlib
 
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.data.http.links import direct_links
-from dNG.pas.data.text.tmd5 import direct_tmd5
+from dNG.pas.data.settings import Settings
+from dNG.pas.data.http.links import Links
+from dNG.pas.data.text.tmd5 import Tmd5
 
-from .input_filter import direct_input_filter
+from .input_filter import InputFilter
 
-class direct_input_form(object):
+class InputForm(object):
 #
 	"""
-"direct_input_form" provides basic form methods used in protocol / format
+"InputForm" provides basic form methods used in protocol / format
 specific form instances.
 
 :author:     direct Netware Group
@@ -71,7 +71,7 @@ Password input repetition
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_input_form)
+Constructor __init__(InputForm)
 
 :since: v0.1.00
 		"""
@@ -172,7 +172,7 @@ A single line text input field for eMail addresses.
 		field_data = self.entry_limits_set(field_data)
 
 		field_data['error'] = self.entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
-		if (len(field_data['content']) > 0 and direct_input_filter.filter_email_address(field_data['content']) == None): field_data['error'] = "format_invalid"
+		if (len(field_data['content']) > 0 and InputFilter.filter_email_address(field_data['content']) == None): field_data['error'] = "format_invalid"
 
 		self.entry_set("email", field_data)
 		return (field_data['error'] == None)
@@ -199,7 +199,7 @@ Embeds external resources into the current form.
 		field_data['iframe_only'] = is_iframe_only
 		url_parameters['tid'] = field_data['content']
 
-		field_data['url'] = direct_links.build_url(direct_links.TYPE_RELATIVE, url_parameters)
+		field_data['url'] = Links.build_url(Links.TYPE_RELATIVE, url_parameters)
 
 		self.entry_set("embed", field_data)
 		return True
@@ -304,11 +304,11 @@ Insert passwords (including optional a repetition check)
 		field_data['error'] = self.entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
 
 		if (bytemix == None): bytemix = ""
-		elif (len(bytemix) < 1): bytemix = direct_settings.get("pas_user_profile_password_bytemix")
+		elif (len(bytemix) < 1): bytemix = Settings.get("pas_user_profile_password_bytemix")
 
 		if (bytemix == None): field_data['error'] = "internal_error"
 
-		if (mode & direct_input_form.PASSWORD_WITH_REPETITION == direct_input_form.PASSWORD_WITH_REPETITION):
+		if (mode & InputForm.PASSWORD_WITH_REPETITION == InputForm.PASSWORD_WITH_REPETITION):
 		#
 			repetition_name = "{0}_repetition".format(field_data['name'])
 			repetition_content = self.get_input(repetition_name)
@@ -319,8 +319,8 @@ Insert passwords (including optional a repetition check)
 		else: type = "password"
 
 		if (field_data['error'] != None): var_return = False
-		elif (mode & direct_input_form.PASSWORD_MD5 == direct_input_form.PASSWORD_MD5): field_data['content_result'] = hashlib.md5(field_data['content']).hexdigest()
-		elif (mode & direct_input_form.PASSWORD_TMD5 == direct_input_form.PASSWORD_TMD5): field_data['content_result'] = direct_tmd5.encode(field_data['content'], bytemix)
+		elif (mode & InputForm.PASSWORD_MD5 == InputForm.PASSWORD_MD5): field_data['content_result'] = hashlib.md5(field_data['content']).hexdigest()
+		elif (mode & InputForm.PASSWORD_TMD5 == InputForm.PASSWORD_TMD5): field_data['content_result'] = Tmd5.encode(field_data['content'], bytemix)
 
 		self.entry_set(type, field_data)
 		return var_return
@@ -747,7 +747,7 @@ Checks the size for a given string.
 
 		if (data != None and len(data) > 0):
 		#
-			number = direct_input_filter.filter_float(data)
+			number = InputFilter.filter_float(data)
 
 			if (number != None):
 			#

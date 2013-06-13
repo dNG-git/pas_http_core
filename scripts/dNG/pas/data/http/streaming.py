@@ -26,12 +26,12 @@ NOTE_END //n"""
 from os import path
 import re
 
-from dNG.pas.controller.abstract_http_response import direct_abstract_http_response
-from dNG.pas.data.mimetype import direct_mimetype
-from dNG.pas.data.translatable_exception import direct_translatable_exception
-from dNG.pas.data.streamer.abstract import direct_abstract as direct_abstract_streamer
+from dNG.pas.controller.abstract_http_response import AbstractHttpResponse
+from dNG.pas.data.mime_type import MimeType
+from dNG.pas.data.translatable_exception import TranslatableException
+from dNG.pas.data.streamer.abstract import Abstract as AbstractStreamer
 
-class direct_streaming(object):
+class Streaming(object):
 #
 	"""
 HTTP streaming returns data on demand for output.
@@ -55,13 +55,13 @@ are met.
 :since: v0.1.01
 		"""
 
-		if (not isinstance(streamer, direct_abstract_streamer)): raise direct_translatable_exception("pas_http_error_400")
-		if (not isinstance(response, direct_abstract_http_response)): raise direct_translatable_exception("pas_http_error_500")
+		if (not isinstance(streamer, AbstractStreamer)): raise TranslatableException("pas_http_error_400")
+		if (not isinstance(response, AbstractHttpResponse)): raise TranslatableException("pas_http_error_500")
 
 		if (streamer == None): response.set_header("HTTP/1.1", "HTTP/1.1 501 Not Implemented", True)
 		else:
 		#
-			mimetypes = direct_mimetype.get_instance()
+			mimetypes = MimeType.get_instance()
 
 			url_ext = path.splitext(url)[1]
 			mimetype_definition = mimetypes.get(url_ext[1:])

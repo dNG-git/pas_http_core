@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.tag_parser.rewrite_mixin
+dNG.pas.data.text.tag_parser.RewriteMixin
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,10 +23,10 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.binary import direct_binary
-from .source_value_mixin import direct_source_value_mixin
+from dNG.pas.data.binary import Binary
+from .source_value_mixin import SourceValueMixin
 
-class direct_rewrite_mixin(direct_source_value_mixin):
+class RewriteMixin(SourceValueMixin):
 #
 	"""
 This tag parser mixin provides support for rewrite statements.
@@ -53,11 +53,11 @@ Checks and renders the rewrite statement.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -tagParser.render_rewrite(source, {0})- (#echo(__LINE__)#)".format(key))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -TagParser.render_rewrite(source, {0})- (#echo(__LINE__)#)".format(key))
 		var_return = self.source_get_value(source, key)
 
 		if (var_return == None): var_return = " {0} ".format(key)
-		else: var_return = direct_binary.str(var_return)
+		else: var_return = Binary.str(var_return)
 
 		if (type(var_return) != str): var_return = str(var_return)
 

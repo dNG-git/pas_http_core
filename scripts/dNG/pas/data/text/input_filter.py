@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.input_filter
+dNG.pas.data.text.InputFilter
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -26,12 +26,12 @@ NOTE_END //n"""
 from unicodedata import category as unicode_category
 import re
 
-from dNG.pas.data.binary import direct_binary
+from dNG.pas.data.binary import Binary
 
-class direct_input_filter(object):
+class InputFilter(object):
 #
 	"""
-"direct_input_filter" provides basic input filter functions.
+"InputFilter" provides basic input filter functions.
 
 :author:     direct Netware Group
 :copyright:  direct Netware Group - All rights reserved
@@ -56,9 +56,9 @@ characters.
 :since:  v0.1.00
 		"""
 
-		data = direct_binary.utf8(data)
+		data = Binary.utf8(data)
 
-		if (type(data) == direct_binary.UNICODE_TYPE):
+		if (type(data) == Binary.UNICODE_TYPE):
 		#
 			data_position = 0
 			data_length = len(data)
@@ -76,7 +76,7 @@ characters.
 				else: data_position += 1
 			#
 
-			data = direct_binary.str(data)
+			data = Binary.str(data)
 		#
 		else: data = None
 
@@ -101,7 +101,7 @@ address if it is.
 		is_valid = True
 		data_part = ""
 
-		data = direct_input_filter.filter_control_chars(data)
+		data = InputFilter.filter_control_chars(data)
 		if (type(data) == str): data = re.sub("\\r\\n([\\x09\\x20])+", "\\1", data)
 		dot_parts = ([ ] if (data == None) else data.split("."))
 		re_char_escaped = re.compile("([\\\\]+)\"$")
@@ -202,7 +202,7 @@ traversals. We will filter them using "filterFilePath()".
 :since:  v0.1.00
 		"""
 
-		data = direct_input_filter.filter_control_chars(data)
+		data = InputFilter.filter_control_chars(data)
 
 		if (type(data) == str):
 		#

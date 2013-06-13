@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.tag_parser.block_mixin
+dNG.pas.data.text.tag_parser.BlockMixin
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,11 +23,11 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.module.named_loader import direct_named_loader
-from .mapped_element_mixin import direct_mapped_element_mixin
-from .source_value_mixin import direct_source_value_mixin
+from dNG.pas.module.named_loader import NamedLoader
+from .mapped_element_mixin import MappedElementMixin
+from .source_value_mixin import SourceValueMixin
 
-class direct_block_mixin(direct_mapped_element_mixin, direct_source_value_mixin):
+class BlockMixin(MappedElementMixin, SourceValueMixin):
 #
 	"""
 This tag parser mixin provides support for blocks of subelements.
@@ -57,7 +57,7 @@ Checks and renders the block statement.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -tagParser.render_block(data, source_key, source, key, mapping_key)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -TagParser.render_block(data, source_key, source, key, mapping_key)- (#echo(__LINE__)#)")
 		var_return = ""
 
 		try:
@@ -68,9 +68,9 @@ Checks and renders the block statement.
 			action = action_definition.pop()
 			service = ".".join(action_definition)
 
-			if (direct_named_loader.is_defined("dNG.pas.module.blocks.{0}".format(service))):
+			if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}".format(service))):
 			#
-				instance = direct_named_loader.get_instance("dNG.pas.module.blocks.{0}".format(service))
+				instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}".format(service))
 				if (self.log_handler != None): instance.set_log_handler(self.log_handler)
 				instance.set_action(action, content)
 				var_return = instance.execute()

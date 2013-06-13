@@ -25,7 +25,7 @@ NOTE_END //n"""
 
 from threading import RLock
 
-class direct_virtual_config(object):
+class VirtualConfig(object):
 #
 	"""
 Virtual paths are used to run service actions for URIs not calling the
@@ -65,11 +65,11 @@ Return the config for the given virtual path.
 
 		if (len(pathname) > 0):
 		#
-			with direct_virtual_config.synchronized:
+			with VirtualConfig.synchronized:
 			#
 				pathname = pathname.lower()
 
-				for virtual_path_config in direct_virtual_config.virtuals:
+				for virtual_path_config in VirtualConfig.virtuals:
 				#
 					if (pathname.startswith(virtual_path_config['path'])):
 					#
@@ -99,7 +99,7 @@ Set the config for the given virtual path.
 		if (py_setup_function != None): config['setup_function'] = py_setup_function
 		virtual_config = { "path": path.lower(), "config": config }
 
-		direct_virtual_config.virtuals.append(virtual_config)
+		VirtualConfig.virtuals.append(virtual_config)
 	#
 
 	@staticmethod
@@ -113,15 +113,15 @@ Remove the config for the given virtual path.
 :since: v0.1.00
 		"""
 
-		with direct_virtual_config.synchronized:
+		with VirtualConfig.synchronized:
 		#
 			index = 0
 
-			for virtual_config in direct_virtual_config.virtuals:
+			for virtual_config in VirtualConfig.virtuals:
 			#
 				if (path == virtual_config['path']):
 				#
-					direct_virtual_config.virtuals.pop(index)
+					VirtualConfig.virtuals.pop(index)
 					break
 				#
 				else: index += 1

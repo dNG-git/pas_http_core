@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.output.http
+dNG.pas.module.blocks.output.Http
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,14 +23,14 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.text.input_filter import direct_input_filter
-from dNG.pas.data.text.l10n import direct_l10n
-from .module import direct_module
-
 try: from http.client import responses
 except ImportError: from httplib import responses
 
-class direct_http(direct_module):
+from dNG.pas.data.text.input_filter import InputFilter
+from dNG.pas.data.text.l10n import L10n
+from .module import Module
+
+class Http(Module):
 #
 	"""
 Service for "m=output;s=http"
@@ -47,12 +47,12 @@ Service for "m=output;s=http"
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_http)
+Constructor __init__(Http)
 
 @since v0.1.00
 		"""
 
-		direct_module.__init__(self)
+		Module.__init__(self)
 
 		self.error_messages = responses
 		"""
@@ -68,9 +68,9 @@ Action for "login"
 :since: v0.1.00
 		"""
 
-		code = direct_input_filter.filter_int(self.request.get_dsd("code", "500"))
+		code = InputFilter.filter_int(self.request.get_dsd("code", "500"))
 
-		if (direct_l10n.is_defined("errors_pas_http_core_{0:d}".format(code))):
+		if (L10n.is_defined("errors_pas_http_core_{0:d}".format(code))):
 		#
 			if (self.response.supports_headers()): self.response.set_header("HTTP/1.1", ("HTTP/1.1 {0:d} {1}".format(code, self.error_messages[code]) if (code in self.error_messages) else "HTTP/1.1 500 Internal Server Error"), True)
 			self.response.handle_critical_error("pas_http_core_{0:d}".format(code))

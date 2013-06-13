@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.form.renderer
+dNG.pas.data.xhtml.form.Renderer
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -26,15 +26,15 @@ NOTE_END //n"""
 from binascii import hexlify
 from os import urandom
 
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.data.text.l10n import direct_l10n
-from dNG.pas.data.xhtml.formatting import direct_formatting
-from dNG.pas.module.named_loader import direct_named_loader
+from dNG.pas.data.settings import Settings
+from dNG.pas.data.text.l10n import L10n
+from dNG.pas.data.xhtml.formatting import Formatting as XhtmlFormatting
+from dNG.pas.module.named_loader import NamedLoader
 
-class direct_renderer(object):
+class Renderer(object):
 #
 	"""
-"direct_renderer" renders forms for output as (X)HTML.
+"Renderer" renders forms for output as (X)HTML.
 
 :author:     direct Netware Group
 :copyright:  direct Netware Group - All rights reserved
@@ -48,7 +48,7 @@ class direct_renderer(object):
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_renderer)
+Constructor __init__(Renderer)
 
 :since: v0.1.00
 		"""
@@ -57,7 +57,7 @@ Constructor __init__(direct_renderer)
 		"""
 List of form elements
 		"""
-		self.js_form_init_method = direct_settings.get("pas_http_theme_oset_js_form_init", "pas_form_init")
+		self.js_form_init_method = Settings.get("pas_http_theme_oset_js_form_init", "pas_form_init")
 		"""
 Javascript init function
 		"""
@@ -133,11 +133,11 @@ Render the form field using the given OSet template.
 
 		try:
 		#
-			parser = direct_named_loader.get_instance("dNG.pas.data.oset.file_parser")
+			parser = NamedLoader.get_instance("dNG.pas.data.oset.FileParser")
 			parser.set_oset(self.oset)
 			var_return = parser.render(template_name, content)
 		#
-		except: var_return = "<div class='pasformerror'>{0}</div>".format(direct_l10n.get("errors_pas_http_core_form_internal_error"))
+		except: var_return = "<div class='pasformerror'>{0}</div>".format(L10n.get("errors_pas_http_core_form_internal_error"))
 
 		return var_return
 	#
@@ -154,12 +154,12 @@ Format and return XHTML for a password input field.
 		"""
 
 		context = {
-			"id": direct_formatting.escape(field_data['id']),
-			"name": direct_formatting.escape(field_data['name']),
-			"title": direct_formatting.escape(field_data['title']),
-			"value": ("" if (field_data['content'] == None) else direct_formatting.escape(field_data['content'])),
+			"id": XhtmlFormatting.escape(field_data['id']),
+			"name": XhtmlFormatting.escape(field_data['name']),
+			"title": XhtmlFormatting.escape(field_data['title']),
+			"value": ("" if (field_data['content'] == None) else XhtmlFormatting.escape(field_data['content'])),
 			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else direct_formatting.escape(field_data['error'])),
+			"error_message": ("" if (field_data['error'] == None) else XhtmlFormatting.escape(field_data['error'])),
 			"js_form_init_method": self.js_form_init_method
 		}
 
@@ -228,20 +228,20 @@ Format and return XHTML to create radio options.
 		#
 			if ("title" in choice and "value" in choice):
 			#
-				choice['title'] = direct_formatting.escape(choice['title'])
-				choice['value'] = direct_formatting.escape(choice['value'])
+				choice['title'] = XhtmlFormatting.escape(choice['title'])
+				choice['value'] = XhtmlFormatting.escape(choice['value'])
 
 				choices.append(choice)
 			#
 		#
 
 		context = {
-			"id": direct_formatting.escape(field_data['id']),
-			"name": direct_formatting.escape(field_data['name']),
-			"title": direct_formatting.escape(field_data['title']),
+			"id": XhtmlFormatting.escape(field_data['id']),
+			"name": XhtmlFormatting.escape(field_data['name']),
+			"title": XhtmlFormatting.escape(field_data['title']),
 			"choices": choices,
 			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else direct_formatting.escape(field_data['error'])),
+			"error_message": ("" if (field_data['error'] == None) else XhtmlFormatting.escape(field_data['error'])),
 			"js_form_init_method": self.js_form_init_method
 		}
 
@@ -315,7 +315,7 @@ corresponding method to get valid XHTML for output.
 			if (var_return != ""): var_return += "\n"
 
 			if (type(output) == str): var_return += output
-			else: var_return += self.render_oset_file("core/form/error", { "error_message": direct_l10n.get("errors_pas_http_core_form_internal_error") })
+			else: var_return += self.render_oset_file("core/form/error", { "error_message": L10n.get("errors_pas_http_core_form_internal_error") })
 		#
 
 		return var_return
@@ -333,7 +333,7 @@ Render the form submit button.
 		context = {
 			"type": "submit",
 			"id": "formid",
-			"title": direct_formatting.escape(direct_l10n.get(title)),
+			"title": XhtmlFormatting.escape(L10n.get(title)),
 			"js_form_init_method": self.js_form_init_method
 		}
 
@@ -352,13 +352,13 @@ Format and return XHTML for a text input field.
 		"""
 
 		context = {
-			"type": direct_formatting.escape(field_data['type']),
-			"id": direct_formatting.escape(field_data['id']),
-			"name": direct_formatting.escape(field_data['name']),
-			"title": direct_formatting.escape(field_data['title']),
-			"value": ("" if (field_data['content'] == None) else direct_formatting.escape(field_data['content'])),
+			"type": XhtmlFormatting.escape(field_data['type']),
+			"id": XhtmlFormatting.escape(field_data['id']),
+			"name": XhtmlFormatting.escape(field_data['name']),
+			"title": XhtmlFormatting.escape(field_data['title']),
+			"value": ("" if (field_data['content'] == None) else XhtmlFormatting.escape(field_data['content'])),
 			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else direct_formatting.escape(field_data['error'])),
+			"error_message": ("" if (field_data['error'] == None) else XhtmlFormatting.escape(field_data['error'])),
 			"js_form_init_method": self.js_form_init_method
 		}
 

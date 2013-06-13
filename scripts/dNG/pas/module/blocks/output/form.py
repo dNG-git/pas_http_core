@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.output.form
+dNG.pas.module.blocks.output.Form
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,16 +23,14 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.text.l10n import direct_l10n
-from dNG.pas.data.xhtml.links.common import direct_common as direct_links
-from dNG.pas.data.xhtml.form.renderer import direct_renderer
-from dNG.pas.module.named_loader import direct_named_loader
-from dNG.pas.module.blocks.abstract_block import direct_abstract_block
+from dNG.pas.data.text.url import Url
+from dNG.pas.data.xhtml.form.renderer import Renderer
+from dNG.pas.module.blocks.abstract_block import AbstractBlock
 
-class direct_form(direct_abstract_block):
+class Form(AbstractBlock):
 #
 	"""
-"direct_form" implements the form view.
+The "Form" class implements the form view.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -53,8 +51,8 @@ Action for "render"
 
 		if ("object" in self.context and "url_parameters" in self.context):
 		#
-			form_parameters = direct_links.build_url(direct_links.TYPE_FORM_FIELDS, self.context['url_parameters'])
-			form_url = direct_links.build_url(direct_links.TYPE_FORM_URL, self.context['url_parameters'])
+			form_parameters = Url.build_url(Url.TYPE_FORM_FIELDS, self.context['url_parameters'])
+			form_url = Url.build_url(Url.TYPE_FORM_URL, self.context['url_parameters'])
 
 			self.set_action_result("<form action=\"{0}\" method='post' enctype='application/x-www-form-urlencoded' target='_self'>{1}{2}</form>".format(form_url, form_parameters, self.parse()))
 		#
@@ -70,7 +68,7 @@ Parses, renders and returns the given form.
 :since:  v0.1.00
 		"""
 
-		renderer = direct_renderer()
+		renderer = Renderer()
 		renderer.set_data(self.context['object'].get_data())
 		renderer.set_oset(self.response.get_oset())
 

@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.tag_parser.source_value_mixin
+dNG.pas.data.text.tag_parser.SourceValueMixin
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-class direct_source_value_mixin(object):
+class SourceValueMixin(object):
 #
 	"""
 This tag parser mixin provides support to find a key in a given source dict.
@@ -50,7 +50,7 @@ Checks and renders the rewrite statement.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -tagParser.source_get_value(source, {0})- (#echo(__LINE__)#)".format(key))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -TagParser.source_get_value(source, {0})- (#echo(__LINE__)#)".format(key))
 		var_return = None
 
 		if (isinstance(source, dict)):

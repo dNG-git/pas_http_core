@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.server_cherrypy
+dNG.pas.net.http.ServerCherryPy
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -27,15 +27,15 @@ from cherrypy import log
 from cherrypy.wsgiserver import CherryPyWSGIServer
 import socket
 
-from dNG.pas.data.settings import direct_settings
-from dNG.pas.controller.http_wsgi1_request import direct_http_wsgi1_request
-from dNG.pas.module.named_loader import direct_named_loader
-from . import direct_server
+from dNG.pas.data.settings import Settings
+from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
+from dNG.pas.module.named_loader import NamedLoader
+from . import Server
 
-class direct_server_cherrypy(direct_server):
+class ServerCherryPy(Server):
 #
 	"""
-"direct_server_cherrypy" is responsible to start the HTTP CherryPy server.
+"ServerCherryPy" is responsible to start the HTTP CherryPy server.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -49,19 +49,19 @@ class direct_server_cherrypy(direct_server):
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_server_cherrypy)
+Constructor __init__(ServerCherryPy)
 
 :since: v0.1.01
 		"""
 
-		direct_server.__init__(self)
+		Server.__init__(self)
 
 		self.server = None
 		"""
 cherrypy server
 		"""
 
-		log_handler = direct_named_loader.get_singleton("dNG.pas.data.logging.log_handler", False)
+		log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 
 		if (log_handler != None):
 		#
@@ -78,18 +78,18 @@ Configures the server
 :since: v0.1.01
 		"""
 
-		listener_host = direct_settings.get("pas_http_cherrypy_server_host", self.socket_hostname)
-		self.port = int(direct_settings.get("pas_http_cherrypy_server_port", 8080))
+		listener_host = Settings.get("pas_http_cherrypy_server_host", self.socket_hostname)
+		self.port = int(Settings.get("pas_http_cherrypy_server_port", 8080))
 
 		if (listener_host == ""):
 		#
 			listener_host = ("::" if (socket.has_ipv6) else "0.0.0.0")
-			self.host = direct_settings.get("pas_http_cherrypy_server_preferred_hostname", self.socket_hostname)
+			self.host = Settings.get("pas_http_cherrypy_server_preferred_hostname", self.socket_hostname)
 		#
 		else: self.host = listener_host
 
 		listener_data = ( listener_host, self.port )
-		self.server = CherryPyWSGIServer(listener_data, direct_http_wsgi1_request, server_name = "directPAS/#echo(pasHttpCoreIVersion)# [direct Netware Group]")
+		self.server = CherryPyWSGIServer(listener_data, HttpWsgi1Request, server_name = "directPAS/#echo(pasHttpCoreIVersion)# [direct Netware Group]")
 
 		if (self.log_handler != None): self.log_handler.info("pas.http.core cherrypy server starts at '{0}:{1:d}'".format(listener_host, self.port))
 
@@ -97,7 +97,7 @@ Configures the server
 Configure common paths and settings
 		"""
 
-		direct_server.configure(self)
+		Server.configure(self)
 	#
 
 	def run(self):
@@ -127,7 +127,7 @@ Stop the server
 		"""
 
 		if (self.server != None): self.server.stop()
-		return direct_server.stop(self, params, last_return)
+		return Server.stop(self, params, last_return)
 	#
 #
 

@@ -70,10 +70,10 @@ td:last-child, th:last-child { border-right: none }
 [/if]
 </div></header>
 <div class='designpage ui-corner-all'>
-[block]output.menu.main.render[/block]
-[block]output.menu.service.render_primary[/block]
+[block]output.menu.Main.render[/block]
+[block]output.menu.Service.render_primary[/block]
 [rewrite:content]page_content[/rewrite]
-[block]output.menu.service.render_secondary[/block]
+[block]output.menu.Service.render_secondary[/block]
 </div>
 </body>
 

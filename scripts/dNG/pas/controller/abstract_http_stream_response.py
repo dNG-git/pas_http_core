@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.abstract_http_stream_response
+dNG.pas.controller.AbstractHttpStreamResponse
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -25,12 +25,12 @@ NOTE_END //n"""
 
 from zlib import compressobj
 
-from dNG.pas.data.http.chunked_mixin import direct_chunked_mixin
-from dNG.pas.data.binary import direct_binary
-from dNG.pas.data.gzip import direct_gzip
-from .abstract_stream_response import direct_abstract_stream_response
+from dNG.pas.data.http.chunked_mixin import ChunkedMixin
+from dNG.pas.data.binary import Binary
+from dNG.pas.data.gzip import Gzip
+from .abstract_stream_response import AbstractStreamResponse
 
-class direct_abstract_http_stream_response(direct_abstract_stream_response, direct_chunked_mixin):
+class AbstractHttpStreamResponse(AbstractStreamResponse, ChunkedMixin):
 #
 	"""
 A HTTP headers aware stream response.
@@ -57,12 +57,12 @@ Set Transfer-Encoding to chunked and encode output.
 	def __init__(self):
 	#
 		"""
-Constructor __init__(direct_abstract_http_stream_response)
+Constructor __init__(AbstractHttpStreamResponse)
 
 :since: v0.1.00
 		"""
 
-		direct_abstract_stream_response.__init__(self)
+		AbstractStreamResponse.__init__(self)
 
 		self.compressor = None
 		"""
@@ -141,7 +141,7 @@ Finish transmission and cleanup resources.
 		#
 			is_chunked_response = False
 
-			if (self.stream_mode & direct_abstract_http_stream_response.STREAM_CHUNKED == direct_abstract_http_stream_response.STREAM_CHUNKED):
+			if (self.stream_mode & AbstractHttpStreamResponse.STREAM_CHUNKED == AbstractHttpStreamResponse.STREAM_CHUNKED):
 			#
 				is_chunked_response = True
 				self.send()
@@ -149,7 +149,7 @@ Finish transmission and cleanup resources.
 
 			if (is_chunked_response or self.compressor != None): self.send_data(None)
 
-			direct_abstract_stream_response.finish(self)
+			AbstractStreamResponse.finish(self)
 		#
 	#
 
@@ -224,14 +224,11 @@ Prepare data for output. Compress and transform it if required.
 
 		if (self.compressor != None):
 		#
-			if (data == None):
-			#
-				if (self.streamer == None): data = self.compressor.flush()
-			#
-			elif (len(data) > 0): data = self.compressor.compress(direct_binary.bytes(data))
+			if (data == None): data = (self.compressor.flush() if (self.stream_mode_supported & AbstractStreamResponse.STREAM_CALLBACK != AbstractStreamResponse.STREAM_CALLBACK) else Binary.BYTES_TYPE())
+			elif (len(data) > 0): data = self.compressor.compress(Binary.bytes(data))
 		#
 
-		if (self.stream_mode & direct_abstract_http_stream_response.STREAM_CHUNKED == direct_abstract_http_stream_response.STREAM_CHUNKED): data = self.chunkify(data)
+		if (self.stream_mode & AbstractHttpStreamResponse.STREAM_CHUNKED == AbstractHttpStreamResponse.STREAM_CHUNKED): data = self.chunkify(data)
 
 		return data
 	#
@@ -254,7 +251,7 @@ Sends response data.
 				self.send_headers()
 			#
 
-			if (not self.headers_only): direct_abstract_stream_response.send_data(self, self.prepare_output_data(data))
+			if (not self.headers_only): AbstractStreamResponse.send_data(self, self.prepare_output_data(data))
 		#
 	#
 
@@ -289,7 +286,7 @@ Sets the compression formats the client accepts.
 			#
 			elif ("gzip" in self.compression_formats):
 			#
-				self.compressor = direct_gzip()
+				self.compressor = Gzip()
 				self.set_header("Content-Encoding", "gzip")
 			#
 		#
@@ -419,12 +416,12 @@ it.
 :since: v0.1.00
 		"""
 
-		if (self.stream_mode_supported & direct_abstract_http_stream_response.STREAM_CHUNKED == direct_abstract_http_stream_response.STREAM_CHUNKED and self.http_version > 1):
+		if (self.stream_mode_supported & AbstractHttpStreamResponse.STREAM_CHUNKED == AbstractHttpStreamResponse.STREAM_CHUNKED and self.http_version > 1):
 		#
 			self.set_header("Transfer-Encoding", "chunked")
-			self.stream_mode |= direct_abstract_http_stream_response.STREAM_CHUNKED
+			self.stream_mode |= AbstractHttpStreamResponse.STREAM_CHUNKED
 		#
-		elif (self.stream_mode_supported & direct_abstract_http_stream_response.STREAM_DIRECT == direct_abstract_http_stream_response.STREAM_DIRECT): self.stream_mode |= direct_abstract_http_stream_response.STREAM_DIRECT
+		elif (self.stream_mode_supported & AbstractHttpStreamResponse.STREAM_DIRECT == AbstractHttpStreamResponse.STREAM_DIRECT): self.stream_mode |= AbstractHttpStreamResponse.STREAM_DIRECT
 	#
 
 	def supports_compression(self):
