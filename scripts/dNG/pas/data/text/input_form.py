@@ -199,7 +199,7 @@ Embeds external resources into the current form.
 		field_data['iframe_only'] = is_iframe_only
 		url_parameters['tid'] = field_data['content']
 
-		field_data['url'] = Links.build_url(Links.TYPE_RELATIVE, url_parameters)
+		field_data['url'] = Links().build_url(Links.TYPE_RELATIVE, url_parameters)
 
 		self.entry_set("embed", field_data)
 		return True

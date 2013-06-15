@@ -202,7 +202,7 @@ Change data according to the matched tag.
 
 		if (tag_definition['tag'] == "block"):
 		#
-			re_result = re.match("^\[block(:(\w+):([\w\.]+):([\w\.]+)){0,1}\]", data[tag_position:data_position])
+			re_result = re.match("^\\[block(:(\\w+):([\\w\\.]+):([\\w\\.]+)){0,1}\\]", data[tag_position:data_position])
 
 			if (re_result != None):
 			#
@@ -223,7 +223,7 @@ Change data according to the matched tag.
 		#
 		elif (tag_definition['tag'] == "each"):
 		#
-			re_result = re.match("^\[each:(\w+):([\w\.]+):([\w\.]+)\]", data[tag_position:data_position])
+			re_result = re.match("^\\[each:(\\w+):([\\w\\.]+):([\\w\\.]+)\\]", data[tag_position:data_position])
 
 			source = (None if (re_result == None) else re_result.group(1))
 
@@ -240,7 +240,7 @@ Change data according to the matched tag.
 		#
 		elif (tag_definition['tag'] == "if"):
 		#
-			re_result = re.match("^\[if:(\w+):([\w\.]+)(\s*)(\!=|==)(.*)\]", data[tag_position:data_position])
+			re_result = re.match("^\\[if:(\\w+):([\\w\\.]+)(\\s*)(\\!=|==)(.*)\\]", data[tag_position:data_position])
 
 			source = (None if (re_result == None) else re_result.group(1))
 
@@ -258,7 +258,7 @@ Change data according to the matched tag.
 		#
 		elif (tag_definition['tag'] == "rewrite"):
 		#
-			source = re.match("^\[rewrite:(\w+)\]", data[tag_position:data_position]).group(1)
+			source = re.match("^\\[rewrite:(\\w+)\\]", data[tag_position:data_position]).group(1)
 			key = data[data_position:tag_end_position]
 
 			if (source == "content"): var_return += self.render_rewrite(self.mapped_element_update("content", self.content), key)
@@ -299,22 +299,22 @@ Check if a possible tag match is a false positive.
 			#
 				if (data_match == "block"):
 				#
-					re_result = re_result = re.match("^\[block(:\w+:[\w\.]+:[\w\.]+){0,1}\]", data)
+					re_result = re_result = re.match("^\\[block(:\\w+:[\\w\\.]+:[\\w\\.]+){0,1}\\]", data)
 					if (re_result != None): var_return = { "tag": "block", "tag_end": "[/block]", "type": "top_down" }
 				#
 				elif (data_match == "each"):
 				#
-					re_result = re.match("^\[each:\w+:[\w\.]+:[\w\.]+\]", data)
+					re_result = re.match("^\\[each:\\w+:[\\w\\.]+:[\\w\\.]+\\]", data)
 					if (re_result != None): var_return = { "tag": "each", "tag_end": "[/each]", "type": "top_down" }
 				#
 				elif (data_match == "if"):
 				#
-					re_result = re.match("^\[if:\w+:[\w\.]+\s*(\!=|==).*\]", data)
+					re_result = re.match("^\\[if:\\w+:[\\w\\.]+\\s*(\\!=|==).*\\]", data)
 					if (re_result != None): var_return = { "tag": "if", "tag_end": "[/if]", "type": "top_down" }
 				#
 				elif (data_match == "rewrite"):
 				#
-					re_result = re.match("^\[rewrite:(\w+)\]", data)
+					re_result = re.match("^\\[rewrite:(\\w+)\\]", data)
 					if (re_result != None and re_result.group(1) in [ "content", "l10n", "settings" ]): var_return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
 				#
 			#
@@ -337,7 +337,7 @@ Renders content ready for output from the given OSet template.
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -themeRenderer.render(template_data, content)- (#echo(__LINE__)#)")
 
-		theme = self.theme.replace(".", "/")
+		theme = self.theme
 		theme_subtype = self.theme_subtype
 
 		file_pathname = path.normpath("{0}/{1}/{2}.tsc".format(self.path, theme, theme_subtype))
@@ -346,24 +346,6 @@ Renders content ready for output from the given OSet template.
 		#
 			file_pathname = path.normpath("{0}/{1}/site.tsc".format(self.path, theme))
 			theme_subtype = "site"
-		#
-
-		"""
-Retry with default theme
-		"""
-
-		if (not os.access(file_pathname, os.R_OK)):
-		#
-			theme = Settings.get("pas_http_theme_default").replace(".", "/")
-			theme_subtype = self.theme_subtype
-
-			file_pathname = path.normpath("{0}/{1}/{2}.tsc".format(self.path, theme, theme_subtype))
-
-			if (theme_subtype != "site" and (not os.access(file_pathname, os.R_OK))):
-			#
-				file_pathname = path.normpath("{0}/{1}/site.tsc".format(self.path, theme))
-				theme_subtype = "site"
-			#
 		#
 
 		theme_data = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_pathname))
@@ -425,7 +407,27 @@ Sets the theme to use.
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -themeRenderer.set({0})- (#echo(__LINE__)#)".format(theme))
-		self.theme = theme
+
+		theme = theme.replace(".", "/")
+		file_pathname = path.normpath("{0}/{1}/site.tsc".format(self.path, theme))
+
+		"""
+Retry with default theme
+		"""
+
+		if (os.access(file_pathname, os.R_OK)): self.theme = theme
+		else:
+		#
+			self.theme = Settings.get("pas_http_theme_default", "simple").replace(".", "/")
+			file_pathname = path.normpath("{0}/{1}/site.tsc".format(self.path, self.theme))
+		#
+
+		"""
+Read corresponding theme configuration
+		"""
+
+		file_pathname = file_pathname[:-3] + "json"
+		Settings.read_file(file_pathname)
 	#
 
 	def set_log_handler(self, log_handler):

@@ -30,6 +30,7 @@ from dNG.pas.data.settings import Settings
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.plugins.hooks import Hooks
+from .abstract_request import AbstractRequest
 from .abstract_http_response import AbstractHttpResponse
 
 class HttpXhtmlResponse(AbstractHttpResponse):
@@ -75,6 +76,10 @@ Selected theme renderer
 		self.theme_subtype = "site"
 		"""
 Output theme subtype
+		"""
+		self.title = None
+		"""
+Response page title
 		"""
 	#
 
@@ -178,12 +183,19 @@ Set up theme framework
 			"""
 
 			Settings.read_file("{0}/settings/pas_http_theme.json".format(Settings.get("path_data")))
+
+			if (self.theme == None):
+			#
+				theme = AbstractRequest.get_instance().get_parameter("theme")
+				if (theme != None): self.set_theme(theme)
+			#
+
 			theme = (Hooks.call("dNG.pas.http.theme.check_candidates", theme = self.theme) if (Settings.get("pas_http_theme_plugins_supported", True)) else None)
 			self.theme_renderer = NamedLoader.get_instance("dNG.pas.data.theme.Renderer")
 
 			if (theme != None):
 			#
-				theme = re.sub("\W", "", theme)
+				theme = re.sub("\\W", "", theme)
 
 				if (self.theme_renderer.is_supported(theme)): self.theme_active = theme
 				else: theme = None
@@ -203,7 +215,7 @@ Set up theme framework
 Get the corresponding OSet name
 			"""
 
-			self.oset = Settings.get("pas_http_theme_{0}_oset".format(re.sub("\W", "_", self.theme)))
+			self.oset = Settings.get("pas_http_theme_{0}_oset".format(self.theme_active))
 			if (self.oset == None): self.oset = Settings.get("pas_http_theme_oset_default", "xhtml5")
 		#
 	#
@@ -298,6 +310,19 @@ Sets the theme to use.
 
 		self.theme = re.sub("\\W", "", theme)
 		if (self.theme_renderer != None and self.theme_renderer.is_supported(theme)): self.theme_renderer.set(theme)
+	#
+
+	def set_title(self, title):
+	#
+		"""
+Sets the response page title.
+
+:param title: Response page title
+
+:since: v0.1.01
+		"""
+
+		self.title = title
 	#
 #
 

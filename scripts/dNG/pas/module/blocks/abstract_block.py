@@ -119,7 +119,7 @@ Execute the requested action.
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("pas.http.core.block identified action '{0}'".format(self.action))
-		py_method = "execute_{0}".format(re.sub("\W", "_", self.action))
+		py_method = "execute_{0}".format(re.sub("\\W", "_", self.action))
 
 		if (hasattr(self, py_method)):
 		#

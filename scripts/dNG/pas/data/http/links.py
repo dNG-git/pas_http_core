@@ -63,8 +63,33 @@ Optical URLs are used to show the target address.
 Relative URLs like "index.py?..."
 	"""
 
-	@staticmethod
-	def build_url(var_type, parameters, py_escape = None):
+	def __init__(self, scheme = None, host = None, port = None, path = None):
+	#
+		"""
+Constructor __init__(Links)
+
+:since: v0.1.01
+		"""
+
+		self.host = None
+		"""
+Override for the URL host
+		"""
+		self.path = None
+		"""
+Override for the URL path
+		"""
+		self.port = None
+		"""
+Override for the URL port
+		"""
+		self.scheme = None
+		"""
+Override for the URL scheme
+		"""
+	#
+
+	def build_url(self, var_type, parameters, py_escape = None):
 	#
 		"""
 Adds a link. You may use internal links "index.py?...", external links like
@@ -78,15 +103,15 @@ source for parameters.
 :since: v0.1.00
 		"""
 
-		var_return = Links.get_url(var_type, parameters)
-		parameters = Links.filter_parameters(parameters)
+		var_return = self.get_url(var_type, parameters)
+		parameters = self.filter_parameters(parameters)
 
 		if (len(parameters) > 0):
 		#
 			if ("?" not in var_return): var_return += "?"
 			elif (var_return[-1:] != ";"): var_return += ";"
 
-			var_return += Links.build_url_formatted("{0}={1}", ";", parameters, py_escape = None)
+			var_return += self.build_url_formatted("{0}={1}", ";", parameters, py_escape = None)
 		#
 
 		if (var_type & Links.TYPE_OPTICAL == Links.TYPE_OPTICAL):
@@ -191,8 +216,7 @@ more depending on the string length
 		return var_return
 	#
 
-	@staticmethod
-	def build_url_formatted(link_template, link_separator, parameters, py_escape = None):
+	def build_url_formatted(self, link_template, link_separator, parameters, py_escape = None):
 	#
 		"""
 This method removes all parameters marked as "__remove__".
@@ -215,7 +239,7 @@ This method removes all parameters marked as "__remove__".
 
 			if (key == "dsd"):
 			#
-				dsd_value = Links.build_url_dsd_formatted(parameters[key], py_escape)
+				dsd_value = self.build_url_dsd_formatted(parameters[key], py_escape)
 
 				if (len(dsd_value) > 0):
 				#
@@ -256,8 +280,7 @@ This method removes all parameters marked as "__remove__".
 		return var_return
 	#
 
-	@staticmethod
-	def build_url_dsd_formatted(parameters, py_escape):
+	def build_url_dsd_formatted(self, parameters, py_escape):
 	#
 		"""
 This method removes all parameters marked as "__remove__".
@@ -289,8 +312,7 @@ This method removes all parameters marked as "__remove__".
 		return var_return
 	#
 
-	@staticmethod
-	def build_url_remove_requested(parameters):
+	def build_url_remove_requested(self, parameters):
 	#
 		"""
 This method removes all parameters marked as "__remove__" or special ones.
@@ -306,7 +328,7 @@ This method removes all parameters marked as "__remove__" or special ones.
 
 		for key in parameters:
 		#
-			if (type(parameters[key]) == dict and len(parameters[key]) > 0): var_return[key] = Links.build_url_remove_requested(parameters[key])
+			if (type(parameters[key]) == dict and len(parameters[key]) > 0): var_return[key] = self.build_url_remove_requested(parameters[key])
 			elif (parameters[key] == "__remove__"): del(var_return[key])
 		#
 
@@ -318,23 +340,7 @@ This method removes all parameters marked as "__remove__" or special ones.
 		return var_return
 	#
 
-	@staticmethod
-	def escape(data):
-	#
-		"""
-Escape the given data for embedding into (X)HTML.
-
-:param parameters: Parameters dict
-
-:return: (dict) Filtered parameters dict
-:since:  v0.1.00
-		"""
-
-		return quote(data, "")
-	#
-
-	@staticmethod
-	def filter_parameters(parameters):
+	def filter_parameters(self, parameters):
 	#
 		"""
 This method filters all parameters of the type "__<KEYWORD>__".
@@ -378,11 +384,10 @@ This method filters all parameters of the type "__<KEYWORD>__".
 			del(var_return['__request__'])
 		#
 
-		return Links.build_url_remove_requested(var_return)
+		return self.build_url_remove_requested(var_return)
 	#
 
-	@staticmethod
-	def get_url(var_type, parameters):
+	def get_url(self, var_type, parameters):
 	#
 		"""
 Adds a link.
@@ -395,12 +400,12 @@ Adds a link.
 
 		var_return = ""
 
-		if ("__scheme__" in parameters and "__path__" in parameters):
+		if (self.scheme != None and self.path != None):
 		#
-			var_return = "{0}://".format(Binary.str(parameters['__scheme__']))
-			if ("__host__" in parameters): var_return += Binary.str(parameters['__host__'])
-			if ("__port__" in parameters): var_return += ":{0}".format(Binary.str(parameters['__port__']))
-			var_return += Binary.str(parameters['__path__'])
+			var_return = "{0}://".format(Binary.str(self.scheme))
+			if (self.host != None): var_return += Binary.str(self.host)
+			if (self.port != None): var_return += ":{0}".format(Binary.str(self.port))
+			var_return += Binary.str(self.path)
 		#
 		else:
 		#
@@ -408,12 +413,12 @@ Adds a link.
 
 			if (var_type == Links.TYPE_RELATIVE):
 			#
-				if ("__path__" in parameters): var_return = Binary.str(parameters['__path__'])
-				else:
+				if (self.path == None):
 				#
 					script_name = request.get_script_name()
 					if (script_name != None): var_return = Binary.str(script_name)
 				#
+				else: var_return = Binary.str(self.path)
 			#
 			else:
 			#
@@ -422,16 +427,31 @@ Adds a link.
 				port = request.get_server_port()
 				script_pathname = request.get_script_pathname()
 
-				if (scheme == None or ("__path__" not in parameters and script_pathname == None)): raise RuntimeError("Can't construct a full URL from the received request if it is not provided", 5)
+				if (scheme == None or (self.path == None and script_pathname == None)): raise RuntimeError("Can't construct a full URL from the received request if it is not provided", 5)
 
 				var_return = "{0}://".format(Binary.str(scheme))
 				if (host != None): var_return += Binary.str(host)
 				if (port != None): var_return += ":{0:d}".format(port)
-				var_return += (Binary.str(parameters['__path__']) if ("__path__" in parameters) else "/" + Binary.str(script_pathname))
+				var_return += ("/" + Binary.str(script_pathname) if (self.path == None) else Binary.str(self.path))
 			#
 		#
 
 		return var_return
+	#
+
+	@staticmethod
+	def escape(data):
+	#
+		"""
+Escape the given data for embedding into (X)HTML.
+
+:param parameters: Parameters dict
+
+:return: (dict) Filtered parameters dict
+:since:  v0.1.00
+		"""
+
+		return quote(data, "")
 	#
 #
 

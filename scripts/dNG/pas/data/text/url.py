@@ -28,7 +28,7 @@ except ImportError: from urllib import quote, unquote
 
 from dNG.pas.controller.abstract_response import AbstractResponse
 from dNG.pas.data.http.links import Links
-from dNG.pas.data.xhtml.formatting import Formatting as XhtmlFormatting
+from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from .input_filter import InputFilter
 
 class Url(Links):
@@ -54,8 +54,7 @@ Hidden input fields
 Form action URL
 	"""
 
-	@staticmethod
-	def build_url(var_type, parameters, escape = True):
+	def build_url(self, var_type, parameters, escape = True):
 	#
 		"""
 Adds a link. You may use internal links "index.py?...", external links like
@@ -69,9 +68,9 @@ source for parameters.
 :since: v0.1.01
 		"""
 
-		parameters = Url.filter_parameters(parameters)
+		parameters = self.filter_parameters(parameters)
 
-		#if (var_type == "asis"): var_return = Url.build_url(data)
+		#if (var_type == "asis"): var_return = self.build_url(data)
 		#elif ($f_var_type == "asisuuid"):
 		#
 		#	uuid = (((isset ($direct_globals['input']))&&($f_withuuid)) ? $direct_globals['input']->uuidGet () : "");
@@ -93,23 +92,23 @@ value='de' />". Automatically add language, theme and uuid fields.
 			#	if (($f_uuid)&&(!$direct_globals['kernel']->vUuidIsCookied ())&&($direct_globals['kernel']->vUuidCheckUsage ())) { $f_return .= "<input type='hidden' name='uuid' value='$f_uuid' />"; }
 			#}
 
-			var_return = Url.build_url_formatted("<input type='hidden' name=\"{0}\" value=\"{1}\" />", "", parameters, False)
+			var_return = self.build_url_formatted("<input type='hidden' name=\"{0}\" value=\"{1}\" />", "", parameters)
 		#
 		elif (var_type & Url.TYPE_FORM_URL == Url.TYPE_FORM_URL):
 		#
 			if (var_type == Url.TYPE_FORM_URL): var_type = Url.TYPE_RELATIVE
-			var_return = Links.build_url(var_type, { }, (Url.escape if (escape) else Links.escape))
+			var_return = Links.build_url(self, var_type, { }, (Url.escape if (escape) else Links.escape))
 		#
-		else: var_return = Links.build_url(var_type, parameters, (Url.escape if (escape) else Links.escape))
+		else: var_return = Links.build_url(self, var_type, parameters, (Url.escape if (escape) else Links.escape))
 
 		return var_return
 	#
 
 	@staticmethod
-	def build_url_formatted(link_template, link_separator, parameters, xhtml_escape):
+	def escape(data):
 	#
 		"""
-This method removes all parameters marked as "__remove__".
+Escape the given data for embedding into (X)HTML.
 
 :param parameters: Parameters dict
 
@@ -118,7 +117,7 @@ This method removes all parameters marked as "__remove__".
 :since:  v0.1.01
 		"""
 
-		return Links.build_url_formatted(link_template, link_separator, parameters, (Url.xhtml_escape if (xhtml_escape) else Links.escape))
+		return Links.escape(XHtmlFormatting.escape(data))
 	#
 
 	@staticmethod
@@ -185,7 +184,7 @@ source for parameters.
 :since: v0.1.01
 		"""
 
-		url = Url.build_url(var_type, parameters)
+		url = Url().build_url(var_type, parameters)
 		store = AbstractResponse.get_instance_store()
 
 		if (store != None):
@@ -201,22 +200,6 @@ source for parameters.
 			if (set_name in store): store[set_name].append(link)
 			store[set_name] = [ link ]
 		#
-	#
-
-	@staticmethod
-	def xhtml_escape(data):
-	#
-		"""
-Escape the given data for embedding into (X)HTML.
-
-:param parameters: Parameters dict
-
-:access: protected
-:return: (dict) Filtered parameters dict
-:since:  v0.1.01
-		"""
-
-		return Links.escape(XhtmlFormatting.escape(data))
 	#
 #
 

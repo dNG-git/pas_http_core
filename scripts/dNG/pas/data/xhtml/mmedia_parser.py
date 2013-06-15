@@ -96,7 +96,7 @@ Change data according to the matched tag.
 
 		if (tag_definition['tag'] == "rewrite"):
 		#
-			source = re.match("^\[rewrite:(\w+)\]", data[tag_position:data_position]).group(1)
+			source = re.match("^\\[rewrite:(\\w+)\\]", data[tag_position:data_position]).group(1)
 			key = data[data_position:tag_end_position]
 
 			if (source == "l10n"): var_return += self.render_rewrite(L10n.get_instance(), key)
@@ -134,7 +134,7 @@ Check if a possible tag match is a false positive.
 
 			if (data_match == tag and data_match == "rewrite"):
 			#
-				re_result = re.match("^\[rewrite:(\w+)\]", data)
+				re_result = re.match("^\\[rewrite:(\\w+)\\]", data)
 				if (re_result != None and re_result.group(1) in [ "l10n", "settings" ]): var_return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
 			#
 

@@ -80,12 +80,12 @@ are met.
 					streamer_size = streamer.get_size()
 					range_start = 0
 					range_end = 0
-					re_result = re.match("^bytes(.*?)=(.*?)-(.*?)$", request.get_header('range'), re.I)
+					re_result = re.match("^bytes(.*?)=(.*?)\\-(.*?)$", request.get_header('range'), re.I)
 
 					if (re_result != None):
 					#
-						range_start = re.sub("(\D+)", "", re_result.group(2))
-						range_end = re.sub("(\D+)", "", re_result.group(3))
+						range_start = re.sub("(\\D+)", "", re_result.group(2))
+						range_end = re.sub("(\\D+)", "", re_result.group(3))
 
 						if (range_start != ""):
 						#

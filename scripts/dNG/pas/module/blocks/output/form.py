@@ -51,8 +51,9 @@ Action for "render"
 
 		if ("object" in self.context and "url_parameters" in self.context):
 		#
-			form_parameters = Url.build_url(Url.TYPE_FORM_FIELDS, self.context['url_parameters'])
-			form_url = Url.build_url(Url.TYPE_FORM_URL, self.context['url_parameters'])
+			url_parser = Url()
+			form_parameters = url_parser.build_url(Url.TYPE_FORM_FIELDS, self.context['url_parameters'])
+			form_url = url_parser.build_url(Url.TYPE_FORM_URL, self.context['url_parameters'])
 
 			self.set_action_result("<form action=\"{0}\" method='post' enctype='application/x-www-form-urlencoded' target='_self'>{1}{2}</form>".format(form_url, form_parameters, self.parse()))
 		#

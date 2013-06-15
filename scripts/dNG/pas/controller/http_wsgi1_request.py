@@ -108,7 +108,7 @@ Request path after the script
 			#
 		#
 
-		re_result = (None if (self.client_host == None) else re.match("^::ffff:(\d+)\.(\d+)\.(\d+)\.(\d+)$", self.client_host))
+		re_result = (None if (self.client_host == None) else re.match("^::ffff:(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)$", self.client_host))
 		if (re_result != None): self.client_host = "{0}.{1}.{2}.{3}".format(re_result.group(1), re_result.group(2), re_result.group(3), re_result.group(4))
 
 		wsgi_file_wrapper = (wsgi_env['wsgi.file_wrapper'] if ("wsgi.file_wrapper" in wsgi_env) else None)

@@ -28,7 +28,7 @@ from os import urandom
 
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.text.l10n import L10n
-from dNG.pas.data.xhtml.formatting import Formatting as XhtmlFormatting
+from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.module.named_loader import NamedLoader
 
 class Renderer(object):
@@ -154,12 +154,12 @@ Format and return XHTML for a password input field.
 		"""
 
 		context = {
-			"id": XhtmlFormatting.escape(field_data['id']),
-			"name": XhtmlFormatting.escape(field_data['name']),
-			"title": XhtmlFormatting.escape(field_data['title']),
-			"value": ("" if (field_data['content'] == None) else XhtmlFormatting.escape(field_data['content'])),
+			"id": XHtmlFormatting.escape(field_data['id']),
+			"name": XHtmlFormatting.escape(field_data['name']),
+			"title": XHtmlFormatting.escape(field_data['title']),
+			"value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content'])),
 			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else XhtmlFormatting.escape(field_data['error'])),
+			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error'])),
 			"js_form_init_method": self.js_form_init_method
 		}
 
@@ -228,20 +228,20 @@ Format and return XHTML to create radio options.
 		#
 			if ("title" in choice and "value" in choice):
 			#
-				choice['title'] = XhtmlFormatting.escape(choice['title'])
-				choice['value'] = XhtmlFormatting.escape(choice['value'])
+				choice['title'] = XHtmlFormatting.escape(choice['title'])
+				choice['value'] = XHtmlFormatting.escape(choice['value'])
 
 				choices.append(choice)
 			#
 		#
 
 		context = {
-			"id": XhtmlFormatting.escape(field_data['id']),
-			"name": XhtmlFormatting.escape(field_data['name']),
-			"title": XhtmlFormatting.escape(field_data['title']),
+			"id": XHtmlFormatting.escape(field_data['id']),
+			"name": XHtmlFormatting.escape(field_data['name']),
+			"title": XHtmlFormatting.escape(field_data['title']),
 			"choices": choices,
 			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else XhtmlFormatting.escape(field_data['error'])),
+			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error'])),
 			"js_form_init_method": self.js_form_init_method
 		}
 
@@ -333,7 +333,7 @@ Render the form submit button.
 		context = {
 			"type": "submit",
 			"id": "formid",
-			"title": XhtmlFormatting.escape(L10n.get(title)),
+			"title": XHtmlFormatting.escape(L10n.get(title)),
 			"js_form_init_method": self.js_form_init_method
 		}
 
@@ -352,13 +352,13 @@ Format and return XHTML for a text input field.
 		"""
 
 		context = {
-			"type": XhtmlFormatting.escape(field_data['type']),
-			"id": XhtmlFormatting.escape(field_data['id']),
-			"name": XhtmlFormatting.escape(field_data['name']),
-			"title": XhtmlFormatting.escape(field_data['title']),
-			"value": ("" if (field_data['content'] == None) else XhtmlFormatting.escape(field_data['content'])),
+			"type": XHtmlFormatting.escape(field_data['type']),
+			"id": XHtmlFormatting.escape(field_data['id']),
+			"name": XHtmlFormatting.escape(field_data['name']),
+			"title": XHtmlFormatting.escape(field_data['title']),
+			"value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content'])),
 			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else XhtmlFormatting.escape(field_data['error'])),
+			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error'])),
 			"js_form_init_method": self.js_form_init_method
 		}
 

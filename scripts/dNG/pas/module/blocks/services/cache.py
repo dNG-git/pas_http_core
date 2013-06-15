@@ -126,8 +126,8 @@ Action for "index"
 				self.response.set_last_modified(last_modified_on_server)
 			#
 
-			re_tsc_result = re.search("\.tsc\.(css|js|svg)$", file_pathname, re.I)
-			re_result = (re.search("\.(css|gif|jar|jpg|jpeg|js|png|svg|swf)$", file_pathname, re.I) if (re_tsc_result == None) else None)
+			re_tsc_result = re.search("\\.tsc\\.(css|js|svg)$", file_pathname, re.I)
+			re_result = (re.search("\\.(css|gif|jar|jpg|jpeg|js|png|svg|swf)$", file_pathname, re.I) if (re_tsc_result == None) else None)
 
 			if (re_tsc_result != None):
 			#

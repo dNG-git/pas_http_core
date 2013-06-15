@@ -157,7 +157,7 @@ address if it is.
 
 		dot_parts = data_part.split(".")
 		data_part = ""
-		re_comment = re.compile("^\[[\\x00-\\x0c\\x0e-\\x7f]+\]$")
+		re_comment = re.compile("^\\[[\\x00-\\x0c\\x0e-\\x7f]+\\]$")
 
 		for dot_part in dot_parts:
 		#
@@ -206,16 +206,16 @@ traversals. We will filter them using "filterFilePath()".
 
 		if (type(data) == str):
 		#
-			data = re.sub("^(\w{3,5})\:\/\/", "", data)
+			data = re.sub("^(\\w{3,5})://", "", data)
 
 			data = data.replace("/./", "/")
 			data = data.replace("\\", "")
-			data = re.sub("\w\/[\.\/]", "", data)
+			data = re.sub("\\w/[\\./]", "", data)
 
 			if ((not uprefs_allowed) and data != "."):
 			#
-				data = re.sub("^[\.\/]+", "", data)
-				data = re.sub("[\.\/]+$", "", data)
+				data = re.sub("^[\\./]+", "", data)
+				data = re.sub("[\\./]+$", "", data)
 			#
 		#
 

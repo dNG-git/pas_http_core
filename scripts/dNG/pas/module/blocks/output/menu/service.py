@@ -24,7 +24,9 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from dNG.data.xml_parser import XmlParser
+from dNG.pas.data.settings import Settings
 from dNG.pas.data.text.url import Url
+from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.module.blocks.abstract_block import AbstractBlock
 
 class Service(AbstractBlock):
@@ -41,21 +43,70 @@ The "Service" class implements a service menu view.
              Mozilla Public License, v. 2.0
 	"""
 
-	def execute_render(self):
+	def get_links(self, include_image = True):
 	#
 		"""
-Action for "render"
+Returns a list of rendered links for the service menu.
 
-:since: v0.1.00
+:access: protected
+:return: (list) Links for the service menu
+:since:  v0.1.01
 		"""
 
+		var_return = [ ]
+
 		links = Url.store_get("servicemenu")
-		rendered_links = [ ]
-		xml_parser = XmlParser()
+		for link in links: var_return.append(self.render_link(link, include_image))
 
-		for link in links: rendered_links.append(xml_parser.dict2xml_item_encoder({ "tag": "a", "attributes": { "href": link['url'] }, "value": link['title'] }))
+		return var_return
+	#
 
-		if (len(links) > 0): self.set_action_result("<nav class='pageservicemenu'><ul><li>{0}</li></ul></nav>".format("</li>\n<li>".join(rendered_links)))
+	def render_link(self, data, include_image = True):
+	#
+		"""
+Renders a link.
+
+:access: protected
+:return: (str) Link (X)HTML
+:since:  v0.1.01
+		"""
+
+		var_return = ""
+
+		if ("title" in data and "url" in data):
+		#
+			xml_parser = XmlParser()
+
+			var_return = xml_parser.dict2xml_item_encoder({ "tag": "a", "attributes": { "href": data['url'] } }, False)
+			if (include_image and "image" in data): var_return += "{0} ".format(xml_parser.dict2xml_item_encoder({ "tag": "img", "attributes": { "src": "{0}/themes/{1}/{2}.png".format(Settings.get("http_path_mmedia_versioned"), self.response.get_theme(), data['image']) }, "alt": data['title'], "title": data['image'] }, strict_standard = False))
+			var_return += "{0} </a>".format(XHtmlFormatting.escape(data['title']))
+		#
+
+		return var_return
+	#
+
+	def execute_render_primary(self):
+	#
+		"""
+Action for "render_primary"
+
+:since: v0.1.01
+		"""
+
+		rendered_links = self.get_links()
+		if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_p ui-corner-all'><ul><li>{0}</li></ul></nav>".format("</li>\n<li>".join(rendered_links)))
+	#
+
+	def execute_render_secondary(self):
+	#
+		"""
+Action for "render_secondary"
+
+:since: v0.1.01
+		"""
+
+		rendered_links = self.get_links(False)
+		if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_s ui-corner-all'><ul><li>{0}</li></ul></nav>".format("</li>\n<li>".join(rendered_links)))
 	#
 #
 

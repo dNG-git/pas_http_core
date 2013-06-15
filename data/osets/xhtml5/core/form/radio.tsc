@@ -3,7 +3,7 @@
 	<div class="pasformfield">
 		<ul class="pasformradio">
 [each:content:choices:choice]
-			<li><input id="[rewrite:content]choices.choice.id[/rewrite]" type='radio' name="[rewrite:content]name[/rewrite]" value="[rewrite:content]choices.choice.value[/rewrite]"[if:content:choices.choice.selected == True] checked='checked'[/if] /> <label for="[rewrite:content]choices.choice.id[/rewrite]">[rewrite:content]choices.choice.title[/rewrite]</label><script type='text/javascript'><![CDATA[
+			<li><input id="[rewrite:content]choices.choice.id[/rewrite]" type='radio' name="[rewrite:content]name[/rewrite]" value="[rewrite:content]choices.choice.value[/rewrite]"[if:content:choices.choice.selected == True] checked='checked'[/if] /> <label for="[rewrite:content]choices.choice.id[/rewrite]" class="pasformradiolabel">[rewrite:content]choices.choice.title[/rewrite]</label><script type='text/javascript'><![CDATA[
 			require(["jquery", "djs/form5" ], function() {
 				[rewrite:content]js_form_init_method[/rewrite]({ id: "[rewrite:content]choices.choice.id[/rewrite]", type: "radio" });
 			});

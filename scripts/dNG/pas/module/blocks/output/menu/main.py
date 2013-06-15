@@ -55,7 +55,7 @@ Action for "render"
 
 		for link in links: rendered_links.append(xml_parser.dict2xml_item_encoder({ "tag": "a", "attributes": { "href": link['url'] }, "value": link['title'] }))
 
-		if (len(links) > 0): self.set_action_result("<nav class='pagemainmenu'><ul><li>{0}</li></ul></nav>".format("</li>\n<li>".join(rendered_links)))
+		if (len(links) > 0): self.set_action_result("<nav class='pagemainmenu ui-corner-all'><ul><li>{0}</li></ul></nav>".format("</li>\n<li>".join(rendered_links)))
 	#
 #
 

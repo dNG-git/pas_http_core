@@ -470,7 +470,7 @@ Parse the input variables given as an URI query string.
 				value_element = iline.split("=", 1)
 
 				if (len(value_element) > 1): var_return[value_element[0]] = value_element[1]
-				elif ("ohandler" not in var_return): var_return['ohandler'] = re.sub("\W+", "", iline)
+				elif ("ohandler" not in var_return): var_return['ohandler'] = re.sub("\\W+", "", iline)
 			#
 		#
 
@@ -526,7 +526,7 @@ news, topics, ... Take care for injection attacks!
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -request.parse_dsd(+dsd)- (#echo(__LINE__)#)")
 
 		if (" " in dsd): dsd = quote(dsd)
-		dsd = re.sub("[\+]{3,}", "++", dsd, flags = re.I)
+		dsd = re.sub("[\\+]{3,}", "++", dsd, flags = re.I)
 
 		dsd_list = dsd.split("++")
 		var_return = { }
@@ -552,16 +552,16 @@ Parses request parameters.
 
 		self.parameters = self.iline_parse()
 
-		self.action = (re.sub("[;\/\\\?:@\=\&\. \+]", "", unquote(self.parameters['a'])) if ("a" in self.parameters) else "")
-		self.module = (re.sub("[;\/\\\?:@\=\&\. \+]", "", self.parameters['m']) if ("m" in self.parameters) else "")
+		self.action = (re.sub("[;/\\\\\\?:@\\=\\&\\. \\+]", "", unquote(self.parameters['a'])) if ("a" in self.parameters) else "")
+		self.module = (re.sub("[;/\\\\\\?:@\\=\\&\\. \\+]", "", self.parameters['m']) if ("m" in self.parameters) else "")
 
 		if ("s" in self.parameters):
 		#
 			if (" " in self.parameters['s']): self.parameters['s'] = quote(self.parameters['s'])
-			self.parameters['s'] = re.sub("[\+]", " ", self.parameters['s'])
-			self.parameters['s'] = re.sub("^\W+", "", self.parameters['s'])
-			self.parameters['s'] = re.sub("[\/\\\?:@\=\&\.]", "", self.parameters['s'])
-			self.parameters['s'] = re.sub("\W+$", "", self.parameters['s'])
+			self.parameters['s'] = re.sub("[\\+]", " ", self.parameters['s'])
+			self.parameters['s'] = re.sub("^\\W+", "", self.parameters['s'])
+			self.parameters['s'] = re.sub("[/\\\\\\?:@\\=\\&\\.]", "", self.parameters['s'])
+			self.parameters['s'] = re.sub("\\W+$", "", self.parameters['s'])
 			self.service = re.sub("\\x20", ".", self.parameters['s'])
 		#
 		else: self.service = ""
@@ -573,7 +573,9 @@ Parses request parameters.
 Initialize l10n
 		"""
 
-		if ("lang" in self.parameters and os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), self.parameters['lang'])), os.R_OK)): self.lang = self.parameters['lang']
+		lang = (re.sub("^\\W+", "", self.parameters['lang']) if ("lang" in self.parameters) else None)
+
+		if (lang != None and os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang)), os.R_OK)): self.lang = lang
 		else:
 		#
 			if (self.lang == ""): lang_iso = Settings.get("core_lang", "en_US")
