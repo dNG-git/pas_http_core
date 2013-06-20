@@ -25,7 +25,7 @@ NOTE_END //n"""
 
 from threading import local
 from time import time
-from weakref import proxy
+from weakref import ref
 
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.traced_exception import TracedException
@@ -112,7 +112,7 @@ Response specific generic cache
 Response title
 		"""
 
-		AbstractResponse.local.instance = proxy(self)
+		AbstractResponse.local.weakref_instance = ref(self)
 	#
 
 	def get_accepted_formats(self):
@@ -494,7 +494,7 @@ Get the abstract_response singleton.
 :since:  v0.1.00
 		"""
 
-		return (AbstractResponse.local.instance if (hasattr(AbstractResponse.local, "instance")) else None)
+		return (AbstractResponse.local.weakref_instance() if (hasattr(AbstractResponse.local, "weakref_instance")) else None)
 	#
 
 	@staticmethod
@@ -509,7 +509,8 @@ Get the abstract_response singleton.
 :since:  v0.1.00
 		"""
 
-		return (AbstractResponse.local.instance.get_store() if (hasattr(AbstractResponse.local, "instance") and AbstractResponse.local.instance != None) else None)
+		instance = (AbstractResponse.local.weakref_instance() if (hasattr(AbstractResponse.local, "weakref_instance")) else None)
+		return (None if (instance == None) else instance.get_store())
 	#
 #
 

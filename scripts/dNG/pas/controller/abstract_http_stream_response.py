@@ -23,8 +23,11 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+from time import time
 from zlib import compressobj
 
+from dNG.data.rfc.basics import Basics as RfcBasics
+from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
 from dNG.pas.data.http.chunked_mixin import ChunkedMixin
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.gzip import Gzip
@@ -71,6 +74,10 @@ Compression object or file
 		self.compression_formats = None
 		"""
 Compression formats the client accepts
+		"""
+		self.cookies = { }
+		"""
+True if headers are sent
 		"""
 		self.headers = { }
 		"""
@@ -125,6 +132,14 @@ Filter response headers to remove conflicting ones.
 
 		var_return = self.headers.copy()
 		if (self.compressor != None and "CONTENT-LENGTH" in var_return): del(var_return['CONTENT-LENGTH'])
+
+		if (len(self.cookies) > 0):
+		#
+			if ("SET-COOKIE" not in var_return): var_return['SET-COOKIE'] = [ ]
+			elif (type(var_return['SET-COOKIE']) != list): var_return['SET-COOKIE'] = [ var_return['SET-COOKIE'] ]
+
+			for cookie_name in self.cookies: var_return['SET-COOKIE'].append(self.cookies[cookie_name])
+		#
 
 		return var_return
 	#
@@ -303,6 +318,47 @@ Sets the compression formats the client accepts.
 		"""
 
 		if (isinstance(compression_formats, list)): self.compression_formats = compression_formats
+	#
+
+	def set_cookie(self, name, value, timeout = 1209600, secure_only = False, http_only = False, domain = None, path = None):
+	#
+		"""
+Sets a cookie.
+
+:param name: Cookie name
+:param value: Cookue value as string
+:param timeout: Cookie timeout in seconds (max-age)
+:param secure_only: True if send "secure" flag
+:param http_only: True if send "httpOnly" flag
+:param domain: Cookie domain restriction (defaults to requested host)
+:param path: Cookie path restriction (defaults to "/")
+
+:since: v0.1.00
+		"""
+
+		if (";" in value or '"' in value):
+		#
+			value = value.replace('"', '\"')
+			value = '"{0}"'.format(value)
+		#
+
+		timeout = (time() + timeout if (timeout > 0) else time() - 3600)
+
+		cookie = "{0}={1};Expires={2}".format(name, value, RfcBasics.get_rfc1123_datetime(timeout))
+		if (secure_only): cookie += ";Secure="
+		if (http_only): cookie += ";HttpOnly="
+
+		if (domain == None):
+		#
+			request = AbstractHttpRequest.get_instance()
+			if (request != None): cookie += ";Domain={0}".format(request.get_server_host())
+		#
+		else: cookie += ";Domain={0}".format(domain)
+
+		if (path == None): path = "/"
+		cookie += ";Path={0}".format(path)
+
+		self.cookies[name] = cookie
 	#
 
 	def set_header(self, name, value, name_as_key = False, value_append = False):

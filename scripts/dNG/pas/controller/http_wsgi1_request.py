@@ -61,10 +61,6 @@ Constructor __init__(HttpWsgi1Request)
 
 		AbstractHttpRequest.__init__(self)
 
-		self.body_fp = None
-		"""
-Request query string
-		"""
 		self.http_wsgi_stream_response = None
 		"""
 The WSGI stream response instance

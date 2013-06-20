@@ -211,13 +211,33 @@ Sets the HTTP Content-Type header.
 		self.set_header("Content-Type", content_type)
 	#
 
+	def set_cookie(self, name, value, timeout = 1209600, secure_only = False, http_only = False, domain = None, path = None):
+	#
+		"""
+Sets a cookie.
+
+:param name: Cookie name
+:param value: Cookue value as string
+:param timeout: Cookie timeout in seconds (max-age)
+:param secure_only: True if send "secure" flag
+:param http_only: True if send "httpOnly" flag
+:param domain: Cookie domain restriction (defaults to requested host)
+:param path: Cookie path restriction (defaults to "/")
+
+:since: v0.1.00
+		"""
+
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_cookie({0}, +value, {1:d}, +secure_only, +http_only, +domain, +path)- (#echo(__LINE__)#)".format(name, timeout))
+		if (self.stream_response.supports_headers()): self.stream_response.set_cookie(name, value, timeout, secure_only, http_only, domain, path)
+	#
+
 	def set_header(self, name, value, name_as_key = False, value_append = False):
 	#
 		"""
 Sets a header.
 
 :param name: Header name
-:param value: Header value as string or array
+:param value: Header value as string or list
 :param name_as_key: True if the name is used as a key
 :param value_append: True if headers should be appended
 

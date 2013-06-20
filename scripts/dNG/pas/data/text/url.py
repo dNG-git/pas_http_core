@@ -68,7 +68,6 @@ source for parameters.
 :since: v0.1.01
 		"""
 
-		parameters = self.filter_parameters(parameters)
 
 		#if (var_type == "asis"): var_return = self.build_url(data)
 		#elif ($f_var_type == "asisuuid"):
@@ -76,12 +75,16 @@ source for parameters.
 		#	uuid = (((isset ($direct_globals['input']))&&($f_withuuid)) ? $direct_globals['input']->uuidGet () : "");
 		#	var_return = str_replace ("[uuid]",((($f_uuid)&&(!$direct_globals['kernel']->vUuidIsCookied ())&&($direct_globals['kernel']->vUuidCheckUsage ())) ? $f_uuid : ""),$f_data);
 		#
+
 		if (var_type & Url.TYPE_FORM_FIELDS == Url.TYPE_FORM_FIELDS):
 		#
 			"""
 Get all form data in a string like "<input type='hidden' name='lang'
 value='de' />". Automatically add language, theme and uuid fields.
 			"""
+
+			parameters = self.parameters_filter(parameters)
+			parameters = self.parameters_append_defaults(parameters)
 
 			#if (/*#ifndef(PHP4) */stripos/* #*//*#ifdef(PHP4):stristr:#*/($f_data,"lang=") === false) { $f_return .= "<input type='hidden' name='lang' value='$direct_settings[lang]' />"; }
 			#if (/*#ifndef(PHP4) */stripos/* #*//*#ifdef(PHP4):stristr:#*/($f_data,"theme=") === false) { $f_return .= "<input type='hidden' name='theme' value='$direct_settings[theme]' />"; }
@@ -184,7 +187,6 @@ source for parameters.
 :since: v0.1.01
 		"""
 
-		url = Url().build_url(var_type, parameters)
 		store = AbstractResponse.get_instance_store()
 
 		if (store != None):
@@ -194,7 +196,7 @@ source for parameters.
 
 			priority = (kwargs['priority'] if ("priority" in kwargs) else 5)
 
-			link = { "title": title, "url": url, "priority": priority }
+			link = { "title": title, "type": var_type, "parameters": parameters, "priority": priority }
 			link.update(kwargs)
 
 			if (set_name in store): store[set_name].append(link)

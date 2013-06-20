@@ -300,6 +300,7 @@ used to read the body it is started here as well.
 		if (self.input_size < 0 and (not self.input_chunk_encoded)): self.input_data = RuntimeError("Input size and expected first chunk size are unknown", 5)
 		else:
 		#
+			if (hasattr(input_ptr, "settimeout")): input_ptr.settimeout(self.socket_data_timeout)
 			self.input_ptr = input_ptr
 			self.received_event.clear()
 

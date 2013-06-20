@@ -1,0 +1,17 @@
+<div class='pasformelement'>
+	<div class="pasformlabel"><strong>[rewrite:content]title[/rewrite][if:content:required == True] <em>*</em>[/if]</strong>:</div>
+	<div class="pasformfield">
+		<select id="[rewrite:content]id[/rewrite]" name="[rewrite:content]name[/rewrite]" class="pasformselect ui-corner-all" size="1">
+[each:content:choices:choice]
+			<option value="[rewrite:content]choices.choice.value[/rewrite]"[if:content:choices.choice.selected == True] selected='selected'[/if]>[rewrite:content]choices.choice.title[/rewrite]</option>
+[/each]
+		</select><script type='text/javascript'><![CDATA[
+		require(["jquery", "djs/form5" ], function() {
+			[rewrite:content]js_form_init_method[/rewrite]({ id: "[rewrite:content]id[/rewrite]", type: "select" });
+		});
+		]]></script>
+[if:content:error_message != ]
+		<span class='pasformerror ui-corner-all'>[rewrite:content]error_message[/rewrite]</span>
+[/if]
+	</div>
+</div>

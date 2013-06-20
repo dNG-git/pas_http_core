@@ -26,7 +26,7 @@ NOTE_END //n"""
 from os import path
 from threading import local
 from time import timezone
-from weakref import proxy
+from weakref import ref
 import os
 import re
 
@@ -137,7 +137,7 @@ Source timezone
 Requested response format name
 		"""
 
-		AbstractRequest.local.instance = proxy(self)
+		AbstractRequest.local.weakref_instance = ref(self)
 	#
 
 	def __del__(self):
@@ -715,7 +715,7 @@ Get the abstract_request singleton.
 :since:  v0.1.00
 		"""
 
-		return (AbstractRequest.local.instance if (hasattr(AbstractRequest.local, "instance")) else None)
+		return (AbstractRequest.local.weakref_instance() if (hasattr(AbstractRequest.local, "weakref_instance")) else None)
 	#
 #
 

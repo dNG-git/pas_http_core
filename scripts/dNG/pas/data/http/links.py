@@ -34,6 +34,7 @@ except ImportError:
 
 from dNG.pas.controller.abstract_request import AbstractRequest
 from dNG.pas.data.binary import Binary
+from dNG.pas.data.session import Session
 from dNG.pas.data.settings import Settings
 
 class Links(object):
@@ -104,7 +105,9 @@ source for parameters.
 		"""
 
 		var_return = self.get_url(var_type, parameters)
-		parameters = self.filter_parameters(parameters)
+
+		parameters = self.parameters_filter(parameters)
+		parameters = self.parameters_append_defaults(parameters)
 
 		if (len(parameters) > 0):
 		#
@@ -312,10 +315,10 @@ This method removes all parameters marked as "__remove__".
 		return var_return
 	#
 
-	def build_url_remove_requested(self, parameters):
+	def parameters_append_defaults(self, parameters):
 	#
 		"""
-This method removes all parameters marked as "__remove__" or special ones.
+This method filters all parameters of the type "__<KEYWORD>__".
 
 :param parameters: Parameters dict
 
@@ -324,23 +327,24 @@ This method removes all parameters marked as "__remove__" or special ones.
 :since:  v0.1.00
 		"""
 
-		var_return = parameters.copy()
+		var_return = parameters
 
-		for key in parameters:
+		if ("lang" not in var_return):
 		#
-			if (type(parameters[key]) == dict and len(parameters[key]) > 0): var_return[key] = self.build_url_remove_requested(parameters[key])
-			elif (parameters[key] == "__remove__"): del(var_return[key])
+			request = AbstractRequest.get_instance()
+			if (request != None): var_return['lang'] = request.get_lang()
 		#
 
-		if ("__host__" in parameters): del(var_return['__host__'])
-		if ("__path__" in parameters): del(var_return['__path__'])
-		if ("__port__" in parameters): del(var_return['__port__'])
-		if ("__scheme__" in parameters): del(var_return['__scheme__'])
+		if ("uuid" not in var_return):
+		#
+			session = Session.load()
+			if (session.is_active() and (not session.is_persistent())): var_return['uuid'] = Session.get_uuid()
+		#
 
 		return var_return
 	#
 
-	def filter_parameters(self, parameters):
+	def parameters_filter(self, parameters):
 	#
 		"""
 This method filters all parameters of the type "__<KEYWORD>__".
@@ -384,7 +388,35 @@ This method filters all parameters of the type "__<KEYWORD>__".
 			del(var_return['__request__'])
 		#
 
-		return self.build_url_remove_requested(var_return)
+		return self.parameters_remove_filtered(var_return)
+	#
+
+	def parameters_remove_filtered(self, parameters):
+	#
+		"""
+This method removes all parameters marked as "__remove__" or special ones.
+
+:param parameters: Parameters dict
+
+:access: protected
+:return: (dict) Filtered parameters dict
+:since:  v0.1.00
+		"""
+
+		var_return = parameters.copy()
+
+		for key in parameters:
+		#
+			if (type(parameters[key]) == dict and len(parameters[key]) > 0): var_return[key] = self.parameters_remove_filtered(parameters[key])
+			elif (parameters[key] == "__remove__"): del(var_return[key])
+		#
+
+		if ("__host__" in parameters): del(var_return['__host__'])
+		if ("__path__" in parameters): del(var_return['__path__'])
+		if ("__port__" in parameters): del(var_return['__port__'])
+		if ("__scheme__" in parameters): del(var_return['__scheme__'])
+
+		return var_return
 	#
 
 	def get_url(self, var_type, parameters):

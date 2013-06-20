@@ -73,11 +73,12 @@ Renders a link.
 
 		var_return = ""
 
-		if ("title" in data and "url" in data):
+		if ("title" in data and "type" in data and "parameters" in data):
 		#
 			xml_parser = XmlParser()
+			url = Url().build_url(data['type'], data['parameters'])
 
-			var_return = xml_parser.dict2xml_item_encoder({ "tag": "a", "attributes": { "href": data['url'] } }, False)
+			var_return = xml_parser.dict2xml_item_encoder({ "tag": "a", "attributes": { "href": url } }, False)
 			if (include_image and "image" in data): var_return += "{0} ".format(xml_parser.dict2xml_item_encoder({ "tag": "img", "attributes": { "src": "{0}/themes/{1}/{2}.png".format(Settings.get("http_path_mmedia_versioned"), self.response.get_theme(), data['image']) }, "alt": data['title'], "title": data['image'] }, strict_standard = False))
 			var_return += "{0} </a>".format(XHtmlFormatting.escape(data['title']))
 		#

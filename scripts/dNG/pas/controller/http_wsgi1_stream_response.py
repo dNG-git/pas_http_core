@@ -169,23 +169,31 @@ Sends the prepared response headers.
 
 		headers = [ ]
 		headers_indexed = dict([( value, key ) for ( key, value ) in self.headers_indexed.items()])
+		filtered_headers = self.filter_headers()
 
-		for header_name in self.filter_headers():
+		for header_name in filtered_headers:
 		#
-			header_value = str(self.headers[header_name])
-
 			if (type(header_name) == int):
 			#
+				header_value = str(filtered_headers[header_name])
 				header_name = headers_indexed[header_name]
 
 				if (header_name == "HTTP/1.1"): http_status_line = header_value[9:]
 				else: headers.append(( header_name, header_value ))
 			#
-			elif (type(header_value) == list):
+			elif (type(filtered_headers[header_name]) == list):
 			#
-				for header_list_value in header_value: headers.append(( header_name, header_list_value ))
+				for header_list_value in filtered_headers[header_name]:
+				#
+					header_list_value = str(header_list_value)
+					headers.append(( header_name, header_list_value ))
+				#
 			#
-			else: headers.append(( header_name, header_value ))
+			else:
+			#
+				header_value = str(filtered_headers[header_name])
+				headers.append(( header_name, header_value ))
+			#
 		#
 
 		self.headers_sent = True

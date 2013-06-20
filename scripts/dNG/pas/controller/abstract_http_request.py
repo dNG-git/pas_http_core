@@ -28,8 +28,12 @@ from dNG.pas.controller.abstract_inner_request import AbstractInnerRequest
 from dNG.pas.controller.predefined_http_request import PredefinedHttpRequest
 from dNG.pas.data.http.request_body import RequestBody
 from dNG.pas.data.http.request_headers_mixin import RequestHeadersMixin
+from dNG.pas.data.session.http_adapter import HttpAdapter as HttpSessionAdapter
 from dNG.pas.data.text.input_filter import InputFilter
 from .abstract_request import AbstractRequest
+
+try: from dNG.pas.data.session import Session
+except ImportError: Session = None
 
 class AbstractHttpRequest(AbstractRequest, RequestHeadersMixin):
 #
@@ -56,6 +60,10 @@ Constructor __init__(AbstractHttpRequest)
 		AbstractRequest.__init__(self)
 		RequestHeadersMixin.__init__(self)
 
+		self.body_fp = None
+		"""
+Request body pointer
+		"""
 		self.type = None
 		"""
 Request type
@@ -96,9 +104,44 @@ Parse the input variables given as an URI query string.
 				if (content_encoding != None): request_body.define_input_compression(content_encoding)
 
 				request_body.set_input_ptr(self.body_fp)
+				self.body_fp = None
 				var_return = request_body
 			#
 		#
+
+		return var_return
+	#
+
+	def get_cookie(self, name):
+	#
+		"""
+Returns the request header if defined.
+
+:param name: Header name
+
+:return: (str) Header value if set; None otherwise
+:since:  v0.1.00
+		"""
+
+		cookies = self.get_cookies()
+		return (cookies[name] if (name in cookies) else None)
+	#
+
+	def get_cookies(self):
+	#
+		"""
+Returns the request header if defined.
+
+:param name: Header name
+
+:return: (str) Header value if set; None otherwise
+:since:  v0.1.00
+		"""
+
+		var_return = { }
+
+		cookies = Http.header_field_list(InputFilter.filter_control_chars(self.get_header("Cookie")), ";", "=")
+		for cookie in cookies: var_return[cookie['key']] = cookie['value']
 
 		return var_return
 	#
@@ -113,6 +156,18 @@ Returns the request type.
 		"""
 
 		return self.type
+	#
+
+	def init(self):
+	#
+		"""
+Do preparations for request handling.
+
+:since: v0.1.00
+		"""
+
+		if (Session != None): Session.set_adapter(HttpSessionAdapter)
+		AbstractRequest.init(self)
 	#
 
 	def init_response(self):
