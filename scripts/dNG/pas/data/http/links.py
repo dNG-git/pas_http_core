@@ -34,8 +34,11 @@ except ImportError:
 
 from dNG.pas.controller.abstract_request import AbstractRequest
 from dNG.pas.data.binary import Binary
-from dNG.pas.data.session import Session
 from dNG.pas.data.settings import Settings
+from dNG.pas.data.logging.log_line import LogLine
+
+try: from dNG.pas.data.session import Session
+except ImportError: Session = None
 
 class Links(object):
 #
@@ -104,6 +107,7 @@ source for parameters.
 :since: v0.1.00
 		"""
 
+		if (type(var_type) != int): var_type = self.get_type(var_type)
 		var_return = self.get_url(var_type, parameters)
 
 		parameters = self.parameters_filter(parameters)
@@ -315,6 +319,26 @@ This method removes all parameters marked as "__remove__".
 		return var_return
 	#
 
+	def get_type(self, var_type):
+	#
+		"""
+Parses the given type parameter given as a string value.
+
+:param var_type: String type
+
+:access: protected
+:return: (int) Internal type
+:since:  v0.1.01
+		"""
+
+		if (var_type == "elink"): var_return = Links.TYPE_FULL
+		elif (var_type == "ilink"): var_return = Links.TYPE_RELATIVE
+		elif (var_type == "optical"): var_return = Links.TYPE_OPTICAL
+		else: var_return = 0
+
+		return var_return
+	#
+
 	def parameters_append_defaults(self, parameters):
 	#
 		"""
@@ -328,6 +352,7 @@ This method filters all parameters of the type "__<KEYWORD>__".
 		"""
 
 		var_return = parameters
+		request = None
 
 		if ("lang" not in var_return):
 		#
@@ -335,10 +360,11 @@ This method filters all parameters of the type "__<KEYWORD>__".
 			if (request != None): var_return['lang'] = request.get_lang()
 		#
 
-		if ("uuid" not in var_return):
+		if ("uuid" not in var_return and Session != None):
 		#
-			session = Session.load()
-			if (session.is_active() and (not session.is_persistent())): var_return['uuid'] = Session.get_uuid()
+			if (request == None): request = AbstractRequest.get_instance()
+			session = request.get_session()
+			if (session != None and session.is_active() and (not session.is_persistent())): var_return['uuid'] = Session.get_uuid()
 		#
 
 		return var_return
@@ -441,7 +467,7 @@ Adds a link.
 		#
 		else:
 		#
-			request = AbstractRequest.get_instance(False)
+			request = AbstractRequest.get_instance()
 
 			if (var_type == Links.TYPE_RELATIVE):
 			#

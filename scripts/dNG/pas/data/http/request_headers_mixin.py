@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.request_headers_mixin
+dNG.pas.data.http.RequestHeadersMixin
 """
 """n// NOTE
 ----------------------------------------------------------------------------

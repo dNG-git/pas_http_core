@@ -103,18 +103,6 @@ Page title
 		"""
 	#
 
-	def __del__(self):
-	#
-		"""
-Destructor __del__(Renderer)
-
-:since: v0.1.00
-		"""
-
-		if (self.cache_instance != None): self.cache_instance.return_instance()
-		if (AbstractTagParser != None): AbstractTagParser.__del__(self)
-	#
-
 	def add_js_file(self, js_file):
 	#
 		"""
@@ -202,7 +190,7 @@ Change data according to the matched tag.
 
 		if (tag_definition['tag'] == "block"):
 		#
-			re_result = re.match("^\\[block(:(\\w+):([\\w\\.]+):([\\w\\.]+)){0,1}\\]", data[tag_position:data_position])
+			re_result = re.match("^\\[block(:(\\w+):([\\w\\.]+)){0,1}\\]", data[tag_position:data_position])
 
 			if (re_result != None):
 			#
@@ -210,13 +198,12 @@ Change data according to the matched tag.
 				#
 					source = re_result.group(2)
 					key = re_result.group(3)
-					mapping_key = re_result.group(4)
 				#
 				else: source = None
 
 				if (source == None): var_return += self.render_block(data[data_position:tag_end_position])
-				elif (source == "content"): var_return += self.render_block(data[data_position:tag_end_position], "content", self.mapped_element_update("content", self.content), key, mapping_key)
-				elif (source == "settings"): var_return += self.render_block(data[data_position:tag_end_position], "settings", self.mapped_element_update("settings", Settings.get_instance()), key, mapping_key)
+				elif (source == "content"): var_return += self.render_block(data[data_position:tag_end_position], "content", self.mapped_element_update("content", self.content), key)
+				elif (source == "settings"): var_return += self.render_block(data[data_position:tag_end_position], "settings", self.mapped_element_update("settings", Settings.get_instance()), key)
 			#
 
 			var_return += data_closed
@@ -299,7 +286,7 @@ Check if a possible tag match is a false positive.
 			#
 				if (data_match == "block"):
 				#
-					re_result = re_result = re.match("^\\[block(:\\w+:[\\w\\.]+:[\\w\\.]+){0,1}\\]", data)
+					re_result = re_result = re.match("^\\[block(:\\w+:[\\w\\.]+){0,1}\\]", data)
 					if (re_result != None): var_return = { "tag": "block", "tag_end": "[/block]", "type": "top_down" }
 				#
 				elif (data_match == "each"):

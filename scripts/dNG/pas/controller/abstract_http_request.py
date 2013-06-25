@@ -166,7 +166,20 @@ Do preparations for request handling.
 :since: v0.1.00
 		"""
 
-		if (Session != None): Session.set_adapter(HttpSessionAdapter)
+		try:
+		#
+			if (Session != None):
+			#
+				Session.set_adapter(HttpSessionAdapter)
+				session = Session.load(session_create = False)
+				if (session != None): self.set_session(session)
+			#
+		#
+		except Exception as handled_exception:
+		#
+			if (self.log_handler != None): self.log_handler.error(handled_exception)
+		#
+
 		AbstractRequest.init(self)
 	#
 
@@ -308,6 +321,18 @@ Returns false if the server address is unknown.
 
 :return: (bool) True if listener are known.
 :since:  v0.1.00
+		"""
+
+		return True
+	#
+
+	def supports_sessions(self):
+	#
+		"""
+Returns false if the request can't be connected to an active session.
+
+:return: (bool) True if an active session can be identified.
+:since:  v0.1.01
 		"""
 
 		return True

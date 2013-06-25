@@ -56,7 +56,7 @@ td:last-child, th:last-child { border-right: none }
 [/if]
 </div></header>
 <div class='designpage ui-corner-all'>
-[block]output.menu.Main.render[/block]
+[block:settings:pas_http_core_menu_main]output.menu.File.render[/block]
 [block]output.menu.Service.render_primary[/block]
 [rewrite:content]page_content[/rewrite]
 [block]output.menu.Service.render_secondary[/block]

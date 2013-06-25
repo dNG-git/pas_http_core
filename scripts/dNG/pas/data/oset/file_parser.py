@@ -70,18 +70,6 @@ Path to the osets directory
 		"""
 	#
 
-	def __del__(self):
-	#
-		"""
-Destructor __del__(FileParser)
-
-:since: v0.1.00
-		"""
-
-		if (self.cache_instance != None): self.cache_instance.return_instance()
-		if (Parser != None): Parser.__del__(self)
-	#
-
 	def render(self, template_name, content, default = None):
 	#
 		"""
@@ -94,7 +82,7 @@ Renders content ready for output from the given OSet template.
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -osetParser.render({0}, +content)- (#echo(__LINE__)#)".format(template_name))
-		var_return = (L10n.get("pas_http_core_oset_not_viewable") if (default == None) else default)
+		var_return = (L10n.get("errors_pas_http_core_oset_not_viewable") if (default == None) else default)
 
 		try:
 		#

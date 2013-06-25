@@ -99,6 +99,10 @@ Server scheme / protocol
 		"""
 Requested service
 		"""
+		self.session = None
+		"""
+Associated session to request
+		"""
 		self.output_format = None
 		"""
 Requested response format name
@@ -315,6 +319,18 @@ Returns the requested service.
 		return self.service
 	#
 
+	def get_session(self):
+	#
+		"""
+Returns the associated session.
+
+:return: (object) Session instance
+:since:  v0.1.00
+		"""
+
+		return self.session
+	#
+
 	def init(self, request):
 	#
 		"""
@@ -331,6 +347,7 @@ Initializes default values from the original request.
 		self.server_scheme = request.get_server_scheme()
 		self.server_host = request.get_server_host()
 		self.server_port = request.get_server_port()
+		self.session = request.get_session()
 		self.set_script_pathname(request.get_script_pathname())
 	#
 
@@ -489,7 +506,19 @@ Returns false if the server address is unknown.
 :since:  v0.1.00
 		"""
 
-		return False
+		return (self.server_host != None)
+	#
+
+	def supports_sessions(self):
+	#
+		"""
+Returns false if the request can't be connected to an active session.
+
+:return: (bool) True if an active session can be identified.
+:since:  v0.1.01
+		"""
+
+		return (self.session != None)
 	#
 #
 

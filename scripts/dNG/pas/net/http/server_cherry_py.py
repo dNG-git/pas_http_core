@@ -62,12 +62,7 @@ cherrypy server
 		"""
 
 		log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
-
-		if (log_handler != None):
-		#
-			log_handler.add_logger("{0}.error.{1}".format(log.logger_root, log.appid))
-			log_handler.return_instance()
-		#
+		if (log_handler != None): log_handler.add_logger("{0}.error.{1}".format(log.logger_root, log.appid))
 	#
 
 	def configure(self):

@@ -72,12 +72,82 @@ Returns true if the defined session is valid.
 
 		var_return = True
 
-		if (self.session.get("uuids.passcode") != None):
+		passcode = self.session.get("uuids.passcode")
+
+		if (passcode != None):
 		#
-			pass
+			cookie_passcode = None
+			request = NamedLoader.get_singleton("dNG.pas.controller.AbstractHttpRequest", False)
+			response = AbstractHttpResponse.get_instance()
+
+			if (request != None and hasattr(request, "get_cookie")):
+			#
+				uuids_cookie = request.get_cookie("uuids")
+
+				if (uuids_cookie != None):
+				#
+					cookie_data = uuids_cookie.split(":", 1)
+					if (cookie_data[0] == self.session.uuid): cookie_passcode = cookie_data[1]
+				#
+			#
+
+			passcode_prev = self.session.get("uuids.passcode_prev")
+			passcode_timeout = self.session.get("uuids.passcode_timeout")
+
+			if (cookie_passcode == None): var_return = (True if (passcode_prev == None and passcode_timeout + int(Settings.get("pas_session_uuids_passcode_grace_period", 5)) > time()) else False)
+			elif (cookie_passcode != Tmd5.encode(passcode)):
+			#
+				if (passcode_timeout + int(Settings.get("pas_session_uuids_passcode_grace_period", 5)) > time()):
+				#
+					if (passcode_prev == None or cookie_passcode != Tmd5.encode(passcode_prev)): var_return = False
+				#
+				else: var_return = False
+			#
+
+			if (not var_return):
+			#
+				if (isinstance(response, AbstractHttpResponse)): response.set_cookie("uuids", "", 0)
+			#
 		#
 
 		return var_return
+	#
+
+	def load(self):
+	#
+		"""
+Uses protocol specific functionality to load additional information of an
+session.
+
+:since: v0.1.00
+		"""
+
+		passcode_timeout = self.session.get("uuids.passcode_timeout")
+		if (passcode_timeout != None and passcode_timeout < time()): self.renew_passcode()
+	#
+
+	def renew_passcode(self):
+	#
+		"""
+Saves changes of the uuIDs instance.
+
+:return: (bool) True on success
+:since: v0.1.00
+		"""
+
+		response = AbstractHttpResponse.get_instance()
+
+		if (self.session.get("uuids.passcode_timeout") != None and isinstance(response, AbstractHttpResponse)):
+		#
+			self.session.set("uuids.passcode_prev", self.session.get("uuids.passcode"))
+
+			passcode = Binary.str(hexlify(urandom(16)))
+			self.session.set("uuids.passcode", passcode)
+			self.session.set("uuids.passcode_timeout", int(time() + int(Settings.get("pas_session_uuids_passcode_timeout", 300))))
+
+			passcode = Tmd5.encode(passcode)
+			response.set_cookie("uuids", "{0}:{1}".format(self.session.uuid, passcode))
+		#
 	#
 
 	def save(self):
@@ -90,19 +160,7 @@ Saves changes of the uuIDs instance.
 		"""
 
 		passcode_timeout = self.session.get("uuids.passcode_timeout")
-		response = AbstractHttpResponse.get_instance()
-
-		if (passcode_timeout != None and isinstance(response, AbstractHttpResponse) and passcode_timeout < time()):
-		#
-			self.session.set("uuids.passcode_prev", self.session.get("uuids.passcode"))
-
-			passcode = Binary.str(hexlify(urandom(16)))
-			self.session.set("uuids.passcode", passcode)
-			self.session.set("uuids.passcode_timeout", int(time() + int(Settings.get("pas_session_uuids_passcode_timeout", 300))))
-
-			passcode = Tmd5.encode(passcode)
-			response.set_cookie("uuids", "{0}:{1}".format(self.session.uuid, passcode))
-		#
+		if (passcode_timeout != None and passcode_timeout < time()): self.renew_passcode()
 
 		return True
 	#

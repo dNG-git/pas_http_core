@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.virtual_config
+dNG.pas.data.http.VirtualConfig
 """
 """n// NOTE
 ----------------------------------------------------------------------------

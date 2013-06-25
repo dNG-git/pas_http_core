@@ -128,6 +128,10 @@ Server scheme / protocol
 		"""
 Requested service
 		"""
+		self.session = None
+		"""
+Associated session to request
+		"""
 		self.timezone = None
 		"""
 Source timezone
@@ -138,17 +142,6 @@ Requested response format name
 		"""
 
 		AbstractRequest.local.weakref_instance = ref(self)
-	#
-
-	def __del__(self):
-	#
-		"""
-Destructor __del__(AbstractRequest)
-
-:since: v0.1.00
-		"""
-
-		if (self.log_handler != None): self.log_handler.return_instance()
 	#
 
 	def execute(self):
@@ -435,6 +428,18 @@ Returns the requested service.
 		return self.service
 	#
 
+	def get_session(self):
+	#
+		"""
+Returns the associated session.
+
+:return: (object) Session instance
+:since:  v0.1.00
+		"""
+
+		return self.session
+	#
+
 	def get_stream_response(self):
 	#
 		"""
@@ -601,18 +606,6 @@ Set some standard values
 		if (self.service == ""): self.service = "index"
 	#
 
-	def return_instance(self):
-	#
-		"""
-This "return_instance()" implementation is a dummy as a thread-local weakref
-is used for "get_instance()".
-
-:since: v0.1.00
-		"""
-
-		pass
-	#
-
 	def set_dsd(self, key, value):
 	#
 		"""
@@ -653,6 +646,19 @@ Sets the log_handler.
 		"""
 
 		self.log_handler = log_handler
+	#
+
+	def set_session(self, session):
+	#
+		"""
+Sets the associated session.
+
+:param session: (object) Session instance
+
+:since: v0.1.00
+		"""
+
+		self.session = session
 	#
 
 	def supports_accepted_formats(self):
@@ -703,13 +709,23 @@ Returns false if the server address is unknown.
 		return False
 	#
 
+	def supports_sessions(self):
+	#
+		"""
+Returns false if the request can't be connected to an active session.
+
+:return: (bool) True if an active session can be identified.
+:since:  v0.1.01
+		"""
+
+		return (self.session != None)
+	#
+
 	@staticmethod
-	def get_instance(count = False):
+	def get_instance():
 	#
 		"""
 Get the abstract_request singleton.
-
-:param count: Count "get()" request
 
 :return: (AbstractRequest) Object on success
 :since:  v0.1.00

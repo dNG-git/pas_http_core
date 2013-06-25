@@ -261,18 +261,6 @@ Initialize runtime parameters for response.
 		self.initialized = True
 	#
 
-	def return_instance(self):
-	#
-		"""
-This "return_instance()" implementation is a dummy as a thread-local weakref
-is used for "get_instance()".
-
-:since: v0.1.00
-		"""
-
-		pass
-	#
-
 	def send(self):
 	#
 		"""
@@ -483,12 +471,10 @@ Returns false if responses can not be streamed.
 	#
 
 	@staticmethod
-	def get_instance(count = False):
+	def get_instance():
 	#
 		"""
 Get the abstract_response singleton.
-
-:param count: Count "get()" response
 
 :return: (AbstractResponse) Object on success
 :since:  v0.1.00

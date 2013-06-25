@@ -43,7 +43,31 @@ The "Service" class implements a service menu view.
              Mozilla Public License, v. 2.0
 	"""
 
-	def get_links(self, include_image = True):
+	def execute_render_primary(self):
+	#
+		"""
+Action for "render_primary"
+
+:since: v0.1.01
+		"""
+
+		rendered_links = self.get_rendered_links()
+		if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_p ui-corner-all'><ul><li>{0}</li></ul></nav>".format("</li>\n<li>".join(rendered_links)))
+	#
+
+	def execute_render_secondary(self):
+	#
+		"""
+Action for "render_secondary"
+
+:since: v0.1.01
+		"""
+
+		rendered_links = self.get_rendered_links(False)
+		if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_s ui-corner-all'><ul><li>{0}</li></ul></nav>".format("</li>\n<li>".join(rendered_links)))
+	#
+
+	def get_rendered_links(self, include_image = True):
 	#
 		"""
 Returns a list of rendered links for the service menu.
@@ -84,30 +108,6 @@ Renders a link.
 		#
 
 		return var_return
-	#
-
-	def execute_render_primary(self):
-	#
-		"""
-Action for "render_primary"
-
-:since: v0.1.01
-		"""
-
-		rendered_links = self.get_links()
-		if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_p ui-corner-all'><ul><li>{0}</li></ul></nav>".format("</li>\n<li>".join(rendered_links)))
-	#
-
-	def execute_render_secondary(self):
-	#
-		"""
-Action for "render_secondary"
-
-:since: v0.1.01
-		"""
-
-		rendered_links = self.get_links(False)
-		if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_s ui-corner-all'><ul><li>{0}</li></ul></nav>".format("</li>\n<li>".join(rendered_links)))
 	#
 #
 

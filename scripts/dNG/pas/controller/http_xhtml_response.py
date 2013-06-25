@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.http_xhtml_response
+dNG.pas.controller.HttpXhtmlResponse
 """
 """n// NOTE
 ----------------------------------------------------------------------------

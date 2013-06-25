@@ -62,18 +62,6 @@ Constructor __init__(MmediaParser)
 		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 	#
 
-	def __del__(self):
-	#
-		"""
-Destructor __del__(MmediaParser)
-
-:since: v0.1.00
-		"""
-
-		if (self.cache_instance != None): self.cache_instance.return_instance()
-		if (AbstractTagParser != None): AbstractTagParser.__del__(self)
-	#
-
 	def parser_change(self, tag_definition, data, tag_position, data_position, tag_end_position):
 	#
 		"""

@@ -41,7 +41,7 @@ This tag parser mixin provides support for blocks of subelements.
              Mozilla Public License, v. 2.0
 	"""
 
-	def render_block(self, action, source_key = None, source = None, key = None, mapping_key = None):
+	def render_block(self, action, source_key = None, source = None, key = None):
 	#
 		"""
 Checks and renders the block statement.
@@ -50,14 +50,13 @@ Checks and renders the block statement.
 :param source_key: Originating source key
 :param source: Source for comparison
 :param key: Key in source for comparison
-:param mapping_key: Element mapping key
 
 :access: protected
 :return: (str) Rewritten statement if successful
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -TagParser.render_block(data, source_key, source, key, mapping_key)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -TagParser.render_block(data, source_key, source, key)- (#echo(__LINE__)#)")
 		var_return = ""
 
 		try:

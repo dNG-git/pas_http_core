@@ -86,7 +86,6 @@ Destructor __del__(Server)
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.return_instance()
 		Hooks.unregister("dNG.pas.http.server.get_host", self.get_host)
 		Hooks.unregister("dNG.pas.http.server.get_port", self.get_port)
 	#
@@ -215,6 +214,8 @@ Returns an HTTP server instance based on the configuration set.
 		"""
 
 		var_return = None
+
+		Settings.read_file("{0}/settings/pas_http.json".format(Settings.get("path_data")))
 		http_server_mode = Settings.get("pas_http_server_mode", "standalone")
 
 		try:

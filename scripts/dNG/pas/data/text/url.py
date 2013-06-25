@@ -68,6 +68,7 @@ source for parameters.
 :since: v0.1.01
 		"""
 
+		if (type(var_type) != int): var_type = self.get_type(var_type)
 
 		#if (var_type == "asis"): var_return = self.build_url(data)
 		#elif ($f_var_type == "asisuuid"):

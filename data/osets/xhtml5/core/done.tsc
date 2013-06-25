@@ -1,0 +1,4 @@
+<article>
+	<h1><strong>[rewrite:l10n]core_task_done[/rewrite]</strong>: [rewrite:content]task[/rewrite]</h1>
+	<p>[rewrite:content]message[/rewrite]</p>
+</article>

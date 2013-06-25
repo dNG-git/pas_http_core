@@ -29,6 +29,9 @@ from dNG.pas.data.translatable_exception import TranslatableException
 from dNG.pas.data.settings import Settings
 from .abstract_response import AbstractResponse
 
+try: from dNG.pas.data.session import Session
+except ImportError: Session = None
+
 class AbstractHttpResponse(AbstractResponse):
 #
 	"""
@@ -191,7 +194,19 @@ Sends the prepared response headers.
 
 		if (self.stream_response.supports_headers() and (not self.headers_sent)):
 		#
-			if (Settings.get("pas_core_cookies", True) and len(self.cookies)> 0): self.set_header("Set-Cookie", self.cookies)
+			try:
+			#
+				if (Session != None):
+				#
+					session = Session.load()
+					if (session != None and session.is_active()): session.save()
+				#
+			#
+			except Exception as handled_exception:
+			#
+				if (self.log_handler != None): self.log_handler.error(handled_exception)
+			#
+
 			self.headers_sent = True
 			self.stream_response.send_headers()
 		#

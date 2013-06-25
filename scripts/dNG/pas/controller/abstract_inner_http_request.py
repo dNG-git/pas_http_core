@@ -133,6 +133,30 @@ Sets false if the script name is not needed for execution.
 
 		return (False if (self.headers == None) else True)
 	#
+
+	def supports_listener_data(self):
+	#
+		"""
+Returns false if the server address is unknown.
+
+:return: (bool) True if listener are known.
+:since:  v0.1.00
+		"""
+
+		return True
+	#
+
+	def supports_sessions(self):
+	#
+		"""
+Returns false if the request can't be connected to an active session.
+
+:return: (bool) True if an active session can be identified.
+:since:  v0.1.01
+		"""
+
+		return True
+	#
 #
 
 ##j## EOF

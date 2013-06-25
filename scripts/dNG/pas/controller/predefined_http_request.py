@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.abstract_request
+dNG.pas.controller.PredefinedHttpRequest
 """
 """n// NOTE
 ----------------------------------------------------------------------------

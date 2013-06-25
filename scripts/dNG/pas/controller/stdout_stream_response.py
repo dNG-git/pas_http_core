@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.stdout_stream_response
+dNG.pas.controller.StdoutStreamResponse
 """
 """n// NOTE
 ----------------------------------------------------------------------------

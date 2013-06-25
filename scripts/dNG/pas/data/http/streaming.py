@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.streaming
+dNG.pas.data.http.Streaming
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -61,12 +61,8 @@ are met.
 		if (streamer == None): response.set_header("HTTP/1.1", "HTTP/1.1 501 Not Implemented", True)
 		else:
 		#
-			mimetypes = MimeType.get_instance()
-
 			url_ext = path.splitext(url)[1]
-			mimetype_definition = mimetypes.get(url_ext[1:])
-
-			mimetypes.return_instance()
+			mimetype_definition = MimeType.get_instance().get(url_ext[1:])
 
 			if (mimetype_definition != None and streamer.open_url(url)):
 			#

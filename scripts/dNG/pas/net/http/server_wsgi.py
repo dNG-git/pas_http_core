@@ -54,9 +54,6 @@ Constructor __init__(ServerWsgi)
 :since: v0.1.00
 		"""
 
-		Settings.read_file("{0}/settings/pas_core.json".format(Settings.get("path_data")), True)
-		Settings.read_file("{0}/settings/pas_http_server.json".format(Settings.get("path_data")), True)
-
 		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.Cache", False)
 		"""
 Cache instance
@@ -79,6 +76,8 @@ Server port
 Timestamp of service initialisation
 		"""
 
+		self.configure()
+
 		Hooks.load("http")
 		Hooks.register("dNG.pas.status.getUptime", self.get_uptime)
 
@@ -91,7 +90,6 @@ Timestamp of service initialisation
 
 		Hooks.call("dNG.pas.http.wsgi.startup")
 
-		self.configure()
 		self.http_wsgi1_request = HttpWsgi1Request(wsgi_env, wsgi_header_response)
 	#
 
@@ -109,9 +107,22 @@ python.org: Return an iterator object.
 		self.http_wsgi1_request = None
 		Hooks.call("dNG.pas.http.shutdown")
 		Hooks.call("dNG.pas.status.shutdown")
-		if (self.cache_instance != None): self.cache_instance.return_instance()
 
 		return iter(http_wsgi1_request)
+	#
+
+	def configure(self):
+	#
+		"""
+Configures the server
+
+:since: v0.1.01
+		"""
+
+		Settings.read_file("{0}/settings/pas_core.json".format(Settings.get("path_data")), True)
+		Settings.read_file("{0}/settings/pas_http.json".format(Settings.get("path_data")))
+
+		Server.configure(self)
 	#
 
 	def get_uptime (self, params = None, last_return = None):

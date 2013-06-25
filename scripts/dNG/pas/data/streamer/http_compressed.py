@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.streamer.http_compressed
+dNG.pas.data.streamer.HttpCompressed
 """
 """n// NOTE
 ----------------------------------------------------------------------------
