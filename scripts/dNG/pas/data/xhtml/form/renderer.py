@@ -26,7 +26,6 @@ NOTE_END //n"""
 from binascii import hexlify
 from os import urandom
 
-from dNG.pas.data.settings import Settings
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.module.named_loader import NamedLoader
@@ -57,10 +56,6 @@ Constructor __init__(Renderer)
 		"""
 List of form elements
 		"""
-		self.js_form_init_method = Settings.get("pas_http_theme_oset_js_form_init", "pas_form_init")
-		"""
-Javascript init function
-		"""
 		self.oset = None
 		"""
 OSet requested
@@ -79,7 +74,7 @@ valid XHTML for output.
 :since:  v0.1.00
 		"""
 
-		var_return = ""
+		_return = ""
 
 		if (form_id == None): form_id = "pas_form_{0}".format(hexlify(urandom(10)))
 		sections_count = len(self.fields)
@@ -115,9 +110,9 @@ $f_return = ((isset ($f_section) ? "<p class='pagecontenttitle ui-accordion-head
 <tbody>");
 			"""
 		#
-		elif (sections_count > 0): var_return = self.render_section(0)
+		elif (sections_count > 0): _return = self._render_section(0)
 
-		return var_return
+		return _return
 	#
 
 	def render_oset_file(self, template_name, content = None):
@@ -135,11 +130,11 @@ Render the form field using the given OSet template.
 		#
 			parser = NamedLoader.get_instance("dNG.pas.data.oset.FileParser")
 			parser.set_oset(self.oset)
-			var_return = parser.render(template_name, content)
+			_return = parser.render(template_name, content)
 		#
-		except: var_return = "<div class='pasformerror'>{0}</div>".format(L10n.get("errors_pas_http_core_form_internal_error"))
+		except: _return = "<div class='pasformerror'>{0}</div>".format(L10n.get("errors_pas_http_core_form_internal_error"))
 
-		return var_return
+		return _return
 	#
 
 	def render_password(self, field_data, rcp_active = False):
@@ -159,8 +154,7 @@ Format and return XHTML for a password input field.
 			"title": XHtmlFormatting.escape(field_data['title']),
 			"value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content'])),
 			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error'])),
-			"js_form_init_method": self.js_form_init_method
+			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
 		}
 
 		if (field_data['size'] == "s"):
@@ -179,7 +173,7 @@ Format and return XHTML for a password input field.
 			context['size_percentage'] = "80%"
 		#
 
-		var_return = self.render_oset_file("core/form/password", context)
+		_return = self.render_oset_file("core/form/password", context)
 
 		"""
 		global $direct_cachedata,$direct_globals,$direct_settings;
@@ -208,7 +202,7 @@ jQuery (function () { {$direct_settings['theme_form_js_init']} ({ id:'$f_js_id' 
 		return $f_return;
 		"""
 
-		return var_return
+		return _return
 	#
 
 	def render_radio(self, field_data):
@@ -241,11 +235,10 @@ Format and return XHTML to create radio options.
 			"title": XHtmlFormatting.escape(field_data['title']),
 			"choices": choices,
 			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error'])),
-			"js_form_init_method": self.js_form_init_method
+			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
 		}
 
-		var_return = self.render_oset_file("core/form/radio", context)
+		_return = self.render_oset_file("core/form/radio", context)
 
 		"""
 		global $direct_globals,$direct_settings;
@@ -282,10 +275,10 @@ $f_return .= ($f_data['title'].":</strong></td>
 	}
 		"""
 
-		return var_return
+		return _return
 	#
 
-	def render_section(self, position):
+	def _render_section(self, position):
 	#
 		"""
 Reads the form fields of the section at the given position and calls the
@@ -293,12 +286,11 @@ corresponding method to get valid XHTML for output.
 
 :param position: Form section position
 
-:access: protected
 :return: (str) Valid XHTML form
 :since:  v0.1.00
 		"""
 
-		var_return = ""
+		_return = ""
 
 		fields = self.fields[position]['fields']
 
@@ -312,13 +304,13 @@ corresponding method to get valid XHTML for output.
 				if (hasattr(self, output_function)): output = getattr(self, output_function)(field_data)
 			#
 
-			if (var_return != ""): var_return += "\n"
+			if (_return != ""): _return += "\n"
 
-			if (type(output) == str): var_return += output
-			else: var_return += self.render_oset_file("core/form/error", { "error_message": L10n.get("errors_pas_http_core_form_internal_error") })
+			if (type(output) == str): _return += output
+			else: _return += self.render_oset_file("core/form/error", { "error_message": L10n.get("errors_pas_http_core_form_internal_error") })
 		#
 
-		return var_return
+		return _return
 	#
 
 	def render_submit_button(self, title):
@@ -333,8 +325,7 @@ Render the form submit button.
 		context = {
 			"type": "submit",
 			"id": "formid",
-			"title": XHtmlFormatting.escape(L10n.get(title)),
-			"js_form_init_method": self.js_form_init_method
+			"title": XHtmlFormatting.escape(L10n.get(title))
 		}
 
 		return self.render_oset_file("core/form/button", context)
@@ -358,8 +349,7 @@ Format and return XHTML for a text input field.
 			"title": XHtmlFormatting.escape(field_data['title']),
 			"value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content'])),
 			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error'])),
-			"js_form_init_method": self.js_form_init_method
+			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
 		}
 
 		if (field_data['size'] == "s"):
@@ -378,7 +368,7 @@ Format and return XHTML for a text input field.
 			context['size_percentage'] = "80%"
 		#
 
-		var_return = self.render_oset_file("core/form/text", context)
+		_return = self.render_oset_file("core/form/text", context)
 
 		"""$f_js_helper = ($f_data['helper_text'] ? "\n".($direct_globals['output']->jsHelper ($f_data['helper_text'],$f_data['helper_url'],$f_js_id)) : "");
 
@@ -416,7 +406,7 @@ $f_return .= ($f_rcp_active ? ("jQuery (function () {
 		$f_return .= "\n]]></script>$f_js_helper</td>\n</tr>";
 		"""
 
-		return var_return
+		return _return
 	#
 
 	def set_data(self, fields):

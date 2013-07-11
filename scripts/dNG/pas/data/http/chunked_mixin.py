@@ -52,11 +52,11 @@ Returns the formats the client accepts.
 
 		data = Binary.bytes(data)
 
-		if (data == None): var_return = Binary.bytes("0\r\n\r\n")
-		elif (type(data) == type(ChunkedMixin.BINARY_NEWLINE) and len(data) > 0): var_return = Binary.bytes("{0:x}\r\n".format(len(data))) + data + ChunkedMixin.BINARY_NEWLINE
-		else: var_return = Binary.BYTES_TYPE()
+		if (data == None): _return = Binary.bytes("0\r\n\r\n")
+		elif (type(data) == type(ChunkedMixin.BINARY_NEWLINE) and len(data) > 0): _return = Binary.bytes("{0:x}\r\n".format(len(data))) + data + ChunkedMixin.BINARY_NEWLINE
+		else: _return = Binary.BYTES_TYPE()
 
-		return var_return
+		return _return
 	#
 #
 

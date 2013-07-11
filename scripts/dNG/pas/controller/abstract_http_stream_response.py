@@ -120,28 +120,27 @@ Sends the prepared response headers.
 		return self.headers_sent
 	#
 
-	def filter_headers(self):
+	def _filter_headers(self):
 	#
 		"""
 Filter response headers to remove conflicting ones.
 
-:access: protected
 :return: (dict) Filtered headers
 :since:  v0.1.01
 		"""
 
-		var_return = self.headers.copy()
-		if (self.compressor != None and "CONTENT-LENGTH" in var_return): del(var_return['CONTENT-LENGTH'])
+		_return = self.headers.copy()
+		if (self.compressor != None and "CONTENT-LENGTH" in _return): del(_return['CONTENT-LENGTH'])
 
 		if (len(self.cookies) > 0):
 		#
-			if ("SET-COOKIE" not in var_return): var_return['SET-COOKIE'] = [ ]
-			elif (type(var_return['SET-COOKIE']) != list): var_return['SET-COOKIE'] = [ var_return['SET-COOKIE'] ]
+			if ("SET-COOKIE" not in _return): _return['SET-COOKIE'] = [ ]
+			elif (type(_return['SET-COOKIE']) != list): _return['SET-COOKIE'] = [ _return['SET-COOKIE'] ]
 
-			for cookie_name in self.cookies: var_return['SET-COOKIE'].append(self.cookies[cookie_name])
+			for cookie_name in self.cookies: _return['SET-COOKIE'].append(self.cookies[cookie_name])
 		#
 
-		return var_return
+		return _return
 	#
 
 	def finish(self):
@@ -194,11 +193,11 @@ Returns an already defined header.
 
 		name = name.upper()
 
-		if (name in self.headers): var_return = self.headers[name]
-		elif (name_as_key and name in self.headers_indexed): var_return = self.headers[self.headers_indexed[name]]
-		else: var_return = None
+		if (name in self.headers): _return = self.headers[name]
+		elif (name_as_key and name in self.headers_indexed): _return = self.headers[self.headers_indexed[name]]
+		else: _return = None
 
-		return var_return
+		return _return
 	#
 
 	def get_http_code(self):
@@ -225,14 +224,13 @@ Returns true if the response will be compressed.
 		return (self.compressor != None)
 	#
 
-	def prepare_output_data(self, data):
+	def _prepare_output_data(self, data):
 	#
 		"""
 Prepare data for output. Compress and transform it if required.
 
 :param data: Data for output
 
-:access: protected
 :return: (bytes) Transformed data
 :since:  v0.1.01
 		"""
@@ -266,7 +264,7 @@ Sends response data.
 				self.send_headers()
 			#
 
-			if (not self.headers_only): AbstractStreamResponse.send_data(self, self.prepare_output_data(data))
+			if (not self.headers_only): AbstractStreamResponse.send_data(self, self._prepare_output_data(data))
 		#
 	#
 
@@ -281,17 +279,17 @@ Sends the prepared response headers.
 		raise RuntimeError("Not implemented", 38)
 	#
 
-	def set_compression(self, var_compress):
+	def set_compression(self, compress):
 	#
 		"""
 Sets the compression formats the client accepts.
 
-:param var_compress: List of accepted compression formats
+:param compress: True to compress the response
 
 :since: v0.1.01
 		"""
 
-		if (var_compress == False): self.set_header("Content-Encoding", None)
+		if (compress == False): self.set_header("Content-Encoding", None)
 		elif (self.compression_formats != None):
 		#
 			if ("deflate" in self.compression_formats):

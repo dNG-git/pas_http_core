@@ -129,6 +129,8 @@ Action for "index"
 			re_tsc_result = re.search("\\.tsc\\.(css|js|svg)$", file_pathname, re.I)
 			re_result = (re.search("\\.(css|gif|jar|jpg|jpeg|js|png|svg|swf)$", file_pathname, re.I) if (re_tsc_result == None) else None)
 
+			self.response.init(True)
+
 			if (re_tsc_result != None):
 			#
 				file_extension = re_tsc_result.group(1)
@@ -138,8 +140,6 @@ Action for "index"
 				elif (file_extension == "svg"): self.response.set_header("Content-Type", "text/svg+xml")
 
 				parser = MmediaParser()
-
-				self.response.init(True)
 				self.response.set_raw_data(parser.render(file_pathname))
 			#
 			elif (re_result != None):

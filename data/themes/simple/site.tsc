@@ -12,11 +12,11 @@ div, p, td, th { cursor: default }
 a { cursor: pointer }
 a:link { color: #202020; text-decoration: underline }
 a:active { color: #000000; text-decoration: none }
-a:visited { color: #2F2F2F; text-decoration: underline }
+a:visited { color: #2f2f2f; text-decoration: underline }
 a:hover { color: #000000; text-decoration: none }
 a:focus { color: #000000; text-decoration: underline }
 
-body { margin: 0; padding: 0 31px; background-color: #FFFFFF }
+body { margin: 0; padding: 0 31px; background-color: #ffffff }
 body { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 90%; font-style: normal; line-height: normal; font-weight: normal; color: #000000 }
 form { margin: 0; padding: 0 }
 h1, h2, h3, h4, h5, h6, summary { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 130%; font-style: normal; font-weight: bold }
@@ -28,17 +28,17 @@ td:first-child, th:first-child { border-left: none }
 td:last-child, th:last-child { border-right: none }
 
 .designcopyright { height:50px;background-color:#808080;text-align:center;vertical-align:middle }
-.designcopyright { font-family:Verdana,Arial,Helvetica,sans-serif;font-size:70%;color:#DDDDDD }
-.designcopyright a, .designcopyright a:link, .designcopyright a:active, .designcopyright a:visited, .designcopyright a:hover, .designcopyright a:focus { color:#FFFFFF }
+.designcopyright { font-family:Verdana,Arial,Helvetica,sans-serif;font-size:70%;color:#dddddd }
+.designcopyright a, .designcopyright a:link, .designcopyright a:active, .designcopyright a:visited, .designcopyright a:hover, .designcopyright a:focus { color:#ffffff }
 
-.designpage { padding: 10px 12px; background-color: #FFFFFF; border: 1px solid #375A9D; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2); text-align: left; vertical-align: middle }
+.designpage { padding: 10px 12px; background-color: #ffffff; border: 1px solid #375a9d; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2); text-align: left; vertical-align: middle }
 .designpage > :first-child { margin-top: 0 }
 .designpage > :last-child { margin-bottom: 0 }
 
 .designtitle { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 225%; font-weight: bold }
 .designtitle:before, .designtitle:after { position: absolute; top: 100%; width: 0; height: 0; border: 2px solid transparent; content: " " }
-.designtitle:before { left: 50%; margin-top: -9px; margin-left: -10px; border: 2px solid transparent; border-bottom-color: #375A9D; border-width: 10px }
-.designtitle:after { left: 50%; margin-top: -7px; margin-left: -9px; border: 2px solid transparent; border-bottom-color: #FFFFFF; border-width: 9px }
+.designtitle:before { left: 50%; margin-top: -9px; margin-left: -10px; border: 2px solid transparent; border-bottom-color: #375a9d; border-width: 10px }
+.designtitle:after { left: 50%; margin-top: -7px; margin-left: -9px; border: 2px solid transparent; border-bottom-color: #ffffff; border-width: 9px }
 ]]></style>
 [each:content:css_files:file]
 <link href="[rewrite:settings]http_path_mmedia_versioned[/rewrite]/[rewrite:content]css_files.file.name[/rewrite]" rel="stylesheet" type="text/css" />

@@ -247,7 +247,7 @@ Initialize runtime parameters for response.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.init(cache, compress)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.init(cache, compress)- (#echo(__LINE__)#)")
 
 		if (not cache):
 		#
@@ -296,7 +296,7 @@ Sets the charset used for the response.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_charset({0})- (#echo(__LINE__)#)".format(charset))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_charset({0})- (#echo(__LINE__)#)".format(charset))
 		self.charset = charset
 	#
 
@@ -338,7 +338,7 @@ Sets a last modified value.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_last_modified({0:d})- (#echo(__LINE__)#)".format(timestamp))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_last_modified({0:d})- (#echo(__LINE__)#)".format(timestamp))
 		self.last_modified = timestamp
 	#
 
@@ -381,7 +381,7 @@ Sets the called script name.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_script_name({0})- (#echo(__LINE__)#)".format(script_name))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_script_name({0})- (#echo(__LINE__)#)".format(script_name))
 		self.script_name = script_name
 	#
 
@@ -430,7 +430,7 @@ Sets the title set for the response.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_title({0})- (#echo(__LINE__)#)".format(title))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_title({0})- (#echo(__LINE__)#)".format(title))
 		self.title = title
 	#
 

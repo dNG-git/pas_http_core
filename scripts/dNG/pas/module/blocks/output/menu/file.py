@@ -23,15 +23,15 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from copy import copy
 from os import path
 import os
 
 from dNG.data.json_parser import JsonParser
 from dNG.data.xml_parser import XmlParser
 from dNG.pas.data.settings import Settings
+from dNG.pas.data.http.url import Url
 from dNG.pas.data.logging.log_line import LogLine
-from dNG.pas.data.text.url import Url
+from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.module.blocks.abstract_block import AbstractBlock
@@ -59,38 +59,105 @@ Action for "render"
 :since: v0.1.00
 		"""
 
-		if (self.context != None and "file" in self.context): rendered_links = self.get_rendered_links(self.context['file'])
-		else: rendered_links = self.get_rendered_links()
+		if (self.context != None and "file" in self.context): rendered_links = self._get_rendered_links(self.context['file'])
+		else: rendered_links = self._get_rendered_links()
 
 		if (len(rendered_links) > 0): self.set_action_result("<nav class='pagemainmenu ui-corner-all'><ul><li>{0}</li></ul></nav>".format("</li>\n<li>".join(rendered_links)))
 	#
 
-	def filter_links(self, links):
+	def _filter_links(self, links):
 	#
 		"""
 Filters links based on required permissions.
 
-:access: protected
 :return: (str) Link (X)HTML
 :since:  v0.1.01
 		"""
 
-		var_return = (links.copy() if (hasattr(links, "copy")) else copy(links))
+		_return = [ ]
 
-		return var_return
+		links_count = len(links)
+		session = self.request.get_session()
+
+		for position in range(0, links_count):
+		#
+			link = links[position]
+			is_allowed = False
+
+			if ("required_permission" in link):
+			#
+				permissions = (link['required_permission'] if (type(link['required_permission']) == list) else [ link['required_permission'] ])
+
+				if (session != None): pass
+			#
+			elif ("required_permissions" in link and type(link['required_permissions']) == list):
+			#
+				permissions = link['required_permissions']
+
+				if (session != None): pass
+			#
+			elif ("required_user_type" in link):
+			#
+				user_profile = (None if (session == None) else session.get_user_profile())
+				user_types = (link['required_user_type'] if (type(link['required_user_type']) == list) else [ link['required_user_type'] ])
+
+				if (user_profile == None): is_allowed = ("gt" in user_types)
+				else:
+				#
+					for user_type in user_types:
+					#
+						if (user_profile.is_type(user_type)):
+						#
+							is_allowed = True
+							break
+						#
+					#
+				#
+			#
+			elif ("forbidden_user_type" in link):
+			#
+				user_profile = (None if (session == None) else session.get_user_profile())
+				user_types = (link['forbidden_user_type'] if (type(link['forbidden_user_type']) == list) else [ link['forbidden_user_type'] ])
+
+				if (user_profile == None): is_allowed = ("gt" not in user_types)
+				else:
+				#
+					is_allowed = True
+
+					for user_type in user_types:
+					#
+						if (user_profile.is_type(user_type)):
+						#
+							is_allowed = False
+							break
+						#
+					#
+				#
+			#
+			else: is_allowed = True
+
+			if (is_allowed and "required_setting" in link):
+			#
+				setting = InputFilter.filter_control_chars(link['required_setting'])
+				if (Settings.get(setting, False) == False): is_allowed = False
+			#
+
+			if (is_allowed): _return.append(link)
+		#
+
+		return _return
 	#
 
-	def get_rendered_links(self, file_pathname = None, include_image = True):
+	def _get_rendered_links(self, file_pathname = None, include_image = True):
 	#
 		"""
 Returns a list of rendered links for the service menu.
 
-:access: protected
 :return: (list) Links for the service menu
 :since:  v0.1.01
 		"""
 
-		var_return = [ ]
+		_return = [ ]
 
 		if (file_pathname == None): links = Url.store_get("mainmenu")
 		else:
@@ -137,36 +204,37 @@ Returns a list of rendered links for the service menu.
 
 		if (links != None):
 		#
-			links = self.filter_links(links)
-			for link in links: var_return.append(self.render_link(link, include_image))
+			links = self._filter_links(links)
+			for link in links: _return.append(self._render_link(link, include_image))
 		#
 
-		return var_return
+		return _return
 	#
 
-	def render_link(self, data, include_image = True):
+	def _render_link(self, data, include_image = True):
 	#
 		"""
 Renders a link.
 
-:access: protected
 :return: (str) Link (X)HTML
 :since:  v0.1.01
 		"""
 
-		var_return = ""
+		_return = ""
 
 		if ("title" in data and "type" in data and "parameters" in data):
 		#
-			xml_parser = XmlParser()
+			l10n_title_id = "title_{0}".format(self.request.get_lang())
+			title = (data[l10n_title_id] if (l10n_title_id in data) else data['title'])
 			url = Url().build_url(data['type'], data['parameters'])
+			xml_parser = XmlParser()
 
-			var_return = xml_parser.dict2xml_item_encoder({ "tag": "a", "attributes": { "href": url } }, False)
-			if (include_image and "image" in data): var_return += "{0} ".format(xml_parser.dict2xml_item_encoder({ "tag": "img", "attributes": { "src": "{0}/themes/{1}/{2}.png".format(Settings.get("http_path_mmedia_versioned"), self.response.get_theme(), data['image']) }, "alt": data['title'], "title": data['image'] }, strict_standard = False))
-			var_return += "{0} </a>".format(XHtmlFormatting.escape(data['title']))
+			_return = xml_parser.dict2xml_item_encoder({ "tag": "a", "attributes": { "href": url } }, False)
+			if (include_image and "image" in data): _return += "{0} ".format(xml_parser.dict2xml_item_encoder({ "tag": "img", "attributes": { "src": "{0}/themes/{1}/{2}.png".format(Settings.get("http_path_mmedia_versioned"), self.response.get_theme(), data['image']) }, "alt": title, "title": data['image'] }, strict_standard = False))
+			_return += "{0} </a>".format(XHtmlFormatting.escape(title))
 		#
 
-		return var_return
+		return _return
 	#
 #
 

@@ -51,13 +51,12 @@ Checks and renders the content of the "if" condition.
 :param operator: Comparison operator
 :param value: Comparison value
 
-:access: protected
 :return: (str) Conditional data if successful
 :since:  v0.1.00
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -TagParser.render_if_condition(source, {0}, {1}, {2}, data)- (#echo(__LINE__)#)".format(key, operator, value))
-		var_return = ""
+		_return = ""
 
 		is_valid = False
 		source_value = self.source_get_value(source, key)
@@ -68,8 +67,8 @@ Checks and renders the content of the "if" condition.
 		if (operator == "==" and source_value == value): is_valid = True
 		if (operator == "!=" and source_value != value): is_valid = True
 
-		if (is_valid): var_return = data
-		return var_return
+		if (is_valid): _return = data
+		return _return
 	#
 #
 

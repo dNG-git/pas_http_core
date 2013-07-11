@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.text.url import Url
+from dNG.pas.data.http.url import Url
 from dNG.pas.data.xhtml.form.renderer import Renderer
 from dNG.pas.module.blocks.abstract_block import AbstractBlock
 
@@ -55,16 +55,15 @@ Action for "render"
 			form_parameters = url_parser.build_url(Url.TYPE_FORM_FIELDS, self.context['url_parameters'])
 			form_url = url_parser.build_url(Url.TYPE_FORM_URL, self.context['url_parameters'])
 
-			self.set_action_result("<form action=\"{0}\" method='post' enctype='application/x-www-form-urlencoded' target='_self'>{1}{2}</form>".format(form_url, form_parameters, self.parse()))
+			self.set_action_result("<form action=\"{0}\" method='post' enctype='application/x-www-form-urlencoded' target='_self'>{1}{2}</form>".format(form_url, form_parameters, self._parse()))
 		#
 	#
 
-	def parse(self):
+	def _parse(self):
 	#
 		"""
 Parses, renders and returns the given form.
 
-:access: protected
 :return: (str) Valid XHTML form
 :since:  v0.1.00
 		"""
@@ -73,12 +72,12 @@ Parses, renders and returns the given form.
 		renderer.set_data(self.context['object'].get_data())
 		renderer.set_oset(self.response.get_oset())
 
-		var_return = renderer.render()
+		_return = renderer.render()
 
 		button_title = (self.context['button_title'] if ("button_title" in self.context) else "core_continue")
-		var_return += (renderer.render_submit_button(button_title) if (var_return == "") else "\n{0}".format(renderer.render_submit_button(button_title)))
+		_return += (renderer.render_submit_button(button_title) if (_return == "") else "\n{0}".format(renderer.render_submit_button(button_title)))
 
-		return var_return
+		return _return
 	#
 #
 

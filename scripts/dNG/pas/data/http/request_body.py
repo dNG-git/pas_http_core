@@ -107,16 +107,16 @@ Reads "chunked" encoded content if set to true.
 :since: v0.1.00
 		"""
 
-		var_return = (data if (self.decompressors == None) else None)
+		_return = (data if (self.decompressors == None) else None)
 		raw_data = data
 
 		if (self.decompressors != None):
 		#
 			for decompressor in self.decompressors: raw_data = (decompressor.flush() if (data == None) else decompressor.decompress(raw_data))
-			var_return = raw_data
+			_return = raw_data
 		#
 
-		return var_return
+		return _return
 	#
 
 	def define_input_chunk_encoded(self, chunk_encoded):
@@ -164,7 +164,7 @@ Returns the request body.
 :since:  v0.1.00
 		"""
 
-		var_return = None
+		_return = None
 
 		if (timeout == None): timeout = self.socket_data_timeout
 		if (self.input_ptr != None and (not self.receive_in_thread)): self.run(timeout)
@@ -172,11 +172,11 @@ Returns the request body.
 		if (self.received_event.wait(timeout)):
 		#
 			if (isinstance(self.input_data, Exception)): raise self.input_data
-			else: var_return = self.input_data
+			else: _return = self.input_data
 		#
 		else: raise RuntimeError("Input pointer could not be read before timeout occurred", 62)
 
-		return var_return
+		return _return
 	#
 
 	def run(self, timeout = None):
@@ -308,17 +308,17 @@ used to read the body it is started here as well.
 		#
 	#
 
-	def set_input_size(self, var_bytes):
+	def set_input_size(self, _bytes):
 	#
 		"""
 Sets the expected input size.
 
-:param var_bytes: Size in bytes
+:param _bytes: Size in bytes
 
 :since: v0.1.00
 		"""
 
-		self.input_size = var_bytes
+		self.input_size = _bytes
 	#
 #
 

@@ -59,7 +59,7 @@ WSGI server
 		"""
 	#
 
-	def configure(self):
+	def _configure(self):
 	#
 		"""
 Configures the server
@@ -81,7 +81,7 @@ Configures the server
 Configure common paths and settings
 		"""
 
-		Server.configure(self)
+		Server._configure(self)
 	#
 
 	def run(self):

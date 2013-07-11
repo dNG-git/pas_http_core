@@ -44,7 +44,7 @@ class PredefinedHttpRequest(AbstractInnerHttpRequest):
 		"""
 Sets the requested action.
 
-:since:  v0.1.00
+:since: v0.1.00
 		"""
 
 		self.action = action
@@ -57,7 +57,7 @@ Sets the requested module.
 
 :param module: Requested module
 
-:since:  v0.1.00
+:since: v0.1.00
 		"""
 
 		self.module = module
@@ -70,7 +70,7 @@ Sets the output format.
 
 :param output_format: (str) Output format
 
-:since:  v0.1.00
+:since: v0.1.00
 		"""
 
 		self.output_format = output_format
@@ -83,7 +83,7 @@ Sets the requested service.
 
 :param service: Requested service
 
-:since:  v0.1.00
+:since: v0.1.00
 		"""
 
 		self.service = service

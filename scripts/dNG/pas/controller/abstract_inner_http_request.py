@@ -145,18 +145,6 @@ Returns false if the server address is unknown.
 
 		return True
 	#
-
-	def supports_sessions(self):
-	#
-		"""
-Returns false if the request can't be connected to an active session.
-
-:return: (bool) True if an active session can be identified.
-:since:  v0.1.01
-		"""
-
-		return True
-	#
 #
 
 ##j## EOF

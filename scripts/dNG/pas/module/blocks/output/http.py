@@ -49,7 +49,7 @@ Service for "m=output;s=http"
 		"""
 Constructor __init__(Http)
 
-@since v0.1.00
+:since: v0.1.00
 		"""
 
 		Module.__init__(self)

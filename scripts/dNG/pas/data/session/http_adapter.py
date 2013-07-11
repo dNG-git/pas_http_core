@@ -70,7 +70,7 @@ Returns true if the defined session is valid.
 :since:  v0.1.00
 		"""
 
-		var_return = True
+		_return = True
 
 		passcode = self.session.get("uuids.passcode")
 
@@ -87,30 +87,27 @@ Returns true if the defined session is valid.
 				if (uuids_cookie != None):
 				#
 					cookie_data = uuids_cookie.split(":", 1)
-					if (cookie_data[0] == self.session.uuid): cookie_passcode = cookie_data[1]
+					if (cookie_data[0] == self.session.get_uuid()): cookie_passcode = cookie_data[1]
 				#
 			#
 
 			passcode_prev = self.session.get("uuids.passcode_prev")
 			passcode_timeout = self.session.get("uuids.passcode_timeout")
 
-			if (cookie_passcode == None): var_return = (True if (passcode_prev == None and passcode_timeout + int(Settings.get("pas_session_uuids_passcode_grace_period", 5)) > time()) else False)
-			elif (cookie_passcode != Tmd5.encode(passcode)):
+			if (cookie_passcode == None): _return = (True if (passcode_prev == None and passcode_timeout + int(Settings.get("pas_session_uuids_passcode_grace_period", 15)) > time()) else False)
+			elif (cookie_passcode != Tmd5.hash(passcode)):
 			#
-				if (passcode_timeout + int(Settings.get("pas_session_uuids_passcode_grace_period", 5)) > time()):
-				#
-					if (passcode_prev == None or cookie_passcode != Tmd5.encode(passcode_prev)): var_return = False
-				#
-				else: var_return = False
+				passcode_timeout = self.session.set("uuids.passcode_prev_timeout")
+				if (passcode_timeout == None or passcode_timeout < time() or passcode_prev == None or cookie_passcode != Tmd5.hash(passcode_prev)): _return = False
 			#
 
-			if (not var_return):
+			if (not _return):
 			#
 				if (isinstance(response, AbstractHttpResponse)): response.set_cookie("uuids", "", 0)
 			#
 		#
 
-		return var_return
+		return _return
 	#
 
 	def load(self):
@@ -123,10 +120,10 @@ session.
 		"""
 
 		passcode_timeout = self.session.get("uuids.passcode_timeout")
-		if (passcode_timeout != None and passcode_timeout < time()): self.renew_passcode()
+		if (passcode_timeout != None and passcode_timeout < time()): self._renew_passcode()
 	#
 
-	def renew_passcode(self):
+	def _renew_passcode(self):
 	#
 		"""
 Saves changes of the uuIDs instance.
@@ -140,13 +137,14 @@ Saves changes of the uuIDs instance.
 		if (self.session.get("uuids.passcode_timeout") != None and isinstance(response, AbstractHttpResponse)):
 		#
 			self.session.set("uuids.passcode_prev", self.session.get("uuids.passcode"))
+			self.session.set("uuids.passcode_prev_timeout", int(time() + Settings.get("pas_session_uuids_passcode_grace_period", 15)))
 
 			passcode = Binary.str(hexlify(urandom(16)))
 			self.session.set("uuids.passcode", passcode)
 			self.session.set("uuids.passcode_timeout", int(time() + int(Settings.get("pas_session_uuids_passcode_timeout", 300))))
 
-			passcode = Tmd5.encode(passcode)
-			response.set_cookie("uuids", "{0}:{1}".format(self.session.uuid, passcode))
+			passcode = Tmd5.hash(passcode)
+			response.set_cookie("uuids", "{0}:{1}".format(self.session.get_uuid(), passcode))
 		#
 	#
 
@@ -160,7 +158,7 @@ Saves changes of the uuIDs instance.
 		"""
 
 		passcode_timeout = self.session.get("uuids.passcode_timeout")
-		if (passcode_timeout != None and passcode_timeout < time()): self.renew_passcode()
+		if (passcode_timeout != None and passcode_timeout < time()): self._renew_passcode()
 
 		return True
 	#
@@ -197,11 +195,11 @@ Returns the uuID.
 		if (instance != None and hasattr(instance, "get_cookie")):
 		#
 			uuids_cookie = instance.get_cookie("uuids")
-			var_return = (None if (uuids_cookie == None) else uuids_cookie.split(":", 1)[0])
+			_return = (None if (uuids_cookie == None) else uuids_cookie.split(":", 1)[0])
 		#
-		else: var_return = None
+		else: _return = None
 
-		return var_return
+		return _return
 	#
 
 	"""

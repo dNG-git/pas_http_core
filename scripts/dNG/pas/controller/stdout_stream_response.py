@@ -41,7 +41,7 @@ This stream response instance will write all data to STDOUT.
              Mozilla Public License, v. 2.0
 	"""
 
-	def write(self, data):
+	def _write(self, data):
 	#
 		"""
 Writes the given data.

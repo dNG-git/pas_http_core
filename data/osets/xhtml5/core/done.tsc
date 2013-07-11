@@ -1,4 +1,8 @@
 <article>
-	<h1><strong>[rewrite:l10n]core_task_done[/rewrite]</strong>: [rewrite:content]task[/rewrite]</h1>
+	<h1><strong>[rewrite:l10n]core_title_task_done[/rewrite]</strong>: [rewrite:content]task[/rewrite]</h1>
 	<p>[rewrite:content]message[/rewrite]</p>
+[if:content:continue_url != ]
+	<p class="pagenavbox pagenavtask ui-corner-all"><a href="[rewrite:content]continue_url[/rewrite]" target="_self">[if:content:continue_title == ][rewrite:l10n]core_continue[/rewrite][/if][if:content:continue_title != ][rewrite:content]continue_title[/rewrite][/if]</a></p><script type="text/javascript"><![CDATA[
+	]]></script>
+[/if]
 </article>

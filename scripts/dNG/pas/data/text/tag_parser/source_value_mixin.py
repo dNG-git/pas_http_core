@@ -45,13 +45,12 @@ Checks and renders the rewrite statement.
 :param source: Source for rewrite
 :param key: Key in source for rewrite
 
-:access: protected
 :return: (str) Rewritten statement if successful
 :since:  v0.1.00
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -TagParser.source_get_value(source, {0})- (#echo(__LINE__)#)".format(key))
-		var_return = None
+		_return = None
 
 		if (isinstance(source, dict)):
 		#
@@ -59,12 +58,12 @@ Checks and renders the rewrite statement.
 
 			if (key_list[0] in source):
 			#
-				if (len(key_list) > 1): var_return = self.source_get_value(source[key_list[0]], key_list[1])
-				else: var_return = source[key]
+				if (len(key_list) > 1): _return = self.source_get_value(source[key_list[0]], key_list[1])
+				else: _return = source[key]
 			#
 		#
 
-		return var_return
+		return _return
 	#
 #
 

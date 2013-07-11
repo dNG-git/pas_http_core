@@ -118,13 +118,13 @@ Execute the requested action.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("pas.http.core.block identified action '{0}'".format(self.action))
-		py_method = "execute_{0}".format(re.sub("\\W", "_", self.action))
+		if (self.log_handler != None): self.log_handler.debug("pas.http.core.Block identified action '{0}'".format(self.action))
+		method = "execute_{0}".format(re.sub("\\W", "_", self.action))
 
-		if (hasattr(self, py_method)):
+		if (hasattr(self, method)):
 		#
-			py_method = getattr(self, py_method)
-			py_method()
+			method = getattr(self, method)
+			method()
 		#
 		else:
 		#

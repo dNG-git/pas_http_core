@@ -5,6 +5,10 @@
 	<details>
 		<summary>[rewrite:l10n]core_title_error_details[/rewrite]</summary>
 		<pre>[rewrite:content]details[/rewrite]</pre>
-	</details>
+	</details><script type="text/javascript"><![CDATA[
+	require([ "djs/uiX" ], function(uiX) {
+		uiX.details();
+	});
+	]]></script>
 [/if][/if]
 </article>

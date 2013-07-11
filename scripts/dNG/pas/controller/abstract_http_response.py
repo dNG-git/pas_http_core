@@ -29,9 +29,6 @@ from dNG.pas.data.translatable_exception import TranslatableException
 from dNG.pas.data.settings import Settings
 from .abstract_response import AbstractResponse
 
-try: from dNG.pas.data.session import Session
-except ImportError: Session = None
-
 class AbstractHttpResponse(AbstractResponse):
 #
 	"""
@@ -82,7 +79,7 @@ Returns the current HTTP Content-Type header.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.get_content_type()- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.get_content_type()- (#echo(__LINE__)#)")
 		self.get_header("Content-Type")
 	#
 
@@ -98,7 +95,7 @@ Returns an already defined header.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.get_header({0}, +name_as_key)- (#echo(__LINE__)#)".format(name))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.get_header({0}, +name_as_key)- (#echo(__LINE__)#)".format(name))
 
 		if (not self.stream_response.supports_headers()): return None
 		else: return self.stream_response.get_header(name, name_as_key)
@@ -147,7 +144,7 @@ compression setting and information about P3P.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.init(+cache, +compress)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.init(+cache, +compress)- (#echo(__LINE__)#)")
 
 		AbstractResponse.init(self, cache, compress)
 
@@ -194,19 +191,6 @@ Sends the prepared response headers.
 
 		if (self.stream_response.supports_headers() and (not self.headers_sent)):
 		#
-			try:
-			#
-				if (Session != None):
-				#
-					session = Session.load()
-					if (session != None and session.is_active()): session.save()
-				#
-			#
-			except Exception as handled_exception:
-			#
-				if (self.log_handler != None): self.log_handler.error(handled_exception)
-			#
-
 			self.headers_sent = True
 			self.stream_response.send_headers()
 		#
@@ -222,7 +206,7 @@ Sets the HTTP Content-Type header.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_content_type({0})- (#echo(__LINE__)#)".format(content_type))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_content_type({0})- (#echo(__LINE__)#)".format(content_type))
 		self.set_header("Content-Type", content_type)
 	#
 
@@ -242,7 +226,7 @@ Sets a cookie.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_cookie({0}, +value, {1:d}, +secure_only, +http_only, +domain, +path)- (#echo(__LINE__)#)".format(name, timeout))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_cookie({0}, +value, {1:d}, +secure_only, +http_only, +domain, +path)- (#echo(__LINE__)#)".format(name, timeout))
 		if (self.stream_response.supports_headers()): self.stream_response.set_cookie(name, value, timeout, secure_only, http_only, domain, path)
 	#
 
@@ -259,7 +243,7 @@ Sets a header.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.set_header({0}, +value, +name_as_key, +value_append)- (#echo(__LINE__)#)".format(name))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_header({0}, +value, +name_as_key, +value_append)- (#echo(__LINE__)#)".format(name))
 		if (self.stream_response.supports_headers()): self.stream_response.set_header(name, value, name_as_key, value_append)
 	#
 

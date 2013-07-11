@@ -65,7 +65,7 @@ cherrypy server
 		if (log_handler != None): log_handler.add_logger("{0}.error.{1}".format(log.logger_root, log.appid))
 	#
 
-	def configure(self):
+	def _configure(self):
 	#
 		"""
 Configures the server
@@ -92,7 +92,7 @@ Configures the server
 Configure common paths and settings
 		"""
 
-		Server.configure(self)
+		Server._configure(self)
 	#
 
 	def run(self):

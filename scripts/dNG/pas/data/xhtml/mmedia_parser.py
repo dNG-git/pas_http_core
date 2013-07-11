@@ -62,7 +62,7 @@ Constructor __init__(MmediaParser)
 		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 	#
 
-	def parser_change(self, tag_definition, data, tag_position, data_position, tag_end_position):
+	def _parser_change(self, tag_definition, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the matched tag.
@@ -73,49 +73,47 @@ Change data according to the matched tag.
 :param data_position: Data starting position
 :param tag_end_position: Starting position of the closing tag
 
-:access: protected
 :return: (str) Converted data
 :since:  v0.1.00
 		"""
 
-		var_return = data[:tag_position]
+		_return = data[:tag_position]
 
-		data_closed = data[self.parser_tag_find_end_position(data, tag_end_position):]
+		data_closed = data[self._parser_tag_find_end_position(data, tag_end_position):]
 
 		if (tag_definition['tag'] == "rewrite"):
 		#
 			source = re.match("^\\[rewrite:(\\w+)\\]", data[tag_position:data_position]).group(1)
 			key = data[data_position:tag_end_position]
 
-			if (source == "l10n"): var_return += self.render_rewrite(L10n.get_instance(), key)
-			else: var_return += self.render_rewrite(Settings.get_instance(), key)
+			if (source == "l10n"): _return += self.render_rewrite(L10n.get_instance(), key)
+			else: _return += self.render_rewrite(Settings.get_instance(), key)
 
-			var_return += data_closed
+			_return += data_closed
 		#
-		else: var_return += data_closed
+		else: _return += data_closed
 
-		return var_return
+		return _return
 	#
 
-	def parser_check(self, data):
+	def _parser_check(self, data):
 	#
 		"""
 Check if a possible tag match is a false positive.
 
 :param data: Data starting with the possible tag
 
-:access: protected
 :return: (dict) Matched tag definition; None if false positive
 :since:  v0.1.00
 		"""
 
-		var_return = None
+		_return = None
 
 		i = 0
 		tags = [ "rewrite" ]
 		tags_length = len(tags)
 
-		while (var_return == None and i < tags_length):
+		while (_return == None and i < tags_length):
 		#
 			tag = tags[i]
 			data_match = data[1:1 + len(tag)]
@@ -123,13 +121,13 @@ Check if a possible tag match is a false positive.
 			if (data_match == tag and data_match == "rewrite"):
 			#
 				re_result = re.match("^\\[rewrite:(\\w+)\\]", data)
-				if (re_result != None and re_result.group(1) in [ "l10n", "settings" ]): var_return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
+				if (re_result != None and re_result.group(1) in [ "l10n", "settings" ]): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
 			#
 
 			i += 1
 		#
 
-		return var_return
+		return _return
 	#
 
 	def render(self, file_pathname):
@@ -142,7 +140,7 @@ Renders content ready for output from the given "mmedia" file.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -mmediaParser.render({0})- (#echo(__LINE__)#)".format(file_pathname))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Parser.render({0})- (#echo(__LINE__)#)".format(file_pathname))
 
 		file_pathname = path.normpath(file_pathname)
 		file_content = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_pathname))
@@ -160,7 +158,7 @@ Renders content ready for output from the given "mmedia" file.
 			elif (self.cache_instance != None): self.cache_instance.set_file(file_pathname, file_content)
 		#
 
-		return self.parser(file_content)
+		return self._parser(file_content)
 	#
 #
 

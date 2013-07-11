@@ -76,7 +76,7 @@ Server port
 Timestamp of service initialisation
 		"""
 
-		self.configure()
+		self._configure()
 
 		Hooks.load("http")
 		Hooks.register("dNG.pas.status.getUptime", self.get_uptime)
@@ -85,7 +85,7 @@ Timestamp of service initialisation
 		#
 			Hooks.set_log_handler(self.log_handler)
 			NamedLoader.set_log_handler(self.log_handler)
-			self.log_handler.debug("#echo(__FILEPATH__)# -server.__init__()- (#echo(__LINE__)#)")
+			self.log_handler.debug("#echo(__FILEPATH__)# -ServerWsgi.__init__()- (#echo(__LINE__)#)")
 		#
 
 		Hooks.call("dNG.pas.http.wsgi.startup")
@@ -111,7 +111,7 @@ python.org: Return an iterator object.
 		return iter(http_wsgi1_request)
 	#
 
-	def configure(self):
+	def _configure(self):
 	#
 		"""
 Configures the server
@@ -122,7 +122,7 @@ Configures the server
 		Settings.read_file("{0}/settings/pas_core.json".format(Settings.get("path_data")), True)
 		Settings.read_file("{0}/settings/pas_http.json".format(Settings.get("path_data")))
 
-		Server.configure(self)
+		Server._configure(self)
 	#
 
 	def get_uptime (self, params = None, last_return = None):

@@ -27,12 +27,10 @@ from binascii import hexlify
 from copy import copy
 from os import urandom
 
-try: import hashlib
-except ImportError: import md5 as hashlib
-
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.http.links import Links
+from dNG.pas.data.text.md5 import Md5
 from dNG.pas.data.text.tmd5 import Tmd5
+from dNG.pas.data.text.url import Url
 
 from .input_filter import InputFilter
 
@@ -107,7 +105,7 @@ Parses all previously defined form fields and checks them.
 :since:  v0.1.00
 		"""
 
-		var_return = (self.form_is_valid if (self.form_is_valid != None) else True)
+		_return = (self.form_is_valid if (self.form_is_valid != None) else True)
 
 		if (len(self.cache) > 0 and (force or self.form_is_valid == None)):
 		#
@@ -117,17 +115,17 @@ Parses all previously defined form fields and checks them.
 				#
 					if (field_data['error'] != None):
 					#
-						var_return = False
+						_return = False
 						break
 					#
 				#
 
-				if (not var_return): break
+				if (not _return): break
 			#
 		#
 
-		self.form_is_valid = var_return
-		return var_return
+		self.form_is_valid = _return
+		return _return
 	#
 
 	def entry_add(self, field_type, field_data = { }):
@@ -147,13 +145,13 @@ Creates spacing fields like "hidden", "element", "info", "spacer" or "subtitle".
 
 		if (field_type == "hidden"or field_type == "element" or field_type == "info" or field_type == "spacer" or field_type == "subtitle"):
 		#
-			var_return = True
-			field_data = self.entry_defaults_set(field_data, None, None, None)
-			self.entry_set(field_type, field_data)
+			_return = True
+			field_data = self._entry_defaults_set(field_data, None, None, None)
+			self._entry_set(field_type, field_data)
 		#
-		else: var_return = False
+		else: _return = False
 
-		return var_return
+		return _return
 	#
 
 	def entry_add_email(self, field_data):
@@ -167,14 +165,14 @@ A single line text input field for eMail addresses.
 :since:  v0.1.00
 		"""
 
-		field_data = self.entry_defaults_set(field_data, "", "", None)
-		field_data = self.entry_field_size_set(field_data)
-		field_data = self.entry_limits_set(field_data)
+		field_data = self._entry_defaults_set(field_data, "", "", None)
+		field_data = self._entry_field_size_set(field_data)
+		field_data = self._entry_limits_set(field_data)
 
-		field_data['error'] = self.entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
+		field_data['error'] = self._entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
 		if (len(field_data['content']) > 0 and InputFilter.filter_email_address(field_data['content']) == None): field_data['error'] = "format_invalid"
 
-		self.entry_set("email", field_data)
+		self._entry_set("email", field_data)
 		return (field_data['error'] == None)
 	#
 
@@ -191,17 +189,17 @@ Embeds external resources into the current form.
 :since:  v0.1.00
 		"""
 
-		field_data = self.entry_defaults_set(field_data, "", "", None)
-		field_data = self.entry_field_size_set(field_data)
+		field_data = self._entry_defaults_set(field_data, "", "", None)
+		field_data = self._entry_field_size_set(field_data)
 
 		if (len(field_data['content']) < 1): field_data['content'] = hexlify(urandom(10))
 
 		field_data['iframe_only'] = is_iframe_only
 		url_parameters['tid'] = field_data['content']
 
-		field_data['url'] = Links().build_url(Links.TYPE_RELATIVE, url_parameters)
+		field_data['url'] = Url().build_url(Url.TYPE_RELATIVE, url_parameters)
 
-		self.entry_set("embed", field_data)
+		self._entry_set("embed", field_data)
 		return True
 	#
 
@@ -249,8 +247,8 @@ Inserts a selectbox for multiple selectable options.
 :since:  v0.1.00
 		"""
 
-		field_data = self.entry_defaults_set(field_data,"" ,"", None)
-		field_data = self.entry_field_size_set(field_data, "s")
+		field_data = self._entry_defaults_set(field_data,"" ,"", None)
+		field_data = self._entry_field_size_set(field_data, "s")
 
 		if ("choices" not in field_data or type(field_data['choices']) != list): field_data['error'] = "internal_error"
 		else:
@@ -278,7 +276,7 @@ Inserts a selectbox for multiple selectable options.
 			if (field_data['required'] and len(field_data['content']) < 1): field_data['error'] = "required_element"
 		#
 
-		self.entry_set("multiselect", field_data)
+		self._entry_set("multiselect", field_data)
 		return (field_data['error'] == None)
 	#
 
@@ -295,13 +293,13 @@ Insert passwords (including optional a repetition check)
 :since:  v0.1.00
 		"""
 
-		var_return = True
+		_return = True
 
-		field_data = self.entry_defaults_set(field_data, "", "", None)
-		field_data = self.entry_field_size_set(field_data)
-		field_data = self.entry_limits_set(field_data)
+		field_data = self._entry_defaults_set(field_data, "", "", None)
+		field_data = self._entry_field_size_set(field_data)
+		field_data = self._entry_limits_set(field_data)
 
-		field_data['error'] = self.entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
+		field_data['error'] = self._entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
 
 		if (bytemix == None): bytemix = ""
 		elif (len(bytemix) < 1): bytemix = Settings.get("pas_user_profile_password_bytemix")
@@ -314,16 +312,16 @@ Insert passwords (including optional a repetition check)
 			repetition_content = self.get_input(repetition_name)
 
 			if (field_data['content'] != repetition_content): field_data['error'] = "password_repetition"
-			type = "password_with_repetition"
+			_type = "password_with_repetition"
 		#
-		else: type = "password"
+		else: _type = "password"
 
-		if (field_data['error'] != None): var_return = False
-		elif (mode & InputForm.PASSWORD_MD5 == InputForm.PASSWORD_MD5): field_data['content_result'] = hashlib.md5(field_data['content']).hexdigest()
-		elif (mode & InputForm.PASSWORD_TMD5 == InputForm.PASSWORD_TMD5): field_data['content_result'] = Tmd5.encode(field_data['content'], bytemix)
+		if (field_data['error'] != None): _return = False
+		elif (mode & InputForm.PASSWORD_MD5 == InputForm.PASSWORD_MD5): field_data['content_result'] = Md5.hash(field_data['content'])
+		elif (mode & InputForm.PASSWORD_TMD5 == InputForm.PASSWORD_TMD5): field_data['content_result'] = Tmd5.hash(field_data['content'], bytemix)
 
-		self.entry_set(type, field_data)
-		return var_return
+		self._entry_set(_type, field_data)
+		return _return
 	#
 
 	def entry_add_radio(self, field_data):
@@ -337,7 +335,7 @@ Inserts radio fields for exact one selected option.
 :since:  v0.1.00
 		"""
 
-		field_data = self.entry_defaults_set(field_data,"" ,"", None)
+		field_data = self._entry_defaults_set(field_data,"" ,"", None)
 
 		if ("choices" not in field_data or type(field_data['choices']) != list): field_data['error'] = "internal_error"
 		else:
@@ -362,7 +360,7 @@ Inserts radio fields for exact one selected option.
 			if (field_data['required'] and field_data['content_result'] == None): field_data['error'] = "required_element"
 		#
 
-		self.entry_set("radio", field_data)
+		self._entry_set("radio", field_data)
 		return (field_data['error'] == None)
 	#
 
@@ -579,17 +577,17 @@ A single line text input field.
 :since:  v0.1.00
 		"""
 
-		field_data = self.entry_defaults_set(field_data, "", "", None)
-		field_data = self.entry_field_size_set(field_data)
-		field_data = self.entry_limits_set(field_data)
+		field_data = self._entry_defaults_set(field_data, "", "", None)
+		field_data = self._entry_field_size_set(field_data)
+		field_data = self._entry_limits_set(field_data)
 
-		field_data['error'] = self.entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
+		field_data['error'] = self._entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
 
-		self.entry_set("text", field_data)
+		self._entry_set("text", field_data)
 		return (field_data['error'] == None)
 	#
 
-	def entry_defaults_set(self, field_data, name = "", title = None, content = "", required = False):
+	def _entry_defaults_set(self, field_data, name = "", title = None, content = "", required = False):
 	#
 		"""
 Sets default values for the given field.
@@ -600,14 +598,13 @@ Sets default values for the given field.
 :param content: Form field related content data
 :param required: True if the field is required to continue
 
-:access: protected
 :return: (dict) Changed field data; None on error
 :since:  v0.1.00
 		"""
 
 		if (isinstance(field_data, dict)):
 		#
-			var_return = field_data
+			_return = field_data
 			if ("section" not in field_data): field_data['section'] = ""
 
 			if ("id" not in field_data):
@@ -630,9 +627,9 @@ Sets default values for the given field.
 			if ("helper_content" not in field_data): field_data['helper_content'] = ""
 			if ("helper_url" not in field_data): field_data['helper_url'] = ""
 		#
-		else: var_return = None
+		else: _return = None
 
-		return var_return
+		return _return
 	#
 
 	def entry_error_set(self, section, name, error):
@@ -644,14 +641,14 @@ Set an external error message for the given form field.
 :param name: Field name
 :param error: Error message definition
 
-:since:  v0.1.00
+:since: v0.1.00
 		"""
 
-		var_type = type(error)
-		if (var_type == str or var_type == tuple): self.entry_update(section, name, { "error": error })
+		_type = type(error)
+		if (_type == str or _type == tuple): self.entry_update(section, name, { "error": error })
 	#
 
-	def entry_field_size_set(self, field_data, size = "m"):
+	def _entry_field_size_set(self, field_data, size = "m"):
 	#
 		"""
 Sets the default requested size for the given field if not already defined.
@@ -659,33 +656,31 @@ Sets the default requested size for the given field if not already defined.
 :param field_data: Form field data
 :param size: "s" = small, "m" = medium, "l" = large
 
-:access: protected
 :return: (dict) Changed field data; None on error
 :since:  v0.1.00
 		"""
 
 		if (isinstance(field_data, dict)):
 		#
-			var_return = field_data
-			if ("size" not in field_data): field_data['size'] = min
+			_return = field_data
+			if ("size" not in field_data): field_data['size'] = size
 		#
-		else: var_return = None
+		else: _return = None
 
-		return var_return
+		return _return
 	#
 
-	def entry_length_check(self, data, min = None, max = None, required = False):
+	def _entry_length_check(self, data, _min = None, _max = None, required = False):
 	#
 		"""
 Checks the size for a given string.
 
 :param data: The string that should be checked
-:param min: Defines the minimal length for a string or None to ignore
-:param max: Defines the maximal length for a string or None for an unlimited
+:param _min: Defines the minimal length for a string or None to ignore
+:param _max: Defines the maximal length for a string or None for an unlimited
             size
 :param required: True if the field is required to continue
 
-:access: protected
 :return: (bool) False if a required field is empty, it is smaller than the
          minimum or larger than the maximum
 :since:  v0.1.00
@@ -693,57 +688,55 @@ Checks the size for a given string.
 
 		data_length = (0 if (data == None) else len(data))
 
-		if (required and data_length < 1): var_return = "required_element"
-		elif (min != None and min > data_length): var_return = ( "string_min", str(min) )
-		elif (max != None and max < data_length): var_return = ( "string_max", str(max) )
-		else: var_return = None
+		if (required and data_length < 1): _return = "required_element"
+		elif (_min != None and _min > data_length): _return = ( "string_min", str(_min) )
+		elif (_max != None and _max < data_length): _return = ( "string_max", str(_max) )
+		else: _return = None
 
-		return var_return
+		return _return
 	#
 
-	def entry_limits_set(self, field_data, min = None, max = None):
+	def _entry_limits_set(self, field_data, _min = None, _max = None):
 	#
 		"""
 Sets default limits for the given field if they are not already defined.
 
 :param field_data: Form field data
-:param min: Minimum range of a number or length of a string
-:param max: Maximum range of a number or length of a string
+:param _min: Minimum range of a number or length of a string
+:param _max: Maximum range of a number or length of a string
 
-:access: protected
 :return: (dict) Changed field data; None on error
 :since:  v0.1.00
 		"""
 
 		if (isinstance(field_data, dict)):
 		#
-			var_return = field_data
-			if ("min" not in field_data): field_data['min'] = min
-			if ("max" not in field_data): field_data['max'] = max
+			_return = field_data
+			if ("min" not in field_data): field_data['min'] = _min
+			if ("max" not in field_data): field_data['max'] = _max
 		#
-		else: var_return = None
+		else: _return = None
 
-		return var_return
+		return _return
 	#
 
-	def entry_range_check(self, data, min = None, max = None, required = False):
+	def _entry_range_check(self, data, _min = None, _max = None, required = False):
 	#
 		"""
 Checks the size for a given string.
 
 :param data: The string that should be checked
-:param min: Defines the minimal range for a number or None to ignore
-:param max: Defines the maximal range for a number or None for an unlimited
+:param _min: Defines the minimal range for a number or None to ignore
+:param _max: Defines the maximal range for a number or None for an unlimited
             size
 :param required: True if the field is required to continue
 
-:access: protected
 :return: (bool) False if a required field is empty, it is smaller than the
          minimum or larger than the maximum
 :since:  v0.1.00
 		"""
 
-		var_return = None
+		_return = None
 
 		if (data != None and len(data) > 0):
 		#
@@ -751,17 +744,17 @@ Checks the size for a given string.
 
 			if (number != None):
 			#
-				if (min != None and min > number): var_return = ( "number_min", str(min) )
-				elif (max != None and max < number): var_return = ( "number_max", str(max) )
+				if (_min != None and _min > number): _return = ( "number_min", str(_min) )
+				elif (_max != None and _max < number): _return = ( "number_max", str(_max) )
 			#
-			else: var_return = "format_invalid"
+			else: _return = "format_invalid"
 		#
-		elif (required): var_return = "required_element"
+		elif (required): _return = "required_element"
 
-		return var_return
+		return _return
 	#
 
-	def entry_set(self, field_type, field_data):
+	def _entry_set(self, field_type, field_data):
 	#
 		"""
 Adds a new field entry to the list.
@@ -772,8 +765,7 @@ Adds a new field entry to the list.
 :link: http://www.direct-netware.de/redirect.py?handbooks;pas;http;dev;formbuilder
        Click here to get a list of available form fields
 
-:access: protected
-:since:  v0.1.00
+:since: v0.1.00
 		"""
 
 		if (isinstance(field_data, dict)):
@@ -833,7 +825,7 @@ Updates existing field entries.
 		#
 	#
 
-	def error_get_message(self, error_data):
+	def _error_get_message(self, error_data):
 	#
 		"""
 Returns the error message for the error data given. Returned message is
@@ -841,7 +833,6 @@ implementation specific.
 
 :param error_data: Field error data
 
-:access: protected
 :return: (str) Implementation specific error message
 :since:  v0.1.00
 		"""
@@ -860,11 +851,11 @@ Returns all defined fields.
 :since:  v0.1.00
 		"""
 
-		var_return = (self.cache.copy() if (hasattr(self.cache, "copy")) else copy(self.cache))
+		_return = (self.cache.copy() if (hasattr(self.cache, "copy")) else copy(self.cache))
 
 		if (self.form_is_valid == None or (not self.form_has_input)):
 		#
-			for section in var_return:
+			for section in _return:
 			#
 				for field_data in section['fields']: field_data['error'] = None
 			#
@@ -879,10 +870,10 @@ Returns all defined fields.
 			self.form_is_valid = None
 		#
 
-		return var_return
+		return _return
 	#
 
-	def get_value(self, name, section = None, raw_input = False):
+	def get_value(self, name, section = None, _raw_input = False):
 	#
 		"""
 Returns the field value given or transmitted.
@@ -894,7 +885,7 @@ Returns the field value given or transmitted.
 :since:  v0.1.00
 		"""
 
-		var_return = None
+		_return = None
 
 		if (section == None): sections = self.cache
 		else: sections = ([ self.cache[self.cache_sections[section]] ] if (section in self.cache_sections) else [ ])
@@ -904,12 +895,12 @@ Returns the field value given or transmitted.
 			if (name in section['positions']):
 			#
 				field = section['fields'][section['positions'][name]]
-				var_return = (field['content_result'] if ("content_result" in field and (not raw_input)) else field['content'])
+				_return = (field['content_result'] if ("content_result" in field and (not _raw_input)) else field['content'])
 				break
 			#
 		#
 
-		return var_return
+		return _return
 	#
 
 	def get_errors(self, section = None, types_hidden = None):
@@ -927,7 +918,7 @@ untranslated as well as the translated error message.
 :since:  v0.1.00
 		"""
 
-		var_return =  [ ]
+		_return =  [ ]
 
 		if (section == None): sections = self.cache_sections
 		else: sections = ([ self.cache_sections[section] ] if (section in self.cache_sections) else None)
@@ -941,12 +932,12 @@ untranslated as well as the translated error message.
 			#
 				for field_data in section['fields']:
 				#
-					if (field_data['error'] != None): var_return.append({ "name": field_data['name'], "error_data": field_data['error'], "error_message": self.error_get_message(field_data['error']) })
+					if (field_data['error'] != None): _return.append({ "name": field_data['name'], "error_data": field_data['error'], "error_message": self._error_get_message(field_data['error']) })
 				#
 			#
 		#
 
-		return var_return
+		return _return
 	#
 
 	def get_input(self, name):
@@ -970,7 +961,7 @@ source (e.g. from a HTTP POST request parameter).
 Sets the flag for available input. Input values can be read with
 "get_input()".
 
-:since:  v0.1.00
+:since: v0.1.00
 		"""
 
 		self.form_has_input = True

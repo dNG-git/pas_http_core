@@ -62,12 +62,12 @@ Returns the formats the client accepts.
 :since:  v0.1.00
 		"""
 
-		var_return = self.get_header("Accept")
-		if (var_return != None): var_return = Http.header_field_list(var_return)
-		if (var_return == None): var_return = [ ]
+		_return = self.get_header("Accept")
+		if (_return != None): _return = Http.header_field_list(_return)
+		if (_return == None): _return = [ ]
 
-		for position in range(0, len(var_return)): var_return[position] = var_return[position].split(";")[0]
-		return var_return
+		for position in range(0, len(_return)): _return[position] = _return[position].split(";")[0]
+		return _return
 	#
 
 	def get_compression_formats(self):
@@ -79,12 +79,12 @@ Returns the compression formats the client accepts.
 :since:  v0.1.01
 		"""
 
-		var_return = self.get_header("Accept-Encoding")
-		if (var_return != None): var_return = Http.header_field_list(var_return)
-		if (var_return == None): var_return = [ ]
+		_return = self.get_header("Accept-Encoding")
+		if (_return != None): _return = Http.header_field_list(_return)
+		if (_return == None): _return = [ ]
 
-		for position in range(0, len(var_return)): var_return[position] = var_return[position].split(";")[0]
-		return var_return
+		for position in range(0, len(_return)): _return[position] = _return[position].split(";")[0]
+		return _return
 	#
 
 	def get_header(self, name):

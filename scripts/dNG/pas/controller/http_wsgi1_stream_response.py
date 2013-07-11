@@ -97,7 +97,7 @@ python.org: Return the next item from the container.
 :since:  v0.1.00
 		"""
 
-		var_return = None
+		_return = None
 
 		if (self.active):
 		#
@@ -107,24 +107,24 @@ This iterator is only called for uncompressed data.
 
 			if (self.streamer != None):
 			#
-				var_return = (None if (self.streamer.eof_check()) else self.streamer.read())
+				_return = (None if (self.streamer.eof_check()) else self.streamer.read())
 
-				if (var_return == False): var_return = None
-				elif (var_return != None): var_return = self.prepare_output_data(var_return)
+				if (_return == False): _return = None
+				elif (_return != None): _return = self._prepare_output_data(_return)
 			#
 			elif (self.data != None):
 			#
-				var_return = self.data
+				_return = self.data
 				self.data = None
 			#
 		#
 
-		if (var_return == None):
+		if (_return == None):
 		#
 			self.finish()
 			raise StopIteration()
 		#
-		else: return var_return
+		else: return _return
 	#
 	next = __next__
 
@@ -169,7 +169,7 @@ Sends the prepared response headers.
 
 		headers = [ ]
 		headers_indexed = dict([( value, key ) for ( key, value ) in self.headers_indexed.items()])
-		filtered_headers = self.filter_headers()
+		filtered_headers = self._filter_headers()
 
 		for header_name in filtered_headers:
 		#
@@ -201,15 +201,14 @@ Sends the prepared response headers.
 		self.wsgi_header_response = None
 	#
 
-	def write(self, data):
+	def _write(self, data):
 	#
 		"""
 Writes the given data.
 
 :param data: Data to be send
 
-:access: protected
-:since:  v0.1.00
+:since: v0.1.00
 		"""
 
 		try:

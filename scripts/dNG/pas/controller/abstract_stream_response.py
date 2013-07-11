@@ -88,7 +88,7 @@ Streamer implementation
 		"""
 Destructor __del__(AbstractStreamResponse)
 
-@since v0.1.00
+:since: v0.1.00
 		"""
 
 		self.finish()
@@ -172,7 +172,7 @@ Send data in cache.
 			#
 			elif (self.data != None):
 			#
-				self.write(self.data)
+				self._write(self.data)
 				self.data = None
 			#
 		#
@@ -197,7 +197,7 @@ Sends the given data as part of the response.
 				if (self.data == None): self.data = Binary.BYTES_TYPE()
 				self.data += data
 			#
-			else: self.write(data)
+			else: self._write(data)
 		#
 	#
 
@@ -282,13 +282,12 @@ Returns false if responses can not be streamed.
 		return False
 	#
 
-	def write(self):
+	def _write(self):
 	#
 		"""
 Writes the given data.
 
-:access: protected
-:since:  v0.1.00
+:since: v0.1.00
 		"""
 
 		raise RuntimeError("Not implemented", 38)

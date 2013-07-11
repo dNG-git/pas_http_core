@@ -81,8 +81,8 @@ Renders content ready for output from the given OSet template.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -osetParser.render({0}, +content)- (#echo(__LINE__)#)".format(template_name))
-		var_return = (L10n.get("errors_pas_http_core_oset_not_viewable") if (default == None) else default)
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -FileParser.render({0}, +content)- (#echo(__LINE__)#)".format(template_name))
+		_return = (L10n.get("errors_pas_http_core_oset_not_viewable") if (default == None) else default)
 
 		try:
 		#
@@ -104,14 +104,14 @@ Renders content ready for output from the given OSet template.
 				elif (self.cache_instance != None): self.cache_instance.set_file(file_pathname, template_data)
 			#
 
-			var_return = Parser.render(self, template_data, content)
+			_return = Parser.render(self, template_data, content)
 		#
 		except Exception as handled_exception:
 		#
 			if (self.log_handler != None): self.log_handler.error(handled_exception)
 		#
 
-		return var_return
+		return _return
 	#
 
 	def set_oset(self, oset):

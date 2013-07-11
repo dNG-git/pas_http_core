@@ -126,7 +126,7 @@ Request path after the script
 		#
 		else: virtual_pathname = self.virtual_pathname
 
-		inner_request = self.parse_virtual_config(virtual_config, virtual_pathname)
+		inner_request = self._parse_virtual_config(virtual_config, virtual_pathname)
 		if (isinstance(inner_request, AbstractInnerRequest)): self.set_inner_request(inner_request)
 
 		self.execute()
@@ -147,19 +147,6 @@ python.org: Return an iterator object.
 		return iter(http_wsgi_stream_response)
 	#
 
-	def get_stream_response(self):
-	#
-		"""
-Returns the stream object output should go to.
-
-:access: protected
-:return: (object) Stream response object
-:since:  v0.1.00
-		"""
-
-		return self.http_wsgi_stream_response
-	#
-
 	def iline_parse(self, iline = None):
 	#
 		"""
@@ -172,7 +159,7 @@ Parse the input variables given as an URI query string.
 		"""
 
 		if (iline == None): iline = self.query_string
-		var_return = AbstractHttpRequest.iline_parse(self, iline)
+		_return = AbstractHttpRequest.iline_parse(self, iline)
 
 		request_body = RequestBodyUrlencoded()
 		request_body = self.configure_request_body(request_body, "application/x-www-form-urlencoded")
@@ -182,10 +169,10 @@ Parse the input variables given as an URI query string.
 			try: post_data = request_body.get_dict()
 			except: post_data = { }
 
-			for key in post_data: var_return[key] = post_data[key]
+			for key in post_data: _return[key] = post_data[key]
 		#
 
-		return var_return
+		return _return
 	#
 
 	def init(self):
@@ -200,6 +187,18 @@ Do preparations for request handling.
 		self.script_name = path.basename(self.script_pathname)
 
 		AbstractHttpRequest.init(self)
+	#
+
+	def _init_stream_response(self):
+	#
+		"""
+Initializes the matching stream response instance.
+
+:return: (object) Stream response object
+:since:  v0.1.00
+		"""
+
+		return self.http_wsgi_stream_response
 	#
 #
 

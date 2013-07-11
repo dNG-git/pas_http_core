@@ -1,7 +1,7 @@
-<div class='pasformelement' style='text-align: center'>
-	<input id="[rewrite:content]id[/rewrite]" type="[rewrite:content]type[/rewrite]" value="[rewrite:content]title[/rewrite]" class='pasformbutton ui-corner-all' />
-</div><script type='text/javascript'><![CDATA[
-require(["jquery", "djs/form5" ], function() {
-	[rewrite:content]js_form_init_method[/rewrite]({ id: "[rewrite:content]id[/rewrite]", type: "[rewrite:content]type[/rewrite]" });
+<div class="pasformelement" style="text-align: center">
+	<input id="[rewrite:content]id[/rewrite]" type="[rewrite:content]type[/rewrite]" value="[rewrite:content]title[/rewrite]" class="pasformbutton ui-corner-all" />
+</div><script type="text/javascript"><![CDATA[
+require([ "djs/formX" ], function(formX) {
+	formX.init({ id: "[rewrite:content]id[/rewrite]", type: "button" });
 });
 ]]></script>

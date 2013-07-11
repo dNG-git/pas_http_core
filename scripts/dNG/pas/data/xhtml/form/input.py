@@ -51,17 +51,17 @@ Returns all defined fields.
 :since:  v0.1.00
 		"""
 
-		var_return = InputForm.get_data(self, flush)
+		_return = InputForm.get_data(self, flush)
 
-		for section in var_return:
+		for section in _return:
 		#
 			for field_data in section['fields']:
 			#
-				if (field_data['error'] != None): field_data['error'] = self.error_get_message(field_data['error'])
+				if (field_data['error'] != None): field_data['error'] = self._error_get_message(field_data['error'])
 			#
 		#
 
-		return var_return
+		return _return
 	#
 
 	def get_input(self, name):
@@ -85,7 +85,7 @@ source (e.g. from a HTTP POST request parameter).
 Sets the flag for available input. Input values can be read with
 "get_input()".
 
-:since:  v0.1.00
+:since: v0.1.00
 		"""
 
 		self.form_has_input = True

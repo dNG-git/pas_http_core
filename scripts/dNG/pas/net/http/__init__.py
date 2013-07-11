@@ -90,7 +90,7 @@ Destructor __del__(Server)
 		Hooks.unregister("dNG.pas.http.server.get_port", self.get_port)
 	#
 
-	def configure(self):
+	def _configure(self):
 	#
 		"""
 Configures the server
@@ -153,7 +153,7 @@ Start the server
 :since: v0.1.00
 		"""
 
-		self.configure()
+		self._configure()
 		Thread.start(self)
 
 		Hooks.call("dNG.pas.http.startup", server = self)
@@ -170,12 +170,13 @@ tornadoweb.org: Writes a completed HTTP request to the logs.
 
 		if (self.log_handler != None):
 		#
-			if handler.get_status() < 400: py_function = self.log_handler.info
-			elif handler.get_status() < 500: py_function = self.log_handler.warning
-			else: py_function = self.log_handler.error
+			if handler.get_status() < 400: method = self.log_handler.info
+			elif handler.get_status() < 500: method = self.log_handler.warning
+			else: method = self.log_handler.error
 
-			py_function("{0} {1:d} {2} {3} ({4} {5:.2f})".format(handler.request.version, handler.get_status(), handler.request.method, handler.request.uri , handler.request.remote_ip, handler.request.request_time()))
+			method("{0} {1:d} {2} {3} ({4} {5:.2f})".format(handler.request.version, handler.get_status(), handler.request.method, handler.request.uri , handler.request.remote_ip, handler.request.request_time()))
 		#
+	#
 
 	def run(self):
 	#
@@ -213,15 +214,15 @@ Returns an HTTP server instance based on the configuration set.
 :since:  v0.1.00
 		"""
 
-		var_return = None
+		_return = None
 
 		Settings.read_file("{0}/settings/pas_http.json".format(Settings.get("path_data")))
 		http_server_mode = Settings.get("pas_http_server_mode", "standalone")
 
 		try:
 		#
-			if (http_server_mode == "cherrypy"): var_return = NamedLoader.get_instance("dNG.pas.net.http.ServerCherryPy")
-			elif (http_server_mode == "waitress"): var_return = NamedLoader.get_instance("dNG.pas.net.http.ServerWaitress")
+			if (http_server_mode == "cherrypy"): _return = NamedLoader.get_instance("dNG.pas.net.http.ServerCherryPy")
+			elif (http_server_mode == "waitress"): _return = NamedLoader.get_instance("dNG.pas.net.http.ServerWaitress")
 		#
 		except Exception as handled_exception:
 		#
@@ -231,8 +232,8 @@ Returns an HTTP server instance based on the configuration set.
 			http_server_mode= "standalone"
 		#
 
-		if (http_server_mode == "standalone"): var_return = NamedLoader.get_instance("dNG.pas.net.http.ServerStandalone")
-		return var_return
+		if (http_server_mode == "standalone"): _return = NamedLoader.get_instance("dNG.pas.net.http.ServerStandalone")
+		return _return
 	#
 #
 

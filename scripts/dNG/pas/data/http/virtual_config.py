@@ -61,7 +61,7 @@ Return the config for the given virtual path.
 :since:  v0.1.00
 		"""
 
-		var_return = None
+		_return = None
 
 		if (len(pathname) > 0):
 		#
@@ -73,18 +73,18 @@ Return the config for the given virtual path.
 				#
 					if (pathname.startswith(virtual_path_config['path'])):
 					#
-						var_return = virtual_path_config['config']
+						_return = virtual_path_config['config']
 						break
 					#
 				#
 			#
 		#
 
-		return var_return
+		return _return
 	#
 
 	@staticmethod
-	def set_virtual_path(path, config, py_setup_function = None):
+	def set_virtual_path(path, config, setup_callback = None):
 	#
 		"""
 Set the config for the given virtual path.
@@ -96,7 +96,7 @@ Set the config for the given virtual path.
 :since: v0.1.00
 		"""
 
-		if (py_setup_function != None): config['setup_function'] = py_setup_function
+		if (setup_callback != None): config['setup_callback'] = setup_callback
 		virtual_config = { "path": path.lower(), "config": config }
 
 		VirtualConfig.virtuals.append(virtual_config)

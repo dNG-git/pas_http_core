@@ -51,13 +51,12 @@ Checks and renders the block statement.
 :param source: Source for comparison
 :param key: Key in source for comparison
 
-:access: protected
 :return: (str) Rewritten statement if successful
 :since:  v0.1.00
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -TagParser.render_block(data, source_key, source, key)- (#echo(__LINE__)#)")
-		var_return = ""
+		_return = ""
 
 		try:
 		#
@@ -72,7 +71,7 @@ Checks and renders the block statement.
 				instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}".format(service))
 				if (self.log_handler != None): instance.set_log_handler(self.log_handler)
 				instance.set_action(action, content)
-				var_return = instance.execute()
+				_return = instance.execute()
 			#
 		#
 		except Exception as handled_exception:
@@ -80,7 +79,7 @@ Checks and renders the block statement.
 			if (self.log_handler != None): self.log_handler.error(handled_exception)
 		#
 
-		return var_return
+		return _return
 	#
 #
 

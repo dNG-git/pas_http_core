@@ -59,19 +59,19 @@ Compression function
 		"""
 	#
 
-	def read(self, var_bytes = 1048576):
+	def read(self, _bytes = 1048576):
 	#
 		"""
 Reads from the current streamer session.
 
-:param var_bytes: How many bytes to read from the current position (0 means
+:param _bytes: How many bytes to read from the current position (0 means
                   until EOF)
 
 :return: (mixed) Data; False on error
 :since:  v0.1.00
 		"""
 
-		data = AbstractEncapsulated.read(self, var_bytes)
+		data = AbstractEncapsulated.read(self, _bytes)
 
 		if (self.compressor != None):
 		#

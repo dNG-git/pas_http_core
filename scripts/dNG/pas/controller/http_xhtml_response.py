@@ -109,7 +109,7 @@ Add output content from an OSet template.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.add_oset_content({0}, content)- (#echo(__LINE__)#)".format(template_name))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.add_oset_content({0}, content)- (#echo(__LINE__)#)".format(template_name))
 
 		parser = NamedLoader.get_instance("dNG.pas.data.oset.FileParser")
 		parser.set_oset(self.oset)
@@ -172,7 +172,7 @@ compression setting and information about P3P.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -response.init(cache, compress)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.init(cache, compress)- (#echo(__LINE__)#)")
 
 		AbstractHttpResponse.init(self, cache, compress)
 

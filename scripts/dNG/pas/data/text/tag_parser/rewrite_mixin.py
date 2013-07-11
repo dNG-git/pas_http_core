@@ -48,20 +48,19 @@ Checks and renders the rewrite statement.
 :param source: Source for rewrite
 :param key: Key in source for rewrite
 
-:access: protected
 :return: (str) Rewritten statement if successful
 :since:  v0.1.00
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -TagParser.render_rewrite(source, {0})- (#echo(__LINE__)#)".format(key))
-		var_return = self.source_get_value(source, key)
+		_return = self.source_get_value(source, key)
 
-		if (var_return == None): var_return = " {0} ".format(key)
-		else: var_return = Binary.str(var_return)
+		if (_return == None): _return = " {0} ".format(key)
+		else: _return = Binary.str(_return)
 
-		if (type(var_return) != str): var_return = str(var_return)
+		if (type(_return) != str): _return = str(_return)
 
-		return var_return
+		return _return
 	#
 #
 

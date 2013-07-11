@@ -168,7 +168,7 @@ Executes the given request.
 		#
 		else: request = self
 
-		response = self.init_response()
+		response = self._init_response()
 
 		try:
 		#
@@ -193,8 +193,10 @@ Executes the given request.
 			#
 				instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))
 				if (self.log_handler != None): instance.set_log_handler(self.log_handler)
+
 				instance.init(request, response)
 				instance.execute()
+				del(instance)
 			#
 			else:
 			#
@@ -202,7 +204,9 @@ Executes the given request.
 				#
 					instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.module".format(requested_module));
 					if (self.log_handler != None): instance.set_log_handler(self.log_handler)
+
 					instance.init(request, response)
+					del(instance)
 				#
 
 				if (response.supports_headers()): response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
@@ -215,7 +219,7 @@ Executes the given request.
 			response.handle_exception_error(None, handled_exception)
 		#
 
-		response.send()
+		self.respond(response)
 	#
 
 	def get_action(self):
@@ -440,19 +444,6 @@ Returns the associated session.
 		return self.session
 	#
 
-	def get_stream_response(self):
-	#
-		"""
-Returns the stream object output should go to.
-
-:access: protected
-:return: (object) Stream response object
-:since:  v0.1.00
-		"""
-
-		return StdoutStreamResponse()
-	#
-
 	def iline_parse(self, iline = None):
 	#
 		"""
@@ -464,7 +455,7 @@ Parse the input variables given as an URI query string.
 :since:  v0.1.00
 		"""
 
-		var_return = { }
+		_return = { }
 
 		if (iline != None):
 		#
@@ -474,12 +465,12 @@ Parse the input variables given as an URI query string.
 			#
 				value_element = iline.split("=", 1)
 
-				if (len(value_element) > 1): var_return[value_element[0]] = value_element[1]
-				elif ("ohandler" not in var_return): var_return['ohandler'] = re.sub("\\W+", "", iline)
+				if (len(value_element) > 1): _return[value_element[0]] = value_element[1]
+				elif ("ohandler" not in _return): _return['ohandler'] = re.sub("\\W+", "", iline)
 			#
 		#
 
-		return var_return
+		return _return
 	#
 
 	def init(self):
@@ -495,11 +486,11 @@ Set source variables. The server timezone will be changed if a user is
 logged in and/or its timezone is identified.
 		"""
 
-		self.parse_parameters()
+		self._parse_parameters()
 		self.timezone = float(Settings.get("core_timezone", (timezone / 3600)))
 	#
 
-	def init_response(self):
+	def _init_response(self):
 	#
 		"""
 Initializes the matching response instance.
@@ -511,12 +502,24 @@ Initializes the matching response instance.
 		response = NamedLoader.get_instance("dNG.pas.controller.{0}Response".format("".join([word.capitalize() for word in self.output_format.split("_")])))
 		if (self.log_handler != None): response.set_log_handler(self.log_handler)
 		response.set_charset(L10n.get("lang_charset", "UTF-8"))
-		response.set_stream_response(self.get_stream_response())
+		response.set_stream_response(self._init_stream_response())
 
 		return response
 	#
 
-	def parse_dsd (self, dsd):
+	def _init_stream_response(self):
+	#
+		"""
+Initializes the matching stream response instance.
+
+:return: (object) Stream response object
+:since:  v0.1.00
+		"""
+
+		return StdoutStreamResponse()
+	#
+
+	def parse_dsd(self, dsd):
 	#
 		"""
 DSD stands for dynamic service data and should be used for transfering IDs for
@@ -528,26 +531,26 @@ news, topics, ... Take care for injection attacks!
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -request.parse_dsd(+dsd)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Request.parse_dsd(+dsd)- (#echo(__LINE__)#)")
 
 		if (" " in dsd): dsd = quote(dsd)
 		dsd = re.sub("[\\+]{3,}", "++", dsd, flags = re.I)
 
 		dsd_list = dsd.split("++")
-		var_return = { }
+		_return = { }
 
 		for dsd in dsd_list:
 		#
 			dsd_element = dsd.strip().split("+", 1)
 
-			if (len(dsd_element) > 1): var_return[dsd_element[0]] = InputFilter.filter_control_chars(unquote(dsd_element[1]))
-			elif (len(dsd_element[0]) > 0): var_return[dsd_element[0]] = ""
+			if (len(dsd_element) > 1): _return[dsd_element[0]] = InputFilter.filter_control_chars(unquote(dsd_element[1]))
+			elif (len(dsd_element[0]) > 0): _return[dsd_element[0]] = ""
 		#
 
-		return var_return
+		return _return
 	#
 
-	def parse_parameters(self):
+	def _parse_parameters(self):
 	#
 		"""
 Parses request parameters.
@@ -606,6 +609,17 @@ Set some standard values
 		if (self.service == ""): self.service = "index"
 	#
 
+	def respond(self, response):
+	#
+		"""
+Reply the request with the given response.
+
+:since: v0.1.01
+		"""
+
+		response.send()
+	#
+
 	def set_dsd(self, key, value):
 	#
 		"""
@@ -614,7 +628,7 @@ Sets the DSD value for the specified parameter.
 :param key: DSD key
 :param default: DSD value
 
-:since:  v0.1.00
+:since: v0.1.00
 		"""
 
 		if (self.dsd == None): self.dsd = { key: value }
@@ -631,7 +645,7 @@ Sets the inner request object.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -request.set_inner_request(+request)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Request.set_inner_request(+request)- (#echo(__LINE__)#)")
 		self.inner_request = request
 	#
 
@@ -707,18 +721,6 @@ Returns false if the server address is unknown.
 		"""
 
 		return False
-	#
-
-	def supports_sessions(self):
-	#
-		"""
-Returns false if the request can't be connected to an active session.
-
-:return: (bool) True if an active session can be identified.
-:since:  v0.1.01
-		"""
-
-		return (self.session != None)
 	#
 
 	@staticmethod
