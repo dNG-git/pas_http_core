@@ -289,7 +289,7 @@ Respond the request with the given response.
 
 					if ("theme" in self.parameters): user_profile_data['theme'] = self.parameters['theme']
 
-					user_profile.db_set(**user_profile_data)
+					user_profile.data_set(**user_profile_data)
 					user_profile.save()
 				#
 

@@ -98,7 +98,7 @@ Returns true if the defined session is valid.
 			elif (cookie_passcode != Tmd5.hash(passcode)):
 			#
 				passcode_timeout = self.session.set("uuids.passcode_prev_timeout")
-				if (passcode_timeout == None or passcode_timeout < time() or passcode_prev == None or cookie_passcode != Tmd5.hash(passcode_prev)): _return = False
+				if (passcode_timeout == None or passcode_timeout + Settings.get("pas_session_uuids_passcode_grace_period", 15) < time() or passcode_prev == None or cookie_passcode != Tmd5.hash(passcode_prev)): _return = False
 			#
 
 			if (not _return):
@@ -120,7 +120,12 @@ session.
 		"""
 
 		passcode_timeout = self.session.get("uuids.passcode_timeout")
-		if (passcode_timeout != None and passcode_timeout < time()): self._renew_passcode()
+
+		if (passcode_timeout != None):
+		#
+			self.session.set_session_time(int(Settings.get("pas_session_uuids_passcode_session_time", 604800)))
+			if (passcode_timeout < time()): self._renew_passcode()
+		#
 	#
 
 	def _renew_passcode(self):
@@ -137,7 +142,7 @@ Saves changes of the uuIDs instance.
 		if (self.session.get("uuids.passcode_timeout") != None and isinstance(response, AbstractHttpResponse)):
 		#
 			self.session.set("uuids.passcode_prev", self.session.get("uuids.passcode"))
-			self.session.set("uuids.passcode_prev_timeout", int(time() + Settings.get("pas_session_uuids_passcode_grace_period", 15)))
+			self.session.set("uuids.passcode_prev_timeout", int(time()))
 
 			passcode = Binary.str(hexlify(urandom(16)))
 			self.session.set("uuids.passcode", passcode)
@@ -158,7 +163,12 @@ Saves changes of the uuIDs instance.
 		"""
 
 		passcode_timeout = self.session.get("uuids.passcode_timeout")
-		if (passcode_timeout != None and passcode_timeout < time()): self._renew_passcode()
+
+		if (passcode_timeout != None):
+		#
+			self.session.set_session_time(int(Settings.get("pas_session_uuids_passcode_session_time", 604800)))
+			if (passcode_timeout < time()): self._renew_passcode()
+		#
 
 		return True
 	#
@@ -173,11 +183,7 @@ Sets a cookie to store the uuID.
 :since: v0.1.00
 		"""
 
-		if (mode and self.session.get("uuids.passcode") == None):
-		#
-			self.session.set("uuids.passcode_timeout", 0)
-			self.session.set_session_time(int(Settings.get("pas_session_uuids_passcode_session_time", 604800)))
-		#
+		if (mode and self.session.get("uuids.passcode") == None): self.session.set("uuids.passcode_timeout", 0)
 	#
 
 	@staticmethod

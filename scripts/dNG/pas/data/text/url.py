@@ -25,10 +25,10 @@ NOTE_END //n"""
 
 from math import floor
 
-try: from urllib.parse import quote, urlsplit
+try: from urllib.parse import quote, unquote, urlsplit
 except ImportError:
 #
-	from urllib import quote
+	from urllib import quote, unquote
 	from urlparse import urlsplit
 #
 
@@ -504,6 +504,21 @@ Escape the given data for embedding into (X)HTML.
 		"""
 
 		return quote(data, "")
+	#
+
+	@staticmethod
+	def unescape(data):
+	#
+		"""
+Unescape the given data.
+
+:param parameters: Parameters dict
+
+:return: (dict) Filtered parameters dict
+:since:  v0.1.01
+		"""
+
+		return unquote(data)
 	#
 #
 
