@@ -1,5 +1,5 @@
-<div class="pasformelement" style="text-align: center">
-	<input id="[rewrite:content]id[/rewrite]" type="[rewrite:content]type[/rewrite]" value="[rewrite:content]title[/rewrite]" class="pasformbutton ui-corner-all" />
+<div class="pasform_element" style="text-align: center">
+	<input id="[rewrite:content]id[/rewrite]" type="[rewrite:content]type[/rewrite]" value="[rewrite:content]title[/rewrite]" class="pasform_button ui-corner-all" />
 </div><script type="text/javascript"><![CDATA[
 require([ "djs/formX" ], function(formX) {
 	formX.init({ id: "[rewrite:content]id[/rewrite]", type: "button" });

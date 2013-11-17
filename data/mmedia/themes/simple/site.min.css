@@ -1,22 +1,43 @@
-.pasformbutton { margin: 0.2%; padding: 0.1% 0.2%; background-color: #ffffff; border: 1px solid #375a9d }
-.pasformbutton { font-size: 110% }
+.pasform_button {
+	margin: 0.2%; padding: 0.1% 0.2%; background-color: #ffffff; border: 1px solid #375a9d;
+	font-size: 110%
+}
 
-.pasformfield { width: 73%; margin 0; float: right; padding: 0.4%; text-align: center }
+.pasform_field {
+	display: inline-block; width: 73%; margin: 0; padding: 0.4% 0.3%;
+	text-align: center
+}
 
-.pasformelement { overflow: auto; clear: both; border-bottom: 1px solid #eeeeee; box-shadow: 0 2px 5px -5px rgba(0, 0, 0, 0.2) }
-.pasformelement .pasformerror { display: inline-block; margin-top: 10px }
+.pasform_element { overflow: auto; border-bottom: 1px solid #eeeeee; box-shadow: 0 2px 5px -5px rgba(0, 0, 0, 0.2) }
+.pasform_element .pasform_error { display: inline-block; margin-top: 10px }
 
-.pasformerror { clear: both; border: 1px solid #ff0000; padding: 0.25% }
-.pageforminputfocused { background-color: #e6e8eb }
-.pasformlabel { width: 25%; margin 0; float: left; padding: 0.6% 0.4% 0.6% 0.4%; text-align: right; font-weight: bold }
-.pasformradio { margin: 0; padding: 0; display: inline-block; list-style-type: none; text-align: left }
-.pasformtextnpassword { border: 1px solid #d8deeb; border-bottom: 1px solid #375a9d; padding: 0.1% 0.4%; font-size: 110% }
+.pasform_element_radio .pasform_label {
+	padding: 0.6% 0.4%
+}
 
-.pasformselect { margin: 0.2%; padding: 0.1% 0.2%; background-color: #FFFFFF; border: 1px solid #d8deeb; border-bottom: 1px solid #375a9d }
-.pasformselect { font-size: 110% }
+.pasform_error { clear: both; border: 1px solid #ff0000; padding: 0.25% }
 
-.pagemainmenu { margin: 0 -12px 0 -12px; padding: 0 12px 8px 12px; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(55, 90, 157, 0.2) 100%); border-bottom: 1px solid #375a9d }
-.pagemainmenu { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 105%; font-weight: bold; color: #375a9d }
+.pageform_input_focused { background-color: #e6e8eb }
+
+.pasform_label {
+	display: inline-block; width: 25%; margin: 0; padding: 0.8% 0.4%; font-weight: bold;
+	vertical-align: top; text-align: right
+}
+
+.pasform_radio { margin: 0; padding: 0; display: inline-block; list-style-type: none; text-align: left }
+.pasform_radio_label { vertical-align: middle }
+
+.pasform_textnpassword { border: 1px solid #d8deeb; border-bottom: 1px solid #375a9d; padding: 0.4%; font-size: 110% }
+
+.pasform_select {
+	margin: 0.2%; padding: 0.2%; background-color: #FFFFFF; border: 1px solid #d8deeb; border-bottom: 1px solid #375a9d;
+	font-size: 110%
+}
+
+.pagemainmenu {
+	margin: 0 -12px 0 -12px; padding: 0 12px 8px 12px; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(55, 90, 157, 0.2) 100%); border-bottom: 1px solid #375a9d;
+	font-size: 105%; font-weight: bold; color: #375a9d
+}
 
 .pagemainmenu a { display: inline-block }
 .pagemainmenu a:link, .pagemainmenu a:visited { color: #375a9d; text-decoration: none }
@@ -27,6 +48,7 @@
 .pagemainmenu ul { margin: 0; padding: 0; list-style: none }
 
 .pagenavbox { border: 1px solid #e6e8eb; padding: 0.4% }
+
 .pagenavtask { text-align: center; font-weight: bold }
 
 .pageservicemenu { margin: 1% 0; border: 1px solid #d8deeb }
@@ -39,8 +61,12 @@
 .pageservicemenu li { display: inline-block; white-space: nowrap }
 .pageservicemenu ul { margin: 0; padding: 0; list-style: none }
 
-.pageservicemenu_p { padding: 4px 4px 2px 4px }
-.pageservicemenu_p { text-align: left }
+.pageservicemenu_p {
+	padding: 4px 4px 2px 4px;
+	text-align: left
+}
 
-.pageservicemenu_s { padding: 4px }
-.pageservicemenu_s { text-align: right; font-size: 80% }
+.pageservicemenu_s {
+	padding: 4px;
+	text-align: right; font-size: 80%
+}

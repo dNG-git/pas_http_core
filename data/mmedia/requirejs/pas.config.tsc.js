@@ -18,7 +18,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ------------------------------------------------------------------------- */
 
 var djs_config = {
-	formX_focused_class: "pageforminputfocused"
+	formX_focused_class: "pageform_input_focused"
 };
 
 var require = {

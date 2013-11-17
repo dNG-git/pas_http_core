@@ -1,7 +1,7 @@
-<div class="pasformelement">
-	<div class="pasformlabel"><strong>[rewrite:content]title[/rewrite][if:content:required == True] <em>*</em>[/if]</strong>:</div>
-	<div class="pasformfield">
-		<select id="[rewrite:content]id[/rewrite]" name="[rewrite:content]name[/rewrite]"[if:content:required == True] required="required"[/if] class="pasformselect ui-corner-all" size="1">
+<div class="pasform_element">
+	<div class="pasform_label"><strong>[rewrite:content]title[/rewrite][if:content:required == True] <em>*</em>[/if]</strong>:</div>
+	<div class="pasform_field">
+		<select id="[rewrite:content]id[/rewrite]" name="[rewrite:content]name[/rewrite]"[if:content:required == True] required="required"[/if] class="pasform_select ui-corner-all" size="1">
 [each:content:choices:choice]
 			<option value="[rewrite:content]choices.choice.value[/rewrite]"[if:content:choices.choice.selected == True] selected="selected"[/if]>[rewrite:content]choices.choice.title[/rewrite]</option>
 [/each]
@@ -11,7 +11,7 @@
 		});
 		]]></script>
 [if:content:error_message != ]
-		<span class="pasformerror ui-corner-all">[rewrite:content]error_message[/rewrite]</span>
+		<span class="pasform_error ui-corner-all">[rewrite:content]error_message[/rewrite]</span>
 [/if]
 	</div>
 </div>

@@ -10,19 +10,18 @@
 div, p, td, th { cursor: default }
 
 a { cursor: pointer }
-a:link { color: #202020; text-decoration: underline }
-a:active { color: #000000; text-decoration: none }
-a:visited { color: #2f2f2f; text-decoration: underline }
-a:hover { color: #000000; text-decoration: none }
-a:focus { color: #000000; text-decoration: underline }
+a:link, a:visited { color: #2f2f2f; text-decoration: underline }
+a:active, a:hover, a:focus { color: #000000; text-decoration: none }
+a:focus { text-decoration: underline }
 
 body { margin: 0; padding: 0 31px; background-color: #ffffff }
-body { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 90%; font-style: normal; line-height: normal; font-weight: normal; color: #000000 }
-form { margin: 0; padding: 0 }
-h1, h2, h3, h4, h5, h6, summary { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 130%; font-style: normal; font-weight: bold }
-img { border: none }
-table { margin: 0; table-layout: fixed; border: none; border-collapse: collapse; border-spacing: 0 }
+body { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 95%; font-style: normal; line-height: normal; font-weight: normal; color: #000000 }
+h1, h2, h3, h4, h5, h6, summary { font-size: 130%; font-weight: bold }
 
+form { margin: 0; padding: 0 }
+img { border: none }
+
+table { margin: 0; table-layout: fixed; border: none; border-collapse: collapse; border-spacing: 0 }
 td, th { padding: 0 }
 td:first-child, th:first-child { border-left: none }
 td:last-child, th:last-child { border-right: none }
@@ -55,12 +54,12 @@ td:last-child, th:last-child { border-right: none }
 	<span class='designtitle'><i>direct</i> Netware Group</span>
 [/if]
 </div></header>
-<div class='designpage ui-corner-all'>
-[block:settings:pas_http_core_menu_main]output.menu.File.render[/block]
+<main><div class='designpage ui-corner-all'>
+[block:settings:pas_http_site_menu_main]output.menu.File.render[/block]
 [block]output.menu.Service.render_primary[/block]
 [rewrite:content]page_content[/rewrite]
 [block]output.menu.Service.render_secondary[/block]
-</div>
+</div></main>
 </body>
 
 </html>
