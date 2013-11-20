@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="[rewrite:l10n]lang_iso_domain[/rewrite]">
 
 <head>
-<title>[rewrite:content]page_title[/rewrite]</title>
+<title>[if:settings:pas_http_site_title != ][rewrite:settings]pas_http_site_title[/rewrite] • [/if][rewrite:content]page_title[/rewrite]</title>
 [if:content:p3purl != ]<link rel="P3Pv1" href="[rewrite:content]p3purl[/rewrite]" />[/if]
-<meta name="author" content="direct Netware Group" />
+<meta name="author" content="[if:settings:pas_http_site_author == ]direct Netware Group[/if][if:settings:pas_http_site_author != ][rewrite:settings]pas_http_site_author[/rewrite][/if]" />
 <meta name="creator" content="direct PAS" />
 <style type="text/css"><![CDATA[
 div, p, td, th { cursor: default }
@@ -30,7 +30,11 @@ td:last-child, th:last-child { border-right: none }
 .designcopyright { font-family:Verdana,Arial,Helvetica,sans-serif;font-size:70%;color:#dddddd }
 .designcopyright a, .designcopyright a:link, .designcopyright a:active, .designcopyright a:visited, .designcopyright a:hover, .designcopyright a:focus { color:#ffffff }
 
-.designpage { padding: 10px 12px; background-color: #ffffff; border: 1px solid #375a9d; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2); text-align: left; vertical-align: middle }
+.designpage {
+	padding: 10px 12px; background-color: #ffffff; border: 1px solid #375a9d; border-radius: 1em; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+	text-align: left; vertical-align: middle
+}
+
 .designpage > :first-child { margin-top: 0 }
 .designpage > :last-child { margin-bottom: 0 }
 
@@ -48,13 +52,13 @@ td:last-child, th:last-child { border-right: none }
 
 <body>
 <header style='margin: 10px 0; text-align: right'><div style='display: inline-block; position: relative'>
-[if:content:site_title != ]
-	<span class='designtitle'>[rewrite:content]site_title[/rewrite]</span>
-[/if][if:content:site_title == ]
+[if:settings:pas_http_site_title_xhtml != ]
+	<span class='designtitle'>[rewrite:settings]pas_http_site_title_xhtml[/rewrite]</span>
+[/if][if:settings:pas_http_site_title_xhtml == ]
 	<span class='designtitle'><i>direct</i> Netware Group</span>
 [/if]
 </div></header>
-<main><div class='designpage ui-corner-all'>
+<main><div class='designpage'>
 [block:settings:pas_http_site_menu_main]output.menu.File.render[/block]
 [block]output.menu.Service.render_primary[/block]
 [rewrite:content]page_content[/rewrite]

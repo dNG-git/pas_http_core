@@ -1,8 +1,6 @@
-<article>
-	<h1>[rewrite:content]title[/rewrite]</h1>
+<h1>[rewrite:content]title[/rewrite]</h1>
 [if:content:service_list != ]
 [block:content:service_list]output.ServiceList.render[/block]
 [/if][if:content:service_list == ]
-	<p>[rewrite:l10n]pas_http_core_service_list_empty[/rewrite]</p>
+<p>[rewrite:l10n]pas_http_core_service_list_empty[/rewrite]</p>
 [/if]
-</article>

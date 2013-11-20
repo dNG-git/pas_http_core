@@ -1,0 +1,30 @@
+{
+ "pas_http_core_service_list_empty": "Currently there are no functions available or you may have not proper permission to access restricted functions.",
+
+ "errors_pas_http_core_400": "The transmitted request is erroneous and will not be processed.",
+ "errors_pas_http_core_401": "Sorry, but you do not have sufficient rights to execute the current task successfully. Please log in using an account with proper permission if applicable.",
+ "errors_pas_http_core_402": "A fee required is required for the transmitted request. It can not be processed.",
+ "errors_pas_http_core_403": "Access to the restricted function has been denied by the system.",
+ "errors_pas_http_core_404": "The requested resource does not or no longer exist.",
+ "errors_pas_http_core_405": "The transmitted request is erroneous and will not be processed.",
+ "errors_pas_http_core_406": "The requested format of the transmitted request is not supported.",
+ "errors_pas_http_core_407": "Sorry, but you do not have sufficient rights to execute the current task successfully. Please log in using an account with proper permission if applicable.",
+ "errors_pas_http_core_408": "The transmission of the request took too long and will not be processed.",
+ "errors_pas_http_core_409": "The transmitted request causes a conflict and will not be processed.",
+ "errors_pas_http_core_410": "The requested resource does not exist.",
+ "errors_pas_http_core_411": "The transmission of the request requires information about the data size.",
+ "errors_pas_http_core_412": "The transmitted request contains a requirement that is not fulfilled.",
+ "errors_pas_http_core_413": "The transmitted request is too large.",
+ "errors_pas_http_core_414": "The transmitted request contains an address that is too long.",
+ "errors_pas_http_core_415": "The transmitted data format of the request is not supported.",
+ "errors_pas_http_core_416": "The requested data range of the transmitted request is not supported.",
+ "errors_pas_http_core_417": "The transmitted request contains a requirement that is not fulfilled.",
+ "errors_pas_http_core_500": "The application encountered an unknown error and is unable complete the current task.",
+ "errors_pas_http_core_501": "The transmitted request uses a function that is not supported.",
+ "errors_pas_http_core_502": "The application encountered an internal communication error and is unable complete the current task.",
+ "errors_pas_http_core_503": "The transmitted request uses a function that is currently not available.",
+ "errors_pas_http_core_504": "The application encountered an internal communication error and is unable complete the current task.",
+ "errors_pas_http_core_505": "The HTTP version used for the transmitted request is not supported.",
+
+ "errors_pas_http_core_oset_not_viewable": "The content is not viewable after a server-side error occurred."
+}

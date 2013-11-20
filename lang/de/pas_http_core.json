@@ -1,0 +1,30 @@
+{
+ "pas_http_core_service_list_empty": "Derzeit sind keine Funktionen verfügbar oder du hast für die zugriffsbeschränkten Funktionen keine ausreichenden Rechte.",
+
+ "errors_pas_http_core_400": "Die übermittelte Anfrage ist fehlerhaft und wird nicht verarbeitet.",
+ "errors_pas_http_core_401": "Deine derzeitigen Zugangsrechte sind unzureichend, um die gewünschte Aufgabe erfolgreich auszuführen. Melde dich bitte gegebenenfalls mit einem zugangsberechtigten Account an.",
+ "errors_pas_http_core_402": "Die übermittelte Anfrage ist kostenpflichtig und kann nicht verarbeitet werden.",
+ "errors_pas_http_core_403": "Der Zugriff auf die gesicherte Funktion wurde durch das System verweigert.",
+ "errors_pas_http_core_404": "Das Ziel der übermittelten Anfrage existiert nicht oder nicht mehr.",
+ "errors_pas_http_core_405": "Die übermittelte Anfrage ist fehlerhaft und wird nicht verarbeitet.",
+ "errors_pas_http_core_406": "Das gewünschte Format der übermittelten Anfrage wird nicht unterstützt.",
+ "errors_pas_http_core_407": "Deine derzeitigen Zugangsrechte sind unzureichend, um die gewünschte Aufgabe erfolgreich auszuführen. Melde dich bitte gegebenenfalls mit einem zugangsberechtigten Account an.",
+ "errors_pas_http_core_408": "Die Übermittlung der Anfrage dauerte zu lange und wird nicht verarbeitet.",
+ "errors_pas_http_core_409": "Die übermittelte Anfrage löst einen Konflikt aus und wird nicht verarbeitet.",
+ "errors_pas_http_core_410": "Das Ziel der übermittelten Anfrage existiert nicht mehr.",
+ "errors_pas_http_core_411": "Die Übermittlung der Anfrage benötigt eine Angabe zur Datengröße.",
+ "errors_pas_http_core_412": "Die übermittelte Anfrage besitzt eine Voraussetzung die nicht erfüllt wird.",
+ "errors_pas_http_core_413": "Die übermittelte Anfrage besitzt eine zu große Datengröße.",
+ "errors_pas_http_core_414": "Die übermittelte Anfrage besitzt eine zu lange Adressangabe.",
+ "errors_pas_http_core_415": "Das übermittelte Datenformat der Anfrage wird nicht unterstützt.",
+ "errors_pas_http_core_416": "Der gewünschte Datenbereich der übermittelten Anfrage wird nicht unterstützt.",
+ "errors_pas_http_core_417": "Die übermittelte Anfrage besitzt eine Voraussetzung die nicht erfüllt wird.",
+ "errors_pas_http_core_500": "Die Anwendung hat einen unbekannten Fehler festgestellt und kann die derzeitige Aufgabe nicht beenden.",
+ "errors_pas_http_core_501": "Die übermittelte Anfrage nutzt eine nicht unterstützte Funktion.",
+ "errors_pas_http_core_502": "Die Anwendung hat einen Fehler während der internen Kommunikation festgestellt und kann die derzeitige Aufgabe nicht beenden.",
+ "errors_pas_http_core_503": "Die übermittelte Anfrage nutzt eine aktuell nicht verfügbare Funktion.",
+ "errors_pas_http_core_504": "Die Anwendung hat einen Fehler während der internen Kommunikation festgestellt und kann die derzeitige Aufgabe nicht beenden.",
+ "errors_pas_http_core_505": "Die genutzte HTTP-Version der übermittelten Anfrage wird nicht unterstützt.",
+
+ "errors_pas_http_core_oset_not_viewable": "Der Inhalt kann aufgrund eines serverseitigen Fehlers nicht angezeigt werden."
+}
