@@ -27,6 +27,7 @@ from dNG.data.rfc.basics import Basics as RfcBasics
 from dNG.pas.data.traced_exception import TracedException
 from dNG.pas.data.translatable_exception import TranslatableException
 from dNG.pas.data.settings import Settings
+from dNG.pas.data.http.translatable_exception import TranslatableException as HttpTranslatableException
 from .abstract_response import AbstractResponse
 
 class AbstractHttpResponse(AbstractResponse):
@@ -125,7 +126,20 @@ send.
 :since: v0.1.00
 		"""
 
-		if (self.get_header("HTTP/1.1", True) == None): self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+		if (self.get_header("HTTP/1.1", True) == None):
+		#
+			self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+
+			if (isinstance(exception, HttpTranslatableException)):
+			#
+				code = exception.get_http_code()
+
+				if (code == 400): self.set_header("HTTP/1.1", "HTTP/1.1 400 Bad Request", True)
+				elif (code == 402): self.set_header("HTTP/1.1", "HTTP/1.1 402 Payment Required", True)
+				elif (code == 403): self.set_header("HTTP/1.1", "HTTP/1.1 403 Forbidden", True)
+				elif (code == 404): self.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+			#
+		#
 
 		if (message == None and isinstance(exception, TranslatableException)): message = "{0:l10n_message}".format(exception)
 		if (not isinstance(exception, TracedException)): exception = TracedException(str(exception), exception)

@@ -209,8 +209,7 @@ Executes the given request.
 					del(instance)
 				#
 
-				if (response.supports_headers()): response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
-				response.handle_critical_error("core_unsupported_command")
+				self.handle_missing_service(response)
 			#
 		#
 		except Exception as handled_exception:
@@ -220,6 +219,20 @@ Executes the given request.
 		#
 
 		self.respond(response)
+	#
+
+	def handle_missing_service(self, response):
+	#
+		"""
+"handle_missing_service()" is called if the requested service has not been
+found.
+
+:param response: Waiting response object
+
+:since: v0.1.00
+		"""
+
+		response.handle_critical_error("core_unsupported_command")
 	#
 
 	def get_action(self):

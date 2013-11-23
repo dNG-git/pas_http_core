@@ -6,6 +6,7 @@
 [if:content:p3purl != ]<link rel="P3Pv1" href="[rewrite:content]p3purl[/rewrite]" />[/if]
 <meta name="author" content="[if:settings:pas_http_site_author == ]direct Netware Group[/if][if:settings:pas_http_site_author != ][rewrite:settings]pas_http_site_author[/rewrite][/if]" />
 <meta name="creator" content="direct PAS" />
+<meta name="viewport" content="initial-scale=1" />
 <style type="text/css"><![CDATA[
 div, p, td, th { cursor: default }
 

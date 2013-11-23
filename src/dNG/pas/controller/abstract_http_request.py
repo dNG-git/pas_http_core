@@ -119,6 +119,21 @@ Configures the given RequestBody to be read by the Request implementation.
 		return _return
 	#
 
+	def handle_missing_service(self, response):
+	#
+		"""
+"handle_missing_service()" is called if the requested service has not been
+found.
+
+:param response: Waiting response object
+
+:since: v0.1.00
+		"""
+
+		if (response.supports_headers()): response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+		AbstractRequest.handle_missing_service(self, response)
+	#
+
 	def get_cookie(self, name):
 	#
 		"""

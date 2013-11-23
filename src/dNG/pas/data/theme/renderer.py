@@ -29,6 +29,7 @@ import os
 import re
 
 from dNG.data.file import File
+from dNG.pas.data.binary import Binary
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.traced_exception import TracedException
 from dNG.pas.data.text.l10n import L10n
@@ -387,6 +388,7 @@ Sets the theme to use.
 :since: v0.1.00
 		"""
 
+		theme = Binary.str(theme)
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Renderer.set({0})- (#echo(__LINE__)#)".format(theme))
 
 		theme = theme.replace(".", "/")
@@ -433,7 +435,9 @@ Sets the theme to use.
 :since: v0.1.00
 		"""
 
+		subtype = Binary.str(subtype)
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Renderer.set_subtype({0})- (#echo(__LINE__)#)".format(subtype))
+
 		self.subtype = subtype
 	#
 
@@ -446,7 +450,9 @@ Sets the theme to use.
 :since: v0.1.00
 		"""
 
+		title = Binary.str(title)
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Renderer.set_title({0})- (#echo(__LINE__)#)".format(title))
+
 		self.title = title
 	#
 #

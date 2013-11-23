@@ -82,9 +82,40 @@
 .pageoptionsblock ul { position: relative; margin: 0; padding: 0; list-style: none inside none }
 
 @media only screen and (max-width: 31em) {
+	.pasform_element { padding: 2% 0 }
+
+	.pasform_field
+	{
+		display: block; width: inherit;
+		text-align: left
+	}
+
+	.pasform_label {
+		display: block; width: inherit;
+		text-align: left
+	}
+
+	.pasform_textnpassword {
+		width: 100% !important;
+		box-sizing: border-box; -moz-box-sizing: border-box; -ms-box-sizing: border-box; -opera-box-sizing: border-box; -webkit-box-sizing: border-box
+	}
+
 	.pageoptionsblock li { width: 100%; margin: 0; padding: 0 }
 }
 
 @media only screen and (min-width: 31em) and (max-width: 62em) {
+	.pasform_element { padding: 1% 0 }
+
+	.pasform_field
+	{
+		display: block; width: inherit;
+		text-align: left
+	}
+
+	.pasform_label {
+		display: block; width: inherit;
+		text-align: left
+	}
+
 	.pageoptionsblock li { width: 50%; margin: 0; padding: 0 }
 }

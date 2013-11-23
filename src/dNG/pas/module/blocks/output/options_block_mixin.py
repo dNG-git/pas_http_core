@@ -24,6 +24,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from dNG.data.xml_parser import XmlParser
+from dNG.pas.data.binary import Binary
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.url import Url
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
@@ -70,7 +71,7 @@ Renders a link.
 			l10n_description_id = "description_{0}".format(self.request.get_lang())
 			description = (data[l10n_description_id] if (l10n_description_id in data) else None)
 			if (description == None and "description" in data): description = data['description']
-			if (description != None): _return += "<br />\n{0}".format(description) # TODO: Add FormTags parser
+			if (description != None): _return += "<br />\n{0}".format(Binary.str(description)) # TODO: Add FormTags parser
 
 			_return += "</a>"
 		#
