@@ -1,74 +1,103 @@
-.pasform_button {
-	margin: 0.2%; padding: 0.1% 0.2%; background-color: #ffffff; border: 1px solid #375a9d;
-	font-size: 110%
+.pagecontent_subobjects_box {
+	clear: right; float: right; width: 35%; padding: 0.4%; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgb(230, 232, 235) 100%); border: 1px solid #d8deeb; border-radius: 0.2em;
 }
 
-.pasform_field {
+.pagecontent_subobjects_box h1 {
+	border-bottom: 1px #e6e8eb solid;
+	font-size: 1em; line-height: 1em
+}
+
+.pagecontent_subobjects_box li { margin: 0; padding: 0 }
+.pagecontent_subobjects_box li:nth-child(n+2) { border-top: 1px #e6e8eb dotted }
+.pagecontent_subobjects_box ul { margin: 0; padding: 0; list-style: none inside none }
+
+.pageform_button {
+	margin: 0.2%; padding: 0.1% 0.2%; background-color: #ffffff; border: 1px solid #375a9d; border-radius: 0.2em;
+	font-size: 1.2em
+}
+
+.pageform_field {
 	display: inline-block; width: 73%; margin: 0; padding: 0.4% 0.3%;
 	text-align: center
 }
 
-.pasform_element { overflow: auto; border-bottom: 1px solid #eeeeee; box-shadow: 0 2px 5px -5px rgba(0, 0, 0, 0.2) }
-.pasform_element .pasform_error { display: inline-block; margin-top: 10px }
+.pageform_element { overflow: auto; border-bottom: 1px solid #eeeeee; box-shadow: 0 2px 5px -5px rgba(0, 0, 0, 0.2) }
+.pageform_element .pageform_error { display: inline-block; margin-top: 10px }
 
-.pasform_element_radio .pasform_label {
+.pageform_element_radio .pageform_label {
 	padding: 0.6% 0.4%
 }
 
-.pasform_error { clear: both; border: 1px solid #ff0000; padding: 0.25% }
+.pageform_error { padding: 0.25%; clear: both; border: 1px solid #ff0000; border-radius: 0.2em }
 
 .pageform_input_focused { background-color: #e6e8eb }
 
-.pasform_label {
+.pageform_label {
 	display: inline-block; width: 25%; margin: 0; padding: 0.8% 0.4%; font-weight: bold;
 	vertical-align: top; text-align: right
 }
 
-.pasform_radio { margin: 0; padding: 0; display: inline-block; list-style-type: none; text-align: left }
-.pasform_radio_label { vertical-align: middle }
+.pageform_radio {
+	margin: 0; padding: 0; display: inline-block; list-style-type: none;
+	text-align: left
+}
 
-.pasform_textnpassword { border: 1px solid #d8deeb; border-bottom: 1px solid #375a9d; padding: 0.4%; font-size: 110% }
+.pageform_radio_label { vertical-align: middle }
 
-.pasform_select {
-	margin: 0.2%; padding: 0.2%; background-color: #FFFFFF; border: 1px solid #d8deeb; border-bottom: 1px solid #375a9d;
-	font-size: 110%
+.pageform_textnpassword {
+	padding: 0.4%; border: 1px solid #d8deeb; border-bottom: 1px solid #375a9d; border-radius: 0.2em;
+	font-size: 1.2em
+}
+
+.pageform_select {
+	margin: 0.2%; padding: 0.2%; background-color: #FFFFFF; border: 1px solid #d8deeb; border-bottom: 1px solid #375a9d; border-radius: 0.2em;
+	font-size: 1.2em
 }
 
 .pagemainmenu {
-	margin: 0 -12px 0 -12px; padding: 0 12px 8px 12px; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(55, 90, 157, 0.2) 100%); border-bottom: 1px solid #375a9d;
-	font-size: 105%; font-weight: bold; color: #375a9d
+	margin: -0.25% -0.75% 0 -0.75%; padding: 0 0.75% 0.5% 0.75%; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(55, 90, 157, 0.2) 100%); border-bottom: 1px solid #375a9d;
+	font-size: 1.1em; font-weight: bold; color: #375a9d
 }
 
 .pagemainmenu a { display: inline-block }
 .pagemainmenu a:link, .pagemainmenu a:visited { color: #375a9d; text-decoration: none }
 .pagemainmenu a:active, .pagemainmenu a:hover, .pagemainmenu a:focus { color: #000000; text-decoration: underline }
 
-.pagemainmenu li { display: inline-block; white-space: nowrap }
-.pagemainmenu li:nth-child(n+2):before { content: " • " }
+.pagemainmenu li {
+	display: inline-block;
+	white-space: nowrap
+}
+
+.pagemainmenu li:not(:last-child):after { margin: 0 0.3em; content: "•" }
 .pagemainmenu ul { margin: 0; padding: 0; list-style: none }
 
-.pagenavbox { border: 1px solid #e6e8eb; padding: 0.4% }
+.pagenavbox { padding: 0.4%; border: 1px solid #e6e8eb }
 
 .pagenavtask { text-align: center; font-weight: bold }
 
-.pageservicemenu { margin: 1% 0; border: 1px solid #d8deeb }
+.pagenotification_completed_info { padding: 0.4%; background-color: #e0fae0; border: 1px solid #8ae08a; border-radius: 0.2em }
+.pagenotification_error { padding: 0.4%; background-color: #fae0e0; border: 1px solid #e02222; border-radius: 0.2em }
+
+.pageservicemenu { clear: both; margin: 1% 0; border: 1px solid #d8deeb; border-radius: 0.2em }
 
 .pageservicemenu a { display: inline-block }
 .pageservicemenu a:link, .pageservicemenu a:visited { color: #375a9d; text-decoration: none }
 .pageservicemenu a:active, .pageservicemenu a:hover, .pageservicemenu a:focus { color: #000000; text-decoration: none }
 
 .pageservicemenu img { padding-bottom: 2%; vertical-align: middle }
-.pageservicemenu li { display: inline-block; white-space: nowrap }
+
+.pageservicemenu li { display: inline-block }
+.pageservicemenu li:not(:last-child):after { margin-right: 0.3em; content: ", " }
 .pageservicemenu ul { position: relative; margin: 0; padding: 0; list-style: none inside none }
 
 .pageservicemenu_p {
-	padding: 4px 4px 2px 4px;
+	padding: 4px 4px 0 4px;
 	text-align: left
 }
 
 .pageservicemenu_s {
 	padding: 4px;
-	text-align: right; font-size: 80%
+	text-align: right; font-size: 0.8em
 }
 
 .pageoptionsblock a {
@@ -81,38 +110,48 @@
 .pageoptionsblock li { display: inline-block; width: 25%; margin: 0; padding: 0 }
 .pageoptionsblock ul { position: relative; margin: 0; padding: 0; list-style: none inside none }
 
-@media only screen and (max-width: 31em) {
-	.pasform_element { padding: 2% 0 }
+.pageurl_requirements_unsupported { color: #808080 }
 
-	.pasform_field
+@media only screen and (max-width: 46em) {
+	.pageform_element { padding: 2% 0 }
+
+	.pageform_field
 	{
 		display: block; width: inherit;
 		text-align: left
 	}
 
-	.pasform_label {
+	.pageform_label {
 		display: block; width: inherit;
 		text-align: left
 	}
 
-	.pasform_textnpassword {
+	.pageform_textnpassword {
 		width: 100% !important;
 		box-sizing: border-box; -moz-box-sizing: border-box; -ms-box-sizing: border-box; -opera-box-sizing: border-box; -webkit-box-sizing: border-box
 	}
 
 	.pageoptionsblock li { width: 100%; margin: 0; padding: 0 }
+
+	.pageservicemenu_p {
+		text-align: center
+	}
+
+	.pageservicemenu_s {
+		text-align: center
+	}
 }
 
-@media only screen and (min-width: 31em) and (max-width: 62em) {
-	.pasform_element { padding: 1% 0 }
+@media only screen and (min-width: 46em) and (max-width: 62em) {
+	.pageform_element { padding: 1% 0 }
 
-	.pasform_field
+	.pageform_field
 	{
 		display: block; width: inherit;
 		text-align: left
 	}
 
-	.pasform_label {
+	.pageform_label {
 		display: block; width: inherit;
 		text-align: left
 	}

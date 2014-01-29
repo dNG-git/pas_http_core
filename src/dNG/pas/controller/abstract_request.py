@@ -31,9 +31,12 @@ import os
 import re
 
 from dNG.pas.data.settings import Settings
+from dNG.pas.data.translatable_exception import TranslatableException
 from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.module.named_loader import NamedLoader
+from .abstract_inner_request import AbstractInnerRequest
+from .abstract_response import AbstractResponse
 from .stdout_stream_response import StdoutStreamResponse
 
 try: from urllib.parse import quote, unquote
@@ -51,6 +54,35 @@ This abstract class contains common methods for request implementations.
 :since:      v0.1.00
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
+	"""
+
+	RE_PARAMETER_DSD_PLUS_SPAM_CHAR = re.compile("(\\+){3,}")
+	"""
+RegExp to find more than 3 plus characters in a row
+	"""
+	RE_PARAMETER_FILTERED_CHARS = re.compile("[/\\\\\\?:@\\=\\&\\.]")
+	"""
+RegExp to find characters to be filtered out
+	"""
+	RE_PARAMETER_FILTERED_WORD_CHARS = re.compile("[;\\x20\\+]")
+	"""
+RegExp to find characters to be filtered out
+	"""
+	RE_PARAMETER_NON_WORD_END = re.compile("\\W+$")
+	"""
+RegExp to find non-word characters at the end of the string
+	"""
+	RE_PARAMETER_NON_WORD_START = re.compile("^\\W+")
+	"""
+RegExp to find non-word characters at the beginning of the string
+	"""
+	RE_PARAMETER_PLUS_CHAR = re.compile("\\+")
+	"""
+RegExp to find plus characters
+	"""
+	RE_PARAMETER_SPACE_CHAR = re.compile("\\x20")
+	"""
+RegExp to find space characters
 	"""
 
 	local = local()
@@ -147,7 +179,7 @@ Requested response format name
 	def execute(self):
 	#
 		"""
-Executes the given request.
+Executes the incoming request.
 
 :since: v0.1.00
 		"""
@@ -184,33 +216,8 @@ Executes the given request.
 				if (len(compression_formats) > 0): response.set_compression_formats(compression_formats)
 			#
 
-			requested_module = request.get_module()
 			if (response.supports_script_name()): response.set_script_name(request.get_script_name())
-
-			requested_service = "".join([word.capitalize() for word in request.get_service().split("_")])
-
-			if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))):
-			#
-				instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))
-				if (self.log_handler != None): instance.set_log_handler(self.log_handler)
-
-				instance.init(request, response)
-				instance.execute()
-				del(instance)
-			#
-			else:
-			#
-				if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.module".format(requested_module))):
-				#
-					instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.module".format(requested_module));
-					if (self.log_handler != None): instance.set_log_handler(self.log_handler)
-
-					instance.init(request, response)
-					del(instance)
-				#
-
-				self.handle_missing_service(response)
-			#
+			self._execute(request, response)
 		#
 		except Exception as handled_exception:
 		#
@@ -218,7 +225,42 @@ Executes the given request.
 			response.handle_exception_error(None, handled_exception)
 		#
 
-		self.respond(response)
+		self._respond(response)
+	#
+
+	def _execute(self, request, response):
+	#
+		"""
+Executes the given request and generate content for the given response.
+
+:since: v0.1.00
+		"""
+
+		requested_module = request.get_module()
+		requested_service = "".join([word.capitalize() for word in request.get_service().split("_")])
+
+		if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))):
+		#
+			instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))
+			if (self.log_handler != None): instance.set_log_handler(self.log_handler)
+
+			instance.init(request, response)
+			instance.execute()
+			del(instance)
+		#
+		else:
+		#
+			if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.module".format(requested_module))):
+			#
+				instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.module".format(requested_module));
+				if (self.log_handler != None): instance.set_log_handler(self.log_handler)
+
+				instance.init(request, response)
+				del(instance)
+			#
+
+			self.handle_missing_service(response)
+		#
 	#
 
 	def handle_missing_service(self, response):
@@ -283,7 +325,7 @@ Returns the DSD value for the specified parameter.
 :since:  v0.1.00
 		"""
 
-		return (self.dsd[key] if (key in self.dsd) else default)
+		return (self.dsd[key] if (self.is_dsd_set(key)) else default)
 	#
 
 	def get_dsd_dict(self):
@@ -373,6 +415,18 @@ Returns the requested output format.
 		return self.output_format
 	#
 
+	def _get_request_parameters(self):
+	#
+		"""
+Returns the unparsed request parameters.
+
+:return: (dict) Request parameters
+:since:  v0.1.01
+		"""
+
+		return { }
+	#
+
 	def get_script_name(self):
 	#
 		"""
@@ -457,35 +511,6 @@ Returns the associated session.
 		return self.session
 	#
 
-	def iline_parse(self, iline = None):
-	#
-		"""
-Parse the input variables given as an URI query string.
-
-:param iline: Input query string with ";" delimiter.
-
-:return: (dict) Parsed query string
-:since:  v0.1.00
-		"""
-
-		_return = { }
-
-		if (iline != None):
-		#
-			iline_list = iline.split(";")
-
-			for iline in iline_list:
-			#
-				value_element = iline.split("=", 1)
-
-				if (len(value_element) > 1): _return[value_element[0]] = value_element[1]
-				elif ("ohandler" not in _return): _return['ohandler'] = re.sub("\\W+", "", iline)
-			#
-		#
-
-		return _return
-	#
-
 	def init(self):
 	#
 		"""
@@ -532,35 +557,18 @@ Initializes the matching stream response instance.
 		return StdoutStreamResponse()
 	#
 
-	def parse_dsd(self, dsd):
+	def is_dsd_set(self, key):
 	#
 		"""
-DSD stands for dynamic service data and should be used for transfering IDs for
-news, topics, ... Take care for injection attacks!
+Returns true if the DSD for the specified parameter exists.
 
-:param dsd: DSD string for parsing
+:param key: DSD key
 
-:return: (dict) Parsed DSD
-:since:  v0.1.00
+:return: (bool) True if set
+:since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Request.parse_dsd(+dsd)- (#echo(__LINE__)#)")
-
-		if (" " in dsd): dsd = quote(dsd)
-		dsd = re.sub("[\\+]{3,}", "++", dsd, flags = re.I)
-
-		dsd_list = dsd.split("++")
-		_return = { }
-
-		for dsd in dsd_list:
-		#
-			dsd_element = dsd.strip().split("+", 1)
-
-			if (len(dsd_element) > 1): _return[dsd_element[0]] = InputFilter.filter_control_chars(unquote(dsd_element[1]))
-			elif (len(dsd_element[0]) > 0): _return[dsd_element[0]] = ""
-		#
-
-		return _return
+		return (key in self.dsd)
 	#
 
 	def _parse_parameters(self):
@@ -571,44 +579,34 @@ Parses request parameters.
 :since: v0.1.00
 		"""
 
-		self.parameters = self.iline_parse()
+		self.parameters = self._get_request_parameters()
 
-		self.action = (re.sub("[;/\\\\\\?:@\\=\\&\\. \\+]", "", unquote(self.parameters['a'])) if ("a" in self.parameters) else "")
-		self.module = (re.sub("[;/\\\\\\?:@\\=\\&\\. \\+]", "", self.parameters['m']) if ("m" in self.parameters) else "")
+		self.action = (AbstractRequest.filter_parameter_word(self.parameters['a']) if ("a" in self.parameters) else "")
+		self.module = (AbstractRequest.filter_parameter_word(self.parameters['m']) if ("m" in self.parameters) else "")
+		self.service = (AbstractRequest.filter_parameter_service(self.parameters['s']) if ("s" in self.parameters) else "")
 
-		if ("s" in self.parameters):
-		#
-			if (" " in self.parameters['s']): self.parameters['s'] = quote(self.parameters['s'])
-			self.parameters['s'] = re.sub("[\\+]", " ", self.parameters['s'])
-			self.parameters['s'] = re.sub("^\\W+", "", self.parameters['s'])
-			self.parameters['s'] = re.sub("[/\\\\\\?:@\\=\\&\\.]", "", self.parameters['s'])
-			self.parameters['s'] = re.sub("\\W+$", "", self.parameters['s'])
-			self.service = re.sub("\\x20", ".", self.parameters['s'])
-		#
-		else: self.service = ""
-
-		if ("dsd" in self.parameters): self.dsd = self.parse_dsd(self.parameters['dsd'])
-		if ("ohandler" in self.parameters and len(self.parameters['ohandler']) > 0): self.output_handler = self.parameters['ohandler']
+		if ("dsd" in self.parameters): self.dsd = AbstractRequest.parse_dsd(self.parameters['dsd'])
+		if ("ohandler" in self.parameters and len(self.parameters['ohandler']) > 0): self.output_handler = AbstractRequest.filter_parameter_word(self.parameters['ohandler'])
 
 		"""
 Initialize l10n
 		"""
 
-		lang = (re.sub("^\\W+", "", self.parameters['lang']) if ("lang" in self.parameters) else "")
+		lang = (AbstractRequest.filter_parameter(self.parameters['lang']) if ("lang" in self.parameters) else "")
 
 		if (lang != "" and os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang)), os.R_OK)): self.lang = lang
 		else:
 		#
-			if (self.lang == ""): lang_iso = Settings.get("core_lang", "en_US")
-			else: lang_iso = self.lang.lower()
+			if (self.lang == ""): lang_rfc_region = Settings.get("core_lang", "en_US")
+			else: lang_rfc_region = self.lang.lower()
 
-			lang_iso = re.sub("\\W", "", lang_iso)
-			lang_domain = lang_iso[:2]
+			lang_rfc_region = re.sub("\\W", "", lang_rfc_region)
+			lang_domain = lang_rfc_region[:2]
 
-			if (Settings.is_defined("core_lang_{0}".format(lang_iso))): lang_iso = Settings.get("core_lang_{0}".format(lang_iso))
+			if (Settings.is_defined("core_lang_{0}".format(lang_rfc_region))): lang_rfc_region = Settings.get("core_lang_{0}".format(lang_rfc_region))
 			elif (Settings.is_defined("core_lang_{0}".format(lang_domain))): lang_domain = Settings.get("core_lang_{0}".format(lang_domain))
 
-			if (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_iso)), os.R_OK)): self.lang = lang_iso
+			if (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_rfc_region)), os.R_OK)): self.lang = lang_rfc_region
 			elif (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_domain)), os.R_OK)): self.lang = lang_domain
 			else: self.lang = Settings.get("core_lang", "en")
 		#
@@ -622,7 +620,27 @@ Set some standard values
 		if (self.service == ""): self.service = "index"
 	#
 
-	def respond(self, response):
+	def redirect(self, request, response = None):
+	#
+		"""
+A request redirect executes the given new request as if it has been
+requested by the client. It will reset the response and its cached values.
+
+:param response: Waiting response object
+
+:since: v0.1.00
+		"""
+
+		if (isinstance(request, AbstractInnerRequest)):
+		#
+			request.init(self)
+			if (not isinstance(response, AbstractResponse)): response = AbstractResponse.get_instance()
+			self._execute(request, response)
+		#
+		else: raise TranslatableException("core_unsupported_command")
+	#
+
+	def _respond(self, response):
 	#
 		"""
 Reply the request with the given response.
@@ -644,8 +662,7 @@ Sets the DSD value for the specified parameter.
 :since: v0.1.00
 		"""
 
-		if (self.dsd == None): self.dsd = { key: value }
-		else: self.dsd[key] = value
+		self.dsd[key] = value
 	#
 
 	def set_inner_request(self, request):
@@ -737,16 +754,127 @@ Returns false if the server address is unknown.
 	#
 
 	@staticmethod
+	def filter_parameter(value):
+	#
+		"""
+Filters the given parameter value.
+
+:param value: Request parameter
+
+:return: (str) Filtered parameter
+:since:  v0.1.01
+		"""
+
+		if (" " in value): _return = quote(value)
+		value = AbstractRequest.RE_PARAMETER_NON_WORD_START.sub("", value)
+		value = AbstractRequest.RE_PARAMETER_FILTERED_CHARS.sub("", value)
+		return AbstractRequest.RE_PARAMETER_NON_WORD_END.sub("", value)
+	#
+
+	@staticmethod
+	def filter_parameter_service(value):
+	#
+		"""
+Filter service like parameters.
+
+:param value: Request parameter
+
+:return: (str) Filtered parameter
+:since:  v0.1.01
+		"""
+
+		value = AbstractRequest.filter_parameter(value)
+		value = AbstractRequest.RE_PARAMETER_PLUS_CHAR.sub(" ", value)
+		return AbstractRequest.RE_PARAMETER_SPACE_CHAR.sub(".", value)
+	#
+
+	@staticmethod
+	def filter_parameter_word(value):
+	#
+		"""
+Filter word parameters used for module and action statements.
+
+:param value: Request parameter
+
+:return: (str) Filtered parameter
+:since:  v0.1.01
+		"""
+
+		value = AbstractRequest.filter_parameter(value)
+		return AbstractRequest.RE_PARAMETER_FILTERED_WORD_CHARS.sub("", unquote(value))
+	#
+
+	@staticmethod
 	def get_instance():
 	#
 		"""
-Get the abstract_request singleton.
+Get the AbstractRequest singleton.
 
-:return: (AbstractRequest) Object on success
+:return: (object) Object on success
 :since:  v0.1.00
 		"""
 
 		return (AbstractRequest.local.weakref_instance() if (hasattr(AbstractRequest.local, "weakref_instance")) else None)
+	#
+
+	@staticmethod
+	def parse_dsd(dsd):
+	#
+		"""
+DSD stands for dynamic service data and should be used for transfering IDs for
+news, topics, ... Take care for injection attacks!
+
+:param dsd: DSD string for parsing
+
+:return: (dict) Parsed DSD
+:since:  v0.1.00
+		"""
+
+		if (" " in dsd): dsd = quote(dsd)
+		dsd = AbstractRequest.RE_PARAMETER_DSD_PLUS_SPAM_CHAR.sub("++", dsd)
+
+		dsd_list = dsd.split("++")
+		_return = { }
+
+		for dsd in dsd_list:
+		#
+			dsd_element = dsd.strip().split("+", 1)
+
+			if (len(dsd_element) > 1): _return[dsd_element[0]] = InputFilter.filter_control_chars(unquote(dsd_element[1]))
+			elif (len(dsd_element[0]) > 0): _return[dsd_element[0]] = ""
+		#
+
+		return _return
+	#
+
+	@staticmethod
+	def parse_iline(iline):
+	#
+		"""
+Parse the input variables given as an URI query string.
+
+:param iline: Input query string with ";" delimiter.
+
+:return: (dict) Parsed query string
+:since:  v0.1.00
+		"""
+
+		_return = { }
+
+		if (iline != None):
+		#
+			iline_list = iline.split(";")
+
+			for iline in iline_list:
+			#
+				value_element = iline.split("=", 1)
+
+				if (len(value_element) > 1): _return[value_element[0]] = value_element[1]
+				elif ("ohandler" not in _return): _return['ohandler'] = re.sub("\\W+", "", iline)
+			#
+		#
+
+		return _return
 	#
 #
 

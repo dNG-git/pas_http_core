@@ -178,16 +178,19 @@ Returns the request type.
 		return self.type
 	#
 
-	def init(self):
+	def _init_response(self):
 	#
 		"""
-Do preparations for request handling.
+Initializes the matching response instance.
 
-:since: v0.1.00
+:return: (object) Response object
+:since:  v0.1.01
 		"""
 
+		response = AbstractRequest._init_response(self)
+
+		if (response.supports_headers() and self.type == "HEAD"): response.set_send_headers_only(True)
 		if (Session != None): Session.set_adapter(HttpSessionAdapter)
-		AbstractRequest.init(self)
 
 		try:
 		#
@@ -201,19 +204,7 @@ Do preparations for request handling.
 		#
 			if (self.log_handler != None): self.log_handler.error(handled_exception)
 		#
-	#
 
-	def _init_response(self):
-	#
-		"""
-Initializes the matching response instance.
-
-:return: (object) Response object
-:since:  v0.1.01
-		"""
-
-		response = AbstractRequest._init_response(self)
-		if (response.supports_headers() and self.type == "HEAD"): response.set_send_headers_only(True)
 		return response
 	#
 
@@ -280,7 +271,7 @@ instance.
 		return inner_request
 	#
 
-	def respond(self, response):
+	def _respond(self, response):
 	#
 		"""
 Respond the request with the given response.
@@ -298,7 +289,7 @@ Respond the request with the given response.
 				#
 					user_profile_data = {
 						"lang": self.lang,
-						"lastvisit_time": int(time()),
+						"lastvisit_time": time(),
 						"lastvisit_ip": self.client_host
 					}
 
@@ -316,7 +307,7 @@ Respond the request with the given response.
 			if (self.log_handler != None): self.log_handler.error(handled_exception)
 		#
 
-		AbstractRequest.respond(self, response)
+		AbstractRequest._respond(self, response)
 	#
 
 	def set_header(self, name, value):

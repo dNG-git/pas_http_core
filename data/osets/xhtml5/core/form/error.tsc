@@ -1,1 +1,1 @@
-<div class="pasform_error ui-corner-all">[rewrite:content]error_message[/rewrite]</div>
+<div class="pageform_error">[rewrite:content]error_message[/rewrite]</div>

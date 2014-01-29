@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from cherrypy import log
+from cherrypy import config, log
 from cherrypy.wsgiserver import CherryPyWSGIServer
 import socket
 
@@ -79,12 +79,15 @@ Configures the server
 		if (listener_host == ""):
 		#
 			listener_host = ("::" if (socket.has_ipv6) else "0.0.0.0")
-			self.host = Settings.get("pas_http_cherrypy_server_preferred_hostname", self.socket_hostname)
+			self.host = Settings.get("pas_http_server_preferred_hostname", self.socket_hostname)
 		#
 		else: self.host = listener_host
 
+		config.update({ "response.stream": True })
+		numthreads = Settings.get("pas_http_cherrypy_server_numthreads", 10)
+
 		listener_data = ( listener_host, self.port )
-		self.server = CherryPyWSGIServer(listener_data, HttpWsgi1Request, server_name = "directPAS/#echo(pasHttpCoreIVersion)# [direct Netware Group]")
+		self.server = CherryPyWSGIServer(listener_data, HttpWsgi1Request, numthreads = numthreads, server_name = self.host)
 
 		if (self.log_handler != None): self.log_handler.info("pas.http.core cherrypy server starts at '{0}:{1:d}'".format(listener_host, self.port))
 

@@ -112,6 +112,8 @@ Filters links based on required permissions.
 			#
 			else: is_allowed = True
 
+			if (is_allowed and "required_lang" in link): is_allowed = (self.request.get_lang() == link['required_lang'])
+
 			if (is_allowed and "required_setting" in link):
 			#
 				setting = InputFilter.filter_control_chars(link['required_setting'])

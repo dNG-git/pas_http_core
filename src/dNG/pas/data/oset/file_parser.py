@@ -28,9 +28,9 @@ import os
 
 from dNG.data.file import File
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.traced_exception import TracedException
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.runtime.io_exception import IOException
 from .parser import Parser
 
 class FileParser(Parser):
@@ -95,12 +95,12 @@ Renders content ready for output from the given OSet template.
 			if (template_data == None):
 			#
 				file_obj = File()
-				if (not file_obj.open(file_pathname, True, "r")): raise TracedException("Failed to open OSet file for '{0}'".format(template_name))
+				if (not file_obj.open(file_pathname, True, "r")): raise IOException("Failed to open OSet file for '{0}'".format(template_name))
 
 				template_data = file_obj.read()
 				file_obj.close()
 
-				if (template_data == False): raise TracedException("Failed to read OSet file for '{0}'".format(template_name))
+				if (template_data == False): raise IOException("Failed to read OSet file for '{0}'".format(template_name))
 				if (self.cache_instance != None): self.cache_instance.set_file(file_pathname, template_data)
 			#
 

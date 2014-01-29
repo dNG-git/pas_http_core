@@ -28,11 +28,11 @@ import re
 
 from dNG.data.file import File
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.traced_exception import TracedException
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.text.tag_parser.abstract import Abstract as AbstractTagParser
 from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
 from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.runtime.io_exception import IOException
 
 class MmediaParser(AbstractTagParser, RewriteMixin):
 #
@@ -89,10 +89,9 @@ Change data according to the matched tag.
 
 			if (source == "l10n"): _return += self.render_rewrite(L10n.get_instance(), key)
 			else: _return += self.render_rewrite(Settings.get_instance(), key)
-
-			_return += data_closed
 		#
-		else: _return += data_closed
+
+		_return += data_closed
 
 		return _return
 	#
@@ -149,12 +148,12 @@ Renders content ready for output from the given "mmedia" file.
 		if (file_content == None):
 		#
 			file_obj = File()
-			if (not file_obj.open(file_pathname, True, "r")): raise TracedException("Failed to open mmedia file '{0}'".format(file_pathname))
+			if (not file_obj.open(file_pathname, True, "r")): raise IOException("Failed to open mmedia file '{0}'".format(file_pathname))
 
 			file_content = file_obj.read()
 			file_obj.close()
 
-			if (file_content == False): raise TracedException("Failed to read mmedia file '{0}'".format(file_pathname))
+			if (file_content == False): raise IOException("Failed to read mmedia file '{0}'".format(file_pathname))
 			if (self.cache_instance != None): self.cache_instance.set_file(file_pathname, file_content)
 		#
 

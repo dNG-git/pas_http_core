@@ -32,10 +32,13 @@ from dNG.pas.data.text.tag_parser.block_mixin import BlockMixin
 from dNG.pas.data.text.tag_parser.each_mixin import EachMixin
 from dNG.pas.data.text.tag_parser.if_condition_mixin import IfConditionMixin
 from dNG.pas.data.text.tag_parser.mapped_element_mixin import MappedElementMixin
-from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
+from dNG.pas.data.text.tag_parser.rewrite_date_time_mixin import RewriteDateTimeMixin
+from dNG.pas.data.xhtml.tag_parser.rewrite_form_tags_xhtml_mixin import RewriteFormTagsXhtmlMixin
+from dNG.pas.data.xhtml.tag_parser.rewrite_safe_xhtml_mixin import RewriteSafeXhtmlMixin
+from dNG.pas.data.xhtml.tag_parser.rewrite_user_xhtml_mixin import RewriteUserXhtmlMixin
 from dNG.pas.module.named_loader import NamedLoader
 
-class Parser(AbstractTagParser, BlockMixin, EachMixin, IfConditionMixin, MappedElementMixin, RewriteMixin):
+class Parser(AbstractTagParser, BlockMixin, EachMixin, IfConditionMixin, MappedElementMixin, RewriteDateTimeMixin, RewriteFormTagsXhtmlMixin, RewriteSafeXhtmlMixin, RewriteUserXhtmlMixin):
 #
 	"""
 The OSet parser takes a template string to render the output.
@@ -107,8 +110,6 @@ Change data according to the matched tag.
 				elif (source == "content"): _return += self.render_block(data[data_position:tag_end_position], "content", self._mapped_element_update("content", self.content), key)
 				elif (source == "settings"): _return += self.render_block(data[data_position:tag_end_position], "settings", self._mapped_element_update("settings", Settings.get_instance()), key)
 			#
-
-			_return += data_closed
 		#
 		elif (tag_definition['tag'] == "each"):
 		#
@@ -124,8 +125,6 @@ Change data according to the matched tag.
 				if (source == "content"): _return += self.render_each(data[data_position:tag_end_position], "content", self._mapped_element_update("content", self.content), key, mapping_key)
 				elif (source == "settings"): _return += self.render_each(data[data_position:tag_end_position], "settings", self._mapped_element_update("settings", Settings.get_instance()), key, mapping_key)
 			#
-
-			_return += data_closed
 		#
 		elif (tag_definition['tag'] == "if"):
 		#
@@ -142,21 +141,26 @@ Change data according to the matched tag.
 				if (source == "content"): _return += self.render_if_condition(self._mapped_element_update("content", self.content), key, operator, value, data[data_position:tag_end_position])
 				elif (source == "settings"): _return += self.render_if_condition(self._mapped_element_update("settings", Settings.get_instance()), key, operator, value, data[data_position:tag_end_position])
 			#
-
-			_return += data_closed
 		#
 		elif (tag_definition['tag'] == "rewrite"):
 		#
-			source = re.match("^\\[rewrite:(\\w+)\\]", data[tag_position:data_position]).group(1)
+			source = re.match("^\\[rewrite:(\\w+)(:[\\w:]+)*\\]", data[tag_position:data_position]).group(1)
 			key = data[data_position:tag_end_position]
 
 			if (source == "content"): _return += self.render_rewrite(self._mapped_element_update("content", self.content), key)
+			elif (source == "formtags_content"): _return += self.render_rewrite_form_tags_xhtml(self._mapped_element_update("content", self.content), key)
 			elif (source == "l10n"): _return += self.render_rewrite(self._mapped_element_update("l10n", L10n.get_instance()), key)
+			elif (source == "safe_content"): _return += self.render_rewrite_safe_xhtml(self._mapped_element_update("content", self.content), key)
 			elif (source == "settings"): _return += self.render_rewrite(self._mapped_element_update("settings", Settings.get_instance()), key)
-
-			_return += data_closed
+			elif (source == "timestamp"):
+			#
+				re_result = re.match("^\\[rewrite:timestamp:([\\w]+)\\]", data[tag_position:data_position])
+				_return += self.render_rewrite_date_time(self._mapped_element_update("content", self.content), key, ("date_time_short" if (re_result == None) else re_result.group(1)))
+			#
+			elif (source == "user_linked"): _return += self.render_rewrite_user_xhtml_link(self._mapped_element_update("content", self.content), key)
 		#
-		else: _return += data_closed
+
+		_return += data_closed
 
 		return _return
 	#
@@ -185,7 +189,7 @@ Check if a possible tag match is a false positive.
 
 			if (data_match == "block"):
 			#
-				re_result = re_result = re.match("^\\[block(:\\w+:[\\w\\.]+){0,1}\\]", data)
+				re_result = re.match("^\\[block(:\\w+:[\\w\\.]+){0,1}\\]", data)
 				if (re_result != None): _return = { "tag": "block", "tag_end": "[/block]", "type": "top_down" }
 			#
 			elif (data_match == "each"):
@@ -200,8 +204,12 @@ Check if a possible tag match is a false positive.
 			#
 			elif (data_match == "rewrite"):
 			#
-				re_result = re.match("^\\[rewrite:(\\w+)\\]", data)
-				if (re_result != None and re_result.group(1) in [ "content", "l10n", "settings" ]): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
+				re_result = re.match("^\\[rewrite:(\\w+)(:[\\w:]+)*\\]", data)
+
+				if (
+					re_result != None and
+					re_result.group(1) in [ "content", "formtags_content", "l10n", "safe_content", "settings", "timestamp", "user_linked" ]
+				): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
 			#
 
 			i += 1

@@ -70,7 +70,7 @@ Configures the server
 		listener_host = Settings.get("pas_http_standalone_server_host", self.socket_hostname)
 		self.port = int(Settings.get("pas_http_standalone_server_port", 8080))
 
-		if (listener_host == ""): self.host = Settings.get("pas_http_standalone_server_preferred_hostname", self.socket_hostname)
+		if (listener_host == ""): self.host = Settings.get("pas_http_server_preferred_hostname", self.socket_hostname)
 		else: self.host = listener_host
 
 		self.server = make_server(listener_host, self.port, HttpWsgi1Request)

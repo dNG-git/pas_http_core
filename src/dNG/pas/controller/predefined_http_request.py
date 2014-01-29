@@ -24,6 +24,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from .abstract_inner_http_request import AbstractInnerHttpRequest
+from .abstract_request import AbstractRequest
 
 class PredefinedHttpRequest(AbstractInnerHttpRequest):
 #
@@ -48,6 +49,29 @@ Sets the requested action.
 		"""
 
 		self.action = action
+	#
+
+	def set_iline(self, iline):
+	#
+		"""
+Sets all parameters defined in the given URI request string.
+
+:since: v0.1.00
+		"""
+
+		parameters = AbstractRequest.parse_iline(iline)
+
+		if ("a" in parameters): self.set_action(AbstractRequest.filter_parameter_word(parameters['a']))
+		if ("m" in parameters): self.set_module(AbstractRequest.filter_parameter_word(parameters['m']))
+		if ("s" in parameters): self.set_service(AbstractRequest.filter_parameter_service(parameters['s']))
+
+		if ("dsd" in parameters):
+		#
+			dsd = AbstractRequest.parse_dsd(parameters['dsd'])
+			for key in dsd: self.set_dsd(key, dsd[key])
+		#
+
+		if ("ohandler" in parameters and len(parameters['ohandler']) > 0): self.set_output_format(AbstractRequest.filter_parameter_word(self.parameters['ohandler']))
 	#
 
 	def set_module(self, module):

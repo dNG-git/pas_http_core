@@ -30,8 +30,9 @@ from zlib import decompressobj, MAX_WBITS
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.byte_buffer import ByteBuffer
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.traced_exception import TracedException
 from dNG.pas.runtime.thread import Thread
+from dNG.pas.runtime.io_exception import IOException
+from dNG.pas.runtime.value_exception import ValueException
 
 class RequestBody(dict, Thread):
 #
@@ -85,6 +86,10 @@ True if reading should happen in a separate thread.
 		self.received_event = Event()
 		"""
 Event called after all data has been received.
+		"""
+		self.received_size_max = int(Settings.get("pas_http_site_request_body_size_max", 10485760))
+		"""
+Timeout for each network read.
 		"""
 		self.socket_data_timeout = int(Settings.get("pas_server_socket_data_timeout", 0))
 		"""
@@ -151,7 +156,7 @@ Reads "chunked" encoded content if set to true.
 		#
 			if (method == "deflate"): self.decompressors.append(decompressobj(MAX_WBITS))
 			elif (method == "gzip"): self.decompressors.append(decompressobj(16 + MAX_WBITS))
-			else: raise ValueError("Unsupported compression definition '{0}' given".format(method))
+			else: raise ValueException("Unsupported compression definition '{0}' given".format(method))
 		#
 	#
 
@@ -171,7 +176,7 @@ Returns the request body.
 		if (timeout == None): timeout = self.socket_data_timeout
 		if (self.input_ptr != None and (not self.receive_in_thread)): self.run(timeout)
 
-		if (not self.received_event.wait(timeout)): raise TracedException("Input pointer could not be read before timeout occurred")
+		if (not self.received_event.wait(timeout)): raise IOException("Input pointer could not be read before timeout occurred")
 		if (isinstance(self.input_data, Exception)): raise self.input_data
 
 		return self.input_data
@@ -193,6 +198,8 @@ Sets a given pointer for the streamed post instance.
 			input_data = ByteBuffer()
 			is_last_chunk = False
 			if (self.input_size < 0): self.input_size = 5
+			size_read = 0
+			size_read_max = self.received_size_max
 			size_unread = self.input_size
 			timeout_time = time() + (self.timeout if (timeout == None) else timeout)
 
@@ -202,7 +209,7 @@ Sets a given pointer for the streamed post instance.
 				part_data = self.input_ptr.read(part_size)
 				part_size = len(part_data)
 
-				if (part_size < 1): raise TracedException("Input pointer could not be read before socket timeout occurred")
+				if (part_size < 1): raise IOException("Input pointer could not be read before socket timeout occurred")
 
 				if (self.input_chunk_encoded):
 				#
@@ -270,7 +277,10 @@ Get size for next chunk
 
 				if (part_size > 0):
 				#
+					size_read += part_size
 					size_unread -= part_size
+
+					if (size_read_max > 0 and size_read >= size_read_max): raise ValueException("Input size exceeds allowed limit")
 					input_data.write(self.decompress(part_data))
 				#
 			#
@@ -296,7 +306,7 @@ used to read the body it is started here as well.
 :since: v0.1.00
 		"""
 
-		if (self.input_size < 0 and (not self.input_chunk_encoded)): self.input_data = TracedException("Input size and expected first chunk size are unknown")
+		if (self.input_size < 0 and (not self.input_chunk_encoded)): self.input_data = IOException("Input size and expected first chunk size are unknown")
 		else:
 		#
 			if (hasattr(input_ptr, "settimeout")): input_ptr.settimeout(self.socket_data_timeout)

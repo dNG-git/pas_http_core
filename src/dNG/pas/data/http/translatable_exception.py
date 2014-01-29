@@ -36,9 +36,9 @@ http://www.direct-netware.de/redirect.py?licenses;gpl
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.translatable_exception import TranslatableException as AbstractTranslatableException
+from dNG.pas.data.translatable_exception import TranslatableException as _TranslatableException
 
-class TranslatableException(AbstractTranslatableException):
+class TranslatableException(_TranslatableException):
 #
 	"""
 This exception takes a translatable error message for HTTP 400 error codes.
@@ -70,7 +70,7 @@ Constructor __init__(Exception)
 HTTP error code
 		"""
 
-		AbstractTranslatableException.__init__(self, l10n_id, value, _exception)
+		_TranslatableException.__init__(self, l10n_id, value, _exception)
 	#
 
 	def get_http_code(self):

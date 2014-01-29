@@ -31,7 +31,6 @@ import re
 from dNG.data.file import File
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.traced_exception import TracedException
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.text.tag_parser.abstract import Abstract as AbstractTagParser
 from dNG.pas.data.text.tag_parser.block_mixin import BlockMixin
@@ -40,6 +39,7 @@ from dNG.pas.data.text.tag_parser.if_condition_mixin import IfConditionMixin
 from dNG.pas.data.text.tag_parser.mapped_element_mixin import MappedElementMixin
 from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
 from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.runtime.io_exception import IOException
 
 class Renderer(AbstractTagParser, BlockMixin, EachMixin, IfConditionMixin, MappedElementMixin, RewriteMixin):
 #
@@ -205,8 +205,6 @@ Change data according to the matched tag.
 				elif (source == "content"): _return += self.render_block(data[data_position:tag_end_position], "content", self._mapped_element_update("content", self.content), key)
 				elif (source == "settings"): _return += self.render_block(data[data_position:tag_end_position], "settings", self._mapped_element_update("settings", Settings.get_instance()), key)
 			#
-
-			_return += data_closed
 		#
 		elif (tag_definition['tag'] == "each"):
 		#
@@ -222,8 +220,6 @@ Change data according to the matched tag.
 				if (source == "content"): _return += self.render_each(data[data_position:tag_end_position], "content", self._mapped_element_update("content", self.content), key, mapping_key)
 				elif (source == "settings"): _return += self.render_each(data[data_position:tag_end_position], "settings", self._mapped_element_update("settings", Settings.get_instance()), key, mapping_key)
 			#
-
-			_return += data_closed
 		#
 		elif (tag_definition['tag'] == "if"):
 		#
@@ -240,8 +236,6 @@ Change data according to the matched tag.
 				if (source == "content"): _return += self.render_if_condition(self._mapped_element_update("content", self.content), key, operator, value, data[data_position:tag_end_position])
 				elif (source == "settings"): _return += self.render_if_condition(self._mapped_element_update("settings", Settings.get_instance()), key, operator, value, data[data_position:tag_end_position])
 			#
-
-			_return += data_closed
 		#
 		elif (tag_definition['tag'] == "rewrite"):
 		#
@@ -251,10 +245,9 @@ Change data according to the matched tag.
 			if (source == "content"): _return += self.render_rewrite(self._mapped_element_update("content", self.content), key)
 			elif (source == "l10n"): _return += self.render_rewrite(self._mapped_element_update("l10n", L10n.get_instance()), key)
 			elif (source == "settings"): _return += self.render_rewrite(self._mapped_element_update("settings", Settings.get_instance()), key)
-
-			_return += data_closed
 		#
-		else: _return += data_closed
+
+		_return += data_closed
 
 		return _return
 	#
@@ -283,7 +276,7 @@ Check if a possible tag match is a false positive.
 
 			if (data_match == "block"):
 			#
-				re_result = re_result = re.match("^\\[block(:\\w+:[\\w\\.]+){0,1}\\]", data)
+				re_result = re.match("^\\[block(:\\w+:[\\w\\.]+){0,1}\\]", data)
 				if (re_result != None): _return = { "tag": "block", "tag_end": "[/block]", "type": "top_down" }
 			#
 			elif (data_match == "each"):
@@ -336,12 +329,12 @@ Renders content ready for output from the given OSet template.
 		if (theme_data == None):
 		#
 			file_obj = File()
-			if (not file_obj.open(file_pathname, True, "r")): raise TracedException("Failed to open theme file for '{0}'".format(self.theme))
+			if (not file_obj.open(file_pathname, True, "r")): raise IOException("Failed to open theme file for '{0}'".format(self.theme))
 
 			theme_data = file_obj.read()
 			file_obj.close()
 
-			if (theme_data == False): raise TracedException("Failed to read theme file for '{0}'".format(self.theme))
+			if (theme_data == False): raise IOException("Failed to read theme file for '{0}'".format(self.theme))
 			if (self.cache_instance != None): self.cache_instance.set_file(file_pathname, theme_data)
 		#
 
@@ -368,6 +361,11 @@ Read corresponding theme configuration
 		#
 			if ("css_files" in theme_settings[theme_subtype]): css_files += theme_settings[theme_subtype]['css_files']
 			if ("js_files" in theme_settings[theme_subtype]): js_files += theme_settings[theme_subtype]['js_files']
+
+			if ("l10n_inits" in theme_settings[theme_subtype]):
+			#
+				for file_basename in theme_settings[theme_subtype]['l10n_inits']: L10n.init(file_basename)
+			#
 		#
 
 		css_files = self._get_unique_filelist(css_files)

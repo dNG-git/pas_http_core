@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.http.url import Url
+from dNG.pas.data.xhtml.link import Link
 from dNG.pas.module.blocks.abstract_block import AbstractBlock
 from dNG.pas.module.blocks.output.options_block_mixin import OptionsBlockMixin
 
@@ -50,7 +50,7 @@ Action for "render_primary"
 		"""
 
 		rendered_links = self._get_rendered_links()
-		if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_p ui-corner-all'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
+		if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_p'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
 	#
 
 	def execute_render_secondary(self):
@@ -62,7 +62,7 @@ Action for "render_secondary"
 		"""
 
 		rendered_links = self._get_rendered_links(False)
-		if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_s ui-corner-all'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
+		if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_s'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
 	#
 
 	def _get_rendered_links(self, include_image = True):
@@ -76,7 +76,7 @@ Returns a list of rendered links for the service menu.
 
 		_return = [ ]
 
-		links = Url.store_get("servicemenu")
+		links = Link.store_get("servicemenu")
 		for link in links: _return.append(self.options_block_render_link(link, include_image))
 
 		return _return

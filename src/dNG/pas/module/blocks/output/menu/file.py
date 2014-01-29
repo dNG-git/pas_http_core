@@ -28,7 +28,7 @@ import os
 
 from dNG.pas.data.cached_json_file import CachedJsonFile
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.http.url import Url
+from dNG.pas.data.xhtml.link import Link
 from dNG.pas.module.blocks.abstract_block import AbstractBlock
 from dNG.pas.module.blocks.output.filter_links_mixin import FilterLinksMixin
 from dNG.pas.module.blocks.output.options_block_mixin import OptionsBlockMixin
@@ -58,7 +58,7 @@ Action for "render"
 		if (self.context != None and "file" in self.context): rendered_links = self._get_rendered_links(self.context['file'])
 		else: rendered_links = self._get_rendered_links()
 
-		if (len(rendered_links) > 0): self.set_action_result("<nav class='pagemainmenu ui-corner-all'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
+		if (len(rendered_links) > 0): self.set_action_result("<nav class='pagemainmenu'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
 	#
 
 	def _get_rendered_links(self, file_pathname = None, include_image = True):
@@ -72,7 +72,7 @@ Returns a list of rendered links for the service menu.
 
 		_return = [ ]
 
-		if (file_pathname == None): links = Url.store_get("mainmenu")
+		if (file_pathname == None): links = Link.store_get("mainmenu")
 		else:
 		#
 			links = None

@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.Url
+dNG.pas.data.text.Link
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,28 +23,26 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+from collections import Iterable
 from math import floor
 
-try: from urllib.parse import quote, unquote, urlsplit
-except ImportError:
-#
-	from urllib import quote, unquote
-	from urlparse import urlsplit
-#
+try: from urllib.parse import urlsplit
+except ImportError: from urlparse import urlsplit
 
 from dNG.pas.controller.abstract_request import AbstractRequest
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.traced_exception import TracedException
 from dNG.pas.data.text.input_filter import InputFilter
+from dNG.pas.runtime.value_exception import ValueException
+from .uri import Uri
 
 try: from dNG.pas.data.session import Session
 except ImportError: Session = None
 
-class Url(object):
+class Link(Uri):
 #
 	"""
-"Url" provides common methods to build them from parameters.
+"Link" provides common methods to build them from parameters.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -71,7 +69,7 @@ Relative URLs like "index.py?..."
 	def __init__(self, scheme = None, host = None, port = None, path = None):
 	#
 		"""
-Constructor __init__(Url)
+Constructor __init__(Link)
 
 :since: v0.1.01
 		"""
@@ -94,7 +92,7 @@ Override for the URL scheme
 		"""
 	#
 
-	def build_url(self, _type, parameters, _escape = None):
+	def build_url(self, _type, parameters):
 	#
 		"""
 Builds an URL string. You may use internal links "index.py?...", external
@@ -105,13 +103,13 @@ as a source for parameters.
 
 :param _type: Link type (see constants)
 :param parameters: Parameters dict
-:param _escape: Data escape method
+:param escape: True to URL escape input
 
 :return: (str) Formatted URL string
 :since:  v0.1.00
 		"""
 
-		if (type(_type) != int): _type = self._get_type(_type)
+		if (type(_type) != int): _type = self.__class__.get_type(_type)
 		_return = self.get_url_base(_type, parameters)
 
 		parameters = self._parameters_filter(parameters)
@@ -122,10 +120,10 @@ as a source for parameters.
 			if ("?" not in _return): _return += "?"
 			elif (_return[-1:] != ";"): _return += ";"
 
-			_return += self._build_url_formatted("{0}={1}", ";", parameters, _escape = None)
+			_return += self._build_url_formatted("{0}={1}", ";", parameters)
 		#
 
-		if (_type & Url.TYPE_OPTICAL == Url.TYPE_OPTICAL):
+		if (_type & Link.TYPE_OPTICAL == Link.TYPE_OPTICAL):
 		#
 			"""
 A filter is required for really long URLs. First we will have a look at the
@@ -243,9 +241,9 @@ Builds a template-defined string containing the given URL parameters.
 
 		_return = ""
 
-		if (_escape == None): _escape = Url.escape
+		if (_escape == None): _escape = Link.query_param_encode
 
-		for key in parameters:
+		for key in self.__class__._build_url_sorted_parameters(parameters.keys()):
 		#
 			escaped_key = _escape(key)
 			value_type = type(parameters[key])
@@ -309,7 +307,7 @@ Builds a URL DSD string.
 
 		if (type(parameters) == dict):
 		#
-			for key in parameters:
+			for key in sorted(parameters.keys()):
 			#
 				if (len(parameters[key]) > 0):
 				#
@@ -321,25 +319,6 @@ Builds a URL DSD string.
 				#
 			#
 		#
-
-		return _return
-	#
-
-	def _get_type(self, _type):
-	#
-		"""
-Parses the given type parameter given as a string value.
-
-:param _type: String type
-
-:return: (int) Internal type
-:since:  v0.1.01
-		"""
-
-		if (_type == "elink"): _return = Url.TYPE_FULL
-		elif (_type == "ilink"): _return = Url.TYPE_RELATIVE
-		elif (_type == "optical"): _return = Url.TYPE_OPTICAL
-		else: _return = 0
 
 		return _return
 	#
@@ -369,7 +348,7 @@ Returns the base URL for the given type and parameters.
 		#
 			request = AbstractRequest.get_instance()
 
-			if (_type == Url.TYPE_RELATIVE):
+			if (_type == Link.TYPE_RELATIVE):
 			#
 				if (self.path == None):
 				#
@@ -385,12 +364,12 @@ Returns the base URL for the given type and parameters.
 				port = request.get_server_port()
 				script_pathname = request.get_script_pathname()
 
-				if (scheme == None or (self.path == None and script_pathname == None)): raise TracedException("Can't construct a full URL from the received request if it is not provided")
+				if (scheme == None or (self.path == None and script_pathname == None)): raise ValueException("Can't construct a full URL from the received request if it is not provided")
 
 				_return = "{0}://".format(Binary.str(scheme))
 				if (host != None): _return += Binary.str(host)
 				if (port != None): _return += ":{0:d}".format(port)
-				_return += ("/" + Binary.str(script_pathname) if (self.path == None) else Binary.str(self.path))
+				_return += (Binary.str(script_pathname) if (self.path == None) else Binary.str(self.path))
 			#
 		#
 
@@ -442,7 +421,11 @@ This method filters all parameters of the type "__<KEYWORD>__".
 
 		if ("__query__" in _return):
 		#
-			if (len(_return) == 1 and len(_return['__query__']) > 0): _return = AbstractRequest.get_instance().iline_parse(InputFilter.filter_control_chars(_return['__query__']))
+			if (len(_return) == 1 and len(_return['__query__']) > 0):
+			#
+				_return = AbstractRequest.parse_iline(InputFilter.filter_control_chars(_return['__query__']))
+				if ("dsd" in _return): _return['dsd'] = AbstractRequest.parse_dsd(_return['dsd'])
+			#
 			else: del(_return['__query__'])
 		#
 
@@ -502,33 +485,75 @@ This method removes all parameters marked as "__remove__" or special ones.
 	#
 
 	@staticmethod
-	def escape(data):
+	def _build_url_sorted_parameters(parameter_keys):
 	#
 		"""
-Escape the given data for embedding into (X)HTML.
+Builds a sorted list for the parameter key list given.
 
-:param parameters: Parameters dict
+:param parameter_keys: Parameter key list
 
-:return: (dict) Filtered parameters dict
+:return: (list) Sorted parameter key list
 :since:  v0.1.00
 		"""
 
-		return quote(data, "")
+		_return = [ ]
+
+		if (isinstance(parameter_keys, Iterable)):
+		#
+			_return = sorted(parameter_keys)
+
+			if ("a" in _return):
+			#
+				_return.remove("a")
+				_return.insert(0, "a")
+			#
+
+			if ("s" in _return):
+			#
+				_return.remove("s")
+				_return.insert(0, "s")
+			#
+
+			if ("m" in _return):
+			#
+				_return.remove("m")
+				_return.insert(0, "m")
+			#
+
+			if ("lang" in _return):
+			#
+				_return.remove("lang")
+				_return.append("lang")
+			#
+
+			if ("uuid" in _return):
+			#
+				_return.remove("uuid")
+				_return.append("uuid")
+			#
+		#
+
+		return _return
 	#
 
 	@staticmethod
-	def unescape(data):
+	def get_type(_type):
 	#
 		"""
-Unescape the given data.
+Parses the given type parameter given as a string value.
 
-:param parameters: Parameters dict
+:param _type: String type
 
-:return: (dict) Filtered parameters dict
+:return: (int) Internal type
 :since:  v0.1.01
 		"""
 
-		return unquote(data)
+		if (_type == "elink"): _return = Link.TYPE_FULL
+		elif (_type == "ilink"): _return = Link.TYPE_RELATIVE
+		elif (_type == "optical"): _return = Link.TYPE_OPTICAL
+		else: _return = 0
+
+		return _return
 	#
 #
 

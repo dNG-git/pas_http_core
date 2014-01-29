@@ -30,6 +30,7 @@ from weakref import ref
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.traced_exception import TracedException
 from dNG.pas.data.text.l10n import L10n
+from dNG.pas.runtime.io_exception import IOException
 
 class AbstractResponse(object):
 #
@@ -261,6 +262,23 @@ Initialize runtime parameters for response.
 		self.initialized = True
 	#
 
+	def reset(self):
+	#
+		"""
+Resets all cached values.
+
+:since: v0.1.00
+		"""
+
+		self.content = None
+		self.data = None
+		self.errors = None
+		self.expires = 0
+		self.initialized = False
+		self.last_modified = 0
+		self.title = None
+	#
+
 	def send(self):
 	#
 		"""
@@ -323,8 +341,8 @@ Sets the content for the response.
 :since: v0.1.00
 		"""
 
-		if (self.data != None): raise TracedException("Can't combine content and raw data in one response.")
-		if (self.stream_response.is_streamer_set()): raise TracedException("Can't combine a streaming object with content.")
+		if (self.data != None): raise IOException("Can't combine content and raw data in one response.")
+		if (self.stream_response.is_streamer_set()): raise IOException("Can't combine a streaming object with content.")
 
 		self.content = content
 	#
@@ -367,8 +385,8 @@ given.
 :since: v0.1.00
 		"""
 
-		if (self.content != None): raise TracedException("Can't combine raw data and content in one response.")
-		if (self.stream_response.is_streamer_set()): raise TracedException("Can't combine a streaming object with raw data.")
+		if (self.content != None): raise IOException("Can't combine raw data and content in one response.")
+		if (self.stream_response.is_streamer_set()): raise IOException("Can't combine a streaming object with raw data.")
 
 		self.data = data
 	#
@@ -477,9 +495,9 @@ Returns false if responses can not be streamed.
 	def get_instance():
 	#
 		"""
-Get the abstract_response singleton.
+Get the AbstractResponse singleton.
 
-:return: (AbstractResponse) Object on success
+:return: (object) Object on success
 :since:  v0.1.00
 		"""
 
@@ -490,15 +508,13 @@ Get the abstract_response singleton.
 	def get_instance_store():
 	#
 		"""
-Get the abstract_response singleton.
+Get the response store.
 
-:param count: Count "get()" response
-
-:return: (AbstractResponse) Object on success
+:return: (dict) Response store
 :since:  v0.1.00
 		"""
 
-		instance = (AbstractResponse.local.weakref_instance() if (hasattr(AbstractResponse.local, "weakref_instance")) else None)
+		instance = AbstractResponse.get_instance()
 		return (None if (instance == None) else instance.get_store())
 	#
 #

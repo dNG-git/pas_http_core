@@ -27,9 +27,10 @@ from os import path
 import re
 
 from dNG.pas.controller.abstract_inner_request import AbstractInnerRequest
-from dNG.pas.data.traced_exception import TracedException
+from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.request_body_urlencoded import RequestBodyUrlencoded
 from dNG.pas.data.http.virtual_config import VirtualConfig
+from dNG.pas.runtime.io_exception import IOException
 from .abstract_http_request import AbstractHttpRequest
 from .http_wsgi1_stream_response import HttpWsgi1StreamResponse
 
@@ -58,7 +59,7 @@ Constructor __init__(HttpWsgi1Request)
 :since: v0.1.00
 		"""
 
-		if ("wsgi.version" not in wsgi_env or (wsgi_env['wsgi.version'] != ( 1, 0 ) and wsgi_env['wsgi.version'] != ( 1, 1 ))): raise TracedException("WSGI protocol unsupported")
+		if ("wsgi.version" not in wsgi_env or (wsgi_env['wsgi.version'] != ( 1, 0 ) and wsgi_env['wsgi.version'] != ( 1, 1 ))): raise IOException("WSGI protocol unsupported")
 
 		AbstractHttpRequest.__init__(self)
 
@@ -75,6 +76,30 @@ Request query string
 Request path after the script
 		"""
 
+		self.server_host = Settings.get("pas_http_server_forced_hostname")
+		self.server_port = Settings.get("pas_http_server_forced_port")
+
+		# Handle HTTP_FORWARDED_HOST and HTTP_X_HOST
+		if ("HTTP_HOST" in wsgi_env):
+		#
+			host_parts = wsgi_env['HTTP_HOST'].rsplit(":", 2)
+
+			if (len(host_parts) < 2 or host_parts[1][-1:] == "]"): self.server_host = wsgi_env['HTTP_HOST']
+			else:
+			#
+				self.server_host = host_parts[0]
+				if (self.server_port == None): self.server_port = int(host_parts[1])
+			#
+
+			del(wsgi_env['HTTP_HOST'])
+		#
+
+		if (self.server_host == None):
+		#
+			self.server_host = Settings.get("pas_http_server_preferred_hostname")
+			if (self.server_port == None): self.server_port = Settings.get("pas_http_server_preferred_port")
+		#
+
 		for key in wsgi_env:
 		#
 			if (wsgi_env[key] != ""):
@@ -88,20 +113,8 @@ Request path after the script
 				elif (key == "SCRIPT_NAME"): self.script_pathname = wsgi_env[key]
 				elif (key == "QUERY_STRING"): self.query_string = wsgi_env[key]
 				elif (key == "PATH_INFO"): self.virtual_pathname = wsgi_env[key]
-				elif (key == "SERVER_NAME"): self.server_host = wsgi_env[key]
-				elif (key == "SERVER_PORT"): self.server_port = int(wsgi_env[key])
-			#
-		#
-
-		if ("HTTP_HOST" in wsgi_env):
-		#
-			host_parts = wsgi_env['HTTP_HOST'].rsplit(":", 2)
-
-			if (len(host_parts) < 2 or host_parts[1][-1:] == "]"): self.server_host = wsgi_env['HTTP_HOST']
-			else:
-			#
-				self.server_host = host_parts[0]
-				self.server_port = int(host_parts[1])
+				elif (self.server_host == None and key == "SERVER_NAME"): self.server_host = wsgi_env[key]
+				elif (self.server_port == None and key == "SERVER_PORT"): self.server_port = int(wsgi_env[key])
 			#
 		#
 
@@ -148,19 +161,16 @@ python.org: Return an iterator object.
 		return iter(http_wsgi_stream_response)
 	#
 
-	def iline_parse(self, iline = None):
+	def _get_request_parameters(self):
 	#
 		"""
-Parse the input variables given as an URI query string.
+Returns the unparsed request parameters.
 
-:param iline: Input query string with ";" delimiter.
-
-:return: (dict) Parsed query string
-:since:  v0.1.00
+:return: (dict) Request parameters
+:since:  v0.1.01
 		"""
 
-		if (iline == None): iline = self.query_string
-		_return = AbstractHttpRequest.iline_parse(self, iline)
+		_return = AbstractHttpRequest.parse_iline(self.query_string)
 
 		request_body = RequestBodyUrlencoded()
 		request_body = self.configure_request_body(request_body, "application/x-www-form-urlencoded")

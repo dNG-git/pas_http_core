@@ -30,8 +30,9 @@ from dNG.data.rfc.basics import Basics as RfcBasics
 from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.gzip import Gzip
-from dNG.pas.data.traced_exception import TracedException
 from dNG.pas.data.http.chunked_mixin import ChunkedMixin
+from dNG.pas.runtime.io_exception import IOException
+from dNG.pas.runtime.not_implemented_exception import NotImplementedException
 from .abstract_stream_response import AbstractStreamResponse
 
 class AbstractHttpStreamResponse(AbstractStreamResponse, ChunkedMixin):
@@ -278,7 +279,7 @@ Sends the prepared response headers.
 :since: v0.1.00
 		"""
 
-		raise TracedException("Not implemented")
+		raise NotImplementedException()
 	#
 
 	def set_compression(self, compress):
@@ -378,7 +379,7 @@ Sets a header.
 :since: v0.1.00
 		"""
 
-		if (self.headers_sent): raise TracedException("Headers are already sent")
+		if (self.headers_sent): raise IOException("Headers are already sent")
 		name = name.upper()
 
 		if (name_as_key and name == "HTTP/1.1"):

@@ -26,6 +26,7 @@ NOTE_END //n"""
 from binascii import hexlify
 from os import urandom
 
+from dNG.pas.data.binary import Binary
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.module.named_loader import NamedLoader
@@ -78,7 +79,7 @@ valid XHTML for output.
 
 		_return = ""
 
-		if (form_id == None): form_id = "pas_form_{0}".format(hexlify(urandom(10)))
+		if (form_id == None): form_id = "pas_form_{0}".format(Binary.str(hexlify(urandom(10))))
 		sections_count = len(self.fields)
 
 		if (sections_count > 1):
@@ -134,7 +135,7 @@ Render the form field using the given OSet template.
 			parser.set_oset(self.oset)
 			_return = parser.render(template_name, content)
 		#
-		except Exception: _return = "<div class='pasformerror'>{0}</div>".format(L10n.get("errors_pas_http_core_form_internal_error"))
+		except Exception: _return = "<div class='pageform_error'>{0}</div>".format(L10n.get("errors_pas_http_core_form_internal_error"))
 
 		return _return
 	#
@@ -144,7 +145,7 @@ Render the form field using the given OSet template.
 		"""
 Format and return XHTML for a password input field.
 
-:param  field_data: Dict containing information about the form field
+:param field_data: Dict containing information about the form field
 
 :return: (str) Valid XHTML form field definition
 :since:  v0.1.00
@@ -212,7 +213,7 @@ jQuery (function () { {$direct_settings['theme_form_js_init']} ({ id:'$f_js_id' 
 		"""
 Format and return XHTML to create radio options.
 
-:param  field_data: Dict containing information about the form field
+:param field_data: Dict containing information about the form field
 
 :return: (str) Valid XHTML form field definition
 :since:  v0.1.00
@@ -338,7 +339,7 @@ Render the form submit button.
 		"""
 Format and return XHTML for a text input field.
 
-:param  field_data: Dict containing information about the form field
+:param field_data: Dict containing information about the form field
 
 :return: (str) Valid XHTML form field definition
 :since:  v0.1.00
@@ -406,6 +407,62 @@ $f_return .= ($f_rcp_active ? ("jQuery (function () {
 });") : "jQuery (function () { {$direct_settings['theme_form_js_init']} ({ id:'$f_js_id',type:'{$f_data['filter']}' }); });");
 
 		$f_return .= "\n]]></script>$f_js_helper</td>\n</tr>";
+		"""
+
+		return _return
+	#
+
+	def render_textarea(self, field_data, rcp_active = False):
+	#
+		"""
+Format and return XHTML for a textarea input field.
+
+:param field_data: Dict containing information about the form field
+
+:return: (str) Valid XHTML form field definition
+:since:  v0.1.00
+		"""
+
+		context = {
+			"id": XHtmlFormatting.escape(field_data['id']),
+			"name": XHtmlFormatting.escape(field_data['name']),
+			"title": XHtmlFormatting.escape(field_data['title']),
+			"value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content'])),
+			"required": (True if (field_data['required']) else False),
+			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
+		}
+
+		if (field_data['size'] == "s"): context['rows'] = 5
+		elif (field_data['size'] == "m"): context['rows'] = 10
+		else: context['rows'] = 20
+
+		_return = self.render_oset_file("core/form/textarea", context)
+
+		"""
+		$f_js_helper = ($f_data['helper_text'] ? "\n".($direct_globals['output']->jsHelper ($f_data['helper_text'],$f_data['helper_url'],$f_js_id)) : "");
+
+		if ($f_data['size'] == "s") { $f_rows = 5; }
+		elseif ($f_data['size'] == "m") { $f_rows = 10; }
+		else { $f_rows = 20; }
+
+		$f_return = "<tr>\n<td class='pageextrabg pageextracontent' style='width:25%;padding:$direct_settings[theme_form_td_padding];text-align:right;vertical-align:top'><strong>";
+
+		if ($f_data['required'])
+		{
+			$f_required = " required='required'";
+			$f_return .= $direct_settings['swg_required_marker']." ";
+		}
+		else { $f_required = ""; }
+
+		$f_return .= ($f_data['title'].":</strong></td>\n<td class='pagebg pagecontent' style='width:75%;padding:$direct_settings[theme_form_td_padding];text-align:center;vertical-align:middle'><textarea name='$f_data[name]' id='$f_js_id'$f_required cols='26' rows='$f_rows' class='pagecontenttextarea' style='width:80%'>$f_data[content]</textarea><script type='text/javascript'><![CDATA[\n");
+
+$f_return .= ($f_rcp_active ? ("jQuery (function () {
+	djs_load_functions({ file:'swg_formbuilder_rcp.php.js' }).done (function () { djs_formbuilder_rcp_init ({ id:'$f_js_id' }); });
+});") : "jQuery (function () { {$direct_settings['theme_form_js_init']} ({ id:'$f_js_id',type:'resizeable' }); });");
+
+		$f_return .= "\n]]></script>$f_js_helper</td>\n</tr>";
+
+		return $f_return;
 		"""
 
 		return _return
@@ -909,47 +966,6 @@ jQuery (function () { {$direct_settings['theme_form_js_init']} ({ id:'$f_js_id'$
 		if (USE_debug_reporting) { direct_debug (5,"sWG/#echo(__FILEPATH__)# -outputFormbuilder->entryAddSubTitle (+f_data)- (#echo(__LINE__)#)"); }
 
 		return "<tr>\n<td colspan='2' class='pagetitlecell' style='padding:$direct_settings[theme_td_padding];text-align:center'>$f_data[title]</td>\n</tr>";
-	}
-
-/**
-	* Format and return XHTML for a textarea input field.
-	*
-	* @param  array $f_data Array containing information about the form field
-	* @return string Valid XHTML form field definition
-	* @since  v0.1.00
-*/
-	/*#ifndef(PHP4) */public /* #*/function entryAddTextarea ($f_data,$f_rcp_active = false)
-	{
-		global $direct_cachedata,$direct_globals,$direct_settings;
-		if (USE_debug_reporting) { direct_debug (5,"sWG/#echo(__FILEPATH__)# -outputFormbuilder->entryAddTextarea (+f_data)- (#echo(__LINE__)#)"); }
-
-		$f_js_id = "swg_formbuilder_".$direct_cachedata['formbuilder_element_counter'];
-		$direct_cachedata['formbuilder_element_counter']++;
-
-		$f_js_helper = ($f_data['helper_text'] ? "\n".($direct_globals['output']->jsHelper ($f_data['helper_text'],$f_data['helper_url'],$f_js_id)) : "");
-
-		if ($f_data['size'] == "s") { $f_rows = 5; }
-		elseif ($f_data['size'] == "m") { $f_rows = 10; }
-		else { $f_rows = 20; }
-
-		$f_return = "<tr>\n<td class='pageextrabg pageextracontent' style='width:25%;padding:$direct_settings[theme_form_td_padding];text-align:right;vertical-align:top'><strong>";
-
-		if ($f_data['required'])
-		{
-			$f_required = " required='required'";
-			$f_return .= $direct_settings['swg_required_marker']." ";
-		}
-		else { $f_required = ""; }
-
-		$f_return .= ($f_data['title'].":</strong></td>\n<td class='pagebg pagecontent' style='width:75%;padding:$direct_settings[theme_form_td_padding];text-align:center;vertical-align:middle'><textarea name='$f_data[name]' id='$f_js_id'$f_required cols='26' rows='$f_rows' class='pagecontenttextarea' style='width:80%'>$f_data[content]</textarea><script type='text/javascript'><![CDATA[\n");
-
-$f_return .= ($f_rcp_active ? ("jQuery (function () {
-	djs_load_functions({ file:'swg_formbuilder_rcp.php.js' }).done (function () { djs_formbuilder_rcp_init ({ id:'$f_js_id' }); });
-});") : "jQuery (function () { {$direct_settings['theme_form_js_init']} ({ id:'$f_js_id',type:'resizeable' }); });");
-
-		$f_return .= "\n]]></script>$f_js_helper</td>\n</tr>";
-
-		return $f_return;
 	}
 
 /**

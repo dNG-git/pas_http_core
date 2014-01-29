@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.Url
+dNG.pas.data.xhtml.Link
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,18 +23,15 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-try: from urllib.parse import quote, unquote
-except ImportError: from urllib import quote, unquote
-
 from dNG.pas.controller.abstract_response import AbstractResponse
-from dNG.pas.data.text.input_filter import InputFilter
-from dNG.pas.data.text.url import Url as AbstractUrl
+from dNG.pas.controller.http_xhtml_response import HttpXhtmlResponse
+from dNG.pas.data.text.link import Link as _Link
 from dNG.pas.data.xhtml.formatting import Formatting as XhtmlFormatting
 
-class Url(AbstractUrl):
+class Link(_Link):
 #
 	"""
-"Url" provides basic URL decoding / encoding methods.
+"Link" provides (X)HTML centric methods to build them from parameters.
 
 TODO: Code incomplete
 
@@ -55,6 +52,10 @@ Hidden input fields
 	"""
 Form action URL
 	"""
+	TYPE_JS_REQUIRED = 32
+	"""
+JavaScript is required
+	"""
 
 	def build_url(self, _type, parameters, escape = True):
 	#
@@ -73,7 +74,8 @@ as a source for parameters.
 :since:  v0.1.00
 		"""
 
-		if (type(_type) != int): _type = self._get_type(_type)
+		if (type(_type) != int): _type = self.__class__.get_type(_type)
+		xhtml_escape = escape
 
 		#if (_type == "asis"): _return = self.build_url(data)
 		#elif ($f__type == "asisuuid"):
@@ -82,7 +84,7 @@ as a source for parameters.
 		#	_return = str_replace ("[uuid]",((($f_uuid)&&(!$direct_globals['kernel']->vUuidIsCookied ())&&($direct_globals['kernel']->vUuidCheckUsage ())) ? $f_uuid : ""),$f_data);
 		#
 
-		if (_type & Url.TYPE_FORM_FIELDS == Url.TYPE_FORM_FIELDS):
+		if (_type & Link.TYPE_FORM_FIELDS == Link.TYPE_FORM_FIELDS):
 		#
 			"""
 Get all form data in a string like "<input type='hidden' name='lang'
@@ -101,14 +103,67 @@ value='de' />". Automatically add language, theme and uuid fields.
 			#	if (($f_uuid)&&(!$direct_globals['kernel']->vUuidIsCookied ())&&($direct_globals['kernel']->vUuidCheckUsage ())) { $f_return .= "<input type='hidden' name='uuid' value='$f_uuid' />"; }
 			#}
 
-			_return = self._build_url_formatted("<input type='hidden' name=\"{0}\" value=\"{1}\" />", "", parameters)
+			_return = self._build_url_formatted("<input type='hidden' name=\"{0}\" value=\"{1}\" />", "", parameters, Link.escape)
+			xhtml_escape = False
 		#
-		elif (_type & Url.TYPE_FORM_URL == Url.TYPE_FORM_URL):
+		elif (_type & Link.TYPE_FORM_URL == Link.TYPE_FORM_URL):
 		#
-			if (_type == Url.TYPE_FORM_URL): _type = Url.TYPE_RELATIVE
-			_return = AbstractUrl.build_url(self, _type, { }, (Url.escape if (escape) else AbstractUrl.escape))
+			if (_type == Link.TYPE_FORM_URL): _type = Link.TYPE_RELATIVE
+			_return = _Link.build_url(self, _type, { })
 		#
-		else: _return = AbstractUrl.build_url(self, _type, parameters, (Url.escape if (escape) else AbstractUrl.escape))
+		else: _return = _Link.build_url(self, _type, parameters)
+
+		if (xhtml_escape): _return = Link.escape(_return)
+
+		return _return
+	#
+
+	def _parameters_append_defaults(self, parameters):
+	#
+		"""
+This method appends default parameters if not already set.
+
+:param parameters: Parameters dict
+
+:return: (dict) Appended parameters dict
+:since:  v0.1.00
+		"""
+
+		_return = _Link._parameters_append_defaults(self, parameters)
+
+		if ("theme" not in _return):
+		#
+			response = HttpXhtmlResponse.get_instance()
+
+			if (isinstance(response, HttpXhtmlResponse)):
+			#
+				theme = response.get_theme()
+				if (theme != None): _return['theme'] = theme
+			#
+		#
+
+		return _return
+	#
+
+	@staticmethod
+	def _build_url_sorted_parameters(parameter_keys):
+	#
+		"""
+Builds a sorted list for the parameter key list given.
+
+:param parameter_keys: Parameter key list
+
+:return: (list) Sorted parameter key list
+:since:  v0.1.00
+		"""
+
+		_return = _Link._build_url_sorted_parameters(parameter_keys)
+
+		if ("theme" in _return):
+		#
+			_return.remove("theme")
+			_return.append("theme")
+		#
 
 		return _return
 	#
@@ -125,46 +180,48 @@ Escape the given data for embedding into (X)HTML.
 :since:  v0.1.01
 		"""
 
-		return AbstractUrl.escape(XhtmlFormatting.escape(data))
+		return XhtmlFormatting.escape(data)
 	#
 
 	@staticmethod
-	def query_param_decode(data):
+	def get_type(_type):
 	#
 		"""
-Decode special characters from a RFC 2396 compliant URI.
+Parses the given type parameter given as a string value.
 
-:param data: Input string
+:param _type: String type
 
-:return: (str) Decoded string
-:since:  v0.1.00
+:return: (int) Internal type
+:since:  v0.1.01
 		"""
 
-		data = unquote(data)
-		return InputFilter.filter_control_chars(data).strip()
+		if (_type == "js_elink"): _return = Link.TYPE_FULL & Link.TYPE_JS_REQUIRED
+		elif (_type == "js_ilink"): _return = Link.TYPE_RELATIVE & Link.TYPE_JS_REQUIRED
+		else: _return = _Link.get_type(_type)
+
+		return _return
 	#
 
 	@staticmethod
-	def query_param_encode(data):
+	def store_clear(set_name):
 	#
 		"""
-Encode special characters for a RFC 2396 compliant URI.
+Removes all links defined for the given set name.
 
-:param data: Input string
+:param set_name: Link set name
 
-:return: (str) Encoded string
-:since:  v0.1.00
+:since: v0.1.01
 		"""
 
-		data = InputFilter.filter_control_chars(data).strip()
-		return quote(data, "")
+		store = AbstractResponse.get_instance_store()
+		if (store != None and "dNG.pas.data.text.url.links" in store and set_name in store['dNG.pas.data.text.url.links']): del(store['dNG.pas.data.text.url.links'][set_name])
 	#
 
 	@staticmethod
 	def store_get(set_name):
 	#
 		"""
-Return all links defined for the given set name.
+Returns all links defined for the given set name.
 
 :param set_name: Link set name
 
@@ -203,9 +260,39 @@ Adds a link to the given set name.
 			link = { "title": title, "type": _type, "parameters": parameters, "priority": priority }
 			link.update(kwargs)
 
-			if (set_name in store): store[set_name].append(link)
-			store[set_name] = [ link ]
+			if (set_name in store):
+			#
+				store = store[set_name]
+				index = len(store)
+
+				for position in range(0, len(store)):
+				#
+					if (link['priority'] > store[position]['priority']):
+					#
+						index = position
+						break
+					#
+				#
+
+				store.insert(index, link)
+			#
+			else: store[set_name] = [ link ]
 		#
+	#
+
+	@staticmethod
+	def unescape(data):
+	#
+		"""
+Unescape the given data.
+
+:param parameters: Parameters dict
+
+:return: (dict) Filtered parameters dict
+:since:  v0.1.01
+		"""
+
+		return XhtmlFormatting.unescape(data)
 	#
 #
 

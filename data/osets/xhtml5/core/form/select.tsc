@@ -1,17 +1,17 @@
-<div class="pasform_element">
-	<div class="pasform_label"><strong>[rewrite:content]title[/rewrite][if:content:required == True] <em>*</em>[/if]</strong>:</div>
-	<div class="pasform_field">
-		<select id="[rewrite:content]id[/rewrite]" name="[rewrite:content]name[/rewrite]"[if:content:required == True] required="required"[/if] class="pasform_select ui-corner-all" size="1">
+<div class="pageform_element">
+	<div class="pageform_label"><strong>[rewrite:content]title[/rewrite][if:content:required == True] <em>*</em>[/if]</strong>:</div>
+	<div class="pageform_field">
+		<select id="[rewrite:content]id[/rewrite]" name="[rewrite:content]name[/rewrite]"[if:content:required == True] required="required"[/if] class="pageform_select" size="1">
 [each:content:choices:choice]
 			<option value="[rewrite:content]choices.choice.value[/rewrite]"[if:content:choices.choice.selected == True] selected="selected"[/if]>[rewrite:content]choices.choice.title[/rewrite]</option>
 [/each]
 		</select><script type="text/javascript"><![CDATA[
-		require([ "djs/formX" ], function(formX) {
+		require([ "djs/formX.min" ], function(formX) {
 			formX.init({ id: "[rewrite:content]id[/rewrite]", type: "select" });
 		});
 		]]></script>
 [if:content:error_message != ]
-		<span class="pasform_error ui-corner-all">[rewrite:content]error_message[/rewrite]</span>
+		<span class="pageform_error">[rewrite:content]error_message[/rewrite]</span>
 [/if]
 	</div>
 </div>

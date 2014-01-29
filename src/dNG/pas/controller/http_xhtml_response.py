@@ -202,7 +202,7 @@ Set up theme framework
 				else: theme = None
 			#
 
-			if (theme == None and (not self.theme_renderer.is_supported(self.theme))): self.theme = Settings.get("pas_http_theme_default", "simple")
+			if (theme == None and (not self.theme_renderer.is_supported(self.theme))): self.theme = Settings.get("pas_http_site_theme_default", "simple")
 
 			if (self.theme_active == None): self.theme_active = self.theme
 			self.theme_renderer.set(self.theme_active)

@@ -38,7 +38,7 @@ from .module import Module
 class Cache(Module):
 #
 	"""
-Service for "m=services;s=cache"
+Service for "s=cache"
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved

@@ -28,11 +28,10 @@ from copy import copy
 from os import urandom
 
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.text.md5 import Md5
-from dNG.pas.data.text.tmd5 import Tmd5
-from dNG.pas.data.text.url import Url
-
 from .input_filter import InputFilter
+from .link import Link
+from .md5 import Md5
+from .tmd5 import Tmd5
 
 class InputForm(object):
 #
@@ -199,7 +198,7 @@ Embeds external resources into the current form.
 		field_data['iframe_only'] = is_iframe_only
 		url_parameters['tid'] = field_data['content']
 
-		field_data['url'] = Url().build_url(Url.TYPE_RELATIVE, url_parameters)
+		field_data['url'] = Link().build_url(Link.TYPE_RELATIVE, url_parameters)
 
 		self._entry_set("embed", field_data)
 		return True
@@ -305,6 +304,8 @@ Insert passwords (including optional a repetition check)
 
 		if (bytemix == None): bytemix = ""
 		elif (len(bytemix) < 1): bytemix = Settings.get("pas_user_profile_password_bytemix")
+
+		if (mode == None): mode = InputForm.PASSWORD_TMD5 & InputForm.PASSWORD_WITH_REPETITION
 
 		if (bytemix == None): field_data['error'] = "internal_error"
 
@@ -589,6 +590,27 @@ A single line text input field.
 		return (field_data['error'] == None)
 	#
 
+	def entry_add_textarea(self, field_data):
+	#
+		"""
+A multi line textarea input field.
+
+:param field_data: Form field data
+
+:return: (bool) False if the content was not accepted
+:since:  v0.1.00
+		"""
+
+		field_data = self._entry_defaults_set(field_data, "", "", None)
+		field_data = self._entry_field_size_set(field_data)
+		field_data = self._entry_limits_set(field_data)
+
+		field_data['error'] = self._entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
+
+		self._entry_set("textarea", field_data)
+		return (field_data['error'] == None)
+	#
+
 	def _entry_defaults_set(self, field_data, name = "", title = None, content = "", required = False):
 	#
 		"""
@@ -618,7 +640,7 @@ Sets default values for the given field.
 			if ("name" not in field_data): field_data['name'] = name
 			if ("title" not in field_data): field_data['title'] = title
 
-			if ("content" not in field_data):
+			if (self.form_has_input or "content" not in field_data):
 			#
 				input_content = (self.get_input(field_data['name']) if (field_data['name'] != "") else None)
 				field_data['content'] = (content if (input_content == None) else input_content)

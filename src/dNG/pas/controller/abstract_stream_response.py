@@ -24,7 +24,8 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from dNG.pas.data.binary import Binary
-from dNG.pas.data.traced_exception import TracedException
+from dNG.pas.runtime.not_implemented_exception import NotImplementedException
+from dNG.pas.runtime.value_exception import ValueException
 
 class AbstractStreamResponse(object):
 #
@@ -237,7 +238,7 @@ Sets the streamer to create response data when requested.
 :since: v0.1.01
 		"""
 
-		if (not hasattr(streamer, "read")): raise TracedException("Given streaming object is not supported.")
+		if (not hasattr(streamer, "read")): raise ValueException("Given streaming object is not supported.")
 		self.streamer = streamer
 
 		if (self.stream_mode_supported & AbstractStreamResponse.STREAM_CALLBACK == AbstractStreamResponse.STREAM_CALLBACK): self.stream_mode |= AbstractStreamResponse.STREAM_CALLBACK
@@ -288,7 +289,7 @@ Writes the given data.
 :since: v0.1.00
 		"""
 
-		raise TracedException("Not implemented")
+		raise NotImplementedException()
 	#
 #
 

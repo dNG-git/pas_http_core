@@ -29,6 +29,7 @@ try: from urllib.parse import parse_qsl
 except ImportError: from urlparse import parse_qsl
 
 from dNG.pas.data.binary import Binary
+from dNG.pas.runtime.value_exception import ValueException
 from .request_body import RequestBody
 
 class RequestBodyUrlencoded(RequestBody):
@@ -95,7 +96,7 @@ class tree for self).
 
 		self.parse(timeout)
 
-		if (name not in self.parsed_data): raise KeyError("Given key not found in data received")
+		if (name not in self.parsed_data): raise ValueException("Given key not found in data received")
 		return self.parsed_data[name]
 	#
 

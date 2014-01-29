@@ -63,7 +63,7 @@ Client host
 		"""
 Client port
 		"""
-		self.dsd = None
+		self.dsd = { }
 		"""
 Data transmitted with the request
 		"""
@@ -169,7 +169,7 @@ Returns the DSD value for the specified parameter.
 :since:  v0.1.00
 		"""
 
-		return (self.dsd[key] if (self.dsd != None and key in self.dsd) else default)
+		return (self.dsd[key] if (self.is_dsd_set(key)) else default)
 	#
 
 	def get_dsd_dict(self):
@@ -351,6 +351,20 @@ Initializes default values from the original request.
 		self.set_script_pathname(request.get_script_pathname())
 	#
 
+	def is_dsd_set(self, key):
+	#
+		"""
+Returns true if the DSD for the specified parameter exists.
+
+:param key: DSD key
+
+:return: (bool) True if set
+:since:  v0.1.01
+		"""
+
+		return (key in self.dsd)
+	#
+
 	def set_accepted_formats(self, accepted_formats):
 	#
 		"""
@@ -401,8 +415,7 @@ Sets the DSD value for the specified parameter.
 :since: v0.1.00
 		"""
 
-		if (self.dsd == None): self.dsd = { key: value }
-		else: self.dsd[key] = value
+		self.dsd[key] = value
 	#
 
 	def set_script_pathname(self, script_pathname):

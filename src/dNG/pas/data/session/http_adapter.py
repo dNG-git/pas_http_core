@@ -70,11 +70,16 @@ Returns true if the defined session is valid.
 :since:  v0.1.00
 		"""
 
-		_return = True
+		_return = False
 
 		passcode = self.session.get("uuids.passcode")
 
-		if (passcode != None):
+		if (not self.session.is_persistent()):
+		#
+			if (passcode == None): self._renew_passcode()
+			_return = True
+		#
+		elif (passcode != None):
 		#
 			cookie_passcode = None
 			request = NamedLoader.get_singleton("dNG.pas.controller.AbstractHttpRequest", False)
@@ -92,19 +97,22 @@ Returns true if the defined session is valid.
 			#
 
 			passcode_prev = self.session.get("uuids.passcode_prev")
-			passcode_timeout = self.session.get("uuids.passcode_timeout")
+			passcode_timeout = self.session.get("uuids.passcode_timeout", 0)
 
-			if (cookie_passcode == None): _return = (True if (passcode_prev == None and passcode_timeout + int(Settings.get("pas_session_uuids_passcode_grace_period", 15)) > time()) else False)
-			elif (cookie_passcode != Tmd5.hash(passcode)):
+			if (passcode_timeout + Settings.get("pas_session_uuids_passcode_grace_period", 15) > time()):
 			#
-				passcode_timeout = self.session.set("uuids.passcode_prev_timeout")
-				if (passcode_timeout == None or passcode_timeout + Settings.get("pas_session_uuids_passcode_grace_period", 15) < time() or passcode_prev == None or cookie_passcode != Tmd5.hash(passcode_prev)): _return = False
+				passcode_prev_timeout = self.session.get("uuids.passcode_prev_timeout")
+
+				if (cookie_passcode == Tmd5.hash(passcode)): _return = True
+				elif (
+					passcode_prev_timeout != None and
+					passcode_prev_timeout + Settings.get("pas_session_uuids_passcode_grace_period", 15) > time() or
+					passcode_prev != None or
+					cookie_passcode == Tmd5.hash(passcode_prev)
+				): _return = True
 			#
 
-			if (not _return):
-			#
-				if (isinstance(response, AbstractHttpResponse)): response.set_cookie("uuids", "", 0)
-			#
+			if (not _return and isinstance(response, AbstractHttpResponse)): response.set_cookie("uuids", "", 0)
 		#
 
 		return _return
@@ -137,19 +145,24 @@ Saves changes of the uuIDs instance.
 :since: v0.1.00
 		"""
 
+		passcode = self.session.get("uuids.passcode")
+
+		if (passcode != None):
+		#
+			self.session.set("uuids.passcode_prev", passcode)
+			self.session.set("uuids.passcode_prev_timeout", int(time()))
+		#
+
+		passcode = Binary.str(hexlify(urandom(16)))
+		self.session.set("uuids.passcode", passcode)
+		self.session.set("uuids.passcode_timeout", int(time() + int(Settings.get("pas_session_uuids_passcode_timeout", 300))))
+
 		response = AbstractHttpResponse.get_instance()
 
-		if (self.session.get("uuids.passcode_timeout") != None and isinstance(response, AbstractHttpResponse)):
+		if (isinstance(response, AbstractHttpResponse)):
 		#
-			self.session.set("uuids.passcode_prev", self.session.get("uuids.passcode"))
-			self.session.set("uuids.passcode_prev_timeout", int(time()))
-
-			passcode = Binary.str(hexlify(urandom(16)))
-			self.session.set("uuids.passcode", passcode)
-			self.session.set("uuids.passcode_timeout", int(time() + int(Settings.get("pas_session_uuids_passcode_timeout", 300))))
-
-			passcode = Tmd5.hash(passcode)
-			response.set_cookie("uuids", "{0}:{1}".format(self.session.get_uuid(), passcode))
+			passcode_hashed = Tmd5.hash(passcode)
+			response.set_cookie("uuids", "{0}:{1}".format(self.session.get_uuid(), passcode_hashed))
 		#
 	#
 

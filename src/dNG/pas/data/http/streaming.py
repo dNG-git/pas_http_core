@@ -56,8 +56,8 @@ are met.
 :since: v0.1.01
 		"""
 
-		if (not isinstance(streamer, AbstractStreamer)): raise TranslatableException("pas_http_error_400")
-		if (not isinstance(response, AbstractHttpResponse)): raise TranslatableException("pas_http_error_500")
+		if (not isinstance(streamer, AbstractStreamer)): raise TranslatableException("pas_http_core_400")
+		if (not isinstance(response, AbstractHttpResponse)): raise TranslatableException("pas_http_core_500")
 
 		if (streamer == None): response.set_header("HTTP/1.1", "HTTP/1.1 501 Not Implemented", True)
 		else:

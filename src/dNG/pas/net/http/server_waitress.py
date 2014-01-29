@@ -57,6 +57,10 @@ Constructor __init__(ServerWaitress)
 		"""
 WSGI server
 		"""
+		self.sockets = { }
+		"""
+waitress opened sockets
+		"""
 	#
 
 	def _configure(self):
@@ -70,10 +74,10 @@ Configures the server
 		listener_host = Settings.get("pas_http_standalone_server_host", self.socket_hostname)
 		self.port = int(Settings.get("pas_http_standalone_server_port", 8080))
 
-		if (listener_host == ""): self.host = Settings.get("pas_http_standalone_server_preferred_hostname", self.socket_hostname)
+		if (listener_host == ""): self.host = Settings.get("pas_http_server_preferred_hostname", self.socket_hostname)
 		else: self.host = listener_host
 
-		self.server = create_server(HttpWsgi1Request, host = listener_host, port = self.port, asyncore_loop_timeout = 5)
+		self.server = create_server(HttpWsgi1Request, self.sockets, host = listener_host, port = self.port, asyncore_loop_timeout = 5)
 		if (self.log_handler != None): self.log_handler.info("pas.http.core wsgiref server starts at '{0}:{1:d}'".format(self.host, self.port))
 
 		"""
@@ -109,7 +113,12 @@ Stop the server
 :since: v0.1.00
 		"""
 
-		if (self.server != None): self.server.close()
+		if (self.server != None):
+		#
+			sockets = self.sockets.copy()
+			for _socket in sockets: self.sockets[_socket].close()
+		#
+
 		return Server.stop(self, params, last_return)
 	#
 #

@@ -11,14 +11,15 @@
 div, p, td, th { cursor: default }
 
 a { cursor: pointer }
-a:link, a:visited { color: #2f2f2f; text-decoration: underline }
+a:link { color: #202020 }
+a:visited { color: #2f2f2f }
+a:link, a:visited, a:focus { text-decoration: underline }
 a:active, a:hover, a:focus { color: #000000; text-decoration: none }
-a:focus { text-decoration: underline }
 
 body { margin: 0; padding: 0 31px; background-color: #ffffff }
-body { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 95%; font-style: normal; line-height: normal; font-weight: normal; color: #000000 }
-h1, h2, h3, h4, h5, h6, summary { font-size: 130%; font-weight: bold }
-
+body { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 0.9em; font-style: normal; line-height: normal; font-weight: normal; color: #000000 }
+h1, h2, h3, h4, h5, h6, summary { font-size: 1.75em; font-weight: bold }
+header { margin: 10px 0; text-align: right }
 form { margin: 0; padding: 0 }
 img { border: none }
 
@@ -27,19 +28,22 @@ td, th { padding: 0 }
 td:first-child, th:first-child { border-left: none }
 td:last-child, th:last-child { border-right: none }
 
-.designcopyright { height:50px;background-color:#808080;text-align:center;vertical-align:middle }
-.designcopyright { font-family:Verdana,Arial,Helvetica,sans-serif;font-size:70%;color:#dddddd }
-.designcopyright a, .designcopyright a:link, .designcopyright a:active, .designcopyright a:visited, .designcopyright a:hover, .designcopyright a:focus { color:#ffffff }
+.designcopyright {
+	clear: both; margin: 0 -0.75% -0.25% -0.75%; padding: 0.5% 0.75% 0 0.75%; background: linear-gradient(to bottom, rgba(90, 90, 90, 0.2) 0%, rgba(255, 255, 255, 0) 100%); border-top: 1px solid #375a9d;
+	text-align: center; font-size: 0.75em; color: #375a9d
+}
 
-.designpage {
-	padding: 10px 12px; background-color: #ffffff; border: 1px solid #375a9d; border-radius: 1em; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+.designcopyright a, .designcopyright a:link, .designcopyright a:active, .designcopyright a:visited, .designcopyright a:hover, .designcopyright a:focus { color: #202020 }
+
+.designmainblock {
+	padding: 0.75%; background-color: #ffffff; border: 1px solid #375a9d; border-radius: 0.5em; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 	text-align: left; vertical-align: middle
 }
 
-.designpage > :first-child { margin-top: 0 }
-.designpage > :last-child { margin-bottom: 0 }
+.designpage > *:first-child { margin-top: 0.5% }
+.designpage > *:last-child { margin-bottom: 0.5% }
 
-.designtitle { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 225%; font-weight: bold }
+.designtitle { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 3em; font-weight: bold }
 .designtitle:before, .designtitle:after { position: absolute; top: 100%; width: 0; height: 0; border: 2px solid transparent; content: " " }
 .designtitle:before { left: 50%; margin-top: -9px; margin-left: -10px; border: 2px solid transparent; border-bottom-color: #375a9d; border-width: 10px }
 .designtitle:after { left: 50%; margin-top: -7px; margin-left: -9px; border: 2px solid transparent; border-bottom-color: #ffffff; border-width: 9px }
@@ -52,19 +56,25 @@ td:last-child, th:last-child { border-right: none }
 </head>
 
 <body>
-<header style='margin: 10px 0; text-align: right'><div style='display: inline-block; position: relative'>
+<header><div style='display: inline-block; position: relative'>
 [if:settings:pas_http_site_title_xhtml != ]
 	<span class='designtitle'>[rewrite:settings]pas_http_site_title_xhtml[/rewrite]</span>
 [/if][if:settings:pas_http_site_title_xhtml == ]
 	<span class='designtitle'><i>direct</i> Netware Group</span>
 [/if]
 </div></header>
-<main><div class='designpage'>
+<div class='designmainblock'>
 [block:settings:pas_http_site_menu_main]output.menu.File.render[/block]
+<div class='designpage'>
 [block]output.menu.Service.render_primary[/block]
+[block]output.NotificationBox.render[/block]
+<main>
 [rewrite:content]page_content[/rewrite]
+</main>
 [block]output.menu.Service.render_secondary[/block]
-</div></main>
+</div>
+<footer class='designcopyright'>&#169; <i>direct</i> Netware Group - All rights reserved</footer>
+</div>
 </body>
 
 </html>

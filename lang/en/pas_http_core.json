@@ -1,4 +1,8 @@
 {
+ "pas_http_core_edit": "Edit",
+
+ "pas_http_core_js_required": "JavaScript required",
+
  "pas_http_core_service_list_empty": "Currently there are no functions available or you may have not proper permission to access restricted functions.",
 
  "errors_pas_http_core_400": "The transmitted request is erroneous and will not be processed.",

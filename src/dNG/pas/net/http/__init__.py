@@ -26,11 +26,11 @@ NOTE_END //n"""
 from socket import getfqdn
 
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.traced_exception import TracedException
 from dNG.pas.data.http.virtual_config import VirtualConfig
 from dNG.pas.data.logging.log_line import LogLine
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.plugins.hooks import Hooks
+from dNG.pas.runtime.not_implemented_exception import NotImplementedException
 from dNG.pas.runtime.thread import Thread
 
 class Server(Thread):
@@ -187,7 +187,7 @@ Runs the server
 :since: v0.1.00
 		"""
 
-		raise TracedException("Not implemented")
+		raise NotImplementedException()
 	#
 
 	def stop(self, params = None, last_return = None):

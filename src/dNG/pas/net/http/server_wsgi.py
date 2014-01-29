@@ -62,7 +62,7 @@ Cache instance
 		"""
 Configured server host
 		"""
-		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
+		self.log_handler = None
 		"""
 The LogHandler is called whenever debug messages should be logged or errors
 happened.
@@ -75,6 +75,9 @@ Server port
 		"""
 Timestamp of service initialisation
 		"""
+
+		self.cache_instance.disable()
+		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 
 		self._configure()
 
@@ -105,10 +108,11 @@ python.org: Return an iterator object.
 		"""
 
 		http_wsgi1_request = self.http_wsgi1_request
-
 		self.http_wsgi1_request = None
+
 		Hooks.call("dNG.pas.http.Wsgi.shutdown")
 		Hooks.call("dNG.pas.Status.shutdown")
+		Hooks.free()
 
 		return iter(http_wsgi1_request)
 	#
