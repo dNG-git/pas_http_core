@@ -26,7 +26,7 @@ NOTE_END //n"""
 from os import path
 import re
 
-from dNG.pas.controller.abstract_request import AbstractRequest
+from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
 from dNG.pas.controller.abstract_http_response import AbstractHttpResponse
 from dNG.pas.data.mime_type import MimeType
 from dNG.pas.data.translatable_exception import TranslatableException
@@ -67,7 +67,7 @@ are met.
 
 			if (exclusive):
 			#
-				request = AbstractRequest.get_instance()
+				request = AbstractHttpRequest.get_instance()
 				client_host = (None if (request == None) else request.get_client_host())
 
 				exclusive_id = (None if (client_host == None) else "{0}@{1}".format(client_host, url))

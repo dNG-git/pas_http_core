@@ -169,7 +169,7 @@ Sets the theme to use.
 		return _return
 	#
 
-	def _parser_change(self, tag_definition, data, tag_position, data_position, tag_end_position):
+	def _match_change(self, tag_definition, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the matched tag.
@@ -186,7 +186,7 @@ Change data according to the matched tag.
 
 		_return = data[:tag_position]
 
-		data_closed = data[self._parser_tag_find_end_position(data, tag_end_position):]
+		data_closed = data[self._find_tag_end_position(data, tag_end_position):]
 
 		if (tag_definition['tag'] == "block"):
 		#
@@ -252,7 +252,7 @@ Change data according to the matched tag.
 		return _return
 	#
 
-	def _parser_check(self, data):
+	def _match_check(self, data):
 	#
 		"""
 Check if a possible tag match is a false positive.
@@ -308,7 +308,8 @@ Renders content ready for output from the given OSet template.
 
 :param content: Content data
 
-:since: v0.1.00
+:return: (str) Rendered content
+:since:  v0.1.01
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Renderer.render(template_data, content)- (#echo(__LINE__)#)")
@@ -374,7 +375,7 @@ Read corresponding theme configuration
 		js_files = self._get_unique_filelist(js_files)
 		if (len(js_files) > 0): self.content['js_files'] = js_files
 
-		return self._parser(theme_data)
+		return self._parse(theme_data)
 	#
 
 	def set(self, theme):

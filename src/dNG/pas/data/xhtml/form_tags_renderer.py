@@ -72,7 +72,7 @@ True if (X)HTML content is allowed.
 		"""
 	#
 
-	def _parser_change_b(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_b(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "b" tag.
@@ -91,7 +91,7 @@ Change data according to the "b" tag.
 		return ("<b>{0}</b>".format(enclosed_data) if (len(enclosed_data) > 0) else "")
 	#
 
-	def _parser_change_center(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_center(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "center" tag.
@@ -119,7 +119,7 @@ Change data according to the "center" tag.
 		return _return
 	#
 
-	def _parser_change_code(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_code(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "code" tag.
@@ -146,7 +146,7 @@ Change data according to the "code" tag.
 		return _return
 	#
 
-	def _parser_change_color(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_color(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "color" tag.
@@ -171,7 +171,7 @@ Change data according to the "color" tag.
 		return _return
 	#
 
-	def _parser_change_del(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_del(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "del" tag.
@@ -190,7 +190,7 @@ Change data according to the "del" tag.
 		return ("<del>{0}</del>".format(enclosed_data) if (len(enclosed_data) > 0) else "")
 	#
 
-	def _parser_change_i(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_i(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "i" tag.
@@ -209,7 +209,7 @@ Change data according to the "i" tag.
 		return ("<i>{0}</i>".format(enclosed_data) if (len(enclosed_data) > 0) else "")
 	#
 
-	def _parser_change_justify(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_justify(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "justify" tag.
@@ -237,7 +237,7 @@ Change data according to the "justify" tag.
 		return _return
 	#
 
-	def _parser_change_left(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_left(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "left" tag.
@@ -265,7 +265,7 @@ Change data according to the "left" tag.
 		return _return
 	#
 
-	def _parser_change_link(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_link(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "link" tag.
@@ -296,7 +296,7 @@ Change data according to the "link" tag.
 		return _return
 	#
 
-	def _parser_change_margin(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_margin(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "margin" tag.
@@ -322,7 +322,7 @@ Change data according to the "margin" tag.
 		return _return
 	#
 
-	def _parser_change_nobr(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_nobr(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "nobr" tag.
@@ -340,7 +340,7 @@ Change data according to the "nobr" tag.
 		return (data[12 + tag_position:] if (data[6 + tag_position:13 + tag_position] == "<br />\n") else data[6 + tag_position:])
 	#
 
-	def _parser_change_right(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_right(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "right" tag.
@@ -368,7 +368,7 @@ Change data according to the "right" tag.
 		return _return
 	#
 
-	def _parser_change_s(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_s(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "s" tag.
@@ -387,7 +387,7 @@ Change data according to the "s" tag.
 		return ("<span style='text-decoration: line-through'>{0}</span>".format(enclosed_data) if (len(enclosed_data) > 0) else "")
 	#
 
-	def _parser_change_size(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_size(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "size" tag.
@@ -413,7 +413,7 @@ Change data according to the "size" tag.
 		return _return
 	#
 
-	def _parser_change_title(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_title(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "title" tag.
@@ -439,7 +439,7 @@ Change data according to the "title" tag.
 		return _return
 	#
 
-	def _parser_change_u(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_u(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "u" tag.
@@ -458,7 +458,7 @@ Change data according to the "u" tag.
 		return ("<u>{0}</u>".format(enclosed_data) if (len(enclosed_data) > 0) else "")
 	#
 
-	def _parser_change_url(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_url(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "url" tag.
@@ -495,7 +495,7 @@ Change data according to the "url" tag.
 		return _return
 	#
 
-	def _parser_check_nobr(self, data):
+	def _match_check_nobr(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "nobr" tag.
@@ -506,10 +506,10 @@ Check if a possible tag match is a valid "nobr" tag.
 :since:  v0.1.01
 		"""
 
-		return self._parser_check_simple_tag("nobr", data)
+		return self._match_check_simple_tag("nobr", data)
 	#
 
-	def _parser_get_definition_nobr(self):
+	def _match_get_definition_nobr(self):
 	#
 		"""
 Returns the "nobr" tag definition for the parser.
@@ -524,16 +524,19 @@ Returns the "nobr" tag definition for the parser.
 	def render(self, content):
 	#
 		"""
-Constructor __init__(Parser)
+Renders the given FormTags content.
 
-:since: v0.1.01
+:param content: FormTags content
+
+:return: (str) Rendered content
+:since:  v0.1.01
 		"""
 
 		if (not self.is_xhtml_allowed): content = Formatting.escape(content)
 		content = content.replace("\n", "<br />\n")
-		content = self._parser(content).strip()
+		content = self._parse(content).strip()
 
-		return self._parser(content)
+		return content
 	#
 
 	def set_blocks_supported(self, supported):

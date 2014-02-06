@@ -55,7 +55,7 @@ This exception takes a translatable error message for HTTP 400 error codes.
 	def __init__(self, l10n_id, http_code = 500, value = None, _exception = None):
 	#
 		"""
-Constructor __init__(Exception)
+Constructor __init__(TranslatableException)
 
 :param l10n_id: L10n translatable key (prefixed with "errors_")
 :param http_code: HTTP error code

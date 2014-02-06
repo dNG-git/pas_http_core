@@ -27,12 +27,12 @@ from time import time
 from zlib import compressobj
 
 from dNG.data.rfc.basics import Basics as RfcBasics
-from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.gzip import Gzip
 from dNG.pas.data.http.chunked_mixin import ChunkedMixin
 from dNG.pas.runtime.io_exception import IOException
 from dNG.pas.runtime.not_implemented_exception import NotImplementedException
+from .abstract_http_request import AbstractHttpRequest
 from .abstract_stream_response import AbstractStreamResponse
 
 class AbstractHttpStreamResponse(AbstractStreamResponse, ChunkedMixin):

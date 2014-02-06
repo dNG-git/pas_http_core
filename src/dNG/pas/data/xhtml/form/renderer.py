@@ -59,6 +59,10 @@ Constructor __init__(Renderer)
 		"""
 List of form elements
 		"""
+		self.form_id = None
+		"""
+ID of the form
+		"""
 		self.oset = None
 		"""
 OSet requested
@@ -73,13 +77,13 @@ valid XHTML for output.
 
 :param form_id: Form ID string
 
-:return: (str) Valid XHTML form
+:return: (str) Rendered form
 :since:  v0.1.00
 		"""
 
 		_return = ""
 
-		if (form_id == None): form_id = "pas_form_{0}".format(Binary.str(hexlify(urandom(10))))
+		self._set_form_id(form_id)
 		sections_count = len(self.fields)
 
 		if (sections_count > 1):
@@ -327,7 +331,7 @@ Render the form submit button.
 
 		context = {
 			"type": "submit",
-			"id": "formid",
+			"id": "{0}_submit".format(self.form_id),
 			"title": XHtmlFormatting.escape(L10n.get(title))
 		}
 
@@ -479,6 +483,17 @@ Sets defined fields for output.
 		"""
 
 		if (type(fields) == list): self.fields = fields
+	#
+
+	def _set_form_id(self, form_id):
+	#
+		"""
+Sets the form ID currently defined with "set_data()".
+
+:param form_id: Unique form ID
+		"""
+
+		self.form_id = ("pas_form_{0}".format(Binary.str(hexlify(urandom(10)))) if (form_id == None) else form_id)
 	#
 
 	def set_oset(self, oset):

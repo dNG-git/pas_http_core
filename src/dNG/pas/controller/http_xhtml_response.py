@@ -31,7 +31,7 @@ from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.plugins.hooks import Hooks
-from .abstract_request import AbstractRequest
+from .abstract_http_request import AbstractHttpRequest
 from .abstract_http_response import AbstractHttpResponse
 
 class HttpXhtmlResponse(AbstractHttpResponse):
@@ -187,7 +187,7 @@ Set up theme framework
 
 			if (self.theme == None):
 			#
-				theme = AbstractRequest.get_instance().get_parameter("theme")
+				theme = AbstractHttpRequest.get_instance().get_parameter("theme")
 				if (theme != None): self.set_theme(theme)
 			#
 

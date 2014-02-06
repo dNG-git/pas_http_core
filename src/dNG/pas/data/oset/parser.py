@@ -74,7 +74,7 @@ happened.
 		"""
 	#
 
-	def _parser_change(self, tag_definition, data, tag_position, data_position, tag_end_position):
+	def _match_change(self, tag_definition, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the matched tag.
@@ -91,7 +91,7 @@ Change data according to the matched tag.
 
 		_return = data[:tag_position]
 
-		data_closed = data[self._parser_tag_find_end_position(data, tag_end_position):]
+		data_closed = data[self._find_tag_end_position(data, tag_end_position):]
 
 		if (tag_definition['tag'] == "block"):
 		#
@@ -165,7 +165,7 @@ Change data according to the matched tag.
 		return _return
 	#
 
-	def _parser_check(self, data):
+	def _match_check(self, data):
 	#
 		"""
 Check if a possible tag match is a false positive.
@@ -226,13 +226,14 @@ Renders content ready for output from the given OSet template.
 :param template_data: OSet template data
 :param content: Content object
 
-:since: v0.1.00
+:return: (str) Rendered content
+:since:  v0.1.00
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render(template_data, content)- (#echo(__LINE__)#)".format(self))
 
 		self.content = content
-		return self._parser(template_data)
+		return self._parse(template_data)
 	#
 #
 

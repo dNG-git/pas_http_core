@@ -29,7 +29,7 @@ from math import floor
 try: from urllib.parse import urlsplit
 except ImportError: from urlparse import urlsplit
 
-from dNG.pas.controller.abstract_request import AbstractRequest
+from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.text.input_filter import InputFilter
@@ -346,7 +346,7 @@ Returns the base URL for the given type and parameters.
 		#
 		else:
 		#
-			request = AbstractRequest.get_instance()
+			request = AbstractHttpRequest.get_instance()
 
 			if (_type == Link.TYPE_RELATIVE):
 			#
@@ -392,13 +392,13 @@ This method appends default parameters if not already set.
 
 		if ("lang" not in _return):
 		#
-			request = AbstractRequest.get_instance()
+			request = AbstractHttpRequest.get_instance()
 			if (request != None): _return['lang'] = request.get_lang()
 		#
 
 		if ("uuid" not in _return and Session != None):
 		#
-			if (request == None): request = AbstractRequest.get_instance()
+			if (request == None): request = AbstractHttpRequest.get_instance()
 			session = request.get_session()
 			if (session != None and session.is_active() and (not session.is_persistent())): _return['uuid'] = Session.get_uuid()
 		#
@@ -423,15 +423,15 @@ This method filters all parameters of the type "__<KEYWORD>__".
 		#
 			if (len(_return) == 1 and len(_return['__query__']) > 0):
 			#
-				_return = AbstractRequest.parse_iline(InputFilter.filter_control_chars(_return['__query__']))
-				if ("dsd" in _return): _return['dsd'] = AbstractRequest.parse_dsd(_return['dsd'])
+				_return = AbstractHttpRequest.parse_iline(InputFilter.filter_control_chars(_return['__query__']))
+				if ("dsd" in _return): _return['dsd'] = AbstractHttpRequest.parse_dsd(_return['dsd'])
 			#
 			else: del(_return['__query__'])
 		#
 
 		if ("__request__" in _return and _return['__request__']):
 		#
-			request = AbstractRequest.get_instance()
+			request = AbstractHttpRequest.get_instance()
 			inner_request = request.get_inner_request()
 			if (inner_request != None): request = inner_request
 

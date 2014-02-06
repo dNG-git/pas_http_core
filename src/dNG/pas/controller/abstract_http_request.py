@@ -23,15 +23,26 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from time import time
+from os import path
+from time import time, timezone
+import os
+import re
+
+try: from urllib.parse import quote, unquote
+except ImportError: from urllib import quote, unquote
 
 from dNG.data.rfc.http import Http
-from dNG.pas.controller.abstract_inner_request import AbstractInnerRequest
-from dNG.pas.controller.predefined_http_request import PredefinedHttpRequest
+from dNG.pas.data.settings import Settings
+from dNG.pas.data.translatable_exception import TranslatableException
 from dNG.pas.data.http.request_body import RequestBody
 from dNG.pas.data.http.request_headers_mixin import RequestHeadersMixin
 from dNG.pas.data.text.input_filter import InputFilter
+from dNG.pas.data.text.l10n import L10n
+from dNG.pas.module.named_loader import NamedLoader
+from .abstract_inner_request import AbstractInnerRequest
 from .abstract_request import AbstractRequest
+from .abstract_response import AbstractResponse
+from .stdout_stream_response import StdoutStreamResponse
 
 try:
 #
@@ -54,6 +65,35 @@ class AbstractHttpRequest(AbstractRequest, RequestHeadersMixin):
              Mozilla Public License, v. 2.0
 	"""
 
+	RE_PARAMETER_DSD_PLUS_SPAM_CHAR = re.compile("(\\+){3,}")
+	"""
+RegExp to find more than 3 plus characters in a row
+	"""
+	RE_PARAMETER_FILTERED_CHARS = re.compile("[/\\\\\\?:@\\=\\&\\.]")
+	"""
+RegExp to find characters to be filtered out
+	"""
+	RE_PARAMETER_FILTERED_WORD_CHARS = re.compile("[;\\x20\\+]")
+	"""
+RegExp to find characters to be filtered out
+	"""
+	RE_PARAMETER_NON_WORD_END = re.compile("\\W+$")
+	"""
+RegExp to find non-word characters at the end of the string
+	"""
+	RE_PARAMETER_NON_WORD_START = re.compile("^\\W+")
+	"""
+RegExp to find non-word characters at the beginning of the string
+	"""
+	RE_PARAMETER_PLUS_CHAR = re.compile("\\+")
+	"""
+RegExp to find plus characters
+	"""
+	RE_PARAMETER_SPACE_CHAR = re.compile("\\x20")
+	"""
+RegExp to find space characters
+	"""
+
 	def __init__(self):
 	#
 		"""
@@ -69,11 +109,58 @@ Constructor __init__(AbstractHttpRequest)
 		"""
 Request body pointer
 		"""
+
+		self.action = None
+		"""
+Requested action
+		"""
+		self.dsd = { }
+		"""
+Data transmitted with the request
+		"""
+		self.inner_request = None
+		"""
+A inner request is used to support protocols based on other ones (e.g.
+JSON-RPC based on HTTP).
+		"""
+		self.lang = ""
+		"""
+Source language
+		"""
+		self.module = None
+		"""
+Requested module block
+		"""
+		self.script_name = None
+		"""
+Called script
+		"""
+		self.script_pathname = None
+		"""
+Request path to the script
+		"""
+		self.service = None
+		"""
+Requested service
+		"""
+		self.session = None
+		"""
+Associated session to request
+		"""
+		self.timezone = None
+		"""
+Source timezone
+		"""
 		self.type = None
 		"""
 Request type
 		"""
+		self.output_format = "http_xhtml"
+		"""
+Requested response format name
+		"""
 
+		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 		self.server_scheme = "http"
 	#
 
@@ -119,19 +206,100 @@ Configures the given RequestBody to be read by the Request implementation.
 		return _return
 	#
 
-	def handle_missing_service(self, response):
+	def execute(self):
 	#
 		"""
-"handle_missing_service()" is called if the requested service has not been
-found.
-
-:param response: Waiting response object
+Executes the incoming request.
 
 :since: v0.1.00
 		"""
 
-		if (response.supports_headers()): response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
-		AbstractRequest.handle_missing_service(self, response)
+		L10n.set_thread_lang(self.lang)
+
+		L10n.init("core")
+		L10n.init("pas_core")
+		L10n.init("pas_http_core")
+
+		if (self.inner_request != None):
+		#
+			request = self.inner_request
+			if (request.get_output_format() != None): self.output_format = request.get_output_format()
+		#
+		else: request = self
+
+		response = self._init_response()
+
+		try:
+		#
+			if (self.supports_accepted_formats()):
+			#
+				accepted_formats = self.get_accepted_formats()
+				if (len(accepted_formats) > 0): response.set_accepted_formats(accepted_formats)
+			#
+
+			if (self.supports_compression()):
+			#
+				compression_formats = self.get_compression_formats()
+				if (len(compression_formats) > 0): response.set_compression_formats(compression_formats)
+			#
+
+			if (response.supports_script_name()): response.set_script_name(request.get_script_name())
+			self._execute(request, response)
+		#
+		except Exception as handled_exception:
+		#
+			if (self.log_handler != None): self.log_handler.error(handled_exception)
+			response.handle_exception(None, handled_exception)
+		#
+
+		self._respond(response)
+	#
+
+	def _execute(self, request, response):
+	#
+		"""
+Executes the given request and generate content for the given response.
+
+:since: v0.1.00
+		"""
+
+		requested_module = request.get_module()
+		requested_service = "".join([word.capitalize() for word in request.get_service().split("_")])
+
+		if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))):
+		#
+			instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))
+			if (self.log_handler != None): instance.set_log_handler(self.log_handler)
+
+			instance.init(request, response)
+			instance.execute()
+			del(instance)
+		#
+		else:
+		#
+			if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.module".format(requested_module))):
+			#
+				instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.module".format(requested_module));
+				if (self.log_handler != None): instance.set_log_handler(self.log_handler)
+
+				instance.init(request, response)
+				del(instance)
+			#
+
+			self.handle_missing_service(response)
+		#
+	#
+
+	def get_action(self):
+	#
+		"""
+Returns the requested action.
+
+:return: (str) Requested action
+:since:  v0.1.00
+		"""
+
+		return self.action
 	#
 
 	def get_cookie(self, name):
@@ -166,6 +334,141 @@ Returns request cookies.
 		return _return
 	#
 
+	def get_dsd(self, key, default = None):
+	#
+		"""
+Returns the DSD value for the specified parameter.
+
+:param key: DSD key
+:param default: Default value if not set
+
+:return: (mixed) Requested DSD value or default one if undefined
+:since:  v0.1.00
+		"""
+
+		return (self.dsd[key] if (self.is_dsd_set(key)) else default)
+	#
+
+	def get_dsd_dict(self):
+	#
+		"""
+Return all DSD parameters received.
+
+:return: (mixed) Request DSD values
+:since:  v0.1.00
+		"""
+
+		return self.dsd
+	#
+
+	def get_inner_request(self):
+	#
+		"""
+Returns the inner request instance.
+
+:return: (object) Request instance; None if not available
+:since:  v0.1.00
+		"""
+
+		return self.inner_request
+	#
+
+	def get_lang(self):
+	#
+		"""
+Returns the requested or supported language.
+
+:return: (str) Requested l10n key
+:since:  v0.1.00
+		"""
+
+		return self.lang
+	#
+
+	def get_module(self):
+	#
+		"""
+Returns the requested module.
+
+:return: (str) Requested module
+:since:  v0.1.00
+		"""
+
+		return self.module
+	#
+
+	def get_output_format(self):
+	#
+		"""
+Returns the requested output format.
+
+:return: (str) Requested output format
+:since:  v0.1.00
+		"""
+
+		return self.output_format
+	#
+
+	def _get_request_parameters(self):
+	#
+		"""
+Returns the unparsed request parameters.
+
+:return: (dict) Request parameters
+:since:  v0.1.01
+		"""
+
+		return { }
+	#
+
+	def get_script_name(self):
+	#
+		"""
+Returns the script name.
+
+:return: (str) Script name
+:since:  v0.1.00
+		"""
+
+		return self.script_name
+	#
+
+	def get_script_pathname(self):
+	#
+		"""
+Returns the script path and name of the request.
+
+:return: (str) Script path and name
+:since:  v0.1.00
+		"""
+
+		return self.script_pathname
+	#
+
+	def get_service(self):
+	#
+		"""
+Returns the requested service.
+
+:return: (str) Requested service
+:since:  v0.1.00
+		"""
+
+		return self.service
+	#
+
+	def get_session(self):
+	#
+		"""
+Returns the associated session.
+
+:return: (object) Session instance
+:since:  v0.1.00
+		"""
+
+		return self.session
+	#
+
 	def get_type(self):
 	#
 		"""
@@ -178,6 +481,38 @@ Returns the request type.
 		return self.type
 	#
 
+	def handle_missing_service(self, response):
+	#
+		"""
+"handle_missing_service()" is called if the requested service has not been
+found.
+
+:param response: Waiting response object
+
+:since: v0.1.00
+		"""
+
+		if (response.supports_headers()): response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+		response.handle_critical_error("core_unsupported_command")
+	#
+
+	def init(self):
+	#
+		"""
+Do preparations for request handling.
+
+:since: v0.1.00
+		"""
+
+		"""
+Set source variables. The server timezone will be changed if a user is
+logged in and/or its timezone is identified.
+		"""
+
+		self._parse_parameters()
+		self.timezone = float(Settings.get("core_timezone", (timezone / 3600)))
+	#
+
 	def _init_response(self):
 	#
 		"""
@@ -187,7 +522,10 @@ Initializes the matching response instance.
 :since:  v0.1.01
 		"""
 
-		response = AbstractRequest._init_response(self)
+		response = NamedLoader.get_instance("dNG.pas.controller.{0}Response".format("".join([word.capitalize() for word in self.output_format.split("_")])))
+		if (self.log_handler != None): response.set_log_handler(self.log_handler)
+		response.set_charset(L10n.get("lang_charset", "UTF-8"))
+		response.set_stream_response(self._init_stream_response())
 
 		if (response.supports_headers() and self.type == "HEAD"): response.set_send_headers_only(True)
 		if (Session != None): Session.set_adapter(HttpSessionAdapter)
@@ -208,6 +546,32 @@ Initializes the matching response instance.
 		return response
 	#
 
+	def _init_stream_response(self):
+	#
+		"""
+Initializes the matching stream response instance.
+
+:return: (object) Stream response object
+:since:  v0.1.00
+		"""
+
+		return StdoutStreamResponse()
+	#
+
+	def is_dsd_set(self, key):
+	#
+		"""
+Returns true if the DSD for the specified parameter exists.
+
+:param key: DSD key
+
+:return: (bool) True if set
+:since:  v0.1.01
+		"""
+
+		return (key in self.dsd)
+	#
+
 	def _parse_parameters(self):
 	#
 		"""
@@ -222,7 +586,45 @@ Parses request parameters.
 			if (lang != None): self.lang = lang.lower().split(",", 1)[0]
 		#
 
-		AbstractRequest._parse_parameters(self)
+		self.parameters = self._get_request_parameters()
+
+		self.action = (AbstractHttpRequest.filter_parameter_word(self.parameters['a']) if ("a" in self.parameters) else "")
+		self.module = (AbstractHttpRequest.filter_parameter_word(self.parameters['m']) if ("m" in self.parameters) else "")
+		self.service = (AbstractHttpRequest.filter_parameter_service(self.parameters['s']) if ("s" in self.parameters) else "")
+
+		if ("dsd" in self.parameters): self.dsd = AbstractHttpRequest.parse_dsd(self.parameters['dsd'])
+		if ("ohandler" in self.parameters and len(self.parameters['ohandler']) > 0): self.output_handler = AbstractHttpRequest.filter_parameter_word(self.parameters['ohandler'])
+
+		"""
+Initialize l10n
+		"""
+
+		lang = (AbstractHttpRequest.filter_parameter(self.parameters['lang']) if ("lang" in self.parameters) else "")
+
+		if (lang != "" and os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang)), os.R_OK)): self.lang = lang
+		else:
+		#
+			if (self.lang == ""): lang_rfc_region = Settings.get("core_lang", "en_US")
+			else: lang_rfc_region = self.lang.lower()
+
+			lang_rfc_region = re.sub("\\W", "", lang_rfc_region)
+			lang_domain = lang_rfc_region[:2]
+
+			if (Settings.is_defined("core_lang_{0}".format(lang_rfc_region))): lang_rfc_region = Settings.get("core_lang_{0}".format(lang_rfc_region))
+			elif (Settings.is_defined("core_lang_{0}".format(lang_domain))): lang_domain = Settings.get("core_lang_{0}".format(lang_domain))
+
+			if (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_rfc_region)), os.R_OK)): self.lang = lang_rfc_region
+			elif (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_domain)), os.R_OK)): self.lang = lang_domain
+			else: self.lang = Settings.get("core_lang", "en")
+		#
+
+		"""
+Set some standard values
+		"""
+
+		if (self.action == ""): self.action = "index"
+		if (self.module == ""): self.module = "services"
+		if (self.service == ""): self.service = "index"
 	#
 
 	def _parse_virtual_config(self, virtual_config, virtual_pathname):
@@ -248,7 +650,7 @@ instance.
 		#
 		elif ("m" in virtual_config or "s" in virtual_config or "a" in virtual_config or "uri" in virtual_config):
 		#
-			inner_request = PredefinedHttpRequest()
+			inner_request = NamedLoader.get_instance("dNG.pas.controller.PredefinedHttpRequest")
 
 			if ("m" in virtual_config): inner_request.set_module(virtual_config['m'])
 			if ("s" in virtual_config): inner_request.set_service(virtual_config['s'])
@@ -269,6 +671,26 @@ instance.
 		if (isinstance(inner_request, AbstractInnerRequest)): inner_request.init(self)
 
 		return inner_request
+	#
+
+	def redirect(self, request, response = None):
+	#
+		"""
+A request redirect executes the given new request as if it has been
+requested by the client. It will reset the response and its cached values.
+
+:param response: Waiting response object
+
+:since: v0.1.00
+		"""
+
+		if (isinstance(request, AbstractInnerRequest)):
+		#
+			request.init(self)
+			if (not isinstance(response, AbstractResponse)): response = AbstractResponse.get_instance()
+			self._execute(request, response)
+		#
+		else: raise TranslatableException("core_unsupported_command")
 	#
 
 	def _respond(self, response):
@@ -310,6 +732,20 @@ Respond the request with the given response.
 		AbstractRequest._respond(self, response)
 	#
 
+	def set_dsd(self, key, value):
+	#
+		"""
+Sets the DSD value for the specified parameter.
+
+:param key: DSD key
+:param default: DSD value
+
+:since: v0.1.00
+		"""
+
+		self.dsd[key] = value
+	#
+
 	def set_header(self, name, value):
 	#
 		"""
@@ -325,6 +761,33 @@ Set the header with the given name and value.
 
 		if (name in self.headers): self.headers[name] = "{0},{1}".format(self.headers[name], value)
 		else: self.headers[name] = value
+	#
+
+	def set_inner_request(self, request):
+	#
+		"""
+Sets the inner request object.
+
+:param request: Request object
+
+:since: v0.1.00
+		"""
+
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Request.set_inner_request(+request)- (#echo(__LINE__)#)")
+		self.inner_request = request
+	#
+
+	def set_session(self, session):
+	#
+		"""
+Sets the associated session.
+
+:param session: (object) Session instance
+
+:since: v0.1.00
+		"""
+
+		self.session = session
 	#
 
 	def supports_accepted_formats(self):
@@ -373,6 +836,117 @@ Returns false if the server address is unknown.
 		"""
 
 		return True
+	#
+
+	@staticmethod
+	def filter_parameter(value):
+	#
+		"""
+Filters the given parameter value.
+
+:param value: Request parameter
+
+:return: (str) Filtered parameter
+:since:  v0.1.01
+		"""
+
+		if (" " in value): _return = quote(value)
+		value = AbstractHttpRequest.RE_PARAMETER_NON_WORD_START.sub("", value)
+		value = AbstractHttpRequest.RE_PARAMETER_FILTERED_CHARS.sub("", value)
+		return AbstractHttpRequest.RE_PARAMETER_NON_WORD_END.sub("", value)
+	#
+
+	@staticmethod
+	def filter_parameter_service(value):
+	#
+		"""
+Filter service like parameters.
+
+:param value: Request parameter
+
+:return: (str) Filtered parameter
+:since:  v0.1.01
+		"""
+
+		value = AbstractHttpRequest.filter_parameter(value)
+		value = AbstractHttpRequest.RE_PARAMETER_PLUS_CHAR.sub(" ", value)
+		return AbstractHttpRequest.RE_PARAMETER_SPACE_CHAR.sub(".", value)
+	#
+
+	@staticmethod
+	def filter_parameter_word(value):
+	#
+		"""
+Filter word parameters used for module and action statements.
+
+:param value: Request parameter
+
+:return: (str) Filtered parameter
+:since:  v0.1.01
+		"""
+
+		value = AbstractHttpRequest.filter_parameter(value)
+		return AbstractHttpRequest.RE_PARAMETER_FILTERED_WORD_CHARS.sub("", unquote(value))
+	#
+
+	@staticmethod
+	def parse_dsd(dsd):
+	#
+		"""
+DSD stands for dynamic service data and should be used for transfering IDs for
+news, topics, ... Take care for injection attacks!
+
+:param dsd: DSD string for parsing
+
+:return: (dict) Parsed DSD
+:since:  v0.1.00
+		"""
+
+		if (" " in dsd): dsd = quote(dsd)
+		dsd = AbstractHttpRequest.RE_PARAMETER_DSD_PLUS_SPAM_CHAR.sub("++", dsd)
+
+		dsd_list = dsd.split("++")
+		_return = { }
+
+		for dsd in dsd_list:
+		#
+			dsd_element = dsd.strip().split("+", 1)
+
+			if (len(dsd_element) > 1): _return[dsd_element[0]] = InputFilter.filter_control_chars(unquote(dsd_element[1]))
+			elif (len(dsd_element[0]) > 0): _return[dsd_element[0]] = ""
+		#
+
+		return _return
+	#
+
+	@staticmethod
+	def parse_iline(iline):
+	#
+		"""
+Parse the input variables given as an URI query string.
+
+:param iline: Input query string with ";" delimiter.
+
+:return: (dict) Parsed query string
+:since:  v0.1.00
+		"""
+
+		_return = { }
+
+		if (iline != None):
+		#
+			iline_list = iline.split(";")
+
+			for iline in iline_list:
+			#
+				value_element = iline.split("=", 1)
+
+				if (len(value_element) > 1): _return[value_element[0]] = value_element[1]
+				elif ("ohandler" not in _return): _return['ohandler'] = re.sub("\\W+", "", iline)
+			#
+		#
+
+		return _return
 	#
 #
 

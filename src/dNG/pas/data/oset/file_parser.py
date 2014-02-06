@@ -79,7 +79,8 @@ Renders content ready for output from the given OSet template.
 :param template_name: OSet template name
 :param content: Content object
 
-:since: v0.1.00
+:return: (str) Rendered content
+:since:  v0.1.00
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1}, +content)- (#echo(__LINE__)#)".format(self, template_name))

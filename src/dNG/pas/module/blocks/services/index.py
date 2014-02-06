@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.controller.abstract_request import AbstractRequest
+from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
 from dNG.pas.controller.predefined_http_request import PredefinedHttpRequest
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.translatable_exception import TranslatableException
@@ -63,7 +63,7 @@ Action for "index"
 
 			if ("dsd" in default_page_settings):
 			#
-				dsd = (default_page_settings['dsd'] if (type(default_page_settings['dsd']) == dict) else AbstractRequest.parse_dsd(default_page_settings['dsd']))
+				dsd = (default_page_settings['dsd'] if (type(default_page_settings['dsd']) == dict) else AbstractHttpRequest.parse_dsd(default_page_settings['dsd']))
 
 				if (type(dsd) == dict):
 				#

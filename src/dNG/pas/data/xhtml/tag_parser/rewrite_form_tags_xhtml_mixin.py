@@ -24,10 +24,10 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from dNG.pas.data.binary import Binary
-from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
+from dNG.pas.data.text.tag_parser.source_value_mixin import SourceValueMixin
 from dNG.pas.data.xhtml.form_tags import FormTags
 
-class RewriteFormTagsXhtmlMixin(RewriteMixin):
+class RewriteFormTagsXhtmlMixin(SourceValueMixin):
 #
 	"""
 This tag parser mixin provides support for rewrite statements to generate
@@ -57,7 +57,7 @@ Checks and renders the rewrite statement.
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_formtags_xhtml(source, {1})- (#echo(__LINE__)#)".format(self, key))
 
 		content = None
-		data = self.render_rewrite(source, key)
+		data = self.source_get_value(source, key)
 		main_id = None
 
 		if (not isinstance(data, dict)): content = Binary.str(data)

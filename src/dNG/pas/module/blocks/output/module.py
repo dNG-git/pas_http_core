@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.FormTagsRenderer
+dNG.pas.module.blocks.output.Module
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,35 +23,23 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from .abstract_form_tags import AbstractFormTags
+from dNG.pas.module.blocks.abstract_block import AbstractBlock
 
-class FormTagsRenderer(AbstractFormTags):
+class Module(AbstractBlock):
 #
 	"""
-The OSet parser takes a template string to render the output.
+Module for "output"
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.1.01
+:since:      v0.1.00
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
 
-	def render(self, content):
-	#
-		"""
-Renders the given FormTags content.
-
-:param content: FormTags content
-
-:return: (str) Rendered content
-:since:  v0.1.01
-		"""
-
-		return self._parse(content)
-	#
+	pass
 #
 
 ##j## EOF

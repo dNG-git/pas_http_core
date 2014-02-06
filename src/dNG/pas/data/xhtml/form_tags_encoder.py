@@ -184,7 +184,7 @@ The OSet parser takes a template string to render the output.
 		"yellowgreen":          "9acd32"
 	}
 
-	def _parser_change_color(self, data, tag_position, data_position, tag_end_position):
+	def _match_change_color(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "color" tag.
@@ -218,7 +218,7 @@ Change data according to the "color" tag.
 		return _return
 	#
 
-	def _parser_check_color(self, data):
+	def _match_check_color(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "color" tag that needs to be changed.

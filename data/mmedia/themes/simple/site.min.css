@@ -1,15 +1,15 @@
-.pagecontent_subobjects_box {
+.pagecontent_datalinker_objects_box {
 	clear: right; float: right; width: 35%; padding: 0.4%; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgb(230, 232, 235) 100%); border: 1px solid #d8deeb; border-radius: 0.2em;
 }
 
-.pagecontent_subobjects_box h1 {
+.pagecontent_datalinker_objects_box h1 {
 	border-bottom: 1px #e6e8eb solid;
 	font-size: 1em; line-height: 1em
 }
 
-.pagecontent_subobjects_box li { margin: 0; padding: 0 }
-.pagecontent_subobjects_box li:nth-child(n+2) { border-top: 1px #e6e8eb dotted }
-.pagecontent_subobjects_box ul { margin: 0; padding: 0; list-style: none inside none }
+.pagecontent_datalinker_objects_box li { margin: 0; padding: 0 }
+.pagecontent_datalinker_objects_box li:nth-child(n+2) { border-top: 1px #e6e8eb dotted }
+.pagecontent_datalinker_objects_box ul { margin: 0; padding: 0; list-style: none inside none }
 
 .pageform_button {
 	margin: 0.2%; padding: 0.1% 0.2%; background-color: #ffffff; border: 1px solid #375a9d; border-radius: 0.2em;
