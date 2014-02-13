@@ -339,8 +339,8 @@ Check if a possible tag match is a valid "link" tag.
 
 			if (data.find("[link:") == 0):
 			#
-				if ("type" not in tag_params or tag_params['type'] == "id"): _return = ("id" in tag_params and len(tag_params['id'].strip()) > 0)
-				elif (tag_params['type'] == "tag"): _return = ("tag" in tag_params and len(tag_params['tag'].strip()) > 0)
+				if ("id" in tag_params): _return = (len(tag_params['id'].strip()) > 0)
+				elif ("tag" in tag_params): _return = (len(tag_params['tag'].strip()) > 0)
 			#
 		#
 
@@ -804,63 +804,6 @@ Check if a possible tag match is a valid "center" tag.
 		if (value[-2:] == "px"):
 		#
 			if (AbstractFormTags.RE_NUMBER.match(value[:-2]) != None): _return = AbstractFormTags._check_number(int(value[:-2]), _min, _max)
-		#
-
-		return _return
-	#
-
-	@staticmethod
-	def parse_tag_parameters(tag_key, data, tag_position, data_position):
-	#
-		"""
-Check if a possible tag matches the given expected, simple tag.
-
-:param tag_key: Tag key
-:param data: Data starting with the possible tag
-:param tag_position: Tag starting position
-:param data_position: Data starting position
-
-:return: (bool) True if valid
-:since:  v0.1.01
-		"""
-
-		_return = { }
-
-		data_splitted = data[1 + len(tag_key) + tag_position:data_position - 1].split(":", 1)
-
-		data = (data_splitted[0] if (len(data_splitted[0]) > 0 or len(data_splitted) > 1) else None)
-		re_escaped = re.compile("(\\\\+)$")
-		value = ""
-
-		while (data != None):
-		#
-			if (len(data) > 0):
-			#
-				re_result = re_escaped.search(data)
-				value += data
-
-				if (re_result == None or (len(re_result.group(1)) % 2) != 1):
-				#
-					value_splitted = value.split("=", 1)
-
-					if (len(value_splitted) > 1):
-					#
-						key = value_splitted[0]
-						value = value_splitted[1]
-					#
-					else: key = tag_key
-
-					if (key not in _return): _return[key] = value
-					value = ""
-				#
-			#
-
-			if (len(data_splitted) > 1):
-			#
-				data_splitted = data_splitted[1].split(":", 1)
-				data = data_splitted[0]
-			#
-			else: data = None
 		#
 
 		return _return
