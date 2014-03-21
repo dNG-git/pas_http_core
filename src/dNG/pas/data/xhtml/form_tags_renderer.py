@@ -26,8 +26,8 @@ NOTE_END //n"""
 import re
 
 from dNG.pas.data.text.abstract_form_tags import AbstractFormTags
+from dNG.pas.data.xhtml.content_link_renderer import ContentLinkRenderer
 from dNG.pas.data.xhtml.formatting import Formatting
-from dNG.pas.data.xhtml.link import Link
 
 class FormTagsRenderer(AbstractFormTags):
 #
@@ -42,6 +42,8 @@ The OSet parser takes a template string to render the output.
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
+
+	# pylint: disable=unused-argument
 
 	TAGS = AbstractFormTags.TAGS + [ "nobr" ]
 	"""
@@ -209,6 +211,38 @@ Change data according to the "i" tag.
 		return ("<i>{0}</i>".format(enclosed_data) if (len(enclosed_data) > 0) else "")
 	#
 
+	def _match_change_img(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "img" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = ""
+
+		url = data[data_position:tag_end_position]
+
+		if (len(url) > 0):
+		#
+			tag_params = FormTagsRenderer.parse_tag_parameters("img", data, tag_position, data_position)
+
+			if (len(_return) < 1): url = Formatting.escape(url)
+			title = (Formatting.escape(tag_params['title']) if ("title" in tag_params) else url)
+
+			_return = '<img href="{0}" title="{1}" />'.format(Formatting.escape(url), title)
+		#
+
+		return _return
+	#
+
 	def _match_change_justify(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
@@ -284,13 +318,11 @@ Change data according to the "link" tag.
 
 		if (len(_return) > 0):
 		#
+			renderer = ContentLinkRenderer()
+			if (self.datalinker_main_id != None): renderer.set_datalinker_main_id(self.datalinker_main_id)
 			tag_params = FormTagsRenderer.parse_tag_parameters("link", data, tag_position, data_position)
-			url = None
 
-			if ("type" not in tag_params or tag_params['type'] == "id"): url = Link().build_url(Link.TYPE_RELATIVE, { "m": "datalinker", "s": "sub_object", "a": "related", "dsd": { "eid": tag_params['id'] } })
-			elif (tag_params['type'] == "tag" and self.datalinker_main_id != None): url = Link().build_url(Link.TYPE_RELATIVE, { "m": "datalinker", "s": "sub_object", "a": "related", "dsd": { "etag": "#{0}".format(tag_params['tag']), "emid": self.datalinker_main_id } })
-
-			if (url != None): _return = '<a href="{0}">{1}</a>'.format(Formatting.escape(url), _return)
+			_return = renderer.render(_return, tag_params)
 		#
 
 		return _return

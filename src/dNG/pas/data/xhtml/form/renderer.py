@@ -29,7 +29,9 @@ from os import urandom
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
+from dNG.pas.data.xhtml.oset.file_parser import FileParser
 from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.runtime.value_exception import ValueException
 
 class Renderer(object):
 #
@@ -117,7 +119,7 @@ $f_return = ((isset ($f_section) ? "<p class='pagecontenttitle ui-accordion-head
 <tbody>");
 			"""
 		#
-		elif (sections_count > 0): _return = self._render_section(0)
+		elif (sections_count > 0): _return = self.render_section(0)
 
 		return _return
 	#
@@ -133,9 +135,11 @@ Render the form field using the given OSet template.
 :since: v0.1.00
 		"""
 
+		# pylint: disable=broad-except
+
 		try:
 		#
-			parser = NamedLoader.get_instance("dNG.pas.data.oset.FileParser")
+			parser = FileParser()
 			parser.set_oset(self.oset)
 			_return = parser.render(template_name, content)
 		#
@@ -144,7 +148,21 @@ Render the form field using the given OSet template.
 		return _return
 	#
 
-	def render_password(self, field_data, rcp_active = False):
+	def render_email(self, field_data):
+	#
+		"""
+Format and return XHTML for a email input field.
+
+:param field_data: Dict containing information about the form field
+
+:return: (str) Valid XHTML form field definition
+:since:  v0.1.00
+		"""
+
+		return self.render_text(field_data)
+	#
+
+	def render_password(self, field_data):
 	#
 		"""
 Format and return XHTML for a password input field.
@@ -171,7 +189,7 @@ Format and return XHTML for a password input field.
 		#
 		elif (field_data['size'] == "m"):
 		#
-			context['size'] = 18;
+			context['size'] = 18
 			context['size_percentage'] = "55%"
 		#
 		else:
@@ -285,19 +303,40 @@ $f_return .= ($f_data['title'].":</strong></td>
 		return _return
 	#
 
-	def _render_section(self, position):
+	def render_section(self, section):
 	#
 		"""
 Reads the form fields of the section at the given position and calls the
 corresponding method to get valid XHTML for output.
 
-:param position: Form section position
+:param section: Form section position (int) or name (str)
 
 :return: (str) Valid XHTML form
 :since:  v0.1.00
 		"""
 
 		_return = ""
+
+		position = -1
+
+		if (type(section) == str):
+		#
+			section_position = 0
+
+			for section in self.fields:
+			#
+				if (section['name'] == section):
+				#
+					position = section_position
+					break
+				#
+
+				section_position += 1
+			#
+		#
+		elif (type(section) == int): position = section
+
+		if (position < 0 or len(self.fields) < position): raise ValueException("Given section not found")
 
 		fields = self.fields[position]['fields']
 
@@ -366,7 +405,7 @@ Format and return XHTML for a text input field.
 		#
 		elif (field_data['size'] == "m"):
 		#
-			context['size'] = 18;
+			context['size'] = 18
 			context['size_percentage'] = "55%"
 		#
 		else:
@@ -482,7 +521,7 @@ Sets defined fields for output.
 :since: v0.1.00
 		"""
 
-		if (type(fields) == list): self.fields = fields
+		if (isinstance(fields, list)): self.fields = fields
 	#
 
 	def _set_form_id(self, form_id):

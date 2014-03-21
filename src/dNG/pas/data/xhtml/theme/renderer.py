@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.theme.Renderer
+dNG.pas.data.xhtml.theme.Renderer
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -29,19 +29,23 @@ import os
 import re
 
 from dNG.data.file import File
+from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.settings import Settings
+from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.text.tag_parser.abstract import Abstract as AbstractTagParser
 from dNG.pas.data.text.tag_parser.block_mixin import BlockMixin
 from dNG.pas.data.text.tag_parser.each_mixin import EachMixin
 from dNG.pas.data.text.tag_parser.if_condition_mixin import IfConditionMixin
-from dNG.pas.data.text.tag_parser.mapped_element_mixin import MappedElementMixin
 from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
+from dNG.pas.data.xhtml.content_link_renderer import ContentLinkRenderer
+from dNG.pas.data.xhtml.formatting import Formatting
+from dNG.pas.data.xhtml.link import Link
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.runtime.io_exception import IOException
 
-class Renderer(AbstractTagParser, BlockMixin, EachMixin, IfConditionMixin, MappedElementMixin, RewriteMixin):
+class Renderer(AbstractTagParser, BlockMixin, EachMixin, IfConditionMixin, RewriteMixin):
 #
 	"""
 The theme renderer parses and renders a template file.
@@ -64,11 +68,18 @@ Constructor __init__(Renderer)
 		"""
 
 		AbstractTagParser.__init__(self)
-		MappedElementMixin.__init__(self)
+		BlockMixin.__init__(self)
+		EachMixin.__init__(self)
+		IfConditionMixin.__init__(self)
+		RewriteMixin.__init__(self)
 
 		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.Cache", False)
 		"""
 Cache instance
+		"""
+		self.canonical_url = ""
+		"""
+(X)HTML canonical URL of the response
 		"""
 		self.content = None
 		"""
@@ -86,6 +97,14 @@ JavaScript files to be added.
 		"""
 The LogHandler is called whenever debug messages should be logged or errors
 happened.
+		"""
+		self.p3p_url = ""
+		"""
+P3P URL
+		"""
+		self.page_description = ""
+		"""
+(X)HTML head description
 		"""
 		self.path = Settings.get("path_themes", "{0}/themes".format(Settings.get("path_data")))
 		"""
@@ -118,44 +137,16 @@ Add the defined javascript file to the output.
 		if (js_file not in self.js_files): self.js_files.append({ "name": js_file })
 	#
 
-	def _get_unique_filelist(self, raw_list):
-	#
-		"""
-Sets the theme to use.
-
-:param theme: Output theme
-
-:return: (list) List with unique file entries
-:since: v0.1.00
-		"""
-
-		_return = [ ]
-		names_list = [ ]
-
-		if (len(raw_list) > 0):
-		#
-			for entry in raw_list:
-			#
-				if (entry['name'] not in names_list):
-				#
-					names_list.append(entry['name'])
-					_return.append(entry)
-				#
-			#
-		#
-
-		return _return
-	#
-
 	def is_supported(self, theme, subtype = None):
 	#
 		"""
-Sets the theme to use.
+Checks if the given theme and subtype is supported.
 
 :param theme: Output theme
 :param subtype: Output theme subtype
 
-:since: v0.1.00
+:return: (bool) True if supported
+:since:  v0.1.00
 		"""
 
 		_return = False
@@ -234,12 +225,24 @@ Change data according to the matched tag.
 				value = re_result.group(5).strip()
 
 				if (source == "content"): _return += self.render_if_condition(self._mapped_element_update("content", self.content), key, operator, value, data[data_position:tag_end_position])
+				elif (source == "request"):
+				#
+					request = AbstractHttpRequest.get_instance()
+					_return += self.render_if_condition({ 'lang': request.get_lang() } , key, operator, value, data[data_position:tag_end_position])
+				#
 				elif (source == "settings"): _return += self.render_if_condition(self._mapped_element_update("settings", Settings.get_instance()), key, operator, value, data[data_position:tag_end_position])
 			#
 		#
+		elif (tag_definition['tag'] == "link"):
+		#
+			renderer = ContentLinkRenderer()
+			tag_params = Renderer.parse_tag_parameters("link", data, tag_position, data_position)
+
+			_return += renderer.render(data[data_position:tag_end_position], tag_params)
+		#
 		elif (tag_definition['tag'] == "rewrite"):
 		#
-			source = re.match("^\\[rewrite:(\\w+)\\]", data[tag_position:data_position]).group(1)
+			source = re.match("^\\[rewrite:(\\w+)(:.*|)\\]", data[tag_position:data_position]).group(1)
 			key = data[data_position:tag_end_position]
 
 			if (source == "content"): _return += self.render_rewrite(self._mapped_element_update("content", self.content), key)
@@ -289,9 +292,14 @@ Check if a possible tag match is a false positive.
 				re_result = re.match("^\\[if:\\w+:[\\w\\.]+\\s*(\\!=|==).*?\\]", data)
 				if (re_result != None): _return = { "tag": "if", "tag_end": "[/if]", "type": "top_down" }
 			#
+			elif (data_match == "link"):
+			#
+				re_result = re.match("^\\[link:(.+)\\]", data)
+				if (re_result != None): _return = { "tag": "link", "tag_end": "[/link]" }
+			#
 			elif (data_match == "rewrite"):
 			#
-				re_result = re.match("^\\[rewrite:(\\w+)\\]", data)
+				re_result = re.match("^\\[rewrite:(\\w+)(:.*|)\\]", data)
 				if (re_result != None and re_result.group(1) in [ "content", "l10n", "settings" ]): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
 			#
 
@@ -311,6 +319,8 @@ Renders content ready for output from the given OSet template.
 :return: (str) Rendered content
 :since:  v0.1.01
 		"""
+
+		# pylint: disable=no-member
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Renderer.render(template_data, content)- (#echo(__LINE__)#)")
 
@@ -349,6 +359,9 @@ Read corresponding theme configuration
 		if (self.title == None): self.title = Settings.get("pas_html_title", "Unconfigured site")
 
 		self.content = {
+			"head_canonical_url": self.canonical_url,
+			"head_p3p_url": self.p3p_url,
+			"head_page_description": self.page_description,
 			"page_title": self.title,
 			"page_content": content
 		}
@@ -369,10 +382,10 @@ Read corresponding theme configuration
 			#
 		#
 
-		css_files = self._get_unique_filelist(css_files)
+		css_files = InputFilter.filter_unique_list(css_files)
 		if (len(css_files) > 0): self.content['css_files'] = css_files
 
-		js_files = self._get_unique_filelist(js_files)
+		js_files = InputFilter.filter_unique_list(js_files)
 		if (len(js_files) > 0): self.content['js_files'] = js_files
 
 		return self._parse(theme_data)
@@ -412,6 +425,39 @@ Read corresponding theme configuration
 		Settings.read_file(file_pathname)
 	#
 
+	def set_canonical_url(self, url):
+	#
+		"""
+Sets the (X)HTML canonical URL of the response.
+
+:param url: Canonical URL
+
+:since: v0.1.00
+		"""
+
+		self.canonical_url = url
+	#
+
+	def set_canonical_url_parameters(self, parameters):
+	#
+		"""
+Sets the (X)HTML canonical URL of the response based on the parameters
+given.
+
+:param parameters: Parameters dict
+
+:since: v0.1.00
+		"""
+
+		_type = (
+			Link.TYPE_RELATIVE
+			if (Settings.get("pas_http_site_canonical_url_type", "absolute") == "relative") else
+			Link.TYPE_FULL
+		)
+
+		self.set_canonical_url(Link().build_url(_type, parameters))
+	#
+
 	def set_log_handler(self, log_handler):
 	#
 		"""
@@ -425,27 +471,53 @@ Sets the LogHandler.
 		self.log_handler = log_handler
 	#
 
+	def set_p3p_url(self, url):
+	#
+		"""
+Sets the P3P URL.
+
+:param url: P3P URL
+
+:since: v0.1.00
+		"""
+
+		self.p3p_url = Formatting.escape(url)
+	#
+
+	def set_page_description(self, description):
+	#
+		"""
+Sets the (X)HTML head description of the response.
+
+:param description: Head description
+
+:since: v0.1.00
+		"""
+
+		self.page_description = Formatting.escape(description)
+	#
+
 	def set_subtype(self, subtype):
 	#
 		"""
-Sets the theme to use.
+Sets the theme subtype to use.
 
-:param theme: Output theme
+:param subtype: Output theme subtype
 :since: v0.1.00
 		"""
 
 		subtype = Binary.str(subtype)
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Renderer.set_subtype({0})- (#echo(__LINE__)#)".format(subtype))
 
-		self.subtype = subtype
+		self.theme_subtype = subtype
 	#
 
 	def set_title(self, title):
 	#
 		"""
-Sets the theme to use.
+Sets the title to use.
 
-:param theme: Output theme
+:param title: Page title
 :since: v0.1.00
 		"""
 

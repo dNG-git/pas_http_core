@@ -71,7 +71,7 @@ Sets all parameters defined in the given URI request string.
 			for key in dsd: self.set_dsd(key, dsd[key])
 		#
 
-		if ("ohandler" in parameters and len(parameters['ohandler']) > 0): self.set_output_format(AbstractHttpRequest.filter_parameter_word(self.parameters['ohandler']))
+		if ("ohandler" in parameters and len(parameters['ohandler']) > 0): self.set_output_handler(AbstractHttpRequest.filter_parameter_word(parameters['ohandler']))
 	#
 
 	def set_module(self, module):
@@ -87,17 +87,17 @@ Sets the requested module.
 		self.module = module
 	#
 
-	def set_output_format(self, output_format):
+	def set_output_handler(self, output_handler):
 	#
 		"""
 Sets the output format.
 
-:param output_format: (str) Output format
+:param output_handler: (str) Output format
 
 :since: v0.1.00
 		"""
 
-		self.output_format = output_format
+		self.output_handler = output_handler
 	#
 
 	def set_service(self, service):

@@ -23,7 +23,9 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from cgi import escape as html_escape
+# pylint: disable=import-error
+
+from cgi import escape
 import re
 
 try: from html.parser import HTMLParser
@@ -57,7 +59,7 @@ Escapes given data for (X)HTML output.
 :since:  v0.1.00
 		"""
 
-		return html_escape(Binary.str(data), True)
+		return escape(Binary.str(data), True)
 	#
 
 	@staticmethod

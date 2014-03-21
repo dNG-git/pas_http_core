@@ -29,7 +29,6 @@ from dNG.data.rfc.basics import Basics as RfcBasics
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.traced_exception import TracedException
 from dNG.pas.data.translatable_exception import TranslatableException
-from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.translatable_exception import TranslatableException as HttpTranslatableException
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.runtime.io_exception import IOException
@@ -66,6 +65,10 @@ Charset used for response
 		self.content = None
 		"""
 Content to be shown
+		"""
+		self.content_is_dynamic = False
+		"""
+True if the content is dynamic
 		"""
 		self.cookies = { }
 		"""
@@ -107,6 +110,10 @@ Stream response object
 		"""
 Response title
 		"""
+
+		self.supported_features['headers'] = True
+		self.supported_features['script_name'] = True
+		self.supported_features['streaming'] = self._supports_streaming
 	#
 
 	def are_headers_sent(self):
@@ -117,7 +124,7 @@ Sends the prepared response headers.
 :since: v0.1.00
 		"""
 
-		return (self.stream_response.are_headers_sent() if (self.stream_response.supports_headers()) else None)
+		return (self.stream_response.are_headers_sent() if (self.stream_response.is_supported("headers")) else None)
 	#
 
 	def get_content_type(self):
@@ -147,7 +154,7 @@ Returns an already defined header.
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.get_header({0}, +name_as_key)- (#echo(__LINE__)#)".format(name))
 
-		if (not self.stream_response.supports_headers()): return None
+		if (not self.stream_response.is_supported("headers")): return None
 		else: return self.stream_response.get_header(name, name_as_key)
 	#
 
@@ -302,47 +309,39 @@ compression setting and information about P3P.
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.init(cache, compress)- (#echo(__LINE__)#)")
 
-		if (not cache):
-		#
-			if (self.expires < 1): self.expires = time()
-			if (self.last_modified < 1): self.last_modified = time()
-		#
-		elif (self.expires < 1): self.expires = time() + 63072000
+		expires = self.expires
+		last_modified = self.last_modified
 
-		if (self.stream_response.supports_compression()): self.stream_response.set_compression(compress)
+		if (self.content_is_dynamic):
+		#
+			cache = False
+			current_time = int(time())
+
+			expires = current_time
+			last_modified = current_time
+		#
+		elif (not cache):
+		#
+			if (expires < 1): expires = int(time())
+			if (last_modified < 1): last_modified = int(time())
+		#
+
+		if (self.stream_response.is_supported("compression")): self.stream_response.set_compression(compress)
 
 		self.initialized = True
 
-		if (self.stream_response.supports_headers()):
+		if (self.stream_response.is_supported("headers")):
 		#
 			output_headers = ({ "Cache-Control": "public" } if (cache) else { "Cache-Control": "no-cache, no-store, must-revalidate" })
-			if (self.expires > 0): output_headers['Expires'] = RfcBasics.get_rfc1123_datetime(self.expires)
-			if (self.last_modified > 0): output_headers['Last-Modified'] = RfcBasics.get_rfc1123_datetime(self.last_modified)
-
-			"""
-Send P3P header if defined
-			"""
-
-			p3p_cp = Settings.get("pas_http_core_p3p_cp", "")
-			p3p_url = Settings.get("pas_http_core_p3p_url", "").replace("&", "&amp;")
-
-			if (p3p_cp + p3p_url != ""):
-			#
-				p3p_data = ("" if (p3p_url == "") else "policyref=\"{0}\"".format(p3p_url))
-
-				if (p3p_cp != ""):
-				#
-					if (p3p_data != ""): p3p_data += ","
-					p3p_data += "CP=\"{0}\"".format(p3p_cp)
-				#
-
-				output_headers['P3P'] = p3p_data
-			#
+			if (not cache): output_headers['X-Robots-Tag'] = "noindex"
 
 			for header in output_headers:
 			#
 				self.stream_response.set_header(header, output_headers[header])
 			#
+
+			if (expires > 0): self._set_expires(expires)
+			if (last_modified > 0): self._set_last_modified(last_modified)
 		#
 	#
 
@@ -383,7 +382,7 @@ Sends the prepared response headers.
 :since: v0.1.00
 		"""
 
-		if (self.stream_response.supports_headers() and (not self.headers_sent)):
+		if (self.stream_response.is_supported("headers") and (not self.headers_sent)):
 		#
 			self.headers_sent = True
 			self.stream_response.send_headers()
@@ -427,7 +426,7 @@ Sets the compression formats the client accepts.
 :since: v0.1.01
 		"""
 
-		if (self.stream_response.supports_compression()): self.stream_response.set_compression_formats(compression_formats)
+		if (self.stream_response.is_supported("compression")): self.stream_response.set_compression_formats(compression_formats)
 	#
 
 	def set_content(self, content):
@@ -444,6 +443,30 @@ Sets the content for the response.
 		if (self.stream_response.is_streamer_set()): raise IOException("Can't combine a streaming object with content.")
 
 		self.content = content
+	#
+
+	def set_content_dynamic(self, mode):
+	#
+		"""
+Sets the dynamic content mode of the response. Dynamic content overrides
+the last modified timestamp with the current time.
+
+:param mode: True if page contains dynamic content
+
+:since: v0.1.01
+		"""
+
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_content_dynamic(mode)- (#echo(__LINE__)#)")
+
+		if (mode and self.initialized):
+		#
+			current_time = int(time())
+
+			self.set_expires(current_time)
+			self.set_last_modified(current_time)
+		#
+
+		self.content_is_dynamic = mode
 	#
 
 	def set_content_type(self, content_type):
@@ -477,7 +500,50 @@ Sets a cookie.
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_cookie({0}, +value, {1:d}, +secure_only, +http_only, +domain, +path)- (#echo(__LINE__)#)".format(name, timeout))
-		if (self.stream_response.supports_headers()): self.stream_response.set_cookie(name, value, timeout, secure_only, http_only, domain, path)
+		if (self.stream_response.is_supported("headers")): self.stream_response.set_cookie(name, value, timeout, secure_only, http_only, domain, path)
+	#
+
+	def set_expires(self, timestamp):
+	#
+		"""
+Sets a expires value if the response is not in dynamic mode.
+
+:param timestamp: UNIX timestamp
+
+:since: v0.1.01
+		"""
+
+		if (not self.content_is_dynamic): self._set_expires(timestamp)
+	#
+
+	def _set_expires(self, timestamp):
+	#
+		"""
+Sets a expires value.
+
+:param timestamp: UNIX timestamp
+
+:since: v0.1.01
+		"""
+
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response._set_expires({0:d})- (#echo(__LINE__)#)".format(timestamp))
+
+		self.expires = timestamp
+		if (self.initialized and self.stream_response.is_supported("headers") and (not self.headers_sent)): self.stream_response.set_header("Expires", RfcBasics.get_rfc1123_datetime(self.expires))
+	#
+
+	def set_expires_relative(self, timespan):
+	#
+		"""
+Sets a expires value based on the current time if the response is not in
+dynamic mode. For better readability we recommend using +5/-5.
+
+:param timestamp: Timespan in seconds
+
+:since: v0.1.01
+		"""
+
+		self.set_expires(int(time() + timespan))
 	#
 
 	def set_header(self, name, value, name_as_key = False, value_append = False):
@@ -494,10 +560,23 @@ Sets a header.
 		"""
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_header({0}, +value, +name_as_key, +value_append)- (#echo(__LINE__)#)".format(name))
-		if (self.stream_response.supports_headers()): self.stream_response.set_header(name, value, name_as_key, value_append)
+		if (self.stream_response.is_supported("headers")): self.stream_response.set_header(name, value, name_as_key, value_append)
 	#
 
 	def set_last_modified(self, timestamp):
+	#
+		"""
+Sets a last modified value if the response is not in dynamic mode.
+
+:param timestamp: UNIX timestamp
+
+:since: v0.1.00
+		"""
+
+		if (not self.content_is_dynamic): self._set_last_modified(timestamp)
+	#
+
+	def _set_last_modified(self, timestamp):
 	#
 		"""
 Sets a last modified value.
@@ -507,8 +586,10 @@ Sets a last modified value.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_last_modified({0:d})- (#echo(__LINE__)#)".format(timestamp))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response._set_last_modified({0:d})- (#echo(__LINE__)#)".format(timestamp))
+
 		self.last_modified = timestamp
+		if (self.initialized and self.stream_response.is_supported("headers") and (not self.headers_sent)): self.stream_response.set_header("Last-Modified", RfcBasics.get_rfc1123_datetime(self.last_modified))
 	#
 
 	def set_raw_data(self, data):
@@ -552,7 +633,7 @@ Set to true to send headers only.
 :since: v0.1.01
 		"""
 
-		if (self.stream_response.supports_headers()): self.stream_response.set_send_headers_only(headers_only)
+		if (self.stream_response.is_supported("headers")): self.stream_response.set_send_headers_only(headers_only)
 	#
 
 	def set_stream_mode(self):
@@ -564,7 +645,7 @@ it.
 :since: v0.1.00
 		"""
 
-		if (self.stream_response.supports_streaming()): self.stream_response.set_stream_mode()
+		if (self.stream_response.is_supported("streaming")): self.stream_response.set_stream_mode()
 	#
 
 	def set_stream_response(self, stream_response):
@@ -605,31 +686,7 @@ Sets the title set for the response.
 		self.title = title
 	#
 
-	def supports_headers(self):
-	#
-		"""
-Returns false if headers are not supported.
-
-:return: (bool) True if the response contain headers.
-:since:  v0.1.00
-		"""
-
-		return True
-	#
-
-	def supports_script_name(self):
-	#
-		"""
-Returns false if the script name is not needed for execution.
-
-:return: (bool) True if the controller should call "setScriptName()".
-:since:  v0.1.00
-		"""
-
-		return True
-	#
-
-	def supports_streaming(self):
+	def _supports_streaming(self):
 	#
 		"""
 Returns false if responses can not be streamed.
@@ -638,7 +695,7 @@ Returns false if responses can not be streamed.
 :since:  v0.1.00
 		"""
 
-		return (False if (self.stream_response == None) else self.stream_response.supports_streaming())
+		return (False if (self.stream_response == None) else self.stream_response.is_supported("streaming"))
 	#
 #
 

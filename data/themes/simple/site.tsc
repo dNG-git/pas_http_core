@@ -3,7 +3,9 @@
 
 <head>
 <title>[if:settings:pas_http_site_title != ][rewrite:settings]pas_http_site_title[/rewrite] • [/if][rewrite:content]page_title[/rewrite]</title>
-[if:content:p3purl != ]<link rel="P3Pv1" href="[rewrite:content]p3purl[/rewrite]" />[/if]
+[if:content:head_canonical_url != ]<link rel="canonical" href="[rewrite:content]head_canonical_url[/rewrite]" />[/if]
+[if:content:head_canonical_url != ]<meta name="description" content="[rewrite:content]head_page_description[/rewrite]" />[/if]
+[if:content:head_p3purl != ]<link rel="P3Pv1" href="[rewrite:content]head_p3purl[/rewrite]" />[/if]
 <meta name="author" content="[if:settings:pas_http_site_author == ]direct Netware Group[/if][if:settings:pas_http_site_author != ][rewrite:settings]pas_http_site_author[/rewrite][/if]" />
 <meta name="creator" content="direct PAS" />
 <meta name="viewport" content="initial-scale=1" />

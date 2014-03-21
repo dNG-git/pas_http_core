@@ -3,6 +3,8 @@
 
  "pas_http_core_js_required": "JavaScript wird benötigt",
 
+ "pas_http_core_pages": "Seiten",
+
  "pas_http_core_service_list_empty": "Derzeit sind keine Funktionen verfügbar oder du hast für die zugriffsbeschränkten Funktionen keine ausreichenden Rechte.",
 
  "errors_pas_http_core_400": "Die übermittelte Anfrage ist fehlerhaft und wird nicht verarbeitet.",

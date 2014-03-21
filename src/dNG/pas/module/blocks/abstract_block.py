@@ -127,7 +127,7 @@ Execute the requested action.
 		#
 		else:
 		#
-			if (self.primary_action and self.response.supports_headers()): self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+			if (self.primary_action and self.response.is_supported("headers")): self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
 			raise TranslatableException("core_unsupported_command", "Identified action '{0}' is not supported".format(self.action))
 		#
 

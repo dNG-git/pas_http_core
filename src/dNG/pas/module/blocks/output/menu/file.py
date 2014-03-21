@@ -77,7 +77,7 @@ Returns a list of rendered links for the service menu.
 		#
 			links = None
 
-			if("[lang]" in file_pathname):
+			if ("[lang]" in file_pathname):
 			#
 				expanded_file_pathname = file_pathname.replace("[lang]", self.request.get_lang())
 				if (not os.access(path.normpath("{0}/{1}".format(Settings.get("path_base"), expanded_file_pathname)), os.R_OK)): expanded_file_pathname = file_pathname.replace("[lang]", Settings.get("core_lang"))

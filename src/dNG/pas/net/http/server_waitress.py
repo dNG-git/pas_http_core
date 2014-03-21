@@ -23,13 +23,15 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+# pylint: disable=import-error
+
 from waitress.server import create_server
 
 from dNG.pas.data.settings import Settings
 from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
-from . import Server
+from .server_implementation import ServerImplementation
 
-class ServerWaitress(Server):
+class ServerWaitress(ServerImplementation):
 #
 	"""
 "ServerWaitress" is responsible to start an HTTP aware server.
@@ -51,7 +53,7 @@ Constructor __init__(ServerWaitress)
 :since: v0.1.00
 		"""
 
-		Server.__init__(self)
+		ServerImplementation.__init__(self)
 
 		self.server = None
 		"""
@@ -84,7 +86,7 @@ Configures the server
 Configure common paths and settings
 		"""
 
-		Server._configure(self)
+		ServerImplementation._configure(self)
 	#
 
 	def run(self):
@@ -94,6 +96,8 @@ Runs the server
 
 :since: v0.1.00
 		"""
+
+		# pylint: disable=broad-except
 
 		try: self.server.run()
 		except Exception as handled_exception:
@@ -119,7 +123,7 @@ Stop the server
 			for _socket in sockets: self.sockets[_socket].close()
 		#
 
-		return Server.stop(self, params, last_return)
+		return ServerImplementation.stop(self, params, last_return)
 	#
 #
 

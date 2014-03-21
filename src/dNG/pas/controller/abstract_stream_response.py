@@ -24,10 +24,11 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from dNG.pas.data.binary import Binary
+from dNG.pas.data.supports_mixin import SupportsMixin
 from dNG.pas.runtime.not_implemented_exception import NotImplementedException
 from dNG.pas.runtime.value_exception import ValueException
 
-class AbstractStreamResponse(object):
+class AbstractStreamResponse(SupportsMixin):
 #
 	"""
 A stream response writes given data thread-safe to a underlying stream.
@@ -40,6 +41,8 @@ A stream response writes given data thread-safe to a underlying stream.
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
+
+	# pylint: disable=unused-argument
 
 	STREAM_CALLBACK = 1
 	"""
@@ -58,6 +61,8 @@ Constructor __init__(AbstractStreamResponse)
 
 :since: v0.1.00
 		"""
+
+		SupportsMixin.__init__(self)
 
 		self.accepted_formats = [ ]
 		"""
@@ -238,53 +243,21 @@ Sets the streamer to create response data when requested.
 :since: v0.1.01
 		"""
 
+		# pylint: disable=no-member
+
 		if (not hasattr(streamer, "read")): raise ValueException("Given streaming object is not supported.")
 		self.streamer = streamer
 
 		if (self.stream_mode_supported & AbstractStreamResponse.STREAM_CALLBACK == AbstractStreamResponse.STREAM_CALLBACK): self.stream_mode |= AbstractStreamResponse.STREAM_CALLBACK
-		elif (self.supports_streaming()): self.set_stream_mode()
+		elif (self.is_supported("streaming")): self.set_stream_mode()
 	#
 
-	def supports_compression(self):
-	#
-		"""
-Returns false if data can not be compressed before being send.
-
-:return: (bool) True if the response can be compressed.
-:since:  v0.1.00
-		"""
-
-		return False
-	#
-
-	def supports_headers(self):
-	#
-		"""
-Returns false if headers are not supported.
-
-:return: (bool) True if the response contain headers.
-:since:  v0.1.00
-		"""
-
-		return False
-	#
-
-	def supports_streaming(self):
-	#
-		"""
-Returns false if responses can not be streamed.
-
-:return: (bool) True if streaming is supported.
-:since:  v0.1.00
-		"""
-
-		return False
-	#
-
-	def _write(self):
+	def _write(self, data):
 	#
 		"""
 Writes the given data.
+
+:param data: Data to be send
 
 :since: v0.1.00
 		"""

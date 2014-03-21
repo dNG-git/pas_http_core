@@ -109,6 +109,12 @@ HTTP result code
 		"""
 HTTP request version
 		"""
+
+		self.set_header("Server", "directPAS/#echo(pasHttpCoreIVersion)# [direct Netware Group]")
+
+		self.supported_features['compression'] = True
+		self.supported_features['headers'] = True
+		self.supported_features['streaming'] = True
 	#
 
 	def are_headers_sent(self):
@@ -379,6 +385,9 @@ Sets a header.
 :since: v0.1.00
 		"""
 
+		# pylint: disable=maybe-no-member
+		# pylint doesn't work well with value being of type mixed
+
 		if (self.headers_sent): raise IOException("Headers are already sent")
 		name = name.upper()
 
@@ -437,7 +446,6 @@ Sets the HTTP response code.
 :since: v0.1.00
 		"""
 
-		if (self.http_code == None and "Server" not in self.headers): self.set_header("Server", "directPAS/#echo(pasHttpCoreIVersion)# [direct Netware Group]")
 		self.http_code = http_code
 	#
 
@@ -483,42 +491,6 @@ it.
 			self.stream_mode |= AbstractHttpStreamResponse.STREAM_CHUNKED
 		#
 		elif (self.stream_mode_supported & AbstractHttpStreamResponse.STREAM_DIRECT == AbstractHttpStreamResponse.STREAM_DIRECT): self.stream_mode |= AbstractHttpStreamResponse.STREAM_DIRECT
-	#
-
-	def supports_compression(self):
-	#
-		"""
-Returns false if data can not be compressed before being send.
-
-:return: (bool) True if the response can be compressed.
-:since:  v0.1.00
-		"""
-
-		return True
-	#
-
-	def supports_headers(self):
-	#
-		"""
-Returns false if headers are not supported.
-
-:return: (bool) True if the response contain headers.
-:since:  v0.1.00
-		"""
-
-		return True
-	#
-
-	def supports_streaming(self):
-	#
-		"""
-Returns false if responses can not be streamed.
-
-:return: (bool) True if streaming is supported.
-:since:  v0.1.00
-		"""
-
-		return True
 	#
 #
 

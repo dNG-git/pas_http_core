@@ -23,6 +23,8 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+# pylint: disable=invalid-name
+
 from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting

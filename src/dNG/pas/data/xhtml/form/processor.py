@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.form.Input
+dNG.pas.data.xhtml.form.Processor
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -24,12 +24,12 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from dNG.pas.controller.abstract_request import AbstractRequest
-from dNG.pas.data.text.input_form import InputForm
+from dNG.pas.data.text.form_processor import FormProcessor
 
-class Input(InputForm):
+class Processor(FormProcessor):
 #
 	"""
-"Input" provides form methods based on (X)HTML.
+"Processor" provides form methods based on (X)HTML.
 
 :author:     direct Netware Group
 :copyright:  direct Netware Group - All rights reserved
@@ -51,7 +51,7 @@ Returns all defined fields.
 :since:  v0.1.00
 		"""
 
-		_return = InputForm.get_data(self, flush)
+		_return = FormProcessor.get_data(self, flush)
 
 		for section in _return:
 		#

@@ -143,7 +143,19 @@ Request path after the script
 		inner_request = self._parse_virtual_config(virtual_config, virtual_pathname)
 		if (isinstance(inner_request, AbstractInnerRequest)): self.set_inner_request(inner_request)
 
-		self.execute()
+		try: self.execute()
+		except Exception as handled_exception:
+		#
+			if (self.log_handler != None): self.log_handler.error(handled_exception)
+
+			# Died before output
+			if (not self.http_wsgi_stream_response.are_headers_sent()):
+			#
+				response = self.http_wsgi_stream_response
+				response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+				response.send_data("Internal Server Error")
+			#
+		#
 	#
 
 	def __iter__(self):
@@ -170,6 +182,8 @@ Returns the unparsed request parameters.
 :since:  v0.1.01
 		"""
 
+		# pylint: disable=broad-except,no-member
+
 		_return = AbstractHttpRequest.parse_iline(self.query_string)
 
 		request_body = RequestBodyUrlencoded()
@@ -194,7 +208,6 @@ Do preparations for request handling.
 :since: v0.1.00
 		"""
 
-		if ("ACCEPT-LANGUAGE" in self.headers): self.lang = self.headers['ACCEPT-LANGUAGE']
 		self.script_name = path.basename(self.script_pathname)
 
 		AbstractHttpRequest.init(self)

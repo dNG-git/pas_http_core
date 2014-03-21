@@ -27,9 +27,9 @@ from wsgiref.simple_server import make_server
 
 from dNG.pas.data.settings import Settings
 from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
-from . import Server
+from .server_implementation import ServerImplementation
 
-class ServerStandalone(Server):
+class ServerStandalone(ServerImplementation):
 #
 	"""
 "ServerStandalone" is responsible to start an HTTP aware server.
@@ -51,7 +51,7 @@ Constructor __init__(ServerStandalone)
 :since: v0.1.00
 		"""
 
-		Server.__init__(self)
+		ServerImplementation.__init__(self)
 
 		self.server = None
 		"""
@@ -81,7 +81,7 @@ Configures the server
 Configure common paths and settings
 		"""
 
-		Server._configure(self)
+		ServerImplementation._configure(self)
 	#
 
 	def run(self):
@@ -91,6 +91,8 @@ Runs the server
 
 :since: v0.1.00
 		"""
+
+		# pylint: disable=broad-except
 
 		try: self.server.serve_forever(5)
 		except Exception as handled_exception:
@@ -111,7 +113,7 @@ Stop the server
 		"""
 
 		if (self.server != None): self.server.shutdown()
-		return Server.stop(self, params, last_return)
+		return ServerImplementation.stop(self, params, last_return)
 	#
 #
 

@@ -23,6 +23,8 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+# pylint: disable=import-error
+
 from cherrypy import config, log
 from cherrypy.wsgiserver import CherryPyWSGIServer
 import socket
@@ -30,9 +32,9 @@ import socket
 from dNG.pas.data.settings import Settings
 from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
 from dNG.pas.module.named_loader import NamedLoader
-from . import Server
+from .server_implementation import ServerImplementation
 
-class ServerCherryPy(Server):
+class ServerCherryPy(ServerImplementation):
 #
 	"""
 "ServerCherryPy" is responsible to start the HTTP CherryPy server.
@@ -54,7 +56,7 @@ Constructor __init__(ServerCherryPy)
 :since: v0.1.01
 		"""
 
-		Server.__init__(self)
+		ServerImplementation.__init__(self)
 
 		self.server = None
 		"""
@@ -95,7 +97,7 @@ Configures the server
 Configure common paths and settings
 		"""
 
-		Server._configure(self)
+		ServerImplementation._configure(self)
 	#
 
 	def run(self):
@@ -105,6 +107,8 @@ Runs the server
 
 :since: v0.1.01
 		"""
+
+		# pylint: disable=broad-except
 
 		try: self.server.start()
 		except Exception as handled_exception:
@@ -125,7 +129,7 @@ Stop the server
 		"""
 
 		if (self.server != None): self.server.stop()
-		return Server.stop(self, params, last_return)
+		return ServerImplementation.stop(self, params, last_return)
 	#
 #
 

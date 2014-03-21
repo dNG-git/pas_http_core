@@ -70,14 +70,14 @@ Renders a link.
 			if (is_js_required):
 			#
 				link_id = "pas_id_{0}".format(Md5.hash("pas_http_core_url_{0}_{1:d}_{2:d}".format(url, id(data), id(self))))
-				_return = xml_parser.dict2xml_item_encoder({ "tag": "span", "attributes": { "data-href": url, "id": link_id, "title": L10n.get("pas_http_core_js_required"), "class": "pageurl_requirements_unsupported" } }, False)
+				_return = xml_parser.dict_to_xml_item_encoder({ "tag": "span", "attributes": { "data-href": url, "id": link_id, "title": L10n.get("pas_http_core_js_required"), "class": "pageurl_requirements_unsupported" } }, False)
 			#
-			else: _return = xml_parser.dict2xml_item_encoder({ "tag": "a", "attributes": { "href": url } }, False)
+			else: _return = xml_parser.dict_to_xml_item_encoder({ "tag": "a", "attributes": { "href": url } }, False)
 
 			l10n_title_id = "title_{0}".format(self.request.get_lang())
 			title = (data[l10n_title_id] if (l10n_title_id in data) else data['title'])
 
-			if (include_image and "image" in data): _return += "{0}".format(xml_parser.dict2xml_item_encoder({ "tag": "img", "attributes": {
+			if (include_image and "image" in data): _return += "{0}".format(xml_parser.dict_to_xml_item_encoder({ "tag": "img", "attributes": {
 				"src": "{0}/themes/{1}/{2}.png".format(Settings.get("http_path_mmedia_versioned"), self.response.get_theme(), data['image']) }, "alt": title
 			}, strict_standard = False))
 

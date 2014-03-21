@@ -115,7 +115,7 @@ are met.
 							if (range_end > 0 and range_end < streamer_size): is_valid = True
 						#
 
-						if (is_valid and range_start > 0): is_valid = streamer.supports_seeking()
+						if (is_valid and range_start > 0): is_valid = streamer.is_supported("seeking")
 
 						if (is_valid and (range_start > 0 or (1 + range_end) < streamer_size)):
 						#

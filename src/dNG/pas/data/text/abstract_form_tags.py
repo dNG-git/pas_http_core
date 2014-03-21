@@ -42,7 +42,9 @@ The OSet parser takes a template string to render the output.
              Mozilla Public License, v. 2.0
 	"""
 
-	RE_NUMBER = re.compile("^\d+$")
+	# pylint: disable=unused-argument
+
+	RE_NUMBER = re.compile("^\\d+$")
 	"""
 
 	"""
@@ -265,7 +267,21 @@ Check if a possible tag match is a valid "img" tag.
 :since:  v0.1.01
 		"""
 
-		return False # TODO: Implement me
+		_return = False
+
+		tag_element_end_position = self._find_tag_end_position(data, 4)
+
+		if (tag_element_end_position > 5):
+		#
+			tag_params = AbstractFormTags.parse_tag_parameters("img", data, 0, tag_element_end_position)
+
+			_return = (data.find("[img:") == 0)
+			if (_return and "width" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['width']) or AbstractFormTags.check_size_px(tag_params['width']))
+			if (_return and "height" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['height']) or AbstractFormTags.check_size_px(tag_params['height']))
+		#
+		else: _return = (data.find("[img]") == 0)
+
+		return _return
 	#
 
 	def _match_check_justify(self, data):
@@ -340,6 +356,7 @@ Check if a possible tag match is a valid "link" tag.
 			if (data.find("[link:") == 0):
 			#
 				if ("id" in tag_params): _return = (len(tag_params['id'].strip()) > 0)
+				elif ("link" in tag_params and tag_params['link'] == "params"): _return = (len(tag_params) > 1)
 				elif ("tag" in tag_params): _return = (len(tag_params['tag'].strip()) > 0)
 			#
 		#

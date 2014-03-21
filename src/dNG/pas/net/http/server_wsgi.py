@@ -30,9 +30,9 @@ from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
 from dNG.pas.data.settings import Settings
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.plugins.hooks import Hooks
-from . import Server
+from .server_implementation import ServerImplementation
 
-class ServerWsgi(Server):
+class ServerWsgi(ServerImplementation):
 #
 	"""
 "ServerWsgi" takes requests from WSGI aware servers.
@@ -46,6 +46,8 @@ class ServerWsgi(Server):
              Mozilla Public License, v. 2.0
 	"""
 
+	# pylint: disable=unused-argument
+
 	def __init__(self, wsgi_env, wsgi_header_response):
 	#
 		"""
@@ -58,26 +60,15 @@ Constructor __init__(ServerWsgi)
 		"""
 Cache instance
 		"""
-		self.host = None
-		"""
-Configured server host
-		"""
-		self.log_handler = None
-		"""
-The LogHandler is called whenever debug messages should be logged or errors
-happened.
-		"""
-		self.port = None
-		"""
-Server port
-		"""
 		self.time_started = time()
 		"""
 Timestamp of service initialisation
 		"""
 
 		self.cache_instance.disable()
-		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
+
+		# Call super after we disabled the cache
+		ServerImplementation.__init__(self)
 
 		self._configure()
 
@@ -128,7 +119,7 @@ Configures the server
 		Settings.read_file("{0}/settings/pas_core.json".format(Settings.get("path_data")), True)
 		Settings.read_file("{0}/settings/pas_http.json".format(Settings.get("path_data")))
 
-		Server._configure(self)
+		ServerImplementation._configure(self)
 	#
 
 	def get_time_started(self, params = None, last_return = None):

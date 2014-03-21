@@ -48,6 +48,8 @@ The class "RequestBody" implements method to read the request body.
              Mozilla Public License, v. 2.0
 	"""
 
+	# pylint: disable=arguments-differ
+
 	def __init__(self, receive_in_thread = False):
 	#
 		"""
@@ -171,7 +173,7 @@ Returns the request body.
 :since:  v0.1.00
 		"""
 
-		_return = None
+		# pylint: disable=arguments-differ,raising-bad-type
 
 		if (timeout == None): timeout = self.socket_data_timeout
 		if (self.input_ptr != None and (not self.receive_in_thread)): self.run(timeout)
@@ -189,6 +191,8 @@ Sets a given pointer for the streamed post instance.
 
 :since: v0.1.00
 		"""
+
+		# pylint: disable=broad-except
 
 		try:
 		#

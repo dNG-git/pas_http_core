@@ -23,6 +23,8 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+# pylint: disable=import-error,invalid-name,no-name-in-module
+
 from collections import Iterable
 from math import floor
 
@@ -36,8 +38,8 @@ from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.runtime.value_exception import ValueException
 from .uri import Uri
 
-try: from dNG.pas.data.session import Session
-except ImportError: Session = None
+try: from dNG.pas.data.session.implementation import Implementation as SessionImplementation
+except ImportError: SessionImplementation = None
 
 class Link(Uri):
 #
@@ -52,6 +54,8 @@ class Link(Uri):
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
+
+	# pylint: disable=unused-argument
 
 	TYPE_FULL = 1
 	"""
@@ -239,6 +243,8 @@ Builds a template-defined string containing the given URL parameters.
 :since:  v0.1.00
 		"""
 
+		# pylint: disable=protected-access
+
 		_return = ""
 
 		if (_escape == None): _escape = Link.query_param_encode
@@ -304,21 +310,26 @@ Builds a URL DSD string.
 		"""
 
 		_return = ""
+		_type = type(parameters)
 
-		if (type(parameters) == dict):
+		if (_type == dict):
 		#
 			for key in sorted(parameters.keys()):
 			#
-				if (len(parameters[key]) > 0):
+				value = parameters[key]
+				if (type(value) != str): value = str(value)
+
+				if (len(value) > 0):
 				#
 					escaped_key = _escape(key)
-					escaped_value = _escape(parameters[key])
+					escaped_value = _escape(value)
 
 					if (_return != ""): _return += "++"
 					_return += "{0}+{1}".format(escaped_key, escaped_value)
 				#
 			#
 		#
+		elif (_type == str): _return = parameters
 
 		return _return
 	#
@@ -341,39 +352,65 @@ Returns the base URL for the given type and parameters.
 		#
 			_return = "{0}://".format(Binary.str(self.scheme))
 			if (self.host != None): _return += Binary.str(self.host)
-			if (self.port != None): _return += ":{0}".format(Binary.str(self.port))
-			_return += Binary.str(self.path)
+
+			if (self.port != None):
+			#
+				port = Link._filter_well_known_port(self.scheme, self.port)
+				if (port > 0): _return += ":{0:d}".format(port)
+			#
+
+			path = ("/" if (self.path == None) else Binary.str(self.path))
+			_return += ("/" if (path == "") else path)
 		#
 		else:
 		#
 			request = AbstractHttpRequest.get_instance()
 
-			if (_type == Link.TYPE_RELATIVE):
-			#
-				if (self.path == None):
-				#
-					script_name = request.get_script_name()
-					if (script_name != None): _return = Binary.str(script_name)
-				#
-				else: _return = Binary.str(self.path)
-			#
+			if (_type == Link.TYPE_RELATIVE): _return = self._get_url_path(request)
 			else:
 			#
 				scheme = request.get_server_scheme()
-				host = request.get_server_host()
-				port = request.get_server_port()
-				script_pathname = request.get_script_pathname()
-
-				if (scheme == None or (self.path == None and script_pathname == None)): raise ValueException("Can't construct a full URL from the received request if it is not provided")
+				if (scheme == None): raise ValueException("Can't construct a full URL from the received request if it is not provided")
 
 				_return = "{0}://".format(Binary.str(scheme))
+
+				host = request.get_server_host()
 				if (host != None): _return += Binary.str(host)
-				if (port != None): _return += ":{0:d}".format(port)
-				_return += (Binary.str(script_pathname) if (self.path == None) else Binary.str(self.path))
+
+				port = Link._filter_well_known_port(scheme, request.get_server_port())
+				if (port > 0): _return += ":{0:d}".format(port)
+
+				_return += self._get_url_path(request)
 			#
 		#
 
 		return _return
+	#
+
+	def _get_url_path(self, request = None):
+	#
+		"""
+Returns the base URL path for the given URL or the current handled one.
+
+:return: (str) Base URL path
+:since:  v0.1.01
+		"""
+
+		if (self.path == None):
+		#
+			if (request == None): request = AbstractHttpRequest.get_instance()
+			script_name = request.get_script_name()
+
+			if (script_name == None): path = "/"
+			else:
+			#
+				script_name = Binary.str(script_name)
+				path = (script_name if (script_name[:1] == "/") else "/{0}".format(script_name))
+			#
+		#
+		else: path = Binary.str(self.path)
+
+		return ("/" if (path == "") else path)
 	#
 
 	def _parameters_append_defaults(self, parameters):
@@ -393,14 +430,14 @@ This method appends default parameters if not already set.
 		if ("lang" not in _return):
 		#
 			request = AbstractHttpRequest.get_instance()
-			if (request != None): _return['lang'] = request.get_lang()
+			if (request != None and request.get_lang() != request.get_lang_default()): _return['lang'] = request.get_lang()
 		#
 
-		if ("uuid" not in _return and Session != None):
+		if ("uuid" not in _return and SessionImplementation != None):
 		#
 			if (request == None): request = AbstractHttpRequest.get_instance()
 			session = request.get_session()
-			if (session != None and session.is_active() and (not session.is_persistent())): _return['uuid'] = Session.get_uuid()
+			if (session != None and session.is_active() and (not session.is_persistent())): _return['uuid'] = SessionImplementation.get_class().get_uuid()
 		#
 
 		return _return
@@ -437,7 +474,7 @@ This method filters all parameters of the type "__<KEYWORD>__".
 
 			if (request != None):
 			#
-				if ("ohandler" not in _return): _return['ohandler'] = request.get_output_format()
+				if ("ohandler" not in _return): _return['ohandler'] = request.get_output_handler()
 				if ("m" not in _return): _return['m'] = request.get_module()
 				if ("s" not in _return): _return['s'] = request.get_service().replace(".", " ")
 				if ("a" not in _return): _return['a'] = request.get_action()
@@ -531,6 +568,35 @@ Builds a sorted list for the parameter key list given.
 				_return.remove("uuid")
 				_return.append("uuid")
 			#
+		#
+
+		return _return
+	#
+
+	@staticmethod
+	def _filter_well_known_port(scheme, port):
+	#
+		"""
+Filter well known ports defined for the given scheme.
+
+:param scheme: Scheme
+:param port: Port number
+
+:return: (int) Port not equal to zero if not specified for the given scheme
+:since:  v0.1.01
+		"""
+
+		_return = 0
+
+		if (port != None):
+		#
+			port = int(port)
+
+			if (
+				(scheme == "http" and port == 80) or
+				(scheme == "https" and port == 443)
+			): _return = 0
+			else: _return = port
 		#
 
 		return _return

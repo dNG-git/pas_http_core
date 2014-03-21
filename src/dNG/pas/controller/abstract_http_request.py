@@ -23,6 +23,8 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+# pylint: disable=import-error,invalid-name,no-name-in-module
+
 from os import path
 from time import time, timezone
 import os
@@ -33,25 +35,24 @@ except ImportError: from urllib import quote, unquote
 
 from dNG.data.rfc.http import Http
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.translatable_exception import TranslatableException
 from dNG.pas.data.http.request_body import RequestBody
 from dNG.pas.data.http.request_headers_mixin import RequestHeadersMixin
 from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.module.named_loader import NamedLoader
+from .abstract_http_redirect_mixin import AbstractHttpRedirectMixin
 from .abstract_inner_request import AbstractInnerRequest
 from .abstract_request import AbstractRequest
-from .abstract_response import AbstractResponse
 from .stdout_stream_response import StdoutStreamResponse
 
 try:
 #
-	from dNG.pas.data.session import Session
 	from dNG.pas.data.session.http_adapter import HttpAdapter as HttpSessionAdapter
+	from dNG.pas.data.session.implementation import Implementation as SessionImplementation
 #
-except ImportError: Session = None
+except ImportError: SessionImplementation = None
 
-class AbstractHttpRequest(AbstractRequest, RequestHeadersMixin):
+class AbstractHttpRequest(AbstractRequest, AbstractHttpRedirectMixin, RequestHeadersMixin):
 #
 	"""
 "AbstractHttpRequest" implements HTTP request related methods.
@@ -64,6 +65,8 @@ class AbstractHttpRequest(AbstractRequest, RequestHeadersMixin):
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
+
+	# pylint: disable=unused-argument
 
 	RE_PARAMETER_DSD_PLUS_SPAM_CHAR = re.compile("(\\+){3,}")
 	"""
@@ -103,6 +106,7 @@ Constructor __init__(AbstractHttpRequest)
 		"""
 
 		AbstractRequest.__init__(self)
+		AbstractHttpRedirectMixin.__init__(self)
 		RequestHeadersMixin.__init__(self)
 
 		self.body_fp = None
@@ -125,7 +129,11 @@ JSON-RPC based on HTTP).
 		"""
 		self.lang = ""
 		"""
-Source language
+User requested language
+		"""
+		self.lang_default = ""
+		"""
+Request based default language
 		"""
 		self.module = None
 		"""
@@ -155,13 +163,18 @@ Source timezone
 		"""
 Request type
 		"""
-		self.output_format = "http_xhtml"
+		self.output_handler = "http_xhtml"
 		"""
-Requested response format name
+Requested response format handler
 		"""
 
 		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 		self.server_scheme = "http"
+
+		self.supported_features['accepted_formats'] = True
+		self.supported_features['compression'] = True
+		self.supported_features['headers'] = True
+		self.supported_features['listener_data'] = True
 	#
 
 	def configure_request_body(self, request_body, content_type_expected = None):
@@ -214,16 +227,12 @@ Executes the incoming request.
 :since: v0.1.00
 		"""
 
-		L10n.set_thread_lang(self.lang)
-
-		L10n.init("core")
-		L10n.init("pas_core")
-		L10n.init("pas_http_core")
+		# pylint: disable=broad-except
 
 		if (self.inner_request != None):
 		#
 			request = self.inner_request
-			if (request.get_output_format() != None): self.output_format = request.get_output_format()
+			if (request.get_output_handler() != None): self.output_handler = request.get_output_handler()
 		#
 		else: request = self
 
@@ -231,19 +240,19 @@ Executes the incoming request.
 
 		try:
 		#
-			if (self.supports_accepted_formats()):
+			if (self.is_supported("accepted_formats")):
 			#
 				accepted_formats = self.get_accepted_formats()
 				if (len(accepted_formats) > 0): response.set_accepted_formats(accepted_formats)
 			#
 
-			if (self.supports_compression()):
+			if (self.is_supported("compression")):
 			#
 				compression_formats = self.get_compression_formats()
 				if (len(compression_formats) > 0): response.set_compression_formats(compression_formats)
 			#
 
-			if (response.supports_script_name()): response.set_script_name(request.get_script_name())
+			if (response.is_supported("script_name")): response.set_script_name(request.get_script_name())
 			self._execute(request, response)
 		#
 		except Exception as handled_exception:
@@ -279,7 +288,7 @@ Executes the given request and generate content for the given response.
 		#
 			if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.module".format(requested_module))):
 			#
-				instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.module".format(requested_module));
+				instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.module".format(requested_module))
 				if (self.log_handler != None): instance.set_log_handler(self.log_handler)
 
 				instance.init(request, response)
@@ -378,11 +387,23 @@ Returns the inner request instance.
 		"""
 Returns the requested or supported language.
 
-:return: (str) Requested l10n key
+:return: (str) Language identifier
 :since:  v0.1.00
 		"""
 
 		return self.lang
+	#
+
+	def get_lang_default(self):
+	#
+		"""
+Returns the default language.
+
+:return: (str) Language identifier
+:since:  v0.1.00
+		"""
+
+		return self.lang_default
 	#
 
 	def get_module(self):
@@ -397,7 +418,7 @@ Returns the requested module.
 		return self.module
 	#
 
-	def get_output_format(self):
+	def get_output_handler(self):
 	#
 		"""
 Returns the requested output format.
@@ -406,7 +427,7 @@ Returns the requested output format.
 :since:  v0.1.00
 		"""
 
-		return self.output_format
+		return self.output_handler
 	#
 
 	def _get_request_parameters(self):
@@ -492,7 +513,7 @@ found.
 :since: v0.1.00
 		"""
 
-		if (response.supports_headers()): response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+		if (response.is_supported("headers")): response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
 		response.handle_critical_error("core_unsupported_command")
 	#
 
@@ -522,26 +543,46 @@ Initializes the matching response instance.
 :since:  v0.1.01
 		"""
 
-		response = NamedLoader.get_instance("dNG.pas.controller.{0}Response".format("".join([word.capitalize() for word in self.output_format.split("_")])))
-		if (self.log_handler != None): response.set_log_handler(self.log_handler)
-		response.set_charset(L10n.get("lang_charset", "UTF-8"))
-		response.set_stream_response(self._init_stream_response())
+		# pylint: disable=broad-except
 
-		if (response.supports_headers() and self.type == "HEAD"): response.set_send_headers_only(True)
-		if (Session != None): Session.set_adapter(HttpSessionAdapter)
+		response = NamedLoader.get_instance("dNG.pas.controller.{0}Response".format("".join([word.capitalize() for word in self.output_handler.split("_")])))
 
 		try:
 		#
-			if (Session != None):
+			if (SessionImplementation != None):
 			#
-				session = Session.load(session_create = False)
-				if (session != None): self.set_session(session)
+				session_class = SessionImplementation.get_class()
+				session_class.set_adapter(HttpSessionAdapter)
+
+				session = session_class.load(session_create = False)
+
+				if (session != None):
+				#
+					response.set_content_dynamic(True)
+					self.set_session(session)
+
+					user_profile = session.get_user_profile()
+					if (user_profile != None): self.lang_default = user_profile.get_lang()
+				#
 			#
 		#
 		except Exception as handled_exception:
 		#
 			if (self.log_handler != None): self.log_handler.error(handled_exception)
 		#
+
+		if (self.lang == ""): self.lang = self.lang_default
+		L10n.set_thread_lang(self.lang)
+
+		L10n.init("core")
+		L10n.init("pas_core")
+		L10n.init("pas_http_core")
+
+		if (self.log_handler != None): response.set_log_handler(self.log_handler)
+		response.set_charset(L10n.get("lang_charset", "UTF-8"))
+		response.set_stream_response(self._init_stream_response())
+
+		if (response.is_supported("headers") and self.type == "HEAD"): response.set_send_headers_only(True)
 
 		return response
 	#
@@ -580,10 +621,10 @@ Parses request parameters.
 :since: v0.1.00
 		"""
 
-		if (self.lang == ""):
+		if (self.lang_default == ""):
 		#
 			lang = InputFilter.filter_control_chars(self.get_header("Accept-Language"))
-			if (lang != None): self.lang = lang.lower().split(",", 1)[0]
+			if (lang != None): self.lang_default = lang.lower().split(",", 1)[0]
 		#
 
 		self.parameters = self._get_request_parameters()
@@ -604,18 +645,18 @@ Initialize l10n
 		if (lang != "" and os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang)), os.R_OK)): self.lang = lang
 		else:
 		#
-			if (self.lang == ""): lang_rfc_region = Settings.get("core_lang", "en_US")
-			else: lang_rfc_region = self.lang.lower()
+			if (self.lang_default == ""): lang_rfc_region = Settings.get("core_lang", "en_US")
+			else: lang_rfc_region = self.lang_default.lower()
 
 			lang_rfc_region = re.sub("\\W", "", lang_rfc_region)
 			lang_domain = lang_rfc_region[:2]
 
-			if (Settings.is_defined("core_lang_{0}".format(lang_rfc_region))): lang_rfc_region = Settings.get("core_lang_{0}".format(lang_rfc_region))
-			elif (Settings.is_defined("core_lang_{0}".format(lang_domain))): lang_domain = Settings.get("core_lang_{0}".format(lang_domain))
+			if (Settings.is_defined("pas_http_site_lang_{0}".format(lang_rfc_region))): lang_rfc_region = Settings.get("pas_http_site_lang_{0}".format(lang_rfc_region))
+			elif (Settings.is_defined("pas_http_site_lang_{0}".format(lang_domain))): lang_domain = Settings.get("pas_http_site_lang_{0}".format(lang_domain))
 
-			if (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_rfc_region)), os.R_OK)): self.lang = lang_rfc_region
-			elif (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_domain)), os.R_OK)): self.lang = lang_domain
-			else: self.lang = Settings.get("core_lang", "en")
+			if (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_rfc_region)), os.R_OK)): self.lang_default = lang_rfc_region
+			elif (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_domain)), os.R_OK)): self.lang_default = lang_domain
+			else: self.lang_default = Settings.get("core_lang", "en")
 		#
 
 		"""
@@ -673,26 +714,6 @@ instance.
 		return inner_request
 	#
 
-	def redirect(self, request, response = None):
-	#
-		"""
-A request redirect executes the given new request as if it has been
-requested by the client. It will reset the response and its cached values.
-
-:param response: Waiting response object
-
-:since: v0.1.00
-		"""
-
-		if (isinstance(request, AbstractInnerRequest)):
-		#
-			request.init(self)
-			if (not isinstance(response, AbstractResponse)): response = AbstractResponse.get_instance()
-			self._execute(request, response)
-		#
-		else: raise TranslatableException("core_unsupported_command")
-	#
-
 	def _respond(self, response):
 	#
 		"""
@@ -700,6 +721,8 @@ Respond the request with the given response.
 
 :since: v0.1.01
 		"""
+
+		# pylint: disable=broad-except,star-args
 
 		try:
 		#
@@ -790,54 +813,6 @@ Sets the associated session.
 		self.session = session
 	#
 
-	def supports_accepted_formats(self):
-	#
-		"""
-Returns false if accepted formats can not be identified.
-
-:return: (bool) True if accepted formats are identified.
-:since:  v0.1.00
-		"""
-
-		return True
-	#
-
-	def supports_compression(self):
-	#
-		"""
-Returns false if supported compression formats can not be identified.
-
-:return: (bool) True if compression formats are identified.
-:since:  v0.1.01
-		"""
-
-		return True
-	#
-
-	def supports_headers(self):
-	#
-		"""
-Returns false if the script name is not needed for execution.
-
-:return: (bool) True if the request contains headers.
-:since:  v0.1.00
-		"""
-
-		return True
-	#
-
-	def supports_listener_data(self):
-	#
-		"""
-Returns false if the server address is unknown.
-
-:return: (bool) True if listener are known.
-:since:  v0.1.00
-		"""
-
-		return True
-	#
-
 	@staticmethod
 	def filter_parameter(value):
 	#
@@ -850,7 +825,7 @@ Filters the given parameter value.
 :since:  v0.1.01
 		"""
 
-		if (" " in value): _return = quote(value)
+		if (" " in value): value = quote(value)
 		value = AbstractHttpRequest.RE_PARAMETER_NON_WORD_START.sub("", value)
 		value = AbstractHttpRequest.RE_PARAMETER_FILTERED_CHARS.sub("", value)
 		return AbstractHttpRequest.RE_PARAMETER_NON_WORD_END.sub("", value)

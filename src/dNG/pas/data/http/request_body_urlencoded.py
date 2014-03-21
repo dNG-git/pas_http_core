@@ -23,6 +23,8 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+# pylint: disable=import-error,no-name-in-module
+
 import re
 
 try: from urllib.parse import parse_qsl
@@ -46,6 +48,8 @@ class RequestBodyUrlencoded(RequestBody):
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
+
+	# pylint: disable=arguments-differ
 
 	RE_ARRAY = re.compile("^(.+)\\[(\\S*)\\]$")
 

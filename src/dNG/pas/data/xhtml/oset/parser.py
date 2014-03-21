@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.oset.Parser
+dNG.pas.data.xhtml.oset.Parser
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -25,20 +25,20 @@ NOTE_END //n"""
 
 import re
 
+from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.text.tag_parser.abstract import Abstract as AbstractTagParser
 from dNG.pas.data.text.tag_parser.block_mixin import BlockMixin
 from dNG.pas.data.text.tag_parser.each_mixin import EachMixin
 from dNG.pas.data.text.tag_parser.if_condition_mixin import IfConditionMixin
-from dNG.pas.data.text.tag_parser.mapped_element_mixin import MappedElementMixin
 from dNG.pas.data.text.tag_parser.rewrite_date_time_mixin import RewriteDateTimeMixin
 from dNG.pas.data.xhtml.tag_parser.rewrite_form_tags_xhtml_mixin import RewriteFormTagsXhtmlMixin
 from dNG.pas.data.xhtml.tag_parser.rewrite_safe_xhtml_mixin import RewriteSafeXhtmlMixin
 from dNG.pas.data.xhtml.tag_parser.rewrite_user_xhtml_mixin import RewriteUserXhtmlMixin
 from dNG.pas.module.named_loader import NamedLoader
 
-class Parser(AbstractTagParser, BlockMixin, EachMixin, IfConditionMixin, MappedElementMixin, RewriteDateTimeMixin, RewriteFormTagsXhtmlMixin, RewriteSafeXhtmlMixin, RewriteUserXhtmlMixin):
+class Parser(AbstractTagParser, BlockMixin, EachMixin, IfConditionMixin, RewriteDateTimeMixin, RewriteFormTagsXhtmlMixin, RewriteSafeXhtmlMixin, RewriteUserXhtmlMixin):
 #
 	"""
 The OSet parser takes a template string to render the output.
@@ -61,7 +61,13 @@ Constructor __init__(Parser)
 		"""
 
 		AbstractTagParser.__init__(self)
-		MappedElementMixin.__init__(self)
+		BlockMixin.__init__(self)
+		EachMixin.__init__(self)
+		IfConditionMixin.__init__(self)
+		RewriteDateTimeMixin.__init__(self)
+		RewriteFormTagsXhtmlMixin.__init__(self)
+		RewriteSafeXhtmlMixin.__init__(self)
+		RewriteUserXhtmlMixin.__init__(self)
 
 		self.content = None
 		"""
@@ -139,6 +145,11 @@ Change data according to the matched tag.
 				value = re_result.group(5).strip()
 
 				if (source == "content"): _return += self.render_if_condition(self._mapped_element_update("content", self.content), key, operator, value, data[data_position:tag_end_position])
+				elif (source == "request"):
+				#
+					request = AbstractHttpRequest.get_instance()
+					_return += self.render_if_condition({ 'lang': request.get_lang() } , key, operator, value, data[data_position:tag_end_position])
+				#
 				elif (source == "settings"): _return += self.render_if_condition(self._mapped_element_update("settings", Settings.get_instance()), key, operator, value, data[data_position:tag_end_position])
 			#
 		#

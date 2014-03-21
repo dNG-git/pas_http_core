@@ -29,7 +29,7 @@ from os import urandom
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.xhtml.form_tags import FormTags
 from dNG.pas.data.xhtml.notification_store import NotificationStore
-from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.data.xhtml.oset.file_parser import FileParser
 from dNG.pas.module.blocks.abstract_block import AbstractBlock
 
 class NotificationBox(AbstractBlock):
@@ -70,7 +70,8 @@ Renders a notification.
 				"message": FormTags.render(data['message'], block_encoding_supported = False),
 			}
 
-			parser = NamedLoader.get_instance("dNG.pas.data.oset.FileParser")
+			parser = FileParser()
+			parser.set_oset(self.response.get_oset())
 			_return = parser.render("core.notification", content)
 		#
 

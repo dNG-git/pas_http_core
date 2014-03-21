@@ -161,8 +161,8 @@ Saves changes of the uuIDs instance.
 
 		if (isinstance(response, AbstractHttpResponse)):
 		#
-			passcode_hashed = Tmd5.hash(passcode)
-			response.set_cookie("uuids", "{0}:{1}".format(self.session.get_uuid(), passcode_hashed))
+			store = response.get_instance_store()
+			if (store != None): store['dNG.pas.data.session.HttpAdapter.passcode_changed'] = True
 		#
 	#
 
@@ -181,6 +181,26 @@ Saves changes of the uuIDs instance.
 		#
 			self.session.set_session_time(int(Settings.get("pas_session_uuids_passcode_session_time", 604800)))
 			if (passcode_timeout < time()): self._renew_passcode()
+
+			is_passcode_changed = False
+			response = AbstractHttpResponse.get_instance()
+
+			if (isinstance(response, AbstractHttpResponse)):
+			#
+				store = response.get_instance_store()
+
+				if (store != None and "dNG.pas.data.session.HttpAdapter.passcode_changed" in store):
+				#
+					is_passcode_changed = store['dNG.pas.data.session.HttpAdapter.passcode_changed']
+					store['dNG.pas.data.session.HttpAdapter.passcode_changed'] = False
+				#
+			#
+
+			if (is_passcode_changed):
+			#
+				passcode_hashed = Tmd5.hash(self.session.get("uuids.passcode"))
+				response.set_cookie("uuids", "{0}:{1}".format(self.session.get_uuid(), passcode_hashed))
+			#
 		#
 
 		return True

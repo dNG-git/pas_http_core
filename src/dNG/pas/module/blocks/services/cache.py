@@ -24,10 +24,11 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from os import path
-import os, re
+import os
+import re
 
-from dNG.data.file import File
 from dNG.data.rfc.basics import Basics as RfcBasics
+from dNG.pas.data.cached_file import CachedFile
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.streaming import Streaming
 from dNG.pas.data.text.input_filter import InputFilter
@@ -58,7 +59,10 @@ Action for "index"
 		"""
 
 		dfile = InputFilter.filter_file_path(self.request.get_dsd("dfile", ""))
+
 		file_pathname = ""
+
+		self.response.set_header("X-Robots-Tag", "noindex")
 
 		if (dfile != None and dfile != ""):
 		#
@@ -68,26 +72,15 @@ Action for "index"
 			#
 				if (file_pathname.endswith(".paslink.url")):
 				#
-					file_content = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_pathname))
-
-					if (file_content == None):
-					#
-						file_obj = File()
-
-						if (file_obj.open(file_pathname, True, "r")):
-						#
-							file_content = file_obj.read()
-							if (file_content != False and self.cache_instance != None): self.cache_instance.set_file(file_pathname, file_content)
-						#
-					#
-
-					file_pathname = ("" if (file_content == None or file_content == False or (not path.exists(file_pathname)) or (not os.access(file_pathname, os.R_OK))) else file_content)
+					file_content = CachedFile.read(file_pathname)
+					if (file_content != None): file_content = path.normpath(file_content)
+					file_pathname = ("" if (file_content == None or (not path.exists(file_content)) or (not os.access(file_content, os.R_OK))) else file_content)
 				#
 			#
 			else: file_pathname = ""
 		#
 
-		is_last_modified_supported = (Settings.get("pas_http_cache_modification_check", "1") == "1")
+		is_last_modified_supported = (Settings.get("pas_http_cache_modification_check", True))
 		is_modified = True
 		is_valid = False
 		last_modified_on_server = 0
@@ -107,9 +100,11 @@ Action for "index"
 					if (last_modified_on_server <= last_modified_on_client):
 					#
 						is_modified = False
+						self.response.set_content_dynamic(False)
 
 						self.response.init(True)
 						self.response.set_header("HTTP/1.1", "HTTP/1.1 304 Not Modified", True)
+						self.response.set_expires_relative(+63072000)
 						self.response.set_last_modified(last_modified_on_server)
 
 						self.response.set_raw_data("")
@@ -129,6 +124,7 @@ Action for "index"
 			re_tsc_result = re.search("\\.tsc\\.(css|js|svg)$", file_pathname, re.I)
 			re_result = (re.search("\\.(css|gif|jar|jpg|jpeg|js|png|svg|swf)$", file_pathname, re.I) if (re_tsc_result == None) else None)
 
+			self.response.set_content_dynamic(re_tsc_result != None)
 			self.response.init(True)
 
 			if (re_tsc_result != None):
@@ -144,6 +140,8 @@ Action for "index"
 			#
 			elif (re_result != None):
 			#
+				self.response.set_expires_relative(+63072000)
+
 				streamer = NamedLoader.get_instance("dNG.pas.data.streamer.File", False)
 
 				if (streamer == None): self.response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)

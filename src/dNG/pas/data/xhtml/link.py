@@ -44,6 +44,8 @@ TODO: Code incomplete
              Mozilla Public License, v. 2.0
 	"""
 
+	# pylint: disable=arguments-differ
+
 	TYPE_FORM_FIELDS = 8
 	"""
 Hidden input fields
@@ -55,6 +57,10 @@ Form action URL
 	TYPE_JS_REQUIRED = 32
 	"""
 JavaScript is required
+	"""
+	TYPE_QUERY_STRING = 64
+	"""
+Generate the query string
 	"""
 
 	def build_url(self, _type, parameters, escape = True):
@@ -110,6 +116,18 @@ value='de' />". Automatically add language, theme and uuid fields.
 		#
 			if (_type == Link.TYPE_FORM_URL): _type = Link.TYPE_RELATIVE
 			_return = _Link.build_url(self, _type, { })
+		#
+		elif (_type & Link.TYPE_QUERY_STRING == Link.TYPE_QUERY_STRING):
+		#
+			if (_type == Link.TYPE_FORM_URL): _type = Link.TYPE_RELATIVE
+			parameters = self._parameters_filter(parameters)
+			parameters = self._parameters_append_defaults(parameters)
+
+			_return = (
+				self._build_url_formatted("{0}={1}", ";", parameters)
+				if (len(parameters) > 0) else
+				""
+			)
 		#
 		else: _return = _Link.build_url(self, _type, parameters)
 
@@ -197,6 +215,7 @@ Parses the given type parameter given as a string value.
 
 		if (_type == "js_elink"): _return = Link.TYPE_FULL & Link.TYPE_JS_REQUIRED
 		elif (_type == "js_ilink"): _return = Link.TYPE_RELATIVE & Link.TYPE_JS_REQUIRED
+		elif (_type == "query_string"): _return = Link.TYPE_QUERY_STRING
 		else: _return = _Link.get_type(_type)
 
 		return _return
@@ -235,7 +254,7 @@ Returns all links defined for the given set name.
 	#
 
 	@staticmethod
-	def store_set(set_name, _type, title, parameters = { }, **kwargs):
+	def store_set(set_name, _type, title, parameters = None, **kwargs):
 	#
 		"""
 Adds a link to the given set name.
@@ -248,6 +267,7 @@ Adds a link to the given set name.
 :since: v0.1.01
 		"""
 
+		if (parameters == None): parameters = { }
 		store = AbstractResponse.get_instance_store()
 
 		if (store != None):
@@ -263,18 +283,25 @@ Adds a link to the given set name.
 			if (set_name in store):
 			#
 				store = store[set_name]
-				index = len(store)
+				index = -1
+				index_replaced = -1
 
 				for position in range(0, len(store)):
 				#
-					if (link['priority'] > store[position]['priority']):
+					if (link['title'] == store[position]['title']):
 					#
-						index = position
+						index_replaced = position
 						break
 					#
+					elif (index < 0 and link['priority'] > store[position]['priority']): index = position
 				#
 
-				store.insert(index, link)
+				if (index_replaced < 0):
+				#
+					if (index < 0): index = len(store)
+					store.insert(index, link)
+				#
+				else: store[index_replaced] = link
 			#
 			else: store[set_name] = [ link ]
 		#

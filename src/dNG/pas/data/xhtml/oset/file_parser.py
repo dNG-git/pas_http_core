@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.oset.FileParser
+dNG.pas.data.xhtml.oset.FileParser
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -47,6 +47,8 @@ The OSet file parser takes a file to render the output.
              Mozilla Public License, v. 2.0
 	"""
 
+	# pylint: disable=arguments-differ
+
 	def __init__(self):
 	#
 		"""
@@ -82,6 +84,8 @@ Renders content ready for output from the given OSet template.
 :return: (str) Rendered content
 :since:  v0.1.00
 		"""
+
+		# pylint: disable=broad-except
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1}, +content)- (#echo(__LINE__)#)".format(self, template_name))
 		_return = ("<span>{0}</span>".format(L10n.get("errors_pas_http_core_oset_not_viewable")) if (default == None) else default)

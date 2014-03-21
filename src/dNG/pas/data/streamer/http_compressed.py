@@ -23,6 +23,9 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+# pylint: disable=abstract-method
+# pylint 1.1.0 was unable to detect next = __next__ correctly
+
 from dNG.pas.data.binary import Binary
 from .abstract_encapsulated import AbstractEncapsulated
 

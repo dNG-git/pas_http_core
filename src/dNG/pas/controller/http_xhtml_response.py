@@ -58,6 +58,18 @@ Constructor __init__(HttpXhtmlResponse)
 
 		AbstractHttpResponse.__init__(self)
 
+		self.html_canonical_url = ""
+		"""
+(X)HTML canonical URL of the response
+		"""
+		self.html_canonical_url_parameters = { }
+		"""
+(X)HTML canonical URL parameters of the response
+		"""
+		self.html_page_description = ""
+		"""
+(X)HTML head description
+		"""
 		self.oset = None
 		"""
 OSet in use (requested or configured)
@@ -82,6 +94,9 @@ Output theme subtype
 		"""
 Response page title
 		"""
+
+		self.supported_features['html_canonical_url'] = True
+		self.supported_features['html_page_description'] = True
 	#
 
 	def add_js_file(self, js_file):
@@ -112,7 +127,7 @@ Add output content from an OSet template.
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.add_oset_content({0}, content)- (#echo(__LINE__)#)".format(template_name))
 
-		parser = NamedLoader.get_instance("dNG.pas.data.oset.FileParser")
+		parser = NamedLoader.get_instance("dNG.pas.data.xhtml.oset.FileParser")
 		parser.set_oset(self.oset)
 
 		data = parser.render(template_name, content)
@@ -177,6 +192,31 @@ compression setting and information about P3P.
 
 		AbstractHttpResponse.init(self, cache, compress)
 
+		p3p_url = ""
+
+		if (self.stream_response.is_supported("headers")):
+		#
+			"""
+Send P3P header if defined
+			"""
+
+			p3p_cp = Settings.get("pas_http_core_p3p_cp", "")
+			p3p_url = Settings.get("pas_http_core_p3p_url", "").replace("&", "&amp;")
+
+			if (p3p_cp + p3p_url != ""):
+			#
+				p3p_data = ("" if (p3p_url == "") else "policyref=\"{0}\"".format(p3p_url))
+
+				if (p3p_cp != ""):
+				#
+					if (p3p_data != ""): p3p_data += ","
+					p3p_data += "CP=\"{0}\"".format(p3p_cp)
+				#
+
+				self.stream_response.set_header("P3P", p3p_data)
+			#
+		#
+
 		if (self.theme_renderer == None):
 		#
 			"""
@@ -192,7 +232,7 @@ Set up theme framework
 			#
 
 			theme = (Hooks.call("dNG.pas.http.Theme.checkCandidates", theme = self.theme) if (Settings.get("pas_http_theme_plugins_supported", True)) else None)
-			self.theme_renderer = NamedLoader.get_instance("dNG.pas.data.theme.Renderer")
+			self.theme_renderer = NamedLoader.get_instance("dNG.pas.data.xhtml.theme.Renderer")
 
 			if (theme != None):
 			#
@@ -208,6 +248,12 @@ Set up theme framework
 			self.theme_renderer.set(self.theme_active)
 			self.theme_renderer.set_log_handler(self.log_handler)
 			self.theme_renderer.set_subtype(self.theme_subtype)
+
+			if (len(self.html_canonical_url_parameters) > 0): self.theme_renderer.set_canonical_url_parameters(self.html_canonical_url_parameters)
+			elif (self.html_canonical_url != ""): self.theme_renderer.set_canonical_url(self.html_canonical_url)
+
+			if (self.html_page_description != ""): self.theme_renderer.set_page_description(self.html_page_description)
+			if (p3p_url != ""): self.theme_renderer.set_p3p_url(p3p_url)
 		#
 
 		if (self.oset == None):
@@ -291,6 +337,49 @@ occurred if they are not sent and all buffers are "None".
 
 			self.send()
 		#
+	#
+
+	def set_html_canonical_url(self, url):
+	#
+		"""
+Sets the (X)HTML canonical URL of the response.
+
+:param url: Canonical URL
+
+:since: v0.1.00
+		"""
+
+		self.html_canonical_url = url
+		if (self.initialized and self.theme_renderer != None): self.theme_renderer.set_canonical_url(url)
+	#
+
+	def set_html_canonical_url_parameters(self, parameters):
+	#
+		"""
+Sets the (X)HTML canonical URL of the response based on the parameters
+given.
+
+:param parameters: Parameters dict
+
+:since: v0.1.00
+		"""
+
+		self.html_canonical_url_parameters = parameters
+		if (self.initialized and self.theme_renderer != None): self.theme_renderer.set_canonical_url_parameters(parameters)
+	#
+
+	def set_html_page_description(self, description):
+	#
+		"""
+Sets the (X)HTML head description of the response.
+
+:param description: Head description
+
+:since: v0.1.00
+		"""
+
+		self.html_page_description = description
+		if (self.initialized and self.theme_renderer != None): self.theme_renderer.set_page_description(description)
 	#
 
 	def set_oset(self, oset):
