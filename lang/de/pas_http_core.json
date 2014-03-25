@@ -32,5 +32,6 @@
  "errors_pas_http_core_504": "Die Anwendung hat einen Fehler während der internen Kommunikation festgestellt und kann die derzeitige Aufgabe nicht beenden.",
  "errors_pas_http_core_505": "Die genutzte HTTP-Version der übermittelten Anfrage wird nicht unterstützt.",
 
+ "errors_pas_http_core_site_unconfigured": "Willkommen auf dieser Webseite! Leider hat die Administration derzeit noch keine Konfiguration für eine eigene Startseite definiert. Bitte versuche es in einigen Tagen noch einmal.",
  "errors_pas_http_core_oset_not_viewable": "Der Inhalt kann aufgrund eines serverseitigen Fehlers nicht angezeigt werden."
 }

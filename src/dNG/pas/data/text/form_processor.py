@@ -922,36 +922,36 @@ implementation specific.
 		if (error == "number_max"):
 		#
 			_return = "{0}{1}{2}".format(
-				L10n.get("pas_http_core_form_number_max_1"),
+				L10n.get("pas_http_core_form_error_number_max_1"),
 				error_data[1],
-				L10n.get("pas_http_core_form_number_max_2")
+				L10n.get("pas_http_core_form_error_number_max_2")
 			)
 		#
 		elif (error == "number_min"):
 		#
 			_return = "{0}{1}{2}".format(
-				L10n.get("pas_http_core_form_number_min_1"),
+				L10n.get("pas_http_core_form_error_number_min_1"),
 				error_data[1],
-				L10n.get("pas_http_core_form_number_min_2")
+				L10n.get("pas_http_core_form_error_number_min_2")
 			)
 		#
 		elif (error == "string_max"):
 		#
 			_return = "{0}{1}{2}".format(
-				L10n.get("pas_http_core_form_string_max_1"),
+				L10n.get("pas_http_core_form_error_string_max_1"),
 				error_data[1],
-				L10n.get("pas_http_core_form_string_max_2")
+				L10n.get("pas_http_core_form_error_string_max_2")
 			)
 		#
 		elif (error == "string_min"):
 		#
 			_return = "{0}{1}{2}".format(
-				L10n.get("pas_http_core_form_string_min_1"),
+				L10n.get("pas_http_core_form_error_string_min_1"),
 				error_data[1],
-				L10n.get("pas_http_core_form_string_min_2")
+				L10n.get("pas_http_core_form_error_string_min_2")
 			)
 		#
-		else: _return = L10n.get("pas_http_core_form_{0}".format(error))
+		else: _return = L10n.get("pas_http_core_form_error_{0}".format(error))
 
 		return _return
 	#

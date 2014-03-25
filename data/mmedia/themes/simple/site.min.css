@@ -1,6 +1,6 @@
-.pagecontent_datalinker_objects_box {
-	clear: right; float: right; width: 35%; padding: 0.4%; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgb(230, 232, 235) 100%); border: 1px solid #d8deeb; border-radius: 0.2em;
-}
+small { font-size: 0.75em }
+
+.pagecontent_datalinker_objects_box { clear: right; float: right; width: 35%; padding: 0.4%; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgb(230, 232, 235) 100%); border: 1px solid #d8deeb; border-radius: 0.2em }
 
 .pagecontent_datalinker_objects_box h1 {
 	border-bottom: 1px #e6e8eb solid;
@@ -10,6 +10,17 @@
 .pagecontent_datalinker_objects_box li { margin: 0; padding: 0 }
 .pagecontent_datalinker_objects_box li:nth-child(n+2) { border-top: 1px #e6e8eb dotted }
 .pagecontent_datalinker_objects_box ul { margin: 0; padding: 0; list-style: none inside none }
+
+.pagecontent_page_navigation { padding: 0.4%; background-color: #fafafa; border: 1px solid #f0f0f0; border-radius: 0.2em }
+section .pagecontent_page_navigation { font-size: 0.75em }
+
+.pagecontent_page_navigation li {
+	display: inline-block;
+	white-space: nowrap
+}
+
+.pagecontent_page_navigation li:not(:last-child):after { margin: 0 0.3em; content: "•" }
+.pagecontent_page_navigation ul { display: inline-block; margin: 0; padding: 0; list-style: none }
 
 .pageform_button {
 	margin: 0.2%; padding: 0.1% 0.2%; background-color: #ffffff; border: 1px solid #375a9d; border-radius: 0.2em;
@@ -91,12 +102,12 @@
 .pageservicemenu ul { position: relative; margin: 0; padding: 0; list-style: none inside none }
 
 .pageservicemenu_p {
-	padding: 4px 4px 0 4px;
+	padding: 0.4% 0.4% 0 0.4%;
 	text-align: left
 }
 
 .pageservicemenu_s {
-	padding: 4px;
+	clear: both; padding: 0.4%;
 	text-align: right; font-size: 0.8em
 }
 

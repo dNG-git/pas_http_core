@@ -32,5 +32,6 @@
  "errors_pas_http_core_504": "The application encountered an internal communication error and is unable complete the current task.",
  "errors_pas_http_core_505": "The HTTP version used for the transmitted request is not supported.",
 
+ "errors_pas_http_core_site_unconfigured": "Welcome to this web site! Unfortunately the administration has not configured the system to show a custom home page. Please visit again in some days.",
  "errors_pas_http_core_oset_not_viewable": "The content is not viewable after a server-side error occurred."
 }

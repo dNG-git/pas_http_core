@@ -30,7 +30,6 @@ from dNG.pas.data.binary import Binary
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.data.xhtml.oset.file_parser import FileParser
-from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.runtime.value_exception import ValueException
 
 class Renderer(object):
@@ -174,6 +173,7 @@ Format and return XHTML for a password input field.
 		"""
 
 		context = {
+			"type": XHtmlFormatting.escape(field_data['type']),
 			"id": XHtmlFormatting.escape(field_data['id']),
 			"name": XHtmlFormatting.escape(field_data['name']),
 			"title": XHtmlFormatting.escape(field_data['title']),
@@ -228,6 +228,20 @@ jQuery (function () { {$direct_settings['theme_form_js_init']} ({ id:'$f_js_id' 
 		"""
 
 		return _return
+	#
+
+	def render_password_with_repetition(self, field_data):
+	#
+		"""
+Format and return XHTML for a password and its repetition input fields.
+
+:param field_data: Dict containing information about the form field
+
+:return: (str) Valid XHTML form field definition
+:since:  v0.1.00
+		"""
+
+		return self.render_password(field_data)
 	#
 
 	def render_radio(self, field_data):

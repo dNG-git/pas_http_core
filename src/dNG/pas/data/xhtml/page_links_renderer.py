@@ -58,25 +58,13 @@ Constructor __init__(PageLinksRenderer)
 		"""
 DSD key used for the page value
 		"""
-		self.first_page_content = "&#0171;"
-		"""
-Content used for a link to the first page
-		"""
 		self.hidden_pages_content = "..."
 		"""
 Content used as replacement for a range of page link hidden
 		"""
-		self.hide_navigation_links = False
-		"""
-True to hide the last and next link
-		"""
 		self.hide_navigation_title = False
 		"""
 True to hide the last and next link
-		"""
-		self.last_page_content = "&#0187;"
-		"""
-Content used for a link to the last page
 		"""
 		self.max_pages = 11
 		"""
@@ -93,10 +81,6 @@ Pages available
 		self.parameters = parameters
 		"""
 Parameters used to render each page link
-		"""
-		self.separator = " &#8226; "
-		"""
-Separator between links
 		"""
 		self.type = (_type if (_type != None) else Link.TYPE_RELATIVE)
 		"""
@@ -121,61 +105,66 @@ Renders the page link navigation bar.
 			first_page = 1
 			last_page = self.pages
 		#
-		elif (self.page < (self.max_pages - 2)):
+		elif (self.page > -1 and self.page < (self.max_pages - 2)):
 		#
-			rendered_suffix = "{0}{1}".format(self.separator, self.hidden_pages_content)
-			if (not self.hide_navigation_links): rendered_suffix += " {0}".format(self._render_page_link(self.pages, self.last_page_content))
+			rendered_suffix = "<li>{0}</li>\n<li>{1}</li>".format(
+				self.hidden_pages_content,
+				self._render_page_link(self.pages)
+			)
 
 			first_page = 1
 			last_page = self.max_pages
 		#
-		elif (((self.page + self.max_pages) - 3) > self.pages):
+		elif (self.page < 0 or ((self.page + self.max_pages) - 3) > self.pages):
 		#
-			if (not self.hide_navigation_links): rendered_prefix += "{0} ".format(self._render_page_link(1, self.first_page_content))
-			rendered_prefix += "{0}{1}".format(self.hidden_pages_content, self.separator)
+			rendered_prefix = "<li>{0}</li>\n<li>{1}</li>\n".format(
+				self._render_page_link(1),
+				self.hidden_pages_content
+			)
 
 			first_page = ((self.pages - self.max_pages) + 3)
 			last_page = self.pages
 		#
 		else:
 		#
-			if (not self.hide_navigation_links): rendered_prefix += "{0} ".format(self._render_page_link(1, self.first_page_content))
-			rendered_prefix += "{0}{1}".format(self.hidden_pages_content, self.separator)
+			rendered_prefix = "<li>{0}</li>\n<li>{1}</li>\n".format(
+				self._render_page_link(1),
+				self.hidden_pages_content
+			)
 
-			rendered_suffix += "{0}{1}".format(self.separator, self.hidden_pages_content)
-			if (not self.hide_navigation_links): rendered_suffix += " {0}".format(self._render_page_link(self.pages, self.last_page_content))
+			rendered_suffix = "<li>{0}</li>\n<li>{1}</li>".format(
+				self.hidden_pages_content,
+				self._render_page_link(self.pages)
+			)
 
 			first_page = (self.pages - (self.pages - self.page) - (floor(self.max_pages / 2)) + 2)
 			last_page = (first_page + (self.max_pages - 4))
 		#
 
-		rendered_links = "";
+		rendered_links = ""
 
 		for page in range(first_page, (1 + last_page)):
 		#
-			if (rendered_links != ""): rendered_links += self.separator
-
-			rendered_links += (
+			rendered_links += ("<li>" + (
 				"<em>{0:d}</em>".format(page)
 				if (self.page == page) else
-				self._render_page_link(page, page)
-			)
+				self._render_page_link(page)
+			) + "</li>\n")
 		#
 
-		return (
-			"<nav class='pagecontent_box pagecontent_page_navigation'>{0}{1}{2}</nav>".format(rendered_prefix, rendered_links, rendered_suffix)
+		return ("<nav class='pagecontent_box pagecontent_page_navigation'>" + (
+			"<ul>{0}{1}{2}</ul>".format(rendered_prefix, rendered_links, rendered_suffix)
 			if (self.hide_navigation_title) else
-			"<nav class='pagecontent_box pagecontent_page_navigation'><b>{0}</b>: {1}{2}{3}</nav>".format(L10n.get("pas_http_core_pages"), rendered_prefix, rendered_links, rendered_suffix)
-		)
+			"<b>{0}</b>: <ul>{1}{2}{3}</ul>".format(L10n.get("pas_http_core_pages"), rendered_prefix, rendered_links, rendered_suffix)
+		) + "</nav>")
 	#
 
-	def _render_page_link(self, page, content):
+	def _render_page_link(self, page):
 	#
 		"""
 Renders the given page link with the defined content.
 
 :param page: Page number
-:param content: Link content
 
 :return: (str) Rendered content
 :since:  v0.1.01
@@ -185,10 +174,10 @@ Renders the given page link with the defined content.
 		if ("dsd" not in parameters): parameters['dsd'] = { }
 		parameters['dsd'][self.dsd_page_key] = page
 
-		return "{0}{1}</a>".format(XmlParser().dict_to_xml_item_encoder({
+		return "{0}{1:d}</a>".format(XmlParser().dict_to_xml_item_encoder({
 			"tag": "a",
 			"attributes": { "href": Link().build_url(self.type, parameters) }
-		}, False), content)
+		}, False), page)
 	#
 
 	def set_dsd_page_key(self, key):

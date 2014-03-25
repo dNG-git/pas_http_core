@@ -20,7 +20,13 @@ a:active, a:hover, a:focus { color: #000000; text-decoration: none }
 
 body { margin: 0; padding: 0 31px; background-color: #ffffff }
 body { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 0.9em; font-style: normal; line-height: normal; font-weight: normal; color: #000000 }
-h1, h2, h3, h4, h5, h6, summary { font-size: 1.75em; font-weight: bold }
+h1, h2, h3, h4, h5, h6, summary { font-weight: bold }
+h1 { font-size: 1.75em }
+h2 { font-size: 1.70em }
+h3 { font-size: 1.65em }
+h4 { font-size: 1.60em }
+h5 { font-size: 1.55em }
+h6, summary { font-size: 1.50em }
 header { margin: 10px 0; text-align: right }
 form { margin: 0; padding: 0 }
 img { border: none }
