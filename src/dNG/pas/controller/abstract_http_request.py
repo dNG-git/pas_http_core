@@ -36,11 +36,10 @@ except ImportError: from urllib import quote, unquote
 from dNG.data.rfc.http import Http
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.request_body import RequestBody
-from dNG.pas.data.http.request_headers_mixin import RequestHeadersMixin
 from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.module.named_loader import NamedLoader
-from .abstract_http_redirect_mixin import AbstractHttpRedirectMixin
+from .abstract_http_mixin import AbstractHttpMixin
 from .abstract_inner_request import AbstractInnerRequest
 from .abstract_request import AbstractRequest
 from .stdout_stream_response import StdoutStreamResponse
@@ -52,7 +51,7 @@ try:
 #
 except ImportError: SessionImplementation = None
 
-class AbstractHttpRequest(AbstractRequest, AbstractHttpRedirectMixin, RequestHeadersMixin):
+class AbstractHttpRequest(AbstractRequest, AbstractHttpMixin):
 #
 	"""
 "AbstractHttpRequest" implements HTTP request related methods.
@@ -106,8 +105,7 @@ Constructor __init__(AbstractHttpRequest)
 		"""
 
 		AbstractRequest.__init__(self)
-		AbstractHttpRedirectMixin.__init__(self)
-		RequestHeadersMixin.__init__(self)
+		AbstractHttpMixin.__init__(self)
 
 		self.body_fp = None
 		"""
@@ -126,14 +124,6 @@ Data transmitted with the request
 		"""
 A inner request is used to support protocols based on other ones (e.g.
 JSON-RPC based on HTTP).
-		"""
-		self.lang = ""
-		"""
-User requested language
-		"""
-		self.lang_default = ""
-		"""
-Request based default language
 		"""
 		self.module = None
 		"""
@@ -159,10 +149,6 @@ Associated session to request
 		"""
 Source timezone
 		"""
-		self.type = None
-		"""
-Request type
-		"""
 		self.output_handler = "http_xhtml"
 		"""
 Requested response format handler
@@ -174,7 +160,7 @@ Requested response format handler
 		self.supported_features['accepted_formats'] = True
 		self.supported_features['compression'] = True
 		self.supported_features['headers'] = True
-		self.supported_features['listener_data'] = True
+		self.supported_features['type'] = self._supports_type
 	#
 
 	def configure_request_body(self, request_body, content_type_expected = None):
@@ -237,6 +223,12 @@ Executes the incoming request.
 		else: request = self
 
 		response = self._init_response()
+
+		if (
+			request.is_supported("type") and
+			request.get_type() == "HEAD" and
+			response.is_supported("headers")
+		): response.set_send_headers_only(True)
 
 		try:
 		#
@@ -382,30 +374,6 @@ Returns the inner request instance.
 		return self.inner_request
 	#
 
-	def get_lang(self):
-	#
-		"""
-Returns the requested or supported language.
-
-:return: (str) Language identifier
-:since:  v0.1.00
-		"""
-
-		return self.lang
-	#
-
-	def get_lang_default(self):
-	#
-		"""
-Returns the default language.
-
-:return: (str) Language identifier
-:since:  v0.1.00
-		"""
-
-		return self.lang_default
-	#
-
 	def get_module(self):
 	#
 		"""
@@ -488,18 +456,6 @@ Returns the associated session.
 		"""
 
 		return self.session
-	#
-
-	def get_type(self):
-	#
-		"""
-Returns the request type.
-
-:return: (str) Request type
-:since:  v0.1.00
-		"""
-
-		return self.type
 	#
 
 	def handle_missing_service(self, response):
@@ -811,6 +767,18 @@ Sets the associated session.
 		"""
 
 		self.session = session
+	#
+
+	def _supports_type(self):
+	#
+		"""
+Returns true if the request type is known.
+
+:return: (bool) True if request type is known
+:since:  v0.1.00
+		"""
+
+		return (self.get_type() != None)
 	#
 
 	@staticmethod

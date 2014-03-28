@@ -102,7 +102,7 @@ python.org: Return the next item from the container.
 
 		_return = None
 
-		if (self.active):
+		if (self.active and (not self.headers_only)):
 		#
 			"""
 This iterator is only called for uncompressed data.
@@ -219,7 +219,7 @@ Writes the given data.
 
 		try:
 		#
-			if (self.active and self.wsgi_write != None):
+			if (self.active and (not self.headers_only) and self.wsgi_write != None):
 			#
 				data = Binary.bytes(data)
 				self.wsgi_write(data)

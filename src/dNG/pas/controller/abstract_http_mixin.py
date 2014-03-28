@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.controller.AbstractHttpRequest
+dNG.pas.controller.AbstractHttpMixin
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -24,13 +24,15 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 NOTE_END //n"""
 
 from dNG.pas.data.translatable_exception import TranslatableException
+from dNG.pas.data.http.request_headers_mixin import RequestHeadersMixin
 from .abstract_inner_request import AbstractInnerRequest
 from .abstract_response import AbstractResponse
 
-class AbstractHttpRedirectMixin(object):
+class AbstractHttpMixin(RequestHeadersMixin):
 #
 	"""
-"AbstractHttpRedirectMixin" is used to chain execution of requests.
+"AbstractHttpMixin" is used to support common methods for HTTP request
+instances.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -49,10 +51,68 @@ Constructor __init__(AbstractInnerHttpRequest)
 :since: v0.1.01
 		"""
 
+		RequestHeadersMixin.__init__(self)
+
+		self.compression_formats = None
+		"""
+Compression formats the client accepts
+		"""
+		self.lang = ""
+		"""
+User requested language
+		"""
+		self.lang_default = ""
+		"""
+Request based default language
+		"""
 		self.parent_request = None
 		"""
 Executable parent request
 		"""
+		self.type = None
+		"""
+Request type
+		"""
+
+		self.supported_features['compression'] = self._supports_compression
+		self.supported_features['headers'] = self._supports_headers
+		self.supported_features['type'] = self._supports_type
+	#
+
+	def get_lang(self):
+	#
+		"""
+Returns the requested or supported language.
+
+:return: (str) Language identifier
+:since:  v0.1.00
+		"""
+
+		return self.lang
+	#
+
+	def get_lang_default(self):
+	#
+		"""
+Returns the default language.
+
+:return: (str) Language identifier
+:since:  v0.1.00
+		"""
+
+		return self.lang_default
+	#
+
+	def get_type(self):
+	#
+		"""
+Returns the request type.
+
+:return: (str) Request type
+:since:  v0.1.00
+		"""
+
+		return self.type
 	#
 
 	def redirect(self, request, response = None):
@@ -71,7 +131,7 @@ requested by the client. It will reset the response and its cached values.
 			parent_request = (self if (self.parent_request == None) else self.parent_request)
 
 			request.init(self)
-			if (isinstance(request, AbstractHttpRedirectMixin)): request._set_parent_request(parent_request)
+			if (isinstance(request, AbstractHttpMixin)): request._set_parent_request(parent_request)
 
 			if (not isinstance(response, AbstractResponse)): response = AbstractResponse.get_instance()
 
@@ -91,6 +151,42 @@ Sets the parent request used for execution of chained requests.
 		"""
 
 		self.parent_request = parent_request
+	#
+
+	def _supports_compression(self):
+	#
+		"""
+Returns false if supported compression formats can not be identified.
+
+:return: (bool) True if compression formats are identified.
+:since:  v0.1.01
+		"""
+
+		return (False if (self.compression_formats == None) else True)
+	#
+
+	def _supports_headers(self):
+	#
+		"""
+Sets false if the script name is not needed for execution.
+
+:return: (bool) True if the request contains headers.
+:since:  v0.1.00
+		"""
+
+		return (False if (self.headers == None) else True)
+	#
+
+	def _supports_type(self):
+	#
+		"""
+Returns true if the request type is known.
+
+:return: (bool) True if request type is known
+:since:  v0.1.00
+		"""
+
+		return (self.get_type() != None)
 	#
 #
 

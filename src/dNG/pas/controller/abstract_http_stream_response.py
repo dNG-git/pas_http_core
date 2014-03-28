@@ -473,7 +473,6 @@ Set to true to send headers only.
 		"""
 
 		self.headers_only = headers_only
-		self.set_header("Content-Length", ("0" if (headers_only) else None))
 	#
 
 	def set_stream_mode(self):
