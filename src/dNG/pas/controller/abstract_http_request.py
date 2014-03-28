@@ -111,56 +111,15 @@ Constructor __init__(AbstractHttpRequest)
 		"""
 Request body pointer
 		"""
-
-		self.action = None
-		"""
-Requested action
-		"""
-		self.dsd = { }
-		"""
-Data transmitted with the request
-		"""
 		self.inner_request = None
 		"""
 A inner request is used to support protocols based on other ones (e.g.
 JSON-RPC based on HTTP).
 		"""
-		self.module = None
-		"""
-Requested module block
-		"""
-		self.script_name = None
-		"""
-Called script
-		"""
-		self.script_pathname = None
-		"""
-Request path to the script
-		"""
-		self.service = None
-		"""
-Requested service
-		"""
-		self.session = None
-		"""
-Associated session to request
-		"""
-		self.timezone = None
-		"""
-Source timezone
-		"""
-		self.output_handler = "http_xhtml"
-		"""
-Requested response format handler
-		"""
 
 		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
-		self.server_scheme = "http"
 
-		self.supported_features['accepted_formats'] = True
-		self.supported_features['compression'] = True
-		self.supported_features['headers'] = True
-		self.supported_features['type'] = self._supports_type
+		self.supported_features['inner_request'] = True
 	#
 
 	def configure_request_body(self, request_body, content_type_expected = None):
@@ -291,77 +250,6 @@ Executes the given request and generate content for the given response.
 		#
 	#
 
-	def get_action(self):
-	#
-		"""
-Returns the requested action.
-
-:return: (str) Requested action
-:since:  v0.1.00
-		"""
-
-		return self.action
-	#
-
-	def get_cookie(self, name):
-	#
-		"""
-Returns the request cookie if defined.
-
-:param name: Cookie name
-
-:return: (str) Cookie value if set; None otherwise
-:since:  v0.1.00
-		"""
-
-		cookies = self.get_cookies()
-		return (cookies[name] if (name in cookies) else None)
-	#
-
-	def get_cookies(self):
-	#
-		"""
-Returns request cookies.
-
-:return: (dict) Request cookie name as key and value
-:since:  v0.1.00
-		"""
-
-		_return = { }
-
-		cookies = Http.header_field_list(InputFilter.filter_control_chars(self.get_header("Cookie")), ";", "=")
-		for cookie in cookies: _return[cookie['key']] = cookie['value']
-
-		return _return
-	#
-
-	def get_dsd(self, key, default = None):
-	#
-		"""
-Returns the DSD value for the specified parameter.
-
-:param key: DSD key
-:param default: Default value if not set
-
-:return: (mixed) Requested DSD value or default one if undefined
-:since:  v0.1.00
-		"""
-
-		return (self.dsd[key] if (self.is_dsd_set(key)) else default)
-	#
-
-	def get_dsd_dict(self):
-	#
-		"""
-Return all DSD parameters received.
-
-:return: (mixed) Request DSD values
-:since:  v0.1.00
-		"""
-
-		return self.dsd
-	#
-
 	def get_inner_request(self):
 	#
 		"""
@@ -372,90 +260,6 @@ Returns the inner request instance.
 		"""
 
 		return self.inner_request
-	#
-
-	def get_module(self):
-	#
-		"""
-Returns the requested module.
-
-:return: (str) Requested module
-:since:  v0.1.00
-		"""
-
-		return self.module
-	#
-
-	def get_output_handler(self):
-	#
-		"""
-Returns the requested output format.
-
-:return: (str) Requested output format
-:since:  v0.1.00
-		"""
-
-		return self.output_handler
-	#
-
-	def _get_request_parameters(self):
-	#
-		"""
-Returns the unparsed request parameters.
-
-:return: (dict) Request parameters
-:since:  v0.1.01
-		"""
-
-		return { }
-	#
-
-	def get_script_name(self):
-	#
-		"""
-Returns the script name.
-
-:return: (str) Script name
-:since:  v0.1.00
-		"""
-
-		return self.script_name
-	#
-
-	def get_script_pathname(self):
-	#
-		"""
-Returns the script path and name of the request.
-
-:return: (str) Script path and name
-:since:  v0.1.00
-		"""
-
-		return self.script_pathname
-	#
-
-	def get_service(self):
-	#
-		"""
-Returns the requested service.
-
-:return: (str) Requested service
-:since:  v0.1.00
-		"""
-
-		return self.service
-	#
-
-	def get_session(self):
-	#
-		"""
-Returns the associated session.
-
-:return: (object) Session instance
-:since:  v0.1.00
-		"""
-
-		return self.session
 	#
 
 	def handle_missing_service(self, response):
@@ -553,20 +357,6 @@ Initializes the matching stream response instance.
 		"""
 
 		return StdoutStreamResponse()
-	#
-
-	def is_dsd_set(self, key):
-	#
-		"""
-Returns true if the DSD for the specified parameter exists.
-
-:param key: DSD key
-
-:return: (bool) True if set
-:since:  v0.1.01
-		"""
-
-		return (key in self.dsd)
 	#
 
 	def _parse_parameters(self):
@@ -711,37 +501,6 @@ Respond the request with the given response.
 		AbstractRequest._respond(self, response)
 	#
 
-	def set_dsd(self, key, value):
-	#
-		"""
-Sets the DSD value for the specified parameter.
-
-:param key: DSD key
-:param default: DSD value
-
-:since: v0.1.00
-		"""
-
-		self.dsd[key] = value
-	#
-
-	def set_header(self, name, value):
-	#
-		"""
-Set the header with the given name and value.
-
-:param name: Header name
-:param value: Header value
-
-:since: v0.1.00
-		"""
-
-		name = name.upper()
-
-		if (name in self.headers): self.headers[name] = "{0},{1}".format(self.headers[name], value)
-		else: self.headers[name] = value
-	#
-
 	def set_inner_request(self, request):
 	#
 		"""
@@ -754,31 +513,6 @@ Sets the inner request object.
 
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Request.set_inner_request(+request)- (#echo(__LINE__)#)")
 		self.inner_request = request
-	#
-
-	def set_session(self, session):
-	#
-		"""
-Sets the associated session.
-
-:param session: (object) Session instance
-
-:since: v0.1.00
-		"""
-
-		self.session = session
-	#
-
-	def _supports_type(self):
-	#
-		"""
-Returns true if the request type is known.
-
-:return: (bool) True if request type is known
-:since:  v0.1.00
-		"""
-
-		return (self.get_type() != None)
 	#
 
 	@staticmethod

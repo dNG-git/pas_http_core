@@ -51,13 +51,26 @@ Constructor __init__(AbstractInnerHttpRequest)
 		AbstractInnerRequest.__init__(self)
 		AbstractHttpMixin.__init__(self)
 
+		self.accepted_formats = None
+		"""
+Formats the client accepts
+		"""
 		self.compression_formats = None
 		"""
 Compression formats the client accepts
 		"""
+	#
 
-		self.supported_features['compression'] = self._supports_compression
-		self.supported_features['headers'] = self._supports_headers
+	def get_accepted_formats(self):
+	#
+		"""
+Returns the formats the client accepts.
+
+:return: (list) Accepted formats
+:since:  v0.1.01
+		"""
+
+		return self.accepted_formats
 	#
 
 	def get_compression_formats(self):
@@ -84,36 +97,27 @@ Initializes default values from the original request.
 
 		AbstractInnerRequest.init(self, request)
 
-		self.lang = request.get_lang()
-		self.lang_default = request.get_lang_default()
+		if (request.is_supported("accepted_formats")): self.accepted_formats = request.get_accepted_formats()
 		if (request.is_supported("compression")): self.compression_formats = request.get_compression_formats()
 		if (request.is_supported("headers")): self.headers = request.get_headers()
+		self.lang = request.get_lang()
+		self.lang_default = request.get_lang_default()
+		self.session = request.get_session()
 		if (request.is_supported("type")): self.type = request.get_type()
-	#
 
-	def set_compression_formats(self, compression_formats):
-	#
-		"""
-Sets the compression formats the client accepts.
-
-:param compression_formats: List of accepted compression formats
-
-:since: v0.1.01
-		"""
-
-		if (isinstance(compression_formats, list)): self.compression_formats = compression_formats
+		self.set_script_pathname(request.get_script_pathname())
 	#
 
 	def _supports_accepted_formats(self):
 	#
 		"""
-Sets false if accepted formats can not be identified.
+Returns false if accepted formats can not be identified.
 
-:return: (bool) True accepted formats are supported.
-:since:  v0.1.00
+:return: (bool) True if accepted formats are identified.
+:since:  v0.1.01
 		"""
 
-		return (False if (self.headers == None) else True)
+		return (self.accepted_formats != None)
 	#
 
 	def _supports_compression(self):
@@ -125,19 +129,7 @@ Returns false if supported compression formats can not be identified.
 :since:  v0.1.01
 		"""
 
-		return (False if (self.compression_formats == None) else True)
-	#
-
-	def _supports_headers(self):
-	#
-		"""
-Sets false if the script name is not needed for execution.
-
-:return: (bool) True if the request contains headers.
-:since:  v0.1.00
-		"""
-
-		return (False if (self.headers == None) else True)
+		return (self.compression_formats != None)
 	#
 #
 
