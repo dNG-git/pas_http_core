@@ -145,7 +145,7 @@ Returns the requested action.
 :since:  v0.1.00
 		"""
 
-		return self.action
+		return ("index" if (self.action == None) else self.action)
 	#
 
 	def get_compression_formats(self):
@@ -286,7 +286,7 @@ Returns the requested module.
 :since:  v0.1.00
 		"""
 
-		return self.module
+		return ("services" if (self.module == None) else self.module)
 	#
 
 	def get_output_handler(self):
@@ -346,7 +346,7 @@ Returns the requested service.
 :since:  v0.1.00
 		"""
 
-		return self.service
+		return ("index" if (self.service == None) else self.service)
 	#
 
 	def get_session(self):

@@ -89,6 +89,20 @@ Timestamp of service initialisation
 		self.http_wsgi1_request = HttpWsgi1Request(wsgi_env, wsgi_header_response)
 	#
 
+	def __del__(self):
+	#
+		"""
+Destructor __del__(ServerWsgi)
+
+Ensure that references are freed for GC. Some implementations like Apache's
+mod_wsgi may already have removed globals at this stage.
+
+:since: v0.1.00
+		"""
+
+		if (Hooks != None): Hooks.free()
+	#
+
 	def __iter__(self):
 	#
 		"""

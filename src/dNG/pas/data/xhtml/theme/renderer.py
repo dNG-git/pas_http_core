@@ -452,7 +452,7 @@ given.
 		_type = (
 			Link.TYPE_RELATIVE
 			if (Settings.get("pas_http_site_canonical_url_type", "absolute") == "relative") else
-			Link.TYPE_FULL
+			Link.TYPE_ABSOLUTE
 		)
 
 		self.set_canonical_url(Link().build_url(_type, parameters))

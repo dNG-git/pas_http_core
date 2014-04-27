@@ -26,12 +26,12 @@ NOTE_END //n"""
 from os import path
 import re
 
-from dNG.pas.controller.abstract_inner_request import AbstractInnerRequest
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.request_body_urlencoded import RequestBodyUrlencoded
 from dNG.pas.data.http.virtual_config import VirtualConfig
 from dNG.pas.runtime.io_exception import IOException
 from .abstract_http_request import AbstractHttpRequest
+from .abstract_inner_request import AbstractInnerRequest
 from .http_wsgi1_stream_response import HttpWsgi1StreamResponse
 
 class HttpWsgi1Request(AbstractHttpRequest):
@@ -104,7 +104,7 @@ Request path after the script
 		#
 			if (wsgi_env[key] != ""):
 			#
-				if (key.startswith("HTTP_")): self.set_header(key[5:].replace("_", "-"), wsgi_env[key])
+				if (key[:5] == "HTTP_"): self.set_header(key[5:].replace("_", "-"), wsgi_env[key])
 				elif (key == "CONTENT_LENGTH" or key == "CONTENT_TYPE"): self.set_header(key.replace("_", "-"), wsgi_env[key])
 				elif (key == "REMOTE_ADDR" and self.client_host == None): self.client_host = wsgi_env[key]
 				elif (key == "REMOTE_HOST"): self.client_host = wsgi_env[key]
@@ -131,9 +131,10 @@ Request path after the script
 		if (self.script_pathname == None): self.script_pathname = ""
 
 		self.init()
+
 		virtual_config = VirtualConfig.get_config(self.virtual_pathname)
 
-		if (virtual_config == None and (self.virtual_pathname != "" or self.virtual_pathname == "/")):
+		if (virtual_config == None and self.virtual_pathname != ""):
 		#
 			virtual_config = VirtualConfig.get_config(self.script_pathname)
 			virtual_pathname = self.script_pathname
@@ -151,9 +152,8 @@ Request path after the script
 			# Died before output
 			if (not self.http_wsgi_stream_response.are_headers_sent()):
 			#
-				response = self.http_wsgi_stream_response
-				response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
-				response.send_data("Internal Server Error")
+				self.http_wsgi_stream_response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+				self.http_wsgi_stream_response.send_data("Internal Server Error")
 			#
 		#
 	#
@@ -167,10 +167,7 @@ python.org: Return an iterator object.
 :since:  v0.1.00
 		"""
 
-		http_wsgi_stream_response = self.http_wsgi_stream_response
-		self.http_wsgi_stream_response = None
-
-		return iter(http_wsgi_stream_response)
+		return iter(self.http_wsgi_stream_response)
 	#
 
 	def _get_request_parameters(self):

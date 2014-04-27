@@ -76,6 +76,7 @@ are met.
 
 			if (mimetype_definition != None and streamer.open_url(url, exclusive_id)):
 			#
+				if (response.get_header("Accept-Ranges") == None): response.set_header("Accept-Ranges", "bytes")
 				if (response.get_header("Content-Type") == None): response.set_header("Content-Type", mimetype_definition['type'])
 
 				is_content_length_set = False
@@ -93,34 +94,25 @@ are met.
 						range_start = re.sub("(\\D+)", "", re_result.group(2))
 						range_end = re.sub("(\\D+)", "", re_result.group(3))
 
-						if (range_start != ""):
-						#
-							range_start = int(range_start)
+						if (range_start != ""): range_start = int(range_start)
 
-							if (range_end != ""):
-							#
-								range_end = int(range_end)
-								if (range_start >= 0 and range_start <= range_end and range_end < streamer_size): is_valid = True
-							#
-							elif (range_start >= 0 and range_start < streamer_size):
-							#
-								is_valid = True
-								range_end = streamer_size - 1
-							#
+						if (range_end != ""):
 						#
-						elif (range_end != ""):
-						#
-							range_start = 0
 							range_end = int(range_end)
-							if (range_end > 0 and range_end < streamer_size): is_valid = True
+							if (range_start >= 0 and range_start <= range_end and range_end < streamer_size): is_valid = True
+						#
+						elif (range_start >= 0 and range_start < streamer_size):
+						#
+							is_valid = True
+							range_end = streamer_size - 1
 						#
 
 						if (is_valid and range_start > 0): is_valid = streamer.is_supported("seeking")
 
-						if (is_valid and (range_start > 0 or (1 + range_end) < streamer_size)):
+						if (is_valid and (range_start > 0 or range_end < streamer_size)):
 						#
 							response.set_header("HTTP/1.1", "HTTP/1.1 206 Partial Content", True)
-							response.set_header("Content-Range", "{0:d}-{1:d}/{2:d}".format(range_start, range_end, streamer_size))
+							response.set_header("Content-Range", "bytes {0:d}-{1:d}/{2:d}".format(range_start, range_end, streamer_size))
 
 							response.set_header("Content-Length", (1 + range_end - range_start))
 

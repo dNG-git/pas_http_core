@@ -114,7 +114,8 @@ Stop the server
 :param params: Parameter specified
 :param last_return: The return value from the last hook called.
 
-:since: v0.1.00
+:return: (mixed) Return value
+:since:  v0.1.00
 		"""
 
 		if (self.server != None):

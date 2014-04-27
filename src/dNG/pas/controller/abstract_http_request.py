@@ -424,7 +424,7 @@ instance.
 :since:  v0.1.01
 		"""
 
-		if (virtual_config == None): inner_request = None
+		if (virtual_config == None): _return = None
 		elif ("setup_callback" in virtual_config):
 		#
 			if ("uri" in virtual_config):
@@ -433,31 +433,31 @@ instance.
 				self.set_dsd(virtual_config['uri'], uri)
 			#
 
-			inner_request = virtual_config['setup_callback'](self, virtual_config)
+			_return = virtual_config['setup_callback'](self, virtual_config)
 		#
 		elif ("m" in virtual_config or "s" in virtual_config or "a" in virtual_config or "uri" in virtual_config):
 		#
-			inner_request = NamedLoader.get_instance("dNG.pas.controller.PredefinedHttpRequest")
+			_return = NamedLoader.get_instance("dNG.pas.controller.PredefinedHttpRequest")
 
-			if ("m" in virtual_config): inner_request.set_module(virtual_config['m'])
-			if ("s" in virtual_config): inner_request.set_service(virtual_config['s'])
-			if ("a" in virtual_config): inner_request.set_action(virtual_config['a'])
+			if ("m" in virtual_config): _return.set_module(virtual_config['m'])
+			if ("s" in virtual_config): _return.set_service(virtual_config['s'])
+			if ("a" in virtual_config): _return.set_action(virtual_config['a'])
 
-			if ("dsd" in virtual_config):
+			if ("dsd" in virtual_config and isinstance(virtual_config['dsd'], dict)):
 			#
-				for key in virtual_config['dsd']: inner_request.set_dsd(key, virtual_config['dsd'][key])
+				for key in virtual_config['dsd']: _return.set_dsd(key, virtual_config['dsd'][key])
 			#
 
 			if ("uri" in virtual_config):
 			#
 				uri = (virtual_pathname[len(virtual_config['uri_prefix']):] if ("uri_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['uri_prefix'])) else virtual_pathname)
-				inner_request.set_dsd(virtual_config['uri'], uri)
+				_return.set_dsd(virtual_config['uri'], uri)
 			#
 		#
 
-		if (isinstance(inner_request, AbstractInnerRequest)): inner_request.init(self)
+		if (isinstance(_return, AbstractInnerRequest)): _return.init(self)
 
-		return inner_request
+		return _return
 	#
 
 	def _respond(self, response):

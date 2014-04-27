@@ -68,31 +68,17 @@ Configured server host
 The LogHandler is called whenever debug messages should be logged or errors
 happened.
 		"""
-		self.socket_hostname = getfqdn().lower()
-		"""
-Socket server hostname
-		"""
 		self.port = None
 		"""
 Configured server port
 		"""
+		self.socket_hostname = getfqdn().lower()
+		"""
+Socket server hostname
+		"""
 
 		Hooks.register("dNG.pas.http.Server.getHost", self.get_host)
 		Hooks.register("dNG.pas.http.Server.getPort", self.get_port)
-	#
-
-	def __del__(self):
-	#
-		"""
-Destructor __del__(ServerImplementation)
-
-Some implementations like Apache's mod_wsgi may already have removed
-globals at this stage.
-
-:since: v0.1.00
-		"""
-
-		if (Hooks != None): Hooks.free()
 	#
 
 	def _configure(self):
@@ -127,7 +113,8 @@ Returns the configured server host.
 :param params: Parameter specified
 :param last_return: The return value from the last hook called.
 
-:since: v0.1.00
+:return: (mixed) Return value
+:since:  v0.1.00
 		"""
 
 		return (self.host if (last_return == None) else last_return)
@@ -141,7 +128,8 @@ Returns the configured server port.
 :param params: Parameter specified
 :param last_return: The return value from the last hook called.
 
-:since: v0.1.00
+:return: (mixed) Return value
+:since:  v0.1.00
 		"""
 
 		return (self.port if (last_return == None) else last_return)
@@ -155,7 +143,8 @@ Start the server
 :param params: Parameter specified
 :param last_return: The return value from the last hook called.
 
-:since: v0.1.00
+:return: (mixed) Return value
+:since:  v0.1.00
 		"""
 
 		self._configure()
@@ -163,24 +152,6 @@ Start the server
 
 		Hooks.call("dNG.pas.http.Server.startup", server = self)
 		return self
-	#
-
-	def log_request(self, handler):
-	#
-		"""
-tornadoweb.org: Writes a completed HTTP request to the logs.
-
-:since: v0.1.00
-		"""
-
-		if (self.log_handler != None):
-		#
-			if handler.get_status() < 400: method = self.log_handler.info
-			elif handler.get_status() < 500: method = self.log_handler.warning
-			else: method = self.log_handler.error
-
-			method("{0} {1:d} {2} {3} ({4} {5:.2f})".format(handler.request.version, handler.get_status(), handler.request.method, handler.request.uri , handler.request.remote_ip, handler.request.request_time()))
-		#
 	#
 
 	def run(self):
@@ -202,7 +173,8 @@ Stop the server
 :param params: Parameter specified
 :param last_return: The return value from the last hook called.
 
-:since: v0.1.00
+:return: (mixed) Return value
+:since:  v0.1.00
 		"""
 
 		Hooks.call("dNG.pas.http.Server.shutdown", server = self)

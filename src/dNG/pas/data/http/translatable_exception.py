@@ -45,7 +45,7 @@ This exception takes a translatable error message for HTTP 400 error codes.
 
 :author:     direct Netware Group
 :copyright:  direct Netware Group - All rights reserved
-:package:    pas;http
+:package:    pas.http
 :subpackage: core
 :since:      v0.1.01
 :license:    http://www.direct-netware.de/redirect.py?licenses;gpl

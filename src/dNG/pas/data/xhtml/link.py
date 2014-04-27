@@ -46,24 +46,24 @@ TODO: Code incomplete
 
 	# pylint: disable=arguments-differ
 
-	TYPE_FORM_FIELDS = 8
+	TYPE_FORM_FIELDS = 16
 	"""
 Hidden input fields
 	"""
-	TYPE_FORM_URL = 16
+	TYPE_FORM_URL = 32
 	"""
 Form action URL
 	"""
-	TYPE_JS_REQUIRED = 32
+	TYPE_JS_REQUIRED = 64
 	"""
 JavaScript is required
 	"""
-	TYPE_QUERY_STRING = 64
+	TYPE_QUERY_STRING = 128
 	"""
 Generate the query string
 	"""
 
-	def build_url(self, _type, parameters, escape = True):
+	def build_url(self, _type, parameters = None, escape = True):
 	#
 		"""
 Builds an URL string. You may use internal links "index.py?...", external
@@ -81,6 +81,8 @@ as a source for parameters.
 		"""
 
 		if (type(_type) != int): _type = self.__class__.get_type(_type)
+
+		if (parameters == None): parameters = { }
 		xhtml_escape = escape
 
 		#if (_type == "asis"): _return = self.build_url(data)
@@ -114,8 +116,8 @@ value='de' />". Automatically add language, theme and uuid fields.
 		#
 		elif (_type & Link.TYPE_FORM_URL == Link.TYPE_FORM_URL):
 		#
-			if (_type == Link.TYPE_FORM_URL): _type = Link.TYPE_RELATIVE
-			_return = _Link.build_url(self, _type, { })
+			if (_type == Link.TYPE_FORM_URL): _type |= Link.TYPE_RELATIVE
+			_return = _Link.build_url(self, _type)
 		#
 		elif (_type & Link.TYPE_QUERY_STRING == Link.TYPE_QUERY_STRING):
 		#
@@ -213,7 +215,7 @@ Parses the given type parameter given as a string value.
 :since:  v0.1.01
 		"""
 
-		if (_type == "js_elink"): _return = Link.TYPE_FULL & Link.TYPE_JS_REQUIRED
+		if (_type == "js_elink"): _return = Link.TYPE_ABSOLUTE & Link.TYPE_JS_REQUIRED
 		elif (_type == "js_ilink"): _return = Link.TYPE_RELATIVE & Link.TYPE_JS_REQUIRED
 		elif (_type == "query_string"): _return = Link.TYPE_QUERY_STRING
 		else: _return = _Link.get_type(_type)

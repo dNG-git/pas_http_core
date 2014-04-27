@@ -57,15 +57,19 @@ class Link(Uri):
 
 	# pylint: disable=unused-argument
 
-	TYPE_FULL = 1
+	TYPE_ABSOLUTE = 1
 	"""
-Full URLs like "http://localhost/index.py?..."
+Absolute URLs like "http://localhost/index.py?..."
 	"""
-	TYPE_OPTICAL = 2
+	TYPE_BASE_PATH = 2
+	"""
+Generates URLs to the base path of this application.
+	"""
+	TYPE_OPTICAL = 4
 	"""
 Optical URLs are used to show the target address.
 	"""
-	TYPE_RELATIVE = 4
+	TYPE_RELATIVE = 8
 	"""
 Relative URLs like "index.py?..."
 	"""
@@ -96,7 +100,7 @@ Override for the URL scheme
 		"""
 	#
 
-	def build_url(self, _type, parameters):
+	def build_url(self, _type, parameters = None):
 	#
 		"""
 Builds an URL string. You may use internal links "index.py?...", external
@@ -114,10 +118,18 @@ as a source for parameters.
 		"""
 
 		if (type(_type) != int): _type = self.__class__.get_type(_type)
+
 		_return = self.get_url_base(_type, parameters)
 
-		parameters = self._parameters_filter(parameters)
-		parameters = self._parameters_append_defaults(parameters)
+		if (
+			parameters == None or
+			_type & Link.TYPE_BASE_PATH == Link.TYPE_BASE_PATH
+		): parameters = { }
+		else:
+		#
+			parameters = self._parameters_filter(parameters)
+			parameters = self._parameters_append_defaults(parameters)
+		#
 
 		if (len(parameters) > 0):
 		#
@@ -366,7 +378,7 @@ Returns the base URL for the given type and parameters.
 		#
 			request = AbstractHttpRequest.get_instance()
 
-			if (_type == Link.TYPE_RELATIVE): _return = self._get_url_path(request)
+			if (_type & Link.TYPE_RELATIVE == Link.TYPE_RELATIVE): _return = self._get_url_path(request)
 			else:
 			#
 				scheme = request.get_server_scheme()
@@ -614,7 +626,7 @@ Parses the given type parameter given as a string value.
 :since:  v0.1.01
 		"""
 
-		if (_type == "elink"): _return = Link.TYPE_FULL
+		if (_type == "elink"): _return = Link.TYPE_ABSOLUTE
 		elif (_type == "ilink"): _return = Link.TYPE_RELATIVE
 		elif (_type == "optical"): _return = Link.TYPE_OPTICAL
 		else: _return = 0

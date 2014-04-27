@@ -28,9 +28,8 @@ NOTE_END //n"""
 from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting
-
-try: from dNG.pas.data.user.profile import Profile
-except ImportError: Profile = None
+from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.runtime.value_exception import ValueException
 
 class RewriteUserXhtmlMixin(RewriteMixin):
 #
@@ -40,7 +39,7 @@ safe XHTML compliant output.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
-:package:    pas;http
+:package:    pas.http
 :subpackage: core
 :since:      v0.1.01
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
@@ -62,11 +61,18 @@ Checks and renders the rewrite statement.
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_link(source, {1})- (#echo(__LINE__)#)".format(self, key))
 		_return = L10n.get("core_unknown_entity")
 
-		user_definition = (None if (Profile == None) else self.source_get_value(source, key))
+		user_profile_class = NamedLoader.get_class("dNG.pas.data.user.Profile")
 
-		user_profile = (Profile.load_id(user_definition['id']) if (type(user_definition) == dict and "id" in user_definition) else None)
+		user_definition = (None if (user_profile_class == None) else self.source_get_value(source, key))
+		user_profile = None
 
-		if (user_profile):
+		if (user_definition != None and type(user_definition) == dict and "id" in user_definition):
+		#
+			try: user_profile = user_profile_class.load_id(user_definition['id'])
+			except ValueException: pass
+		#
+
+		if (user_profile != None):
 		#
 			user_data = user_profile.data_get("name")
 			_return = Formatting.escape(user_data['name'])

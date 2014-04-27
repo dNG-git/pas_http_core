@@ -60,10 +60,6 @@ Constructor __init__(HttpWsgi1StreamResponse)
 
 		AbstractHttpStreamResponse.__init__(self)
 
-		self.stream_mode_supported = AbstractHttpStreamResponse.STREAM_CALLBACK | AbstractHttpStreamResponse.STREAM_DIRECT
-		"""
-Support chunked streaming
-		"""
 		self.wsgi_file_wrapper = wsgi_file_wrapper
 		"""
 The WSGI file wrapper callback
@@ -76,6 +72,8 @@ The WSGI header response callback
 		"""
 The WSGI response writer callback
 		"""
+
+		self.stream_mode_supported |= AbstractHttpStreamResponse.STREAM_DIRECT
 	#
 
 	def __iter__(self):
@@ -87,8 +85,16 @@ python.org: Return an iterator object.
 :since:  v0.1.00
 		"""
 
-		if (self.streamer != None and self.wsgi_file_wrapper != None): return (self.wsgi_file_wrapper(self.streamer) if (self.compressor == None) else HttpCompressedStreamer(self.streamer, self.compressor))
-		else: return (self if (self.compressor == None or self.streamer == None) else HttpCompressedStreamer(self.streamer, self.compressor))
+		_return = self
+
+		if (self.compressor != None and self.streamer != None):
+		#
+			_return = HttpCompressedStreamer(self.streamer, self.compressor)
+			self.compressor = None
+		#
+		elif (self.streamer != None and self.wsgi_file_wrapper != None): _return = self.wsgi_file_wrapper(self.streamer)
+
+		return _return
 	#
 
 	def __next__(self):

@@ -80,7 +80,7 @@ Configures the server
 
 		if (listener_host == ""):
 		#
-			listener_host = ("::" if (socket.has_ipv6) else "0.0.0.0")
+			listener_host = ("::" if (hasattr(socket, "has_ipv6") and socket.has_ipv6) else "0.0.0.0")
 			self.host = Settings.get("pas_http_server_preferred_hostname", self.socket_hostname)
 		#
 		else: self.host = listener_host
@@ -125,7 +125,8 @@ Stop the server
 :param params: Parameter specified
 :param last_return: The return value from the last hook called.
 
-:since: v0.1.01
+:return: (mixed) Return value
+:since:  v0.1.01
 		"""
 
 		if (self.server != None): self.server.stop()

@@ -93,7 +93,7 @@ Event called after all data has been received.
 		"""
 Timeout for each network read.
 		"""
-		self.socket_data_timeout = int(Settings.get("pas_server_socket_data_timeout", 0))
+		self.socket_data_timeout = int(Settings.get("pas_global_server_socket_data_timeout", 0))
 		"""
 Timeout for each network read.
 		"""

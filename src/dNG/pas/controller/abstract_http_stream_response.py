@@ -69,6 +69,10 @@ Constructor __init__(AbstractHttpStreamResponse)
 
 		AbstractStreamResponse.__init__(self)
 
+		self.accepted_formats = [ ]
+		"""
+Formats the client accepts
+		"""
 		self.compressor = None
 		"""
 Compression object or file
@@ -173,7 +177,20 @@ Finish transmission and cleanup resources.
 			if (is_chunked_response or self.compressor != None): self.send_data(None)
 
 			AbstractStreamResponse.finish(self)
+			self.compressor = None
 		#
+	#
+
+	def get_accepted_formats(self):
+	#
+		"""
+Returns the formats the client accepts.
+
+:return: (list) Accepted formats
+:since:  v0.1.01
+		"""
+
+		return self.accepted_formats
 	#
 
 	def get_compression_formats(self):
@@ -244,13 +261,15 @@ Prepare data for output. Compress and transform it if required.
 :since:  v0.1.01
 		"""
 
+		is_chunked_response = (self.stream_mode & AbstractHttpStreamResponse.STREAM_CHUNKED == AbstractHttpStreamResponse.STREAM_CHUNKED)
+
 		if (self.compressor != None):
 		#
-			if (data == None): data = (Binary.BYTES_TYPE() if (self.stream_mode_supported & AbstractStreamResponse.STREAM_CALLBACK == AbstractStreamResponse.STREAM_CALLBACK and self.streamer != None) else self.compressor.flush())
+			if (data == None): data = self.compressor.flush()
 			elif (len(data) > 0): data = self.compressor.compress(Binary.bytes(data))
 		#
 
-		if (self.stream_mode & AbstractHttpStreamResponse.STREAM_CHUNKED == AbstractHttpStreamResponse.STREAM_CHUNKED): data = self.chunkify(data)
+		if (is_chunked_response): data = self.chunkify(data)
 
 		return data
 	#
@@ -286,6 +305,19 @@ Sends the prepared response headers.
 		"""
 
 		raise NotImplementedException()
+	#
+
+	def set_accepted_formats(self, accepted_formats):
+	#
+		"""
+Sets the formats the client accepts.
+
+:param accepted_formats: List of accepted formats
+
+:since: v0.1.01
+		"""
+
+		if (isinstance(accepted_formats, list)): self.accepted_formats = accepted_formats
 	#
 
 	def set_compression(self, compress):
