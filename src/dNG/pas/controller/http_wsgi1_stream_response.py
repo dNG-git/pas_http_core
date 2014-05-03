@@ -87,12 +87,18 @@ python.org: Return an iterator object.
 
 		_return = self
 
-		if (self.compressor != None and self.streamer != None):
+		if (self.wsgi_file_wrapper != None):
 		#
-			_return = HttpCompressedStreamer(self.streamer, self.compressor)
-			self.compressor = None
+			if (self.streamer == None): iterator = self
+			elif (self.compressor != None):
+			#
+				iterator = HttpCompressedStreamer(self.streamer, self.compressor)
+				self.compressor = None
+			#
+			else: iterator = self.streamer
+
+			_return = self.wsgi_file_wrapper(iterator)
 		#
-		elif (self.streamer != None and self.wsgi_file_wrapper != None): _return = self.wsgi_file_wrapper(self.streamer)
 
 		return _return
 	#
@@ -175,7 +181,7 @@ Sends the prepared response headers.
 :since: v0.1.00
 		"""
 
-		http_status_line = "200 Ok"
+		http_status_line = "200 OK"
 
 		headers = [ ]
 		headers_indexed = dict([( value, key ) for ( key, value ) in self.headers_indexed.items()])

@@ -669,6 +669,7 @@ Sets the streamer to create response data when requested.
 :since: v0.1.01
 		"""
 
+		if (self.log_handler != None): self.log_handler.debug("{0!r} starts streaming with an IO chunk size of {1:d}".format(self, streamer.get_io_chunk_size()))
 		self.stream_response.set_streamer(streamer)
 	#
 

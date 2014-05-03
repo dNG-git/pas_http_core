@@ -26,7 +26,6 @@ NOTE_END //n"""
 from os import path
 import re
 
-from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
 from dNG.pas.controller.abstract_http_response import AbstractHttpResponse
 from dNG.pas.data.mime_type import MimeType
 from dNG.pas.data.translatable_exception import TranslatableException
@@ -47,7 +46,7 @@ HTTP streaming returns data on demand for output.
 	"""
 
 	@staticmethod
-	def run(request, streamer, url, response, exclusive = False):
+	def run(request, streamer, url, response):
 	#
 		"""
 Parses, configures and activates the given streamer if all prerequisites
@@ -65,16 +64,7 @@ are met.
 			url_ext = path.splitext(url)[1]
 			mimetype_definition = MimeType.get_instance().get(url_ext[1:])
 
-			if (exclusive):
-			#
-				request = AbstractHttpRequest.get_instance()
-				client_host = (None if (request == None) else request.get_client_host())
-
-				exclusive_id = (None if (client_host == None) else "{0}@{1}".format(client_host, url))
-			#
-			else: exclusive_id = None
-
-			if (mimetype_definition != None and streamer.open_url(url, exclusive_id)):
+			if (mimetype_definition != None and streamer.open_url(url)):
 			#
 				if (response.get_header("Accept-Ranges") == None): response.set_header("Accept-Ranges", "bytes")
 				if (response.get_header("Content-Type") == None): response.set_header("Content-Type", mimetype_definition['type'])

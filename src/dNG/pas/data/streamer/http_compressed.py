@@ -60,9 +60,11 @@ Constructor __init__(HttpCompressed)
 		"""
 Compression function
 		"""
+
+		self.set_io_chunk_size(1048576)
 	#
 
-	def read(self, _bytes = 1048576):
+	def read(self, _bytes = None):
 	#
 		"""
 Reads from the current streamer session.
