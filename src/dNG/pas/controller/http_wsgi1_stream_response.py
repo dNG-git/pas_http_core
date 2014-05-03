@@ -87,17 +87,16 @@ python.org: Return an iterator object.
 
 		_return = self
 
-		if (self.wsgi_file_wrapper != None):
+		if (self.streamer != None and self.wsgi_file_wrapper != None):
 		#
-			if (self.streamer == None): iterator = self
-			elif (self.compressor != None):
+			if (self.compressor != None):
 			#
-				iterator = HttpCompressedStreamer(self.streamer, self.compressor)
+				streamer = HttpCompressedStreamer(self.streamer, self.compressor)
 				self.compressor = None
 			#
-			else: iterator = self.streamer
+			else: streamer = self.streamer
 
-			_return = self.wsgi_file_wrapper(iterator)
+			_return = self.wsgi_file_wrapper(streamer)
 		#
 
 		return _return
