@@ -45,7 +45,7 @@ class Uri(object):
 	"""
 
 	@staticmethod
-	def query_param_decode(data):
+	def decode_query_value(data):
 	#
 		"""
 Decode special characters from a RFC 2396 compliant URI.
@@ -61,7 +61,7 @@ Decode special characters from a RFC 2396 compliant URI.
 	#
 
 	@staticmethod
-	def query_param_encode(data):
+	def encode_query_value(data):
 	#
 		"""
 Encode special characters for a RFC 2396 compliant URI.

@@ -57,7 +57,7 @@ Checks and renders the rewrite statement.
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time(source, {1}, {2})- (#echo(__LINE__)#)".format(self, key, _type))
 		_return = L10n.get("core_unknown")
 
-		timestamp = self.source_get_value(source, key)
+		timestamp = self.get_source_value(source, key)
 
 		if (timestamp != None):
 		#

@@ -28,8 +28,8 @@ NOTE_END //n"""
 from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting
+from dNG.pas.database.nothing_matched_exception import NothingMatchedException
 from dNG.pas.module.named_loader import NamedLoader
-from dNG.pas.runtime.value_exception import ValueException
 
 class RewriteUserXhtmlMixin(RewriteMixin):
 #
@@ -63,18 +63,18 @@ Checks and renders the rewrite statement.
 
 		user_profile_class = NamedLoader.get_class("dNG.pas.data.user.Profile")
 
-		user_definition = (None if (user_profile_class == None) else self.source_get_value(source, key))
+		user_definition = (None if (user_profile_class == None) else self.get_source_value(source, key))
 		user_profile = None
 
 		if (user_definition != None and type(user_definition) == dict and "id" in user_definition):
 		#
 			try: user_profile = user_profile_class.load_id(user_definition['id'])
-			except ValueException: pass
+			except NothingMatchedException: pass
 		#
 
 		if (user_profile != None):
 		#
-			user_data = user_profile.data_get("name")
+			user_data = user_profile.get_data_attributes("name")
 			_return = Formatting.escape(user_data['name'])
 		#
 

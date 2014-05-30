@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.TranslatableException
+dNG.pas.data.http.TranslatableError
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -36,12 +36,13 @@ http://www.direct-netware.de/redirect.py?licenses;gpl
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from .translatable_error import TranslatableError
+from dNG.pas.data.translatable_exception import TranslatableException
 
-class TranslatableException(TranslatableError):
+class TranslatableError(TranslatableException):
 #
 	"""
-This exception takes a translatable messages for critical errors.
+This exception is used for non-critical, translatable error messages.
+Non-critical errors are usually expected like wrong entity IDs.
 
 :author:     direct Netware Group
 :copyright:  direct Netware Group - All rights reserved
@@ -52,10 +53,10 @@ This exception takes a translatable messages for critical errors.
              GNU General Public License 2
 	"""
 
-	def __init__(self, l10n_id, http_code = 500, value = None, _exception = None):
+	def __init__(self, l10n_id, http_code = 200, value = None, _exception = None):
 	#
 		"""
-Constructor __init__(TranslatableException)
+Constructor __init__(TranslatableError)
 
 :param l10n_id: L10n translatable key (prefixed with "errors_")
 :param http_code: HTTP code
@@ -65,7 +66,24 @@ Constructor __init__(TranslatableException)
 :since: v0.1.01
 		"""
 
-		TranslatableError.__init__(self, l10n_id, http_code = 500, value = None, _exception = None)
+		TranslatableException.__init__(self, l10n_id, value, _exception)
+
+		self.http_code = http_code
+		"""
+HTTP error code
+		"""
+	#
+
+	def get_http_code(self):
+	#
+		"""
+Return the HTTP error code.
+
+:return: (int) HTTP error code
+:since:  v0.1.01
+		"""
+
+		return self.http_code
 	#
 #
 

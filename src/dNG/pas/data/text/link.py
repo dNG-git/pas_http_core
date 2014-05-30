@@ -100,6 +100,36 @@ Override for the URL scheme
 		"""
 	#
 
+	def _add_default_parameters(self, parameters):
+	#
+		"""
+This method appends default parameters if not already set.
+
+:param parameters: Parameters dict
+
+:return: (dict) Appended parameters dict
+:since:  v0.1.00
+		"""
+
+		_return = parameters
+		request = None
+
+		if ("lang" not in _return):
+		#
+			request = AbstractHttpRequest.get_instance()
+			if (request != None and request.get_lang() != request.get_lang_default()): _return['lang'] = request.get_lang()
+		#
+
+		if ("uuid" not in _return and SessionImplementation != None):
+		#
+			if (request == None): request = AbstractHttpRequest.get_instance()
+			session = request.get_session()
+			if (session != None and session.is_active() and (not session.is_persistent())): _return['uuid'] = SessionImplementation.get_class().get_uuid()
+		#
+
+		return _return
+	#
+
 	def build_url(self, _type, parameters = None):
 	#
 		"""
@@ -121,14 +151,13 @@ as a source for parameters.
 
 		_return = self.get_url_base(_type, parameters)
 
-		if (
-			parameters == None or
-			_type & Link.TYPE_BASE_PATH == Link.TYPE_BASE_PATH
-		): parameters = { }
+		if (parameters == None
+		    or _type & Link.TYPE_BASE_PATH == Link.TYPE_BASE_PATH
+		   ): parameters = { }
 		else:
 		#
-			parameters = self._parameters_filter(parameters)
-			parameters = self._parameters_append_defaults(parameters)
+			parameters = self._filter_parameters(parameters)
+			parameters = self._add_default_parameters(parameters)
 		#
 
 		if (len(parameters) > 0):
@@ -259,7 +288,7 @@ Builds a template-defined string containing the given URL parameters.
 
 		_return = ""
 
-		if (_escape == None): _escape = Link.query_param_encode
+		if (_escape == None): _escape = Link.encode_query_value
 
 		for key in self.__class__._build_url_sorted_parameters(parameters.keys()):
 		#
@@ -346,6 +375,84 @@ Builds a URL DSD string.
 		return _return
 	#
 
+	def _filter_parameters(self, parameters):
+	#
+		"""
+This method filters all parameters of the type "__<KEYWORD>__".
+
+:param parameters: Parameters dict
+
+:return: (dict) Filtered parameters dict
+:since:  v0.1.00
+		"""
+
+		_return = parameters.copy()
+
+		if ("__query__" in _return):
+		#
+			if (len(_return) == 1 and len(_return['__query__']) > 0):
+			#
+				_return = AbstractHttpRequest.parse_iline(InputFilter.filter_control_chars(_return['__query__']))
+				if ("dsd" in _return): _return['dsd'] = AbstractHttpRequest.parse_dsd(_return['dsd'])
+			#
+			else: del(_return['__query__'])
+		#
+
+		if (_return.get("__request__", False)):
+		#
+			request = AbstractHttpRequest.get_instance()
+			inner_request = request.get_inner_request()
+			if (inner_request != None): request = inner_request
+
+			if (request != None):
+			#
+				if ("ohandler" not in _return): _return['ohandler'] = request.get_output_handler()
+				if ("m" not in _return): _return['m'] = request.get_module()
+				if ("s" not in _return): _return['s'] = request.get_service().replace(".", " ")
+				if ("a" not in _return): _return['a'] = request.get_action()
+
+				dsd_dict = request.get_dsd_dict()
+				if (len(dsd_dict) and "dsd" not in _return): _return['dsd'] = { }
+
+				for key in dsd_dict:
+				#
+					if (key not in _return['dsd']): _return['dsd'][key] = dsd_dict[key]
+				#
+			#
+
+			del(_return['__request__'])
+		#
+
+		return self._filter_remove_parameters(_return)
+	#
+
+	def _filter_remove_parameters(self, parameters):
+	#
+		"""
+This method removes all parameters marked as "__remove__" or special ones.
+
+:param parameters: Parameters dict
+
+:return: (dict) Filtered parameters dict
+:since:  v0.1.00
+		"""
+
+		_return = parameters.copy()
+
+		for key in parameters:
+		#
+			if (type(parameters[key]) == dict and len(parameters[key]) > 0): _return[key] = self._filter_remove_parameters(parameters[key])
+			elif (parameters[key] == "__remove__"): del(_return[key])
+		#
+
+		if ("__host__" in parameters): del(_return['__host__'])
+		if ("__path__" in parameters): del(_return['__path__'])
+		if ("__port__" in parameters): del(_return['__port__'])
+		if ("__scheme__" in parameters): del(_return['__scheme__'])
+
+		return _return
+	#
+
 	def get_url_base(self, _type, parameters):
 	#
 		"""
@@ -425,114 +532,6 @@ Returns the base URL path for the given URL or the current handled one.
 		return ("/" if (path == "") else path)
 	#
 
-	def _parameters_append_defaults(self, parameters):
-	#
-		"""
-This method appends default parameters if not already set.
-
-:param parameters: Parameters dict
-
-:return: (dict) Appended parameters dict
-:since:  v0.1.00
-		"""
-
-		_return = parameters
-		request = None
-
-		if ("lang" not in _return):
-		#
-			request = AbstractHttpRequest.get_instance()
-			if (request != None and request.get_lang() != request.get_lang_default()): _return['lang'] = request.get_lang()
-		#
-
-		if ("uuid" not in _return and SessionImplementation != None):
-		#
-			if (request == None): request = AbstractHttpRequest.get_instance()
-			session = request.get_session()
-			if (session != None and session.is_active() and (not session.is_persistent())): _return['uuid'] = SessionImplementation.get_class().get_uuid()
-		#
-
-		return _return
-	#
-
-	def _parameters_filter(self, parameters):
-	#
-		"""
-This method filters all parameters of the type "__<KEYWORD>__".
-
-:param parameters: Parameters dict
-
-:return: (dict) Filtered parameters dict
-:since:  v0.1.00
-		"""
-
-		_return = parameters.copy()
-
-		if ("__query__" in _return):
-		#
-			if (len(_return) == 1 and len(_return['__query__']) > 0):
-			#
-				_return = AbstractHttpRequest.parse_iline(InputFilter.filter_control_chars(_return['__query__']))
-				if ("dsd" in _return): _return['dsd'] = AbstractHttpRequest.parse_dsd(_return['dsd'])
-			#
-			else: del(_return['__query__'])
-		#
-
-		if ("__request__" in _return and _return['__request__']):
-		#
-			request = AbstractHttpRequest.get_instance()
-			inner_request = request.get_inner_request()
-			if (inner_request != None): request = inner_request
-
-			if (request != None):
-			#
-				if ("ohandler" not in _return): _return['ohandler'] = request.get_output_handler()
-				if ("m" not in _return): _return['m'] = request.get_module()
-				if ("s" not in _return): _return['s'] = request.get_service().replace(".", " ")
-				if ("a" not in _return): _return['a'] = request.get_action()
-
-				dsd_dict = request.get_dsd_dict()
-				if (len(dsd_dict) and "dsd" not in _return): _return['dsd'] = { }
-
-				for key in dsd_dict:
-				#
-					if (key not in _return['dsd']): _return['dsd'][key] = dsd_dict[key]
-				#
-			#
-
-			del(_return['__request__'])
-		#
-
-		return self._parameters_remove_filtered(_return)
-	#
-
-	def _parameters_remove_filtered(self, parameters):
-	#
-		"""
-This method removes all parameters marked as "__remove__" or special ones.
-
-:param parameters: Parameters dict
-
-:return: (dict) Filtered parameters dict
-:since:  v0.1.00
-		"""
-
-		_return = parameters.copy()
-
-		for key in parameters:
-		#
-			if (type(parameters[key]) == dict and len(parameters[key]) > 0): _return[key] = self._parameters_remove_filtered(parameters[key])
-			elif (parameters[key] == "__remove__"): del(_return[key])
-		#
-
-		if ("__host__" in parameters): del(_return['__host__'])
-		if ("__path__" in parameters): del(_return['__path__'])
-		if ("__port__" in parameters): del(_return['__port__'])
-		if ("__scheme__" in parameters): del(_return['__scheme__'])
-
-		return _return
-	#
-
 	@staticmethod
 	def _build_url_sorted_parameters(parameter_keys):
 	#
@@ -604,14 +603,30 @@ Filter well known ports defined for the given scheme.
 		#
 			port = int(port)
 
-			if (
-				(scheme == "http" and port == 80) or
-				(scheme == "https" and port == 443)
-			): _return = 0
+			if ((scheme == "http" and port == 80)
+			    or (scheme == "https" and port == 443)
+			   ): _return = 0
 			else: _return = port
 		#
 
 		return _return
+	#
+
+	@staticmethod
+	def get_preferred():
+	#
+		"""
+Returns a "Link" instance based on the defined preferred URL.
+
+:return: (object) Link instance
+:since:  v0.1.01
+		"""
+
+		url = Settings.get("pas_http_site_preferred_url_base")
+		if (url == None): raise ValueException("Preferred URL base setting is not defined")
+		url_elements = urlsplit(url)
+
+		return Link(url_elements.scheme, url_elements.hostname, url_elements.port, url_elements.path)
 	#
 
 	@staticmethod

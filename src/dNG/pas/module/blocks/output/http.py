@@ -25,11 +25,16 @@ NOTE_END //n"""
 
 # pylint: disable=import-error,no-name-in-module
 
+import re
+
 try: from http.client import responses
 except ImportError: from httplib import responses
 
+from dNG.pas.controller.abstract_inner_request import AbstractInnerRequest
 from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.text.l10n import L10n
+from dNG.pas.data.http.translatable_exception import TranslatableException
+from dNG.pas.data.xhtml.link import Link
 from .module import Module
 
 class Http(Module):
@@ -62,10 +67,50 @@ Extendable list of standard HTTP error codes
 		"""
 	#
 
+	def execute_done(self):
+	#
+		"""
+Action for "done"
+
+:since: v0.1.01
+		"""
+
+		if (not isinstance(self.request, AbstractInnerRequest)): raise TranslatableException("pas_http_core_400", 400)
+
+		parameters_chained = self.request.get_parameters_chained()
+		is_parameters_chained_valid = ("title" in parameters_chained and "message" in parameters_chained and "target_iline" in parameters_chained)
+
+		if (not is_parameters_chained_valid): raise TranslatableException("pas_http_core_500")
+
+		l10n = (L10n.get_instance(parameters_chained['lang'])
+		        if ("lang" in parameters_chained) else
+		        L10n.get_instance()
+		       )
+
+		L10n.init("core", l10n.get_lang())
+
+		content = { "title": parameters_chained['title'],
+		            "title_task_done": l10n.get("core_title_task_done"),
+		            "message": parameters_chained['message']
+		          }
+
+		if ("target_iline" in parameters_chained):
+		#
+			content['link_title'] = l10n.get("core_continue")
+
+			target_iline = re.sub("\\[\\w+\\]", "", parameters_chained['target_iline'])
+			content['link_url'] = Link().build_url(Link.TYPE_RELATIVE, { "__query__": target_iline })
+		#
+
+		self.response.init()
+		self.response.set_title(parameters_chained['title'])
+		self.response.add_oset_content("core.done", content)
+	#
+
 	def execute_error(self):
 	#
 		"""
-Action for "login"
+Action for "error"
 
 :since: v0.1.00
 		"""

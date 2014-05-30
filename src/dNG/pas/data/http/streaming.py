@@ -102,9 +102,8 @@ are met.
 						if (is_valid and (range_start > 0 or range_end < streamer_size)):
 						#
 							response.set_header("HTTP/1.1", "HTTP/1.1 206 Partial Content", True)
+							response.set_header("Content-Length", 1 + (range_end - range_start))
 							response.set_header("Content-Range", "bytes {0:d}-{1:d}/{2:d}".format(range_start, range_end, streamer_size))
-
-							response.set_header("Content-Length", (1 + range_end - range_start))
 
 							is_content_length_set = True
 							is_valid = streamer.set_range(range_start, range_end)

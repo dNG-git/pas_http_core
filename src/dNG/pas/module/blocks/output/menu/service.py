@@ -76,8 +76,8 @@ Returns a list of rendered links for the service menu.
 
 		_return = [ ]
 
-		links = Link.store_get("servicemenu")
-		for link in links: _return.append(self.options_block_render_link(link, include_image))
+		links = Link.get_store("servicemenu")
+		for link in links: _return.append(self.render_options_block_link(link, include_image))
 
 		return _return
 	#

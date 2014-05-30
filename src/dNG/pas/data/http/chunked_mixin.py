@@ -23,6 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
+from dNG.net.http.chunked_reader_mixin import ChunkedReaderMixin
 from dNG.pas.data.binary import Binary
 
 class ChunkedMixin(object):
@@ -39,8 +40,6 @@ This response mixin provides the "chunkify()" method.
              Mozilla Public License, v. 2.0
 	"""
 
-	BINARY_NEWLINE = Binary.bytes("\r\n")
-
 	def chunkify(self, data):
 	#
 		"""
@@ -53,7 +52,7 @@ Returns the formats the client accepts.
 		data = Binary.bytes(data)
 
 		if (data == None): _return = Binary.bytes("0\r\n\r\n")
-		elif (type(data) == type(ChunkedMixin.BINARY_NEWLINE) and len(data) > 0): _return = Binary.bytes("{0:x}\r\n".format(len(data))) + data + ChunkedMixin.BINARY_NEWLINE
+		elif (type(data) == type(ChunkedReaderMixin.BINARY_NEWLINE) and len(data) > 0): _return = Binary.bytes("{0:x}\r\n".format(len(data))) + data + ChunkedReaderMixin.BINARY_NEWLINE
 		else: _return = Binary.BYTES_TYPE()
 
 		return _return

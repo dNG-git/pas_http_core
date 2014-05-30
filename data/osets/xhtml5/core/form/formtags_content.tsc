@@ -1,0 +1,15 @@
+<div class="pageform_element">
+[if:content:title != ]
+	<label for="[rewrite:content]name[/rewrite]" class="pageform_label"><strong>[rewrite:content]title[/rewrite]</strong>:</label>
+	<div class="pageform_field">
+[/if]
+		<article>
+[rewrite:content]content[/rewrite]
+		</article>
+[if:content:error_message != ]
+		<p class="pageform_error">[rewrite:content]error_message[/rewrite]</p>
+[/if]
+[if:content:title != ]
+	</div>
+[/if]
+</div>

@@ -55,7 +55,7 @@ Escapes given data for (X)HTML output.
 
 :param data: Input string
 
-:return: Output string
+:return: (str) Output string
 :since:  v0.1.00
 		"""
 
@@ -92,7 +92,7 @@ Unescapes given (X)HTML data.
 
 :param data: Input string
 
-:return: Output string
+:return: (str) Output string
 :since:  v0.1.00
 		"""
 

@@ -85,7 +85,7 @@ Renders a link ready for output.
 			if ("dsd" in data):
 			#
 				parameters['dsd'] = data['dsd']
-				if ("__source__" in data['dsd']): parameters['dsd'] = re.sub("\\_\\_source\\_\\_", Link.query_param_encode(Link().build_url(Link.TYPE_QUERY_STRING, { "__request__": True })), parameters['dsd'])
+				if ("__source__" in data['dsd']): parameters['dsd'] = re.sub("\\_\\_source\\_\\_", Link.encode_query_value(Link().build_url(Link.TYPE_QUERY_STRING, { "__request__": True })), parameters['dsd'])
 				parameters['dsd'] = re.sub("\\[\\w+\\]", "", parameters['dsd'])
 			#
 		#
@@ -94,10 +94,11 @@ Renders a link ready for output.
 
 		if (len(parameters) > 0):
 		#
-			_return = "{0}{1}</a>".format(XmlParser().dict_to_xml_item_encoder({
-				"tag": "a",
-				"attributes": { "href": Link().build_url(_type, parameters) }
-			}, False), content)
+			link_arguments = { "tag": "a",
+			                   "attributes": { "href": Link().build_url(_type, parameters) }
+			                 }
+
+			_return = "{0}{1}</a>".format(XmlParser().dict_to_xml_item_encoder(link_arguments, False), content)
 
 		return _return
 	#

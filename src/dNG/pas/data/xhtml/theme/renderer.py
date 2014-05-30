@@ -160,7 +160,7 @@ Checks if the given theme and subtype is supported.
 		return _return
 	#
 
-	def _match_change(self, tag_definition, data, tag_position, data_position, tag_end_position):
+	def _change_match(self, tag_definition, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the matched tag.
@@ -193,8 +193,8 @@ Change data according to the matched tag.
 				else: source = None
 
 				if (source == None): _return += self.render_block(data[data_position:tag_end_position])
-				elif (source == "content"): _return += self.render_block(data[data_position:tag_end_position], "content", self._mapped_element_update("content", self.content), key)
-				elif (source == "settings"): _return += self.render_block(data[data_position:tag_end_position], "settings", self._mapped_element_update("settings", Settings.get_instance()), key)
+				elif (source == "content"): _return += self.render_block(data[data_position:tag_end_position], "content", self._update_mapped_element("content", self.content), key)
+				elif (source == "settings"): _return += self.render_block(data[data_position:tag_end_position], "settings", self._update_mapped_element("settings", Settings.get_dict()), key)
 			#
 		#
 		elif (tag_definition['tag'] == "each"):
@@ -208,8 +208,8 @@ Change data according to the matched tag.
 				key = re_result.group(2)
 				mapping_key = re_result.group(3)
 
-				if (source == "content"): _return += self.render_each(data[data_position:tag_end_position], "content", self._mapped_element_update("content", self.content), key, mapping_key)
-				elif (source == "settings"): _return += self.render_each(data[data_position:tag_end_position], "settings", self._mapped_element_update("settings", Settings.get_instance()), key, mapping_key)
+				if (source == "content"): _return += self.render_each(data[data_position:tag_end_position], "content", self._update_mapped_element("content", self.content), key, mapping_key)
+				elif (source == "settings"): _return += self.render_each(data[data_position:tag_end_position], "settings", self._update_mapped_element("settings", Settings.get_dict()), key, mapping_key)
 			#
 		#
 		elif (tag_definition['tag'] == "if"):
@@ -224,13 +224,13 @@ Change data according to the matched tag.
 				operator = re_result.group(4)
 				value = re_result.group(5).strip()
 
-				if (source == "content"): _return += self.render_if_condition(self._mapped_element_update("content", self.content), key, operator, value, data[data_position:tag_end_position])
+				if (source == "content"): _return += self.render_if_condition(self._update_mapped_element("content", self.content), key, operator, value, data[data_position:tag_end_position])
 				elif (source == "request"):
 				#
 					request = AbstractHttpRequest.get_instance()
 					_return += self.render_if_condition({ 'lang': request.get_lang() } , key, operator, value, data[data_position:tag_end_position])
 				#
-				elif (source == "settings"): _return += self.render_if_condition(self._mapped_element_update("settings", Settings.get_instance()), key, operator, value, data[data_position:tag_end_position])
+				elif (source == "settings"): _return += self.render_if_condition(self._update_mapped_element("settings", Settings.get_dict()), key, operator, value, data[data_position:tag_end_position])
 			#
 		#
 		elif (tag_definition['tag'] == "link"):
@@ -245,9 +245,9 @@ Change data according to the matched tag.
 			source = re.match("^\\[rewrite:(\\w+)(:.*|)\\]", data[tag_position:data_position]).group(1)
 			key = data[data_position:tag_end_position]
 
-			if (source == "content"): _return += self.render_rewrite(self._mapped_element_update("content", self.content), key)
-			elif (source == "l10n"): _return += self.render_rewrite(self._mapped_element_update("l10n", L10n.get_instance()), key)
-			elif (source == "settings"): _return += self.render_rewrite(self._mapped_element_update("settings", Settings.get_instance()), key)
+			if (source == "content"): _return += self.render_rewrite(self._update_mapped_element("content", self.content), key)
+			elif (source == "l10n"): _return += self.render_rewrite(self._update_mapped_element("l10n", L10n.get_dict()), key)
+			elif (source == "settings"): _return += self.render_rewrite(self._update_mapped_element("settings", Settings.get_dict()), key)
 		#
 
 		_return += data_closed
@@ -255,7 +255,7 @@ Change data according to the matched tag.
 		return _return
 	#
 
-	def _match_check(self, data):
+	def _check_match(self, data):
 	#
 		"""
 Check if a possible tag match is a false positive.
@@ -358,13 +358,12 @@ Read corresponding theme configuration
 
 		if (self.title == None): self.title = Settings.get("pas_html_title", "Unconfigured site")
 
-		self.content = {
-			"head_canonical_url": self.canonical_url,
-			"head_p3p_url": self.p3p_url,
-			"head_page_description": self.page_description,
-			"page_title": self.title,
-			"page_content": content
-		}
+		self.content = { "head_canonical_url": self.canonical_url,
+		                 "head_p3p_url": self.p3p_url,
+		                 "head_page_description": self.page_description,
+		                 "page_title": self.title,
+		                 "page_content": content
+		               }
 
 		theme_settings = Settings.get("pas_http_theme_{0}".format(theme))
 
@@ -449,11 +448,10 @@ given.
 :since: v0.1.00
 		"""
 
-		_type = (
-			Link.TYPE_RELATIVE
-			if (Settings.get("pas_http_site_canonical_url_type", "absolute") == "relative") else
-			Link.TYPE_ABSOLUTE
-		)
+		_type = (Link.TYPE_RELATIVE
+		         if (Settings.get("pas_http_site_canonical_url_type", "absolute") == "relative") else
+		         Link.TYPE_ABSOLUTE
+		        )
 
 		self.set_canonical_url(Link().build_url(_type, parameters))
 	#

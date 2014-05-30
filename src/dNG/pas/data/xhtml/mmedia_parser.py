@@ -63,7 +63,7 @@ Constructor __init__(MmediaParser)
 		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 	#
 
-	def _match_change(self, tag_definition, data, tag_position, data_position, tag_end_position):
+	def _change_match(self, tag_definition, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the matched tag.
@@ -87,8 +87,8 @@ Change data according to the matched tag.
 			source = re.match("^\\[rewrite:(\\w+)\\]", data[tag_position:data_position]).group(1)
 			key = data[data_position:tag_end_position]
 
-			if (source == "l10n"): _return += self.render_rewrite(L10n.get_instance(), key)
-			else: _return += self.render_rewrite(Settings.get_instance(), key)
+			if (source == "l10n"): _return += self.render_rewrite(L10n.get_dict(), key)
+			else: _return += self.render_rewrite(Settings.get_dict(), key)
 		#
 
 		_return += data_closed
@@ -96,7 +96,7 @@ Change data according to the matched tag.
 		return _return
 	#
 
-	def _match_check(self, data):
+	def _check_match(self, data):
 	#
 		"""
 Check if a possible tag match is a false positive.

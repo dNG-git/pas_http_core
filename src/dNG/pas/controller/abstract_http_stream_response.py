@@ -143,7 +143,12 @@ Filter response headers to remove conflicting ones.
 		"""
 
 		_return = self.headers.copy()
-		if (self.compressor != None and "CONTENT-LENGTH" in _return): del(_return['CONTENT-LENGTH'])
+
+		if ((self.compressor != None
+		     or self.stream_mode & AbstractHttpStreamResponse.STREAM_CHUNKED == AbstractHttpStreamResponse.STREAM_CHUNKED
+		    )
+		    and "CONTENT-LENGTH" in _return
+		   ): del(_return['CONTENT-LENGTH'])
 
 		if (len(self.cookies) > 0):
 		#

@@ -29,6 +29,7 @@ from dNG.data.rfc.basics import Basics as RfcBasics
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.traced_exception import TracedException
 from dNG.pas.data.translatable_exception import TranslatableException
+from dNG.pas.data.http.translatable_error import TranslatableError as HttpTranslatableError
 from dNG.pas.data.http.translatable_exception import TranslatableException as HttpTranslatableException
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.runtime.io_exception import IOException
@@ -263,20 +264,26 @@ send.
 :since: v0.1.00
 		"""
 
+		is_critical = True
+
 		if (self.get_header("HTTP/1.1", True) == None):
 		#
 			self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
 
-			if (isinstance(exception, HttpTranslatableException)):
+			if (isinstance(exception, HttpTranslatableError)):
 			#
 				code = exception.get_http_code()
+				is_critical = isinstance(exception, HttpTranslatableException)
 
-				if (code == 400): self.set_header("HTTP/1.1", "HTTP/1.1 400 Bad Request", True)
+				if (code == 200): self.set_header("HTTP/1.1", "HTTP/1.1 200 OK", True)
+				elif (code == 400): self.set_header("HTTP/1.1", "HTTP/1.1 400 Bad Request", True)
 				elif (code == 402): self.set_header("HTTP/1.1", "HTTP/1.1 402 Payment Required", True)
 				elif (code == 403): self.set_header("HTTP/1.1", "HTTP/1.1 403 Forbidden", True)
 				elif (code == 404): self.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
 			#
 		#
+
+		title = (L10n.get("core_title_error_critical") if (is_critical) else L10n.get("core_title_error"))
 
 		if (message == None and isinstance(exception, TranslatableException)): message = "{0:l10n_message}".format(exception)
 		if (not isinstance(exception, TracedException)): exception = TracedException(str(exception), exception)
@@ -291,8 +298,8 @@ send.
 			details = exception.get_printable_trace()
 		#
 
-		if (self.errors == None): self.errors = [ { "title": L10n.get("core_title_error_critical"), "message": message, "details": details } ]
-		else: self.errors.append({ "title": L10n.get("core_title_error_critical"), "message": message, "details": details })
+		if (self.errors == None): self.errors = [ { "title": title, "message": message, "details": details } ]
+		else: self.errors.append({ "title": title, "message": message, "details": details })
 	#
 
 	def init(self, cache = False, compress = True):
@@ -513,7 +520,7 @@ Sets a expires value if the response is not in dynamic mode.
 :since: v0.1.01
 		"""
 
-		if (not self.content_is_dynamic): self._set_expires(timestamp)
+		if (not self.content_is_dynamic): self._set_expires(int(timestamp))
 	#
 
 	def _set_expires(self, timestamp):
@@ -573,7 +580,7 @@ Sets a last modified value if the response is not in dynamic mode.
 :since: v0.1.00
 		"""
 
-		if (not self.content_is_dynamic): self._set_last_modified(timestamp)
+		if (not self.content_is_dynamic): self._set_last_modified(int(timestamp))
 	#
 
 	def _set_last_modified(self, timestamp):

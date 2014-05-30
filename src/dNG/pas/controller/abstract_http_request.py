@@ -33,7 +33,7 @@ import re
 try: from urllib.parse import quote, unquote
 except ImportError: from urllib import quote, unquote
 
-from dNG.data.rfc.http import Http
+from dNG.data.rfc.header import Header
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.request_body import RequestBody
 from dNG.pas.data.text.input_filter import InputFilter
@@ -147,7 +147,12 @@ Configures the given RequestBody to be read by the Request implementation.
 
 			content_length = InputFilter.filter_int(self.get_header("Content-Length"))
 
-			if (self.body_fp != None and (content_type_expected == None or (content_type != None and content_type == content_type_expected)) and ((content_length != None and content_length > 0) or "chunked" in Http.header_field_list(self.get_header("Transfer-Encoding")))):
+			if (self.body_fp != None
+			    and (content_type_expected == None or (content_type != None and content_type == content_type_expected))
+			    and ((content_length != None and content_length > 0)
+			         or "chunked" in Header.get_field_list_dict(self.get_header("Transfer-Encoding"))
+			        )
+			   ):
 			#
 				if (content_length != None): request_body.set_input_size(content_length)
 				else: request_body.define_input_chunk_encoded(True)
@@ -183,11 +188,10 @@ Executes the incoming request.
 
 		response = self._init_response()
 
-		if (
-			request.is_supported("type") and
-			request.get_type() == "HEAD" and
-			response.is_supported("headers")
-		): response.set_send_headers_only(True)
+		if (request.is_supported("type")
+		    and request.get_type() == "HEAD"
+		    and response.is_supported("headers")
+		   ): response.set_send_headers_only(True)
 
 		try:
 		#
@@ -237,9 +241,9 @@ Executes the given request and generate content for the given response.
 		#
 		else:
 		#
-			if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.module".format(requested_module))):
+			if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.Module".format(requested_module))):
 			#
-				instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.module".format(requested_module))
+				instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.Module".format(requested_module))
 				if (self.log_handler != None): instance.set_log_handler(self.log_handler)
 
 				instance.init(request, response)
@@ -380,7 +384,10 @@ Parses request parameters.
 		self.service = (AbstractHttpRequest.filter_parameter_service(self.parameters['s']) if ("s" in self.parameters) else "")
 
 		if ("dsd" in self.parameters): self.dsd = AbstractHttpRequest.parse_dsd(self.parameters['dsd'])
-		if ("ohandler" in self.parameters and len(self.parameters['ohandler']) > 0): self.output_handler = AbstractHttpRequest.filter_parameter_word(self.parameters['ohandler'])
+
+		if ("ohandler" in self.parameters
+		    and len(self.parameters['ohandler']) > 0
+		   ): self.output_handler = AbstractHttpRequest.filter_parameter_word(self.parameters['ohandler'])
 
 		"""
 Initialize l10n
@@ -429,7 +436,11 @@ instance.
 		#
 			if ("uri" in virtual_config):
 			#
-				uri = (virtual_pathname[len(virtual_config['uri_prefix']):] if ("uri_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['uri_prefix'])) else virtual_pathname)
+				uri = (virtual_pathname[len(virtual_config['uri_prefix']):]
+				       if ("uri_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['uri_prefix'])) else
+				       virtual_pathname
+				      )
+
 				self.set_dsd(virtual_config['uri'], uri)
 			#
 
@@ -450,7 +461,11 @@ instance.
 
 			if ("uri" in virtual_config):
 			#
-				uri = (virtual_pathname[len(virtual_config['uri_prefix']):] if ("uri_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['uri_prefix'])) else virtual_pathname)
+				uri = (virtual_pathname[len(virtual_config['uri_prefix']):]
+				       if ("uri_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['uri_prefix'])) else
+				       virtual_pathname
+				      )
+
 				_return.set_dsd(virtual_config['uri'], uri)
 			#
 		#
@@ -478,15 +493,14 @@ Respond the request with the given response.
 
 				if (user_profile != None):
 				#
-					user_profile_data = {
-						"lang": self.lang,
-						"lastvisit_time": time(),
-						"lastvisit_ip": self.client_host
-					}
+					user_profile_data = { "lang": self.lang,
+					                      "lastvisit_time": time(),
+					                      "lastvisit_ip": self.client_host
+					                    }
 
 					if ("theme" in self.parameters): user_profile_data['theme'] = self.parameters['theme']
 
-					user_profile.data_set(**user_profile_data)
+					user_profile.set_data_attributes(**user_profile_data)
 					user_profile.save()
 				#
 

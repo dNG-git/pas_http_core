@@ -1,0 +1,6 @@
+<h1><strong>[rewrite:content]title_task_done[/rewrite]</strong>: [rewrite:content]title[/rewrite]</h1>
+<p>[rewrite:content]message[/rewrite]</p>
+[if:content:link_url != ]
+<p class="pagenavbox pagenavtask ui-corner-all"><a href="[rewrite:content]link_url[/rewrite]" target="_self">[rewrite:content]link_title[/rewrite]</a></p><script type="text/javascript"><![CDATA[
+]]></script>
+[/if]

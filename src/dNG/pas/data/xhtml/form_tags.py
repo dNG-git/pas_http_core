@@ -29,7 +29,8 @@ from .form_tags_renderer import FormTagsRenderer
 class FormTags(object):
 #
 	"""
-The OSet parser takes a template string to render the output.
+The static methods of this (X)HTML FormTags class are used for default
+rendering purposes within an "article" tag or similar block level element.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -44,9 +45,10 @@ The OSet parser takes a template string to render the output.
 	def encode(content):
 	#
 		"""
-Constructor __init__(Parser)
+Encode (X)HTML FormTags and some typical (X)HTML statements.
 
-:since: v0.1.01
+:return: (str) FormTags encoded data
+:since:  v0.1.01
 		"""
 
 		encoder = FormTagsEncoder()
@@ -57,12 +59,17 @@ Constructor __init__(Parser)
 	def render(content, block_encoding_supported = True, main_id = None):
 	#
 		"""
-Constructor __init__(Parser)
+Render FormTags as XHTML output and set given restrictions.
 
-:since: v0.1.01
+:param block_encoding_supported: Do show block level encoded elements.
+:param main_id: DataLinker MainID for tag based links between pages
+
+:return: (str) Rendered content
+:since:  v0.1.01
 		"""
 
 		renderer = FormTagsRenderer()
+		renderer.set_xhtml_title_top_level(2)
 		if (not block_encoding_supported): renderer.set_blocks_supported(block_encoding_supported)
 		if (main_id != None): renderer.set_datalinker_main_id(main_id)
 

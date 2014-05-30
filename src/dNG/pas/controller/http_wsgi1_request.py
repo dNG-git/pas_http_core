@@ -59,6 +59,8 @@ Constructor __init__(HttpWsgi1Request)
 :since: v0.1.00
 		"""
 
+		# pylint: disable=broad-except
+
 		if ("wsgi.version" not in wsgi_env or (wsgi_env['wsgi.version'] != ( 1, 0 ) and wsgi_env['wsgi.version'] != ( 1, 1 ))): raise IOException("WSGI protocol unsupported")
 
 		AbstractHttpRequest.__init__(self)
@@ -121,10 +123,10 @@ Request path after the script
 		re_result = (None if (self.client_host == None) else re.match("^::ffff:(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)$", self.client_host))
 		if (re_result != None): self.client_host = "{0}.{1}.{2}.{3}".format(re_result.group(1), re_result.group(2), re_result.group(3), re_result.group(4))
 
-		wsgi_file_wrapper = (wsgi_env['wsgi.file_wrapper'] if ("wsgi.file_wrapper" in wsgi_env) else None)
+		wsgi_file_wrapper = wsgi_env.get("wsgi.file_wrapper")
 
 		self.http_wsgi_stream_response = HttpWsgi1StreamResponse(wsgi_header_response, wsgi_file_wrapper)
-		if ("SERVER_PROTOCOL" in wsgi_env and wsgi_env['SERVER_PROTOCOL'] == "HTTP/1.0"): self.http_wsgi_stream_response.set_http_version(1)
+		if (wsgi_env.get("SERVER_PROTOCOL") == "HTTP/1.0"): self.http_wsgi_stream_response.set_http_version(1)
 
 		self.body_fp = wsgi_env['wsgi.input']
 		self.server_scheme = wsgi_env['wsgi.url_scheme']

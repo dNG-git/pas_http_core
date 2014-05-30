@@ -72,7 +72,7 @@ Returns a list of rendered links for the service menu.
 
 		_return = [ ]
 
-		if (file_pathname == None): links = Link.store_get("mainmenu")
+		if (file_pathname == None): links = Link.get_store("mainmenu")
 		else:
 		#
 			links = None
@@ -83,6 +83,7 @@ Returns a list of rendered links for the service menu.
 				if (not os.access(path.normpath("{0}/{1}".format(Settings.get("path_base"), expanded_file_pathname)), os.R_OK)): expanded_file_pathname = file_pathname.replace("[lang]", Settings.get("core_lang"))
 				file_pathname = expanded_file_pathname
 			#
+			else: file_pathname = path.normpath("{0}/{1}".format(Settings.get("path_base"), file_pathname))
 
 			json_data = CachedJsonFile.read(file_pathname)
 			if (type(json_data) == list): links = json_data
@@ -91,7 +92,7 @@ Returns a list of rendered links for the service menu.
 		if (links != None):
 		#
 			links = self._filter_links(links)
-			for link in links: _return.append(self.options_block_render_link(link, include_image))
+			for link in links: _return.append(self.render_options_block_link(link, include_image))
 		#
 
 		return _return

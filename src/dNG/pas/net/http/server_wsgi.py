@@ -29,7 +29,7 @@ from time import time
 from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
 from dNG.pas.data.settings import Settings
 from dNG.pas.module.named_loader import NamedLoader
-from dNG.pas.plugins.hooks import Hooks
+from dNG.pas.plugins.hook import Hook
 from .server_implementation import ServerImplementation
 
 class ServerWsgi(ServerImplementation):
@@ -72,19 +72,19 @@ Timestamp of service initialisation
 
 		self._configure()
 
-		Hooks.load("http")
-		Hooks.register("dNG.pas.Status.getTimeStarted", self.get_time_started)
-		Hooks.register("dNG.pas.Status.getUptime", self.get_uptime)
+		Hook.load("http")
+		Hook.register("dNG.pas.Status.getTimeStarted", self.get_time_started)
+		Hook.register("dNG.pas.Status.getUptime", self.get_uptime)
 
 		if (self.log_handler != None):
 		#
-			Hooks.set_log_handler(self.log_handler)
+			Hook.set_log_handler(self.log_handler)
 			NamedLoader.set_log_handler(self.log_handler)
 			self.log_handler.debug("#echo(__FILEPATH__)# -ServerWsgi.__init__()- (#echo(__LINE__)#)")
 		#
 
-		Hooks.call("dNG.pas.Status.startup")
-		Hooks.call("dNG.pas.http.Wsgi.startup")
+		Hook.call("dNG.pas.Status.onStartup")
+		Hook.call("dNG.pas.http.Wsgi.onStartup")
 
 		self.http_wsgi1_request = HttpWsgi1Request(wsgi_env, wsgi_header_response)
 	#
@@ -100,7 +100,7 @@ mod_wsgi may already have removed globals at this stage.
 :since: v0.1.00
 		"""
 
-		if (Hooks != None): Hooks.free()
+		if (Hook != None): Hook.free()
 	#
 
 	def __iter__(self):
@@ -115,9 +115,9 @@ python.org: Return an iterator object.
 		http_wsgi1_request = self.http_wsgi1_request
 		self.http_wsgi1_request = None
 
-		Hooks.call("dNG.pas.http.Wsgi.shutdown")
-		Hooks.call("dNG.pas.Status.shutdown")
-		Hooks.free()
+		Hook.call("dNG.pas.http.Wsgi.onShutdown")
+		Hook.call("dNG.pas.Status.onShutdown")
+		Hook.free()
 
 		return iter(http_wsgi1_request)
 	#

@@ -40,11 +40,11 @@ controller directly.
              Mozilla Public License, v. 2.0
 	"""
 
-	lock = InstanceLock()
+	_lock = InstanceLock()
 	"""
 Thread safety lock
 	"""
-	virtuals = [ ]
+	_virtuals = [ ]
 	"""
 List with registered virtual paths
 	"""
@@ -65,11 +65,11 @@ Return the config for the given virtual path.
 
 		if (len(pathname) > 0):
 		#
-			with VirtualConfig.lock:
+			with VirtualConfig._lock:
 			#
 				pathname = pathname.lower()
 
-				for virtual_path_config in VirtualConfig.virtuals:
+				for virtual_path_config in VirtualConfig._virtuals:
 				#
 					if (pathname.startswith(virtual_path_config['path'])):
 					#
@@ -99,7 +99,7 @@ Set the config for the given virtual path.
 		if (setup_callback != None): config['setup_callback'] = setup_callback
 		virtual_config = { "path": path.lower(), "config": config }
 
-		VirtualConfig.virtuals.append(virtual_config)
+		with VirtualConfig._lock: VirtualConfig._virtuals.append(virtual_config)
 	#
 
 	@staticmethod
@@ -113,15 +113,15 @@ Remove the config for the given virtual path.
 :since: v0.1.00
 		"""
 
-		with VirtualConfig.lock:
+		with VirtualConfig._lock:
 		#
 			index = 0
 
-			for virtual_config in VirtualConfig.virtuals:
+			for virtual_config in VirtualConfig._virtuals:
 			#
 				if (path == virtual_config['path']):
 				#
-					VirtualConfig.virtuals.pop(index)
+					VirtualConfig._virtuals.pop(index)
 					break
 				#
 				else: index += 1

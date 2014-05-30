@@ -52,6 +52,9 @@ class RequestBodyUrlencoded(RequestBody):
 	# pylint: disable=arguments-differ
 
 	RE_ARRAY = re.compile("^(.+)\\[(\\S*)\\]$")
+	"""
+RegEx for keys with array indices
+	"""
 
 	def __init__(self, parse_in_thread = False):
 	#

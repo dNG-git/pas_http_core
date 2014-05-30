@@ -28,6 +28,7 @@ from os import urandom
 
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.text.l10n import L10n
+from dNG.pas.data.xhtml.form_tags_renderer import FormTagsRenderer
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.data.xhtml.oset.file_parser import FileParser
 from dNG.pas.runtime.value_exception import ValueException
@@ -123,7 +124,50 @@ $f_return = ((isset ($f_section) ? "<p class='pagecontenttitle ui-accordion-head
 		return _return
 	#
 
-	def render_oset_file(self, template_name, content = None):
+	def render_email(self, field_data):
+	#
+		"""
+Format and return XHTML for a email input field.
+
+:param field_data: Dict containing information about the form field
+
+:return: (str) Valid XHTML form field definition
+:since:  v0.1.00
+		"""
+
+		return self.render_text(field_data)
+	#
+
+	def render_formtags_file(self, field_data):
+	#
+		"""
+Format and return XHTML for a text input field.
+
+:param field_data: Dict containing information about the form field
+
+:return: (str) Valid XHTML form field definition
+:since:  v0.1.00
+		"""
+
+		renderer = FormTagsRenderer()
+		renderer.set_xhtml_allowed(True)
+
+		context = { "type": XHtmlFormatting.escape(field_data['type']),
+		            "id": XHtmlFormatting.escape(field_data['id']),
+		            "name": XHtmlFormatting.escape(field_data['name']),
+		            "title": XHtmlFormatting.escape(field_data['title']),
+		            "content": ("" if (field_data['content'] == None) else renderer.render(field_data['content'])),
+		            "error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
+		          }
+
+		if (field_data['size'] == "s"): context['size_percentage'] = "30%"
+		elif (field_data['size'] == "m"): context['size_percentage'] = "55%"
+		else: context['size_percentage'] = "80%"
+
+		return self._render_oset_file("core/form/formtags_content", context)
+	#
+
+	def _render_oset_file(self, file_pathname, content):
 	#
 		"""
 Render the form field using the given OSet template.
@@ -140,25 +184,11 @@ Render the form field using the given OSet template.
 		#
 			parser = FileParser()
 			parser.set_oset(self.oset)
-			_return = parser.render(template_name, content)
+			_return = parser.render(file_pathname, content)
 		#
 		except Exception: _return = "<div class='pageform_error'>{0}</div>".format(L10n.get("errors_pas_http_core_form_internal_error"))
 
 		return _return
-	#
-
-	def render_email(self, field_data):
-	#
-		"""
-Format and return XHTML for a email input field.
-
-:param field_data: Dict containing information about the form field
-
-:return: (str) Valid XHTML form field definition
-:since:  v0.1.00
-		"""
-
-		return self.render_text(field_data)
 	#
 
 	def render_password(self, field_data):
@@ -172,15 +202,14 @@ Format and return XHTML for a password input field.
 :since:  v0.1.00
 		"""
 
-		context = {
-			"type": XHtmlFormatting.escape(field_data['type']),
-			"id": XHtmlFormatting.escape(field_data['id']),
-			"name": XHtmlFormatting.escape(field_data['name']),
-			"title": XHtmlFormatting.escape(field_data['title']),
-			"value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content'])),
-			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
-		}
+		context = { "type": XHtmlFormatting.escape(field_data['type']),
+		            "id": XHtmlFormatting.escape(field_data['id']),
+		            "name": XHtmlFormatting.escape(field_data['name']),
+		            "title": XHtmlFormatting.escape(field_data['title']),
+		            "value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content'])),
+		            "required": (True if (field_data['required']) else False),
+		            "error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
+		          }
 
 		if (field_data['size'] == "s"):
 		#
@@ -198,7 +227,7 @@ Format and return XHTML for a password input field.
 			context['size_percentage'] = "80%"
 		#
 
-		_return = self.render_oset_file("core/form/password", context)
+		_return = self._render_oset_file("core/form/password", context)
 
 		"""
 		global $direct_cachedata,$direct_globals,$direct_settings;
@@ -268,16 +297,15 @@ Format and return XHTML to create radio options.
 			#
 		#
 
-		context = {
-			"id": XHtmlFormatting.escape(field_data['id']),
-			"name": XHtmlFormatting.escape(field_data['name']),
-			"title": XHtmlFormatting.escape(field_data['title']),
-			"choices": choices,
-			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
-		}
+		context = { "id": XHtmlFormatting.escape(field_data['id']),
+		            "name": XHtmlFormatting.escape(field_data['name']),
+		            "title": XHtmlFormatting.escape(field_data['title']),
+		            "choices": choices,
+		            "required": (True if (field_data['required']) else False),
+		            "error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
+		          }
 
-		_return = self.render_oset_file("core/form/radio", context)
+		_return = self._render_oset_file("core/form/radio", context)
 
 		"""
 		global $direct_globals,$direct_settings;
@@ -367,7 +395,7 @@ corresponding method to get valid XHTML for output.
 			if (_return != ""): _return += "\n"
 
 			if (type(output) == str): _return += output
-			else: _return += self.render_oset_file("core/form/error", { "error_message": L10n.get("errors_pas_http_core_form_internal_error") })
+			else: _return += self._render_oset_file("core/form/error", { "error_message": L10n.get("errors_pas_http_core_form_internal_error") })
 		#
 
 		return _return
@@ -382,13 +410,12 @@ Render the form submit button.
 :since:  v0.1.00
 		"""
 
-		context = {
-			"type": "submit",
-			"id": "{0}_submit".format(self.form_id),
-			"title": XHtmlFormatting.escape(L10n.get(title))
-		}
+		context = { "type": "submit",
+		            "id": "{0}_submit".format(self.form_id),
+		            "title": XHtmlFormatting.escape(L10n.get(title))
+		          }
 
-		return self.render_oset_file("core/form/button", context)
+		return self._render_oset_file("core/form/button", context)
 	#
 
 	def render_text(self, field_data, rcp_active = False):
@@ -402,15 +429,14 @@ Format and return XHTML for a text input field.
 :since:  v0.1.00
 		"""
 
-		context = {
-			"type": XHtmlFormatting.escape(field_data['type']),
-			"id": XHtmlFormatting.escape(field_data['id']),
-			"name": XHtmlFormatting.escape(field_data['name']),
-			"title": XHtmlFormatting.escape(field_data['title']),
-			"value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content'])),
-			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
-		}
+		context = { "type": XHtmlFormatting.escape(field_data['type']),
+		            "id": XHtmlFormatting.escape(field_data['id']),
+		            "name": XHtmlFormatting.escape(field_data['name']),
+		            "title": XHtmlFormatting.escape(field_data['title']),
+		            "value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content'])),
+		            "required": (True if (field_data['required']) else False),
+		            "error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
+		          }
 
 		if (field_data['size'] == "s"):
 		#
@@ -428,7 +454,7 @@ Format and return XHTML for a text input field.
 			context['size_percentage'] = "80%"
 		#
 
-		_return = self.render_oset_file("core/form/text", context)
+		_return = self._render_oset_file("core/form/text", context)
 
 		"""$f_js_helper = ($f_data['helper_text'] ? "\n".($direct_globals['output']->jsHelper ($f_data['helper_text'],$f_data['helper_url'],$f_js_id)) : "");
 
@@ -480,20 +506,19 @@ Format and return XHTML for a textarea input field.
 :since:  v0.1.00
 		"""
 
-		context = {
-			"id": XHtmlFormatting.escape(field_data['id']),
-			"name": XHtmlFormatting.escape(field_data['name']),
-			"title": XHtmlFormatting.escape(field_data['title']),
-			"value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content'])),
-			"required": (True if (field_data['required']) else False),
-			"error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
-		}
+		context = { "id": XHtmlFormatting.escape(field_data['id']),
+		            "name": XHtmlFormatting.escape(field_data['name']),
+		            "title": XHtmlFormatting.escape(field_data['title']),
+		            "value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content'])),
+		            "required": (True if (field_data['required']) else False),
+		            "error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
+		          }
 
 		if (field_data['size'] == "s"): context['rows'] = 5
 		elif (field_data['size'] == "m"): context['rows'] = 10
 		else: context['rows'] = 20
 
-		_return = self.render_oset_file("core/form/textarea", context)
+		_return = self._render_oset_file("core/form/textarea", context)
 
 		"""
 		$f_js_helper = ($f_data['helper_text'] ? "\n".($direct_globals['output']->jsHelper ($f_data['helper_text'],$f_data['helper_url'],$f_js_id)) : "");
@@ -1109,7 +1134,7 @@ Add additional HTML headers
 		{
 			foreach ($f_section_array as $f_element_array)
 			{
-				if ((isset ($f_element_array['filter']))&&($f_element_array['filter'] != "hidden")&&($f_element_array['filter'] != "element")&&($f_element_array['filter'] != "info")&&($f_element_array['filter'] != "spacer")&&($f_element_array['filter'] != "subtitle")&&((direct_class_function_check ($direct_globals['output_formbuilder'],"entry_add_".$f_element_array['filter']))||(is_callable ($f_element_array['filter']))))
+				if ((isset ($f_element_array['filter']))&&($f_element_array['filter'] != "hidden")&&($f_element_array['filter'] != "element")&&($f_element_array['filter'] != "info")&&($f_element_array['filter'] != "spacer")&&($f_element_array['filter'] != "subtitle")&&((direct_class_function_check ($direct_globals['output_formbuilder'],"add_entry_".$f_element_array['filter']))||(is_callable ($f_element_array['filter']))))
 				{
 					if ($f_return_all) { $f_return_all .= (($f_element_array['filter'] == "spacer") ? "</p>\n<p>" : "<br />\n"); }
 					else { $f_return_all = "<p>"; }
@@ -1144,7 +1169,6 @@ Add additional HTML headers
 		return $f_return;
 	}
 	"""
-
 #
 
 ##j## EOF

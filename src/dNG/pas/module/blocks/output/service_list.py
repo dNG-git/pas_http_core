@@ -23,7 +23,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.translatable_exception import TranslatableException
+from dNG.pas.data.http.translatable_exception import TranslatableException
 from dNG.pas.module.blocks.abstract_block import AbstractBlock
 from .service_list_mixin import ServiceListMixin
 
@@ -49,8 +49,8 @@ Action for "render"
 :since: v0.1.00
 		"""
 
-		if ("file" in self.context): self.set_action_result(self.service_list_render_file(self.context['file']))
-		else: raise TranslatableException("core_unknown_error", "Missing service list to render")
+		if ("file" in self.context): self.set_action_result(self.render_service_list_file(self.context['file']))
+		else: raise TranslatableException("core_unknown_error", value = "Missing service list to render")
 	#
 #
 

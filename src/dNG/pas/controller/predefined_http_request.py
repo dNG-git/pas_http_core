@@ -71,7 +71,9 @@ Sets all parameters defined in the given URI request string.
 			for key in dsd: self.set_dsd(key, dsd[key])
 		#
 
-		if ("ohandler" in parameters and len(parameters['ohandler']) > 0): self.set_output_handler(AbstractHttpRequest.filter_parameter_word(parameters['ohandler']))
+		if ("ohandler" in parameters
+		    and len(parameters['ohandler']) > 0
+		   ): self.set_output_handler(AbstractHttpRequest.filter_parameter_word(parameters['ohandler']))
 	#
 
 	def set_module(self, module):

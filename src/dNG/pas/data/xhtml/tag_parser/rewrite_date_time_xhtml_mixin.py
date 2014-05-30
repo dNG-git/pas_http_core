@@ -2,7 +2,7 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.tag_parser.RewriteFormTagsXhtmlMixin
+dNG.pas.data.text.tag_parser.RewriteDateTimeXhtmlMixin
 """
 """n// NOTE
 ----------------------------------------------------------------------------
@@ -23,15 +23,17 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 NOTE_END //n"""
 
-from dNG.pas.data.binary import Binary
-from dNG.pas.data.text.tag_parser.source_value_mixin import SourceValueMixin
-from dNG.pas.data.xhtml.form_tags import FormTags
+from dNG.data.rfc.basics import Basics as RfcBasics
+from dNG.data.xml_parser import XmlParser
+from dNG.pas.data.text.date_time import DateTime
+from dNG.pas.data.text.l10n import L10n
+from dNG.pas.data.text.tag_parser.rewrite_date_time_mixin import RewriteDateTimeMixin
 
-class RewriteFormTagsXhtmlMixin(SourceValueMixin):
+class RewriteDateTimeXhtmlMixin(RewriteDateTimeMixin):
 #
 	"""
 This tag parser mixin provides support for rewrite statements to generate
-safe XHTML compliant output.
+formatted date and time XHTML tagged strings.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -42,7 +44,7 @@ safe XHTML compliant output.
              Mozilla Public License, v. 2.0
 	"""
 
-	def render_rewrite_form_tags_xhtml(self, source, key):
+	def render_rewrite_date_time_xhtml(self, source, key, _type):
 	#
 		"""
 Checks and renders the rewrite statement.
@@ -54,20 +56,18 @@ Checks and renders the rewrite statement.
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_formtags_xhtml(source, {1})- (#echo(__LINE__)#)".format(self, key))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time_xhtml(source, {1}, {2})- (#echo(__LINE__)#)".format(self, key, _type))
 
-		content = None
-		data = self.get_source_value(source, key)
-		main_id = None
+		timestamp = self.get_source_value(source, key)
 
-		if (not isinstance(data, dict)): content = Binary.str(data)
-		elif ("content" in data):
+		if (timestamp != None):
 		#
-			content = data['content']
-			if ("main_id" in data): main_id = data['main_id']
-		#
+			link_attributes = { "tag": "time", "attributes": { "datetime": "{0}+00:00".format(RfcBasics.get_iso8601_datetime(timestamp)) } }
 
-		if (type(content) == str): _return = FormTags.render(content, main_id = main_id)
+			_return = "{0}{1}</time>".format(XmlParser().dict_to_xml_item_encoder(link_attributes, False),
+			                                 self.render_rewrite_date_time(source, key, _type)
+			                                )
+		#
 
 		return _return
 	#

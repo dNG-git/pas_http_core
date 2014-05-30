@@ -121,7 +121,7 @@ This iterator is only called for uncompressed data.
 
 			if (self.streamer != None):
 			#
-				_return = (None if (self.streamer.eof_check()) else self.streamer.read())
+				_return = (None if (self.streamer.is_eof()) else self.streamer.read())
 
 				if (_return == False): _return = None
 				elif (_return != None): _return = self._prepare_output_data(_return)

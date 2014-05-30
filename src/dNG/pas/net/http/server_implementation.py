@@ -29,7 +29,7 @@ from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.virtual_config import VirtualConfig
 from dNG.pas.data.logging.log_line import LogLine
 from dNG.pas.module.named_loader import NamedLoader
-from dNG.pas.plugins.hooks import Hooks
+from dNG.pas.plugins.hook import Hook
 from dNG.pas.runtime.not_implemented_exception import NotImplementedException
 from dNG.pas.runtime.thread import Thread
 
@@ -77,8 +77,8 @@ Configured server port
 Socket server hostname
 		"""
 
-		Hooks.register("dNG.pas.http.Server.getHost", self.get_host)
-		Hooks.register("dNG.pas.http.Server.getPort", self.get_port)
+		Hook.register("dNG.pas.http.Server.getHost", self.get_host)
+		Hook.register("dNG.pas.http.Server.getPort", self.get_port)
 	#
 
 	def _configure(self):
@@ -102,7 +102,7 @@ Configures the server
 		VirtualConfig.set_virtual_path("/data/mmedia/{0}/".format(site_version), { "s": "cache", "uri": "dfile", "uri_prefix": "{0}/".format(Settings.get("http_path_mmedia_versioned")) })
 		VirtualConfig.set_virtual_path("/data/mmedia/", { "s": "cache", "uri": "dfile", "uri_prefix": "/data/mmedia/" })
 
-		Hooks.call("dNG.pas.http.Server.configured", server = self)
+		Hook.call("dNG.pas.http.Server.onConfigured", server = self)
 	#
 
 	def get_host(self, params = None, last_return = None):
@@ -150,7 +150,7 @@ Start the server
 		self._configure()
 		Thread.start(self)
 
-		Hooks.call("dNG.pas.http.Server.startup", server = self)
+		Hook.call("dNG.pas.http.Server.onStartup", server = self)
 		return self
 	#
 
@@ -177,7 +177,7 @@ Stop the server
 :since:  v0.1.00
 		"""
 
-		Hooks.call("dNG.pas.http.Server.shutdown", server = self)
+		Hook.call("dNG.pas.http.Server.onShutdown", server = self)
 		return last_return
 	#
 

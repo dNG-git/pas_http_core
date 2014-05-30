@@ -25,7 +25,7 @@ NOTE_END //n"""
 
 from os import path
 
-from dNG.data.rfc.http import Http
+from dNG.data.rfc.header import Header
 from dNG.pas.data.translatable_exception import TranslatableException
 from dNG.pas.data.text.input_filter import InputFilter
 from .abstract_inner_request import AbstractInnerRequest
@@ -129,7 +129,7 @@ Returns the formats the client accepts.
 		"""
 
 		_return = self.get_header("Accept")
-		if (_return != None): _return = Http.header_field_list(_return)
+		if (_return != None): _return = Header.get_field_list_dict(_return)
 		if (_return == None): _return = [ ]
 
 		for position in range(0, len(_return)): _return[position] = _return[position].split(";")[0]
@@ -158,7 +158,7 @@ Returns the compression formats the client accepts.
 		"""
 
 		_return = self.get_header("Accept-Encoding")
-		if (_return != None): _return = Http.header_field_list(_return)
+		if (_return != None): _return = Header.get_field_list_dict(_return)
 		if (_return == None): _return = [ ]
 
 		for position in range(0, len(_return)): _return[position] = _return[position].split(";")[0]
@@ -191,7 +191,7 @@ Returns request cookies.
 
 		_return = { }
 
-		cookies = Http.header_field_list(InputFilter.filter_control_chars(self.get_header("Cookie")), ";", "=")
+		cookies = Header.get_field_list_dict(InputFilter.filter_control_chars(self.get_header("Cookie")), ";", "=")
 		for cookie in cookies: _return[cookie['key']] = cookie['value']
 
 		return _return
@@ -236,9 +236,7 @@ Returns the request header if defined.
 		"""
 
 		name = name.upper()
-
-		if (name in self.headers): return self.headers[name]
-		else: return None
+		return self.headers.get(name)
 	#
 
 	def get_headers(self):
@@ -398,6 +396,8 @@ requested by the client. It will reset the response and its cached values.
 :since: v0.1.01
 		"""
 
+		# pylint: disable=protected-access
+
 		if (isinstance(request, AbstractInnerRequest)):
 		#
 			parent_request = (self if (self.parent_request == None) else self.parent_request)
@@ -439,8 +439,10 @@ Set the header with the given name and value.
 
 		name = name.upper()
 
-		if (name in self.headers): self.headers[name] = "{0},{1}".format(self.headers[name], value)
-		else: self.headers[name] = value
+		self.headers[name] = ("{0},{1}".format(self.headers[name], value)
+		                      if (name in self.headers) else
+		                      value
+		                     )
 	#
 
 	def _set_parent_request(self, parent_request):

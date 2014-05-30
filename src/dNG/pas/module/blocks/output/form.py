@@ -74,7 +74,7 @@ Parses, renders and returns the given form.
 
 		_return = renderer.render()
 
-		button_title = (self.context['button_title'] if ("button_title" in self.context) else "core_continue")
+		button_title = self.context.get("button_title", "core_continue")
 		_return += (renderer.render_submit_button(button_title) if (_return == "") else "\n{0}".format(renderer.render_submit_button(button_title)))
 
 		return _return

@@ -70,22 +70,32 @@ Compression function
 Reads from the current streamer session.
 
 :param _bytes: How many bytes to read from the current position (0 means
-                  until EOF)
+               until EOF)
 
 :return: (mixed) Data; False on error
 :since:  v0.1.00
 		"""
 
 		data = AbstractEncapsulated.read(self, _bytes)
+		is_data_uncompressed = True
 
-		if (self.compressor != None):
+		while (self.compressor != None and is_data_uncompressed):
 		#
 			if (data == None or data == False):
 			#
 				data = self.compressor.flush()
+
+				is_data_uncompressed = False
 				self.compressor = None
 			#
-			elif (len(data) > 0): data = self.compressor.compress(Binary.bytes(data))
+			else:
+			#
+				data = self.compressor.compress(Binary.bytes(data))
+
+				# Feed compressor object with data until it returns at least one byte
+				is_data_uncompressed = (len(data) < 1)
+				if (is_data_uncompressed): data = AbstractEncapsulated.read(self, _bytes)
+			#
 		#
 
 		return data

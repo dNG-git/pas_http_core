@@ -30,7 +30,7 @@ from dNG.pas.data.settings import Settings
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting
 from dNG.pas.module.named_loader import NamedLoader
-from dNG.pas.plugins.hooks import Hooks
+from dNG.pas.plugins.hook import Hook
 from .abstract_http_request import AbstractHttpRequest
 from .abstract_http_response import AbstractHttpResponse
 
@@ -231,7 +231,7 @@ Set up theme framework
 				if (theme != None): self.set_theme(theme)
 			#
 
-			theme = (Hooks.call("dNG.pas.http.Theme.checkCandidates", theme = self.theme) if (Settings.get("pas_http_theme_plugins_supported", True)) else None)
+			theme = (Hook.call("dNG.pas.http.Theme.checkCandidates", theme = self.theme) if (Settings.get("pas_http_theme_plugins_supported", True)) else None)
 			self.theme_renderer = NamedLoader.get_instance("dNG.pas.data.xhtml.theme.Renderer")
 
 			if (theme != None):
@@ -243,8 +243,8 @@ Set up theme framework
 			#
 
 			if (theme == None and (not self.theme_renderer.is_supported(self.theme))): self.theme = Settings.get("pas_http_site_theme_default", "simple")
+			if (self.theme_active == None): self.theme_active = (self.theme if (self.theme_renderer.is_supported(self.theme)) else "simple")
 
-			if (self.theme_active == None): self.theme_active = self.theme
 			self.theme_renderer.set(self.theme_active)
 			self.theme_renderer.set_log_handler(self.log_handler)
 			self.theme_renderer.set_subtype(self.theme_subtype)

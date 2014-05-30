@@ -104,12 +104,11 @@ Returns true if the defined session is valid.
 				passcode_prev_timeout = self.session.get("uuids.passcode_prev_timeout")
 
 				if (cookie_passcode == Tmd5.hash(passcode)): _return = True
-				elif (
-					passcode_prev_timeout != None and
-					passcode_prev_timeout + Settings.get("pas_session_uuids_passcode_grace_period", 15) > time() or
-					passcode_prev != None or
-					cookie_passcode == Tmd5.hash(passcode_prev)
-				): _return = True
+				elif (passcode_prev_timeout != None
+				      and (passcode_prev_timeout + Settings.get("pas_session_uuids_passcode_grace_period", 15) > time()
+				           or (passcode_prev != None and cookie_passcode == Tmd5.hash(passcode_prev))
+				          )
+				     ): _return = True
 			#
 
 			if (not _return and isinstance(response, AbstractHttpResponse)): response.set_cookie("uuids", "", 0)

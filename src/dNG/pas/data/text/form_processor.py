@@ -28,6 +28,7 @@ from copy import copy
 from os import urandom
 
 from dNG.pas.data.binary import Binary
+from dNG.pas.data.cached_file import CachedFile
 from dNG.pas.runtime.type_exception import TypeException
 from dNG.pas.runtime.value_exception import ValueException
 from .input_filter import InputFilter
@@ -41,7 +42,8 @@ class FormProcessor(object):
 "FormProcessor" provides basic form methods used in protocol / format
 specific form instances.
 
-TODO: Code incomplete
+@TODO: Support a generic way for external field definition classes derived
+from a interface with "add_instance()".
 
 :author:     direct Netware Group
 :copyright:  direct Netware Group - All rights reserved
@@ -66,18 +68,17 @@ MD5 encoded password
 	"""
 Password input repetition
 	"""
-	SPECIAL_FIELD_TYPES = [
-		"element",
-		"embed",
-		"file_ftg",
-		"hidden",
-		"info",
-		"password",
-		"spacer",
-		"subtitle"
-	]
+	SPECIAL_FIELD_TYPES = [ "element",
+	                        "embed",
+	                        "formtags_file",
+	                        "hidden",
+	                        "info",
+	                        "password",
+	                        "spacer",
+	                        "subtitle"
+	                      ]
 	"""
-Special field types handled by "_entry_set_special_field()"
+Special field types handled by "_set_special_field_entry()"
 	"""
 
 	def __init__(self):
@@ -144,7 +145,62 @@ Parses all previously defined form fields and checks them.
 		return _return
 	#
 
-	def entry_add(self, field_type, field_data = None):
+	def add_email(self, field_data):
+	#
+		"""
+A single line text input field for eMail addresses.
+
+:param field_data: Form field data
+
+:return: (bool) False if the content was not accepted
+:since:  v0.1.00
+		"""
+
+		field_data = self._set_entry_defaults(field_data)
+		field_data = self._set_entry_field_size(field_data)
+		field_data = self._set_entry_limits(field_data)
+
+		field_data['error'] = self._check_entry_length(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
+
+		if (field_data['error'] == None
+		    and len(field_data['content']) > 0
+		    and InputFilter.filter_email_address(field_data['content']) == ""
+		   ): field_data['error'] = "format_invalid"
+
+		if (field_data['error'] == None): field_data['error'] = self._check_validators(field_data)
+
+		self._set_entry("email", field_data)
+		return (field_data['error'] == None)
+	#
+
+	def add_embedded(self, field_data, url_parameters, is_iframe_only = False):
+	#
+		"""
+Embeds external resources into the current form.
+
+:param field_data: Form field data
+:param url_parameters: URL parameters for the embedded resource
+:param is_iframe_only: True if we should not try AJAX to embed the given URL
+
+:return: (bool) Currently always true
+:since:  v0.1.00
+		"""
+
+		field_data = self._set_entry_defaults(field_data)
+		field_data = self._set_entry_field_size(field_data)
+
+		if (len(field_data['content']) < 1): field_data['content'] = Binary.str(hexlify(urandom(10)))
+
+		field_data['iframe_only'] = is_iframe_only
+		url_parameters['tid'] = field_data['content']
+
+		field_data['url'] = Link().build_url(Link.TYPE_RELATIVE, url_parameters)
+
+		self._set_entry("embed", field_data)
+		return True
+	#
+
+	def add_entry(self, field_type, field_data = None):
 	#
 		"""
 Creates spacing fields like "hidden", "element", "info", "spacer" or "subtitle".
@@ -159,17 +215,16 @@ Creates spacing fields like "hidden", "element", "info", "spacer" or "subtitle".
 :since:  v0.1.00
 		"""
 
-		if (
-			field_data['type'] == "element" or
-			field_data['type'] == "hidden" or
-			field_data['type'] == "info" or
-			field_data['type'] == "spacer" or
-			field_data['type'] == "subtitle"
-		):
+		if (field_data['type'] == "element"
+		    or field_data['type'] == "hidden"
+		    or field_data['type'] == "info"
+		    or field_data['type'] == "spacer"
+		    or field_data['type'] == "subtitle"
+		   ):
 		#
 			if (field_data == None): field_data = { }
-			field_data = self._entry_defaults_set(field_data, None, None, None)
-			self._entry_set(field_type, field_data)
+			field_data = self._set_entry_defaults(field_data, None, None, None)
+			self._set_entry(field_type, field_data)
 
 			_return = True
 		#
@@ -178,89 +233,31 @@ Creates spacing fields like "hidden", "element", "info", "spacer" or "subtitle".
 		return _return
 	#
 
-	def entry_add_email(self, field_data):
-	#
-		"""
-A single line text input field for eMail addresses.
-
-:param field_data: Form field data
-
-:return: (bool) False if the content was not accepted
-:since:  v0.1.00
-		"""
-
-		field_data = self._entry_defaults_set(field_data)
-		field_data = self._entry_field_size_set(field_data)
-		field_data = self._entry_limits_set(field_data)
-
-		field_data['error'] = self._entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
-		if (len(field_data['content']) > 0 and InputFilter.filter_email_address(field_data['content']) == ""): field_data['error'] = "format_invalid"
-
-		self._entry_set("email", field_data)
-		return (field_data['error'] == None)
-	#
-
-	def entry_add_embed(self, field_data, url_parameters, is_iframe_only = False):
-	#
-		"""
-Embeds external resources into the current form.
-
-:param field_data: Form field data
-:param url_parameters: URL parameters for the embedded resource
-:param is_iframe_only: True if we should not try AJAX to embed the given URL
-
-:return: (bool) Currently always true
-:since:  v0.1.00
-		"""
-
-		field_data = self._entry_defaults_set(field_data)
-		field_data = self._entry_field_size_set(field_data)
-
-		if (len(field_data['content']) < 1): field_data['content'] = Binary.str(hexlify(urandom(10)))
-
-		field_data['iframe_only'] = is_iframe_only
-		url_parameters['tid'] = field_data['content']
-
-		field_data['url'] = Link().build_url(Link.TYPE_RELATIVE, url_parameters)
-
-		self._entry_set("embed", field_data)
-		return True
-	#
-
-	def entry_add_file_ftg(self, field_data, file_pathname):
+	def add_formtags_file(self, field_data, file_pathname):
 	#
 		"""
 Adds a preformatted text from an external file.
 
 :param field_data: Form field data
-:param file_pathname: Path to the FTG file
+:param file_pathname: Path to the FormTags file
 
-:return: (bool) Currently always true
-:since:  v0.1.00
+:return: (bool) False if the file path is invalid
+:since:  v0.1.01
 		"""
 
-		"""$f_file_path = $direct_globals['basic_functions']->varfilter ($f_file_path,"settings");
-		$f_return = false;
+		_return = True
 
-		if (file_exists ($f_file_path))
-		{
-			$f_file_data = direct_file_get ("s",$f_file_path);
-			$f_file_data = $direct_globals['formtags']->decode (str_replace ("\n","[newline]",$f_file_data));
+		content = CachedFile.read(file_pathname)
+		if (content == None): _return = False
 
-			$f_return = true;
-		}
-		else { $f_file_data = (direct_local_get ("formbuilder_error_file_not_found_1")).(direct_html_encode_special ($f_file_path)).(direct_local_get ("formbuilder_error_file_not_found_2")); }
+		field_data = self._set_entry_defaults(field_data, content = content)
+		field_data = self._set_entry_field_size(field_data, "s")
+		self._set_entry("formtags_file", field_data)
 
-		$f_entry = $this->entryDefaultsSet ($f_entry,"","",$f_file_data);
-		$f_entry = $this->entryFieldSizeSet ($f_entry,"s");
-
-		$this->entrySet ("fileFtg",$f_entry);
-		return /*#ifdef(DEBUG):direct_debug (7,"sWG/#echo(__FILEPATH__)# -formbuilder->entryAddFileFtg ()- (#echo(__LINE__)#)",:#*/$f_return/*#ifdef(DEBUG):,true):#*/;
-		"""
-		return False
+		return _return
 	#
 
-	def entry_add_multiselect(self, field_data):
+	def add_multiselect(self, field_data):
 	#
 		"""
 Inserts a selectbox for multiple selectable options.
@@ -271,8 +268,8 @@ Inserts a selectbox for multiple selectable options.
 :since:  v0.1.00
 		"""
 
-		field_data = self._entry_defaults_set(field_data, content = None)
-		field_data = self._entry_field_size_set(field_data, "s")
+		field_data = self._set_entry_defaults(field_data, content = None)
+		field_data = self._set_entry_field_size(field_data, "s")
 
 		if ("choices" not in field_data or type(field_data['choices']) != list): field_data['error'] = "internal_error"
 		else:
@@ -300,11 +297,35 @@ Inserts a selectbox for multiple selectable options.
 			if (field_data['required'] and len(field_data['content_result']) < 1): field_data['error'] = "required_element"
 		#
 
-		self._entry_set("multiselect", field_data)
+		if (field_data['error'] == None): field_data['error'] = self._check_validators(field_data)
+
+		self._set_entry("multiselect", field_data)
 		return (field_data['error'] == None)
 	#
 
-	def entry_add_password(self, field_data, mode = None):
+	def add_number(self, field_data):
+	#
+		"""
+A number (integer) input field.
+
+:param field_data: Form field data
+
+:return: (bool) False if the content was not accepted
+:since:  v0.1.00
+		"""
+
+		field_data = self._set_entry_defaults(field_data, content = None)
+		field_data = self._set_entry_field_size(field_data)
+		field_data = self._set_entry_limits(field_data)
+
+		field_data['error'] = self._check_entry_range(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
+		if (field_data['error'] == None): field_data['error'] = self._check_validators(field_data)
+
+		self._set_entry("number", field_data)
+		return (field_data['error'] == None)
+	#
+
+	def add_password(self, field_data, mode = None):
 	#
 		"""
 Insert passwords (including optional a repetition check)
@@ -318,11 +339,11 @@ Insert passwords (including optional a repetition check)
 
 		_return = True
 
-		field_data = self._entry_defaults_set(field_data)
-		field_data = self._entry_field_size_set(field_data)
-		field_data = self._entry_limits_set(field_data)
+		field_data = self._set_entry_defaults(field_data)
+		field_data = self._set_entry_field_size(field_data)
+		field_data = self._set_entry_limits(field_data)
 
-		field_data['error'] = self._entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
+		field_data['error'] = self._check_entry_length(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
 
 		if (mode == None): mode = FormProcessor.PASSWORD_MD5
 
@@ -336,14 +357,16 @@ Insert passwords (including optional a repetition check)
 		#
 		else: _type = "password"
 
+		if (field_data['error'] == None): field_data['error'] = self._check_validators(field_data)
+
 		if (field_data['error'] != None): _return = False
 		elif (mode & FormProcessor.PASSWORD_MD5 == FormProcessor.PASSWORD_MD5): field_data['content_result'] = Md5.hash(field_data['content'])
 
-		self._entry_set(_type, field_data)
+		self._set_entry(_type, field_data)
 		return _return
 	#
 
-	def entry_add_radio(self, field_data):
+	def add_radio(self, field_data):
 	#
 		"""
 Inserts radio fields for exact one selected option.
@@ -354,7 +377,7 @@ Inserts radio fields for exact one selected option.
 :since:  v0.1.00
 		"""
 
-		field_data = self._entry_defaults_set(field_data, content = None)
+		field_data = self._set_entry_defaults(field_data, content = None)
 
 		if ("choices" not in field_data or type(field_data['choices']) != list): field_data['error'] = "internal_error"
 		else:
@@ -379,140 +402,36 @@ Inserts radio fields for exact one selected option.
 			if (field_data['required'] and field_data['content_result'] == None): field_data['error'] = "required_element"
 		#
 
-		self._entry_set("radio", field_data)
+		if (field_data['error'] == None): field_data['error'] = self._check_validators(field_data)
+
+		self._set_entry("radio", field_data)
 		return (field_data['error'] == None)
 	#
 
-	"""
-/**
-	* Number (integer) input mechanism
-	*
-	* @param  array $f_entry Form field data
-	* @return boolean False if the content was not accepted
-	* @since  v0.1.00
-*/
-	/*#ifndef(PHP4) */public /* #*/function entryAddNumber ($f_entry)
-	{
-		global $direct_cachedata;
-		if (USE_debug_reporting) { direct_debug (5,"sWG/#echo(__FILEPATH__)# -formbuilder->entryAddNumber (+f_entry)- (#echo(__LINE__)#)"); }
+	def add_range(self, field_data):
+	#
+		"""
+A range input field between including minimum (default 0) and maximum
+(default 100) values.
 
-		$f_return = true;
+:param field_data: Form field data
 
-		$f_entry = $this->entryDefaultsSet ($f_entry,"","",NULL);
-		$f_entry = $this->entryFieldSizeSet ($f_entry);
-		$f_entry = $this->entryLimitsSet ($f_entry);
+:return: (bool) False if the content was not accepted
+:since:  v0.1.00
+		"""
 
-		$f_entry['content'] = str_replace (" ","",$f_entry['content']);
-		$f_entry['error'] = $this->entryRangeCheck ($f_entry['content'],$f_entry['min'],$f_entry['max'],$f_entry['required']);
+		field_data = self._set_entry_defaults(field_data, content = None)
+		field_data = self._set_entry_field_size(field_data, "s")
+		field_data = self._set_entry_limits(field_data, 0, 100)
 
-		if ($f_entry['error']) { $f_return = false; }
-		else { $direct_cachedata["i_".$f_entry['name']] = $f_entry['content']; }
+		field_data['error'] = self._check_entry_range(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
+		if (field_data['error'] == None): field_data['error'] = self._check_validators(field_data)
 
-		$this->entrySet ("number",$f_entry);
-		return /*#ifdef(DEBUG):direct_debug (7,"sWG/#echo(__FILEPATH__)# -formbuilder->entryAddNumber ()- (#echo(__LINE__)#)",:#*/$f_return/*#ifdef(DEBUG):,true):#*/;
-	}
+		self._set_entry("number", field_data)
+		return (field_data['error'] == None)
+	#
 
-/**
-	* Inserts a range input.
-	*
-	* @param  array $f_entry Form field data
-	* @return boolean False if the content was not accepted
-	* @since  v0.1.00
-*/
-	/*#ifndef(PHP4) */public /* #*/function entryAddRange ($f_entry)
-	{
-		global $direct_cachedata;
-		if (USE_debug_reporting) { direct_debug (5,"sWG/#echo(__FILEPATH__)# -formbuilder->entryAddRange (+f_entry)- (#echo(__LINE__)#)"); }
-
-		$f_entry = $this->entryDefaultsSet ($f_entry,"","",NULL);
-		$f_entry = $this->entryFieldSizeSet ($f_entry,"s");
-		$f_entry = $this->entryLimitsSet ($f_entry,0,100);
-
-		$f_entry['error'] = $this->entryRangeCheck ($f_entry['content'],$f_entry['min'],$f_entry['max'],$f_entry['required']);
-
-		if ($f_entry['error']) { $f_return = false; }
-		else { $direct_cachedata["i_".$f_entry['name']] = $f_entry['content']; }
-
-		$f_entry['content'] = direct_html_encode_special ($f_entry['content']);
-
-		$this->entrySet ("range",$f_entry);
-
-		if ($f_entry['error']) { return /*#ifdef(DEBUG):direct_debug (7,"sWG/#echo(__FILEPATH__)# -formbuilder->entryAddRadio ()- (#echo(__LINE__)#)",:#*/false/*#ifdef(DEBUG):,true):#*/; }
-		else { return /*#ifdef(DEBUG):direct_debug (7,"sWG/#echo(__FILEPATH__)# -formbuilder->entryAddRadio ()- (#echo(__LINE__)#)",:#*/true/*#ifdef(DEBUG):,true):#*/; }
-	}
-
-/**
-	* A rcp enhanced text input field.
-	*
-	* @param  array $f_entry Form field data
-	* @return boolean False if the content was not accepted
-	* @since  v0.1.00
-*/
-	/*#ifndef(PHP4) */public /* #*/function entryAddRcpText ($f_entry)
-	{
-		global $direct_cachedata,$direct_settings;
-		if (USE_debug_reporting) { direct_debug (5,"sWG/#echo(__FILEPATH__)# -formbuilder->entryAddRcpText (+f_entry)- (#echo(__LINE__)#)"); }
-
-		if ($direct_settings['formbuilder_rcp_supported'])
-		{
-			$f_return = true;
-
-			$f_entry = $this->entryDefaultsSet ($f_entry,"","",NULL);
-			$f_entry = $this->entryFieldSizeSet ($f_entry);
-			$f_entry = $this->entryLimitsSet ($f_entry);
-
-			$f_entry['content'] = str_replace (array ("\n","&lt;","&gt;","<br />"),(array ("[newline]","<",">","[newline]")),$f_entry['content']);
-			$f_entry['error'] = $this->entryLengthCheck ($f_entry['content'],$f_entry['min'],$f_entry['max'],$f_entry['required']);
-
-			if ($f_entry['error']) { $f_return = false; }
-			else { $direct_cachedata["i_".$f_entry['name']] = $f_entry['content']; }
-
-			$f_entry['content'] = direct_html_encode_special ($f_entry['content']);
-
-			$this->entrySet ("rcpText",$f_entry);
-		}
-		else { $f_return = $this->entryAddText ($f_entry); }
-
-		return /*#ifdef(DEBUG):direct_debug (7,"sWG/#echo(__FILEPATH__)# -formbuilder->entryAddRcpText ()- (#echo(__LINE__)#)",:#*/$f_return/*#ifdef(DEBUG):,true):#*/;
-	}
-
-/**
-	* A rcp enhanced textarea input field.
-	*
-	* @param  array $f_entry Form field data
-	* @return boolean False if the content was not accepted
-	* @since  v0.1.00
-*/
-	/*#ifndef(PHP4) */public /* #*/function entryAddRcpTextarea ($f_entry)
-	{
-		global $direct_cachedata,$direct_settings;
-		if (USE_debug_reporting) { direct_debug (5,"sWG/#echo(__FILEPATH__)# -formbuilder->entryAddRcpTextarea (+f_entry)- (#echo(__LINE__)#)"); }
-
-		if ($direct_settings['formbuilder_rcp_supported'])
-		{
-			$f_return = true;
-
-			$f_entry = $this->entryDefaultsSet ($f_entry,"","",NULL);
-			$f_entry = $this->entryFieldSizeSet ($f_entry);
-			$f_entry = $this->entryLimitsSet ($f_entry);
-
-			$f_entry['content'] = str_replace (array ("[newline]","&lt;","&gt;","<br />"),(array ("\n","<",">","\n")),$f_entry['content']);
-			$f_entry['error'] = $this->entryLengthCheck ($f_entry['content'],$f_entry['min'],$f_entry['max'],$f_entry['required']);
-
-			if ($f_entry['error']) { $f_return = false; }
-			else { $direct_cachedata["i_".$f_entry['name']] = $f_entry['content']; }
-
-			$f_entry['content'] = direct_html_encode_special ($f_entry['content']);
-
-			$this->entrySet ("rcpTextarea",$f_entry);
-		}
-		else { $f_return = $this->entryAddTextarea ($f_entry); }
-
-		return /*#ifdef(DEBUG):direct_debug (7,"sWG/#echo(__FILEPATH__)# -formbuilder->entryAddRcpTextarea ()- (#echo(__LINE__)#)",:#*/$f_return/*#ifdef(DEBUG):,true):#*/;
-	}
-	"""
-
-	def entry_add_select(self, field_data):
+	def add_select(self, field_data):
 	#
 		"""
 Inserts a selectbox for exact one selected option.
@@ -523,8 +442,8 @@ Inserts a selectbox for exact one selected option.
 :since:  v0.1.00
 		"""
 
-		field_data = self._entry_defaults_set(field_data, content = None)
-		field_data = self._entry_field_size_set(field_data, "s")
+		field_data = self._set_entry_defaults(field_data, content = None)
+		field_data = self._set_entry_field_size(field_data, "s")
 
 		if ("choices" not in field_data or type(field_data['choices']) != list): field_data['error'] = "internal_error"
 		else:
@@ -552,11 +471,13 @@ Inserts a selectbox for exact one selected option.
 			if (field_data['required'] and len(field_data['content']) < 1): field_data['error'] = "required_element"
 		#
 
-		self._entry_set("select", field_data)
+		if (field_data['error'] == None): field_data['error'] = self._check_validators(field_data)
+
+		self._set_entry("select", field_data)
 		return (field_data['error'] == None)
 	#
 
-	def entry_add_text(self, field_data):
+	def add_text(self, field_data):
 	#
 		"""
 A single line text input field.
@@ -567,17 +488,18 @@ A single line text input field.
 :since:  v0.1.00
 		"""
 
-		field_data = self._entry_defaults_set(field_data)
-		field_data = self._entry_field_size_set(field_data)
-		field_data = self._entry_limits_set(field_data)
+		field_data = self._set_entry_defaults(field_data)
+		field_data = self._set_entry_field_size(field_data)
+		field_data = self._set_entry_limits(field_data)
 
-		field_data['error'] = self._entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
+		field_data['error'] = self._check_entry_length(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
+		if (field_data['error'] == None): field_data['error'] = self._check_validators(field_data)
 
-		self._entry_set("text", field_data)
+		self._set_entry("text", field_data)
 		return (field_data['error'] == None)
 	#
 
-	def entry_add_textarea(self, field_data):
+	def add_textarea(self, field_data):
 	#
 		"""
 A multi line textarea input field.
@@ -588,17 +510,341 @@ A multi line textarea input field.
 :since:  v0.1.00
 		"""
 
-		field_data = self._entry_defaults_set(field_data)
-		field_data = self._entry_field_size_set(field_data)
-		field_data = self._entry_limits_set(field_data)
+		field_data = self._set_entry_defaults(field_data)
+		field_data = self._set_entry_field_size(field_data)
+		field_data = self._set_entry_limits(field_data)
 
-		field_data['error'] = self._entry_length_check(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
+		field_data['error'] = self._check_entry_length(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
+		if (field_data['error'] == None): field_data['error'] = self._check_validators(field_data)
 
-		self._entry_set("textarea", field_data)
+		self._set_entry("textarea", field_data)
 		return (field_data['error'] == None)
 	#
 
-	def _entry_defaults_set(self, field_data, name = "", title = "", content = "", required = False):
+	def _check_entry_length(self, data, _min = None, _max = None, required = False):
+	#
+		"""
+Checks the size for a given string.
+
+:param data: The string that should be checked
+:param _min: Defines the minimal length for a string or None to ignore
+:param _max: Defines the maximal length for a string or None for an unlimited
+            size
+:param required: True if the field is required to continue
+
+:return: (mixed) Error definition; None if valid
+:since:  v0.1.00
+		"""
+
+		data_length = (0 if (data == None) else len(data))
+
+		if (required and data_length < 1): _return = "required_element"
+		elif (_min != None and _min > data_length): _return = ( "string_min", str(_min) )
+		elif (_max != None and _max < data_length): _return = ( "string_max", str(_max) )
+		else: _return = None
+
+		return _return
+	#
+
+	def _check_entry_range(self, data, _min = None, _max = None, required = False):
+	#
+		"""
+Checks the size for a given string.
+
+:param data: The string that should be checked
+:param _min: Defines the minimal range for a number or None to ignore
+:param _max: Defines the maximal range for a number or None for an unlimited
+            size
+:param required: True if the field is required to continue
+
+:return: (mixed) Error definition; None if valid
+:since:  v0.1.00
+		"""
+
+		_return = None
+
+		if (data != None and len(data) > 0):
+		#
+			number = InputFilter.filter_float(data)
+
+			if (number != None):
+			#
+				if (_min != None and _min > number): _return = ( "number_min", str(_min) )
+				elif (_max != None and _max < number): _return = ( "number_max", str(_max) )
+			#
+			else: _return = "format_invalid"
+		#
+		elif (required): _return = "required_element"
+
+		return _return
+	#
+
+	def _check_validators(self, field_data):
+	#
+		"""
+Checks for validator callbacks, executes them and returns the first error
+occuring.
+
+:param data: The string that should be checked
+:param _min: Defines the minimal range for a number or None to ignore
+:param _max: Defines the maximal range for a number or None for an unlimited
+            size
+:param required: True if the field is required to continue
+
+:return: (mixed) Error definition tuple; None if valid
+:since:  v0.1.00
+		"""
+
+		_return = None
+
+		if (isinstance(field_data.get("validators"), list)):
+		#
+			for _callable in field_data.get("validators"):
+			#
+				result = _callable(field_data)
+
+				if (result != None):
+				#
+					_return = ( "validator_failed", result )
+					break
+				#
+			#
+		#
+
+		return _return
+	#
+
+	def get_data(self, flush = True):
+	#
+		"""
+Returns all defined fields.
+
+:param flush: Flush the cache
+
+:return: (list) Field data
+:since:  v0.1.00
+		"""
+
+		# pylint: disable=no-member
+
+		_return = (self.cache.copy() if (hasattr(self.cache, "copy")) else copy(self.cache))
+
+		if (self.form_is_valid == None or (not self.form_has_input)):
+		#
+			for section in _return:
+			#
+				for field_data in section['fields']: field_data['error'] = None
+			#
+		#
+
+		if (flush):
+		#
+			self.cache = [ ]
+			self.cache_sections = { }
+			self.element_counter = 0
+			self.form_has_input = False
+			self.form_is_valid = None
+		#
+
+		return _return
+	#
+
+	def _get_error_message(self, error_data):
+	#
+		"""
+Returns the error message for the error data given. Returned message is
+implementation specific.
+
+:param error_data: Field error data
+
+:return: (str) Implementation specific error message
+:since:  v0.1.00
+		"""
+
+		error = (error_data[0] if (type(error_data) == tuple) else error_data)
+
+		if (error == "number_max"):
+		#
+			_return = "{0}{1}{2}".format(L10n.get("pas_http_core_form_error_number_max_1"),
+			                             error_data[1],
+			                             L10n.get("pas_http_core_form_error_number_max_2")
+			                            )
+		#
+		elif (error == "number_min"):
+		#
+			_return = "{0}{1}{2}".format(L10n.get("pas_http_core_form_error_number_min_1"),
+			                             error_data[1],
+			                             L10n.get("pas_http_core_form_error_number_min_2")
+			                            )
+		#
+		elif (error == "string_max"):
+		#
+			_return = "{0}{1}{2}".format(L10n.get("pas_http_core_form_error_string_max_1"),
+			                             error_data[1],
+			                             L10n.get("pas_http_core_form_error_string_max_2")
+			                            )
+		#
+		elif (error == "string_min"):
+		#
+			_return = "{0}{1}{2}".format(L10n.get("pas_http_core_form_error_string_min_1"),
+			                             error_data[1],
+			                             L10n.get("pas_http_core_form_error_string_min_2")
+			                            )
+		#
+		elif (error == "validator_failed"): _return = error_data[1]
+		else: _return = L10n.get("pas_http_core_form_error_{0}".format(error))
+
+		return _return
+	#
+
+	def get_errors(self, section = None, types_hidden = None):
+	#
+		"""
+Returns detected errors as a list of dicts containing the field name, the
+untranslated as well as the translated error message.
+
+:param section: If given will only return error messages for the given
+                section.
+:param types_hidden: A list of form fields for which error messages are
+                     ignored.
+
+:return: (list) List of dicts with "name", "error_data" and "error_message"
+:since:  v0.1.00
+		"""
+
+		_return =  [ ]
+
+		if (section == None): sections = self.cache_sections
+		else: sections = ([ self.cache_sections[section] ] if (section in self.cache_sections) else None)
+
+		if (type(types_hidden) == list): types_hidden = [ "hidden", "info", "subtitle" ]
+		else: types_hidden += [ "hidden", "info", "subtitle" ]
+
+		if (sections != None):
+		#
+			for section in sections:
+			#
+				for field_data in section['fields']:
+				#
+					if (field_data['error'] != None): _return.append({ "name": field_data['name'], "error_data": field_data['error'], "error_message": self._get_error_message(field_data['error']) })
+				#
+			#
+		#
+
+		return _return
+	#
+
+	def get_input(self, name):
+	#
+		"""
+"get_input()" should be used to read the input value for the field from a
+source (e.g. from a HTTP POST request parameter).
+
+:param name: Field and parameter name
+
+:return: (mixed) Value; None if not set
+:since:  v0.1.00
+		"""
+
+		return None
+	#
+
+	def get_value(self, name, section = None, _raw_input = False):
+	#
+		"""
+Returns the field value given or transmitted.
+
+:param name: Field name
+:param section: Form section
+
+:return: (str) Field value; None on error
+:since:  v0.1.00
+		"""
+
+		_return = None
+
+		if (section == None): sections = self.cache
+		else: sections = ([ self.cache[self.cache_sections[section]] ] if (section in self.cache_sections) else [ ])
+
+		for section in sections:
+		#
+			if (name in section['positions']):
+			#
+				field = section['fields'][section['positions'][name]]
+				_return = (field['content_result'] if ("content_result" in field and (not _raw_input)) else field['content'])
+				break
+			#
+		#
+
+		return _return
+	#
+
+	def set_data(self, data):
+	#
+		"""
+Set the fields based on the given list.
+
+:param data: Field data list
+
+:since: v0.1.00
+		"""
+
+		if (isinstance(data, list)):
+		#
+			self.cache = [ ]
+			self.cache_sections = { }
+
+			for field_data in data: self._set_entry_field(field_data)
+		#
+		else: raise TypeException("Given data does not reflect a form list")
+	#
+
+	def _set_entry(self, field_type, field_data):
+	#
+		"""
+Adds a new field entry to the list.
+
+:param field_type: Form field type
+:param field_data: Form field data
+
+:link: http://www.direct-netware.de/redirect.py?handbooks;pas;http;dev;formbuilder
+       Click here to get a list of available form fields
+
+:since: v0.1.00
+		"""
+
+		if (isinstance(field_data, dict)):
+		#
+			field_data['type'] = field_type
+
+			if (len(field_data['name']) > 0): name = field_data['name']
+			else: name = Binary.str(hexlify(urandom(10)))
+
+			if (field_data['section'] not in self.cache_sections):
+			#
+				position = len(self.cache)
+				section = { "fields": [ ], "name": field_data['section'], "positions": { } }
+
+				self.cache.append(section)
+				self.cache_sections[field_data['section']] = position
+			#
+
+			cache = self.cache[self.cache_sections[field_data['section']]]
+
+			if (name in cache['positions']): self.update_entry(field_data['section'], name, field_data)
+			else:
+			#
+				position = len(cache['fields'])
+
+				cache['fields'].append(field_data)
+				cache['positions'][name] = position
+
+				self.form_is_valid = None
+			#
+		#
+	#
+
+	def _set_entry_defaults(self, field_data, name = "", title = "", content = "", required = False):
 	#
 		"""
 Sets default values for the given field.
@@ -643,7 +889,7 @@ Sets default values for the given field.
 		return _return
 	#
 
-	def entry_error_set(self, section, name, error):
+	def set_entry_error(self, section, name, error):
 	#
 		"""
 Set an external error message for the given form field.
@@ -656,10 +902,10 @@ Set an external error message for the given form field.
 		"""
 
 		_type = type(error)
-		if (_type == str or _type == tuple): self.entry_update(section, name, { "error": error })
+		if (_type == str or _type == tuple): self.update_entry(section, name, { "error": error })
 	#
 
-	def _entry_field_size_set(self, field_data, size = "m"):
+	def _set_entry_field_size(self, field_data, size = "m"):
 	#
 		"""
 Sets the default requested size for the given field if not already defined.
@@ -681,33 +927,7 @@ Sets the default requested size for the given field if not already defined.
 		return _return
 	#
 
-	def _entry_length_check(self, data, _min = None, _max = None, required = False):
-	#
-		"""
-Checks the size for a given string.
-
-:param data: The string that should be checked
-:param _min: Defines the minimal length for a string or None to ignore
-:param _max: Defines the maximal length for a string or None for an unlimited
-            size
-:param required: True if the field is required to continue
-
-:return: (bool) False if a required field is empty, it is smaller than the
-         minimum or larger than the maximum
-:since:  v0.1.00
-		"""
-
-		data_length = (0 if (data == None) else len(data))
-
-		if (required and data_length < 1): _return = "required_element"
-		elif (_min != None and _min > data_length): _return = ( "string_min", str(_min) )
-		elif (_max != None and _max < data_length): _return = ( "string_max", str(_max) )
-		else: _return = None
-
-		return _return
-	#
-
-	def _entry_limits_set(self, field_data, _min = None, _max = None):
+	def _set_entry_limits(self, field_data, _min = None, _max = None):
 	#
 		"""
 Sets default limits for the given field if they are not already defined.
@@ -731,86 +951,7 @@ Sets default limits for the given field if they are not already defined.
 		return _return
 	#
 
-	def _entry_range_check(self, data, _min = None, _max = None, required = False):
-	#
-		"""
-Checks the size for a given string.
-
-:param data: The string that should be checked
-:param _min: Defines the minimal range for a number or None to ignore
-:param _max: Defines the maximal range for a number or None for an unlimited
-            size
-:param required: True if the field is required to continue
-
-:return: (bool) False if a required field is empty, it is smaller than the
-         minimum or larger than the maximum
-:since:  v0.1.00
-		"""
-
-		_return = None
-
-		if (data != None and len(data) > 0):
-		#
-			number = InputFilter.filter_float(data)
-
-			if (number != None):
-			#
-				if (_min != None and _min > number): _return = ( "number_min", str(_min) )
-				elif (_max != None and _max < number): _return = ( "number_max", str(_max) )
-			#
-			else: _return = "format_invalid"
-		#
-		elif (required): _return = "required_element"
-
-		return _return
-	#
-
-	def _entry_set(self, field_type, field_data):
-	#
-		"""
-Adds a new field entry to the list.
-
-:param field_type: Form field type
-:param field_data: Form field data
-
-:link: http://www.direct-netware.de/redirect.py?handbooks;pas;http;dev;formbuilder
-       Click here to get a list of available form fields
-
-:since: v0.1.00
-		"""
-
-		if (isinstance(field_data, dict)):
-		#
-			field_data['type'] = field_type
-
-			if (len(field_data['name']) > 0): name = field_data['name']
-			else: name = Binary.str(hexlify(urandom(10)))
-
-			if (field_data['section'] not in self.cache_sections):
-			#
-				position = len(self.cache)
-				section = { "fields": [ ], "name": field_data['section'], "positions": { } }
-
-				self.cache.append(section)
-				self.cache_sections[field_data['section']] = position
-			#
-
-			cache = self.cache[self.cache_sections[field_data['section']]]
-
-			if (name in cache['positions']): self.entry_update(field_data['section'], name, field_data)
-			else:
-			#
-				position = len(cache['fields'])
-
-				cache['fields'].append(field_data)
-				cache['positions'][name] = position
-
-				self.form_is_valid = None
-			#
-		#
-	#
-
-	def _entry_set_field(self, field_data):
+	def _set_entry_field(self, field_data):
 	#
 		"""
 Sets an field entry based on the data given.
@@ -822,18 +963,30 @@ Sets an field entry based on the data given.
 
 		if (isinstance(field_data, dict) and "type" in field_data):
 		#
-			if (field_data['type'] in FormProcessor.SPECIAL_FIELD_TYPES): self._entry_set_special_field(field_data)
+			if (field_data['type'] in FormProcessor.SPECIAL_FIELD_TYPES): self._set_special_field_entry(field_data)
 			else:
 			#
-				if (not hasattr(self, "entry_add_{0}".format(field_data['type']))): raise ValueException("Given field type is not defined")
-				method = getattr(self, "entry_add_{0}".format(field_data['type']))
+				if (not hasattr(self, "add_{0}".format(field_data['type']))): raise ValueException("Given field type is not defined")
+				method = getattr(self, "add_{0}".format(field_data['type']))
 				method(field_data)
 			#
 		#
 		else: raise TypeException("Given data does not reflect a form field")
 	#
 
-	def _entry_set_special_field(self, field_data):
+	def set_input_available(self):
+	#
+		"""
+Sets the flag for available input. Input values can be read with
+"get_input()".
+
+:since: v0.1.00
+		"""
+
+		self.form_has_input = True
+	#
+
+	def _set_special_field_entry(self, field_data):
 	#
 		"""
 Handles special field types defined by "SPECIAL_FIELD_TYPES".
@@ -843,43 +996,40 @@ Handles special field types defined by "SPECIAL_FIELD_TYPES".
 :since: v0.1.00
 		"""
 
-		if (
-			isinstance(field_data, dict) and
-			"type" in field_data and
-			field_data['type'] in FormProcessor.SPECIAL_FIELD_TYPES
-		):
+		if (isinstance(field_data, dict)
+		    and "type" in field_data
+		    and field_data['type'] in FormProcessor.SPECIAL_FIELD_TYPES
+		   ):
 		#
-			if (
-				field_data['type'] == "element" or
-				field_data['type'] == "hidden" or
-				field_data['type'] == "info" or
-				field_data['type'] == "spacer" or
-				field_data['type'] == "subtitle"
-			): self.entry_add(field_data['type'], field_data)
+			if (field_data['type'] == "element"
+			    or field_data['type'] == "hidden"
+			    or field_data['type'] == "info"
+			    or field_data['type'] == "spacer"
+			    or field_data['type'] == "subtitle"
+			   ): self.add_entry(field_data['type'], field_data)
 			elif (field_data['type'] == "embed"):
 			#
 				if ("url_parameters" not in field_data): raise ValueException("Given field type is not defined correctly")
 
-				is_iframe_only = (field_data['is_iframe_only'] if ("is_iframe_only" in field_data) else False)
-				self.entry_add_embed(field_data, field_data['url_parameters'], is_iframe_only)
+				is_iframe_only = field_data.get("is_iframe_only", False)
+				self.add_embedded(field_data, field_data['url_parameters'], is_iframe_only)
 			#
-			elif (field_data['type'] == "file_ftg"):
+			elif (field_data['type'] == "formtags_file"):
 			#
 				if ("file_pathname" not in field_data): raise ValueException("Given field type is not defined correctly")
-
-				self.entry_add_file_ftg(field_data, field_data['file_pathname'])
+				self.add_formtags_file(field_data, field_data['file_pathname'])
 			#
 			elif (field_data['type'] == "password"):
 			#
-				mode = (field_data['mode'] if ("mode" in field_data) else None)
-				self.entry_add_password(field_data, mode)
+				mode = field_data.get("mode")
+				self.add_password(field_data, mode)
 			#
 			else: raise ValueException("Given field type is not defined")
 		#
 		else: raise TypeException("Given data does not reflect a form field")
 	#
 
-	def entry_update(self, section, name, field_data):
+	def update_entry(self, section, name, field_data):
 	#
 		"""
 Updates existing field entries.
@@ -903,206 +1053,6 @@ Updates existing field entries.
 
 			self.form_is_valid = None
 		#
-	#
-
-	def _error_get_message(self, error_data):
-	#
-		"""
-Returns the error message for the error data given. Returned message is
-implementation specific.
-
-:param error_data: Field error data
-
-:return: (str) Implementation specific error message
-:since:  v0.1.00
-		"""
-
-		error = (error_data[0] if (type(error_data) == tuple) else error_data)
-
-		if (error == "number_max"):
-		#
-			_return = "{0}{1}{2}".format(
-				L10n.get("pas_http_core_form_error_number_max_1"),
-				error_data[1],
-				L10n.get("pas_http_core_form_error_number_max_2")
-			)
-		#
-		elif (error == "number_min"):
-		#
-			_return = "{0}{1}{2}".format(
-				L10n.get("pas_http_core_form_error_number_min_1"),
-				error_data[1],
-				L10n.get("pas_http_core_form_error_number_min_2")
-			)
-		#
-		elif (error == "string_max"):
-		#
-			_return = "{0}{1}{2}".format(
-				L10n.get("pas_http_core_form_error_string_max_1"),
-				error_data[1],
-				L10n.get("pas_http_core_form_error_string_max_2")
-			)
-		#
-		elif (error == "string_min"):
-		#
-			_return = "{0}{1}{2}".format(
-				L10n.get("pas_http_core_form_error_string_min_1"),
-				error_data[1],
-				L10n.get("pas_http_core_form_error_string_min_2")
-			)
-		#
-		else: _return = L10n.get("pas_http_core_form_error_{0}".format(error))
-
-		return _return
-	#
-
-	def get_data(self, flush = True):
-	#
-		"""
-Returns all defined fields.
-
-:param flush: Flush the cache
-
-:return: (list) Field data
-:since:  v0.1.00
-		"""
-
-		# pylint: disable=no-member
-
-		_return = (self.cache.copy() if (hasattr(self.cache, "copy")) else copy(self.cache))
-
-		if (self.form_is_valid == None or (not self.form_has_input)):
-		#
-			for section in _return:
-			#
-				for field_data in section['fields']: field_data['error'] = None
-			#
-		#
-
-		if (flush):
-		#
-			self.cache = [ ]
-			self.cache_sections = { }
-			self.element_counter = 0
-			self.form_has_input = False
-			self.form_is_valid = None
-		#
-
-		return _return
-	#
-
-	def get_value(self, name, section = None, _raw_input = False):
-	#
-		"""
-Returns the field value given or transmitted.
-
-:param name: Field name
-:param section: Form section
-
-:return: (str) Field value; None on error
-:since:  v0.1.00
-		"""
-
-		_return = None
-
-		if (section == None): sections = self.cache
-		else: sections = ([ self.cache[self.cache_sections[section]] ] if (section in self.cache_sections) else [ ])
-
-		for section in sections:
-		#
-			if (name in section['positions']):
-			#
-				field = section['fields'][section['positions'][name]]
-				_return = (field['content_result'] if ("content_result" in field and (not _raw_input)) else field['content'])
-				break
-			#
-		#
-
-		return _return
-	#
-
-	def get_errors(self, section = None, types_hidden = None):
-	#
-		"""
-Returns detected errors as a list of dicts containing the field name, the
-untranslated as well as the translated error message.
-
-:param section: If given will only return error messages for the given
-                section.
-:param types_hidden: A list of form fields for which error messages are
-                     ignored.
-
-:return: (list) List of dicts with "name", "error_data" and "error_message"
-:since:  v0.1.00
-		"""
-
-		_return =  [ ]
-
-		if (section == None): sections = self.cache_sections
-		else: sections = ([ self.cache_sections[section] ] if (section in self.cache_sections) else None)
-
-		if (type(types_hidden) == list): types_hidden = [ "hidden", "info", "subtitle" ]
-		else: types_hidden += [ "hidden", "info", "subtitle" ]
-
-		if (sections != None):
-		#
-			for section in sections:
-			#
-				for field_data in section['fields']:
-				#
-					if (field_data['error'] != None): _return.append({ "name": field_data['name'], "error_data": field_data['error'], "error_message": self._error_get_message(field_data['error']) })
-				#
-			#
-		#
-
-		return _return
-	#
-
-	def get_input(self, name):
-	#
-		"""
-"get_input()" should be used to read the input value for the field from a
-source (e.g. from a HTTP POST request parameter).
-
-:param name: Field and parameter name
-
-:return: (mixed) Value; None if not set
-:since:  v0.1.00
-		"""
-
-		return None
-	#
-
-	def set_data(self, data):
-	#
-		"""
-Set the fields based on the given list.
-
-:param data: Field data list
-
-:since: v0.1.00
-		"""
-
-		if (isinstance(data, list)):
-		#
-			self.cache = [ ]
-			self.cache_sections = { }
-
-			for field_data in data: self._entry_set_field(field_data)
-		#
-		else: raise TypeException("Given data does not reflect a form list")
-	#
-
-	def set_input_available(self):
-	#
-		"""
-Sets the flag for available input. Input values can be read with
-"get_input()".
-
-:since: v0.1.00
-		"""
-
-		self.form_has_input = True
 	#
 #
 

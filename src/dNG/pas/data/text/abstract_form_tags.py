@@ -48,12 +48,11 @@ The OSet parser takes a template string to render the output.
 	"""
 
 	"""
-	TAGS = [
-		"b", "i", "s", "u", "color", "del", "face", "size",
-		"center", "justify", "left", "right",
-		"code", "link", "margin", "quote", "title", "url",
-		"hr", "img"
-	]
+	TAGS = [ "b", "i", "s", "u", "color", "del", "face", "size",
+	         "center", "justify", "left", "right",
+	         "code", "link", "margin", "quote", "title", "url",
+	         "hr", "img"
+	       ]
 	"""
 Known tags used for en- and decoding.
 	"""
@@ -75,7 +74,7 @@ happened.
 		"""
 	#
 
-	def _match_change(self, tag_definition, data, tag_position, data_position, tag_end_position):
+	def _change_match(self, tag_definition, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the matched tag.
@@ -92,7 +91,7 @@ Change data according to the matched tag.
 
 		_return = data[:tag_position]
 
-		method = (getattr(self, "_match_change_{0}".format(tag_definition['tag'])) if (hasattr(self, "_match_change_{0}".format(tag_definition['tag']))) else None)
+		method = (getattr(self, "_change_match_{0}".format(tag_definition['tag'])) if (hasattr(self, "_change_match_{0}".format(tag_definition['tag']))) else None)
 
 		if (method != None): _return += method(data, tag_position, data_position, tag_end_position)
 		if ("type" not in tag_definition or tag_definition['type'] != "simple"): _return += data[self._find_tag_end_position(data, tag_end_position):]
@@ -100,7 +99,7 @@ Change data according to the matched tag.
 		return _return
 	#
 
-	def _match_check(self, data):
+	def _check_match(self, data):
 	#
 		"""
 Check if a possible tag match is a false positive.
@@ -123,8 +122,8 @@ Check if a possible tag match is a false positive.
 
 			if (data_match == tag):
 			#
-				method = (getattr(self, "_match_check_{0}".format(tag)) if (hasattr(self, "_match_check_{0}".format(tag))) else None)
-				if (method != None and method(data)): _return = getattr(self, "_match_get_definition_{0}".format(tag))()
+				method = (getattr(self, "_check_match_{0}".format(tag)) if (hasattr(self, "_check_match_{0}".format(tag))) else None)
+				if (method != None and method(data)): _return = getattr(self, "_get_match_definition_{0}".format(tag))()
 			#
 
 			i += 1
@@ -133,7 +132,7 @@ Check if a possible tag match is a false positive.
 		return _return
 	#
 
-	def _match_check_b(self, data):
+	def _check_match_b(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "b" tag.
@@ -144,10 +143,10 @@ Check if a possible tag match is a valid "b" tag.
 :since:  v0.1.01
 		"""
 
-		return self._match_check_simple_tag("b", data)
+		return self._check_match_simple_tag("b", data)
 	#
 
-	def _match_check_center(self, data):
+	def _check_match_center(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "center" tag.
@@ -172,7 +171,7 @@ Check if a possible tag match is a valid "center" tag.
 		return _return
 	#
 
-	def _match_check_code(self, data):
+	def _check_match_code(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "code" tag.
@@ -183,10 +182,10 @@ Check if a possible tag match is a valid "code" tag.
 :since:  v0.1.01
 		"""
 
-		return self._match_check_simple_tag("code", data)
+		return self._check_match_simple_tag("code", data)
 	#
 
-	def _match_check_color(self, data):
+	def _check_match_color(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "color" tag.
@@ -200,7 +199,7 @@ Check if a possible tag match is a valid "color" tag.
 		return (re.match("^\\[color=#[0-9a-f]{6}\\]", data) != None)
 	#
 
-	def _match_check_del(self, data):
+	def _check_match_del(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "del" tag.
@@ -211,10 +210,10 @@ Check if a possible tag match is a valid "del" tag.
 :since:  v0.1.01
 		"""
 
-		return self._match_check_simple_tag("del", data)
+		return self._check_match_simple_tag("del", data)
 	#
 
-	def _match_check_face(self, data):
+	def _check_match_face(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "b" tag.
@@ -228,7 +227,7 @@ Check if a possible tag match is a valid "b" tag.
 		return False # TODO: Implement me
 	#
 
-	def _match_check_hr(self, data):
+	def _check_match_hr(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "hr" tag.
@@ -239,10 +238,10 @@ Check if a possible tag match is a valid "hr" tag.
 :since:  v0.1.01
 		"""
 
-		return self._match_check_simple_tag("hr", data)
+		return self._check_match_simple_tag("hr", data)
 	#
 
-	def _match_check_i(self, data):
+	def _check_match_i(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "i" tag.
@@ -253,10 +252,10 @@ Check if a possible tag match is a valid "i" tag.
 :since:  v0.1.01
 		"""
 
-		return self._match_check_simple_tag("i", data)
+		return self._check_match_simple_tag("i", data)
 	#
 
-	def _match_check_img(self, data):
+	def _check_match_img(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "img" tag.
@@ -284,7 +283,7 @@ Check if a possible tag match is a valid "img" tag.
 		return _return
 	#
 
-	def _match_check_justify(self, data):
+	def _check_match_justify(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "justify" tag.
@@ -309,7 +308,7 @@ Check if a possible tag match is a valid "justify" tag.
 		return _return
 	#
 
-	def _match_check_left(self, data):
+	def _check_match_left(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "left" tag.
@@ -334,7 +333,7 @@ Check if a possible tag match is a valid "left" tag.
 		return _return
 	#
 
-	def _match_check_link(self, data):
+	def _check_match_link(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "link" tag.
@@ -356,7 +355,7 @@ Check if a possible tag match is a valid "link" tag.
 			if (data.find("[link:") == 0):
 			#
 				if ("id" in tag_params): _return = (len(tag_params['id'].strip()) > 0)
-				elif ("link" in tag_params and tag_params['link'] == "params"): _return = (len(tag_params) > 1)
+				elif (tag_params.get("link") == "params"): _return = (len(tag_params) > 1)
 				elif ("tag" in tag_params): _return = (len(tag_params['tag'].strip()) > 0)
 			#
 		#
@@ -364,7 +363,7 @@ Check if a possible tag match is a valid "link" tag.
 		return _return
 	#
 
-	def _match_check_margin(self, data):
+	def _check_match_margin(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "margin" tag.
@@ -388,7 +387,7 @@ Check if a possible tag match is a valid "margin" tag.
 		return _return
 	#
 
-	def _match_check_quote(self, data):
+	def _check_match_quote(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "quote" tag.
@@ -399,10 +398,10 @@ Check if a possible tag match is a valid "quote" tag.
 :since:  v0.1.01
 		"""
 
-		return self._match_check_simple_tag("quote", data)
+		return self._check_match_simple_tag("quote", data)
 	#
 
-	def _match_check_right(self, data):
+	def _check_match_right(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "right" tag.
@@ -427,7 +426,7 @@ Check if a possible tag match is a valid "right" tag.
 		return _return
 	#
 
-	def _match_check_s(self, data):
+	def _check_match_s(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "s" tag.
@@ -438,10 +437,10 @@ Check if a possible tag match is a valid "s" tag.
 :since:  v0.1.01
 		"""
 
-		return self._match_check_simple_tag("s", data)
+		return self._check_match_simple_tag("s", data)
 	#
 
-	def _match_check_simple_tag(self, tag, data):
+	def _check_match_simple_tag(self, tag, data):
 	#
 		"""
 Check if a possible tag matches the given expected, simple tag.
@@ -455,7 +454,7 @@ Check if a possible tag matches the given expected, simple tag.
 		return (data.find("[{0}]".format(tag)) == 0)
 	#
 
-	def _match_check_size(self, data):
+	def _check_match_size(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "size" tag.
@@ -479,7 +478,7 @@ Check if a possible tag match is a valid "size" tag.
 		return _return
 	#
 
-	def _match_check_title(self, data):
+	def _check_match_title(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "title" tag.
@@ -493,7 +492,7 @@ Check if a possible tag match is a valid "title" tag.
 		return (re.match("^\\[title(=\\d|)\\]", data) != None)
 	#
 
-	def _match_check_u(self, data):
+	def _check_match_u(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "i" tag.
@@ -504,10 +503,10 @@ Check if a possible tag match is a valid "i" tag.
 :since:  v0.1.01
 		"""
 
-		return self._match_check_simple_tag("u", data)
+		return self._check_match_simple_tag("u", data)
 	#
 
-	def _match_check_url(self, data):
+	def _check_match_url(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "url" tag.
@@ -521,7 +520,7 @@ Check if a possible tag match is a valid "url" tag.
 		return (re.match("^(\\[url=\\w+://.*\\]|\\[url\\]\\w+://.*)", data) != None)
 	#
 
-	def _match_get_definition_b(self):
+	def _get_match_definition_b(self):
 	#
 		"""
 Returns the "b" tag definition for the parser.
@@ -533,7 +532,7 @@ Returns the "b" tag definition for the parser.
 		return { "tag": "b", "tag_end": "[/b]" }
 	#
 
-	def _match_get_definition_center(self):
+	def _get_match_definition_center(self):
 	#
 		"""
 Returns the "center" tag definition for the parser.
@@ -545,7 +544,7 @@ Returns the "center" tag definition for the parser.
 		return { "tag": "center", "tag_end": "[/center]" }
 	#
 
-	def _match_get_definition_code(self):
+	def _get_match_definition_code(self):
 	#
 		"""
 Returns the "code" tag definition for the parser.
@@ -557,7 +556,7 @@ Returns the "code" tag definition for the parser.
 		return { "tag": "code", "tag_end": "[/code]", "type": "top_down" }
 	#
 
-	def _match_get_definition_color(self):
+	def _get_match_definition_color(self):
 	#
 		"""
 Returns the "color" tag definition for the parser.
@@ -569,7 +568,7 @@ Returns the "color" tag definition for the parser.
 		return { "tag": "color", "tag_end": "[/color]" }
 	#
 
-	def _match_get_definition_del(self):
+	def _get_match_definition_del(self):
 	#
 		"""
 Returns the "del" tag definition for the parser.
@@ -581,7 +580,7 @@ Returns the "del" tag definition for the parser.
 		return { "tag": "del", "tag_end": "[/del]" }
 	#
 
-	def _match_get_definition_face(self):
+	def _get_match_definition_face(self):
 	#
 		"""
 Returns the "face" tag definition for the parser.
@@ -593,7 +592,7 @@ Returns the "face" tag definition for the parser.
 		return { "tag": "face", "tag_end": "[/face]" }
 	#
 
-	def _match_get_definition_hr(self):
+	def _get_match_definition_hr(self):
 	#
 		"""
 Returns the "hr" tag definition for the parser.
@@ -605,7 +604,7 @@ Returns the "hr" tag definition for the parser.
 		return { "tag": "hr", "type": "simple" }
 	#
 
-	def _match_get_definition_i(self):
+	def _get_match_definition_i(self):
 	#
 		"""
 Returns the "i" tag definition for the parser.
@@ -617,7 +616,7 @@ Returns the "i" tag definition for the parser.
 		return { "tag": "i", "tag_end": "[/i]" }
 	#
 
-	def _match_get_definition_img(self):
+	def _get_match_definition_img(self):
 	#
 		"""
 Returns the "img" tag definition for the parser.
@@ -629,7 +628,7 @@ Returns the "img" tag definition for the parser.
 		return { "tag": "img", "tag_end": "[/img]" }
 	#
 
-	def _match_get_definition_justify(self):
+	def _get_match_definition_justify(self):
 	#
 		"""
 Returns the "justify" tag definition for the parser.
@@ -641,7 +640,7 @@ Returns the "justify" tag definition for the parser.
 		return { "tag": "justify", "tag_end": "[/justify]" }
 	#
 
-	def _match_get_definition_left(self):
+	def _get_match_definition_left(self):
 	#
 		"""
 Returns the "left" tag definition for the parser.
@@ -653,7 +652,7 @@ Returns the "left" tag definition for the parser.
 		return { "tag": "left", "tag_end": "[/left]" }
 	#
 
-	def _match_get_definition_link(self):
+	def _get_match_definition_link(self):
 	#
 		"""
 Returns the "link" tag definition for the parser.
@@ -665,7 +664,7 @@ Returns the "link" tag definition for the parser.
 		return { "tag": "link", "tag_end": "[/link]" }
 	#
 
-	def _match_get_definition_quote(self):
+	def _get_match_definition_quote(self):
 	#
 		"""
 Returns the "quote" tag definition for the parser.
@@ -677,7 +676,7 @@ Returns the "quote" tag definition for the parser.
 		return { "tag": "quote", "tag_end": "[/quote]" }
 	#
 
-	def _match_get_definition_margin(self):
+	def _get_match_definition_margin(self):
 	#
 		"""
 Returns the "quote" tag definition for the parser.
@@ -689,7 +688,7 @@ Returns the "quote" tag definition for the parser.
 		return { "tag": "margin", "tag_end": "[/margin]" }
 	#
 
-	def _match_get_definition_right(self):
+	def _get_match_definition_right(self):
 	#
 		"""
 Returns the "right" tag definition for the parser.
@@ -701,7 +700,7 @@ Returns the "right" tag definition for the parser.
 		return { "tag": "right", "tag_end": "[/right]" }
 	#
 
-	def _match_get_definition_s(self):
+	def _get_match_definition_s(self):
 	#
 		"""
 Returns the "s" tag definition for the parser.
@@ -713,7 +712,7 @@ Returns the "s" tag definition for the parser.
 		return { "tag": "s", "tag_end": "[/s]" }
 	#
 
-	def _match_get_definition_size(self):
+	def _get_match_definition_size(self):
 	#
 		"""
 Returns the "size" tag definition for the parser.
@@ -725,7 +724,7 @@ Returns the "size" tag definition for the parser.
 		return { "tag": "size", "tag_end": "[/size]" }
 	#
 
-	def _match_get_definition_title(self):
+	def _get_match_definition_title(self):
 	#
 		"""
 Returns the "title" tag definition for the parser.
@@ -737,7 +736,7 @@ Returns the "title" tag definition for the parser.
 		return { "tag": "title", "tag_end": "[/title]" }
 	#
 
-	def _match_get_definition_u(self):
+	def _get_match_definition_u(self):
 	#
 		"""
 Returns the "u" tag definition for the parser.
@@ -749,7 +748,7 @@ Returns the "u" tag definition for the parser.
 		return { "tag": "u", "tag_end": "[/u]" }
 	#
 
-	def _match_get_definition_url(self):
+	def _get_match_definition_url(self):
 	#
 		"""
 Returns the "url" tag definition for the parser.

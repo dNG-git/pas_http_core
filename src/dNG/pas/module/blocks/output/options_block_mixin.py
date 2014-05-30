@@ -46,7 +46,7 @@ description and optional image.
              Mozilla Public License, v. 2.0
 	"""
 
-	def options_block_render_link(self, data, include_image = True):
+	def render_options_block_link(self, data, include_image = True):
 	#
 		"""
 Renders a link.
@@ -77,9 +77,19 @@ Renders a link.
 			l10n_title_id = "title_{0}".format(self.request.get_lang())
 			title = (data[l10n_title_id] if (l10n_title_id in data) else data['title'])
 
-			if (include_image and "image" in data): _return += "{0}".format(xml_parser.dict_to_xml_item_encoder({ "tag": "img", "attributes": {
-				"src": "{0}/themes/{1}/{2}.png".format(Settings.get("http_path_mmedia_versioned"), self.response.get_theme(), data['image']) }, "alt": title
-			}, strict_standard = False))
+			if (include_image and "image" in data):
+			#
+				img_attributes = { "tag": "img",
+				                   "attributes": { "src": "{0}/themes/{1}/{2}.png".format(Settings.get("http_path_mmedia_versioned"),
+				                                                                          self.response.get_theme_active(),
+				                                                                          data['image']
+				                                                                         )
+				                                 },
+				                   "alt": title
+				                 }
+
+				_return += "{0}".format(xml_parser.dict_to_xml_item_encoder(img_attributes, strict_standard_mode = False))
+			#
 
 			_return += "{0}".format(XHtmlFormatting.escape(title))
 
@@ -90,13 +100,13 @@ Renders a link.
 
 			if (is_js_required):
 			#
-				_return += (
-"""</span><script type="text/javascript"><![CDATA[
+				_return += """
+</span><script type="text/javascript"><![CDATA[
 require([ "djs/uiX.min" ], function(uiX) {{
 	uiX.show_link_if_js_supported("{0}");
 }});
-]]></script>""".format(link_id)
-				)
+]]></script>
+				""".format(link_id).strip()
 			#
 			else: _return += "</a>"
 		#

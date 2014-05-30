@@ -99,8 +99,8 @@ Get all form data in a string like "<input type='hidden' name='lang'
 value='de' />". Automatically add language, theme and uuid fields.
 			"""
 
-			parameters = self._parameters_filter(parameters)
-			parameters = self._parameters_append_defaults(parameters)
+			parameters = self._filter_parameters(parameters)
+			parameters = self._add_default_parameters(parameters)
 
 			#if (/*#ifndef(PHP4) */stripos/* #*//*#ifdef(PHP4):stristr:#*/($f_data,"lang=") === false) { $f_return .= "<input type='hidden' name='lang' value='$direct_settings[lang]' />"; }
 			#if (/*#ifndef(PHP4) */stripos/* #*//*#ifdef(PHP4):stristr:#*/($f_data,"theme=") === false) { $f_return .= "<input type='hidden' name='theme' value='$direct_settings[theme]' />"; }
@@ -122,14 +122,13 @@ value='de' />". Automatically add language, theme and uuid fields.
 		elif (_type & Link.TYPE_QUERY_STRING == Link.TYPE_QUERY_STRING):
 		#
 			if (_type == Link.TYPE_FORM_URL): _type = Link.TYPE_RELATIVE
-			parameters = self._parameters_filter(parameters)
-			parameters = self._parameters_append_defaults(parameters)
+			parameters = self._filter_parameters(parameters)
+			parameters = self._add_default_parameters(parameters)
 
-			_return = (
-				self._build_url_formatted("{0}={1}", ";", parameters)
-				if (len(parameters) > 0) else
-				""
-			)
+			_return = (self._build_url_formatted("{0}={1}", ";", parameters)
+			           if (len(parameters) > 0) else
+			           ""
+			          )
 		#
 		else: _return = _Link.build_url(self, _type, parameters)
 
@@ -138,7 +137,7 @@ value='de' />". Automatically add language, theme and uuid fields.
 		return _return
 	#
 
-	def _parameters_append_defaults(self, parameters):
+	def _add_default_parameters(self, parameters):
 	#
 		"""
 This method appends default parameters if not already set.
@@ -149,7 +148,7 @@ This method appends default parameters if not already set.
 :since:  v0.1.00
 		"""
 
-		_return = _Link._parameters_append_defaults(self, parameters)
+		_return = _Link._add_default_parameters(self, parameters)
 
 		if ("theme" not in _return):
 		#
@@ -189,6 +188,21 @@ Builds a sorted list for the parameter key list given.
 	#
 
 	@staticmethod
+	def clear_store(set_name):
+	#
+		"""
+Removes all links defined for the given set name.
+
+:param set_name: Link set name
+
+:since: v0.1.01
+		"""
+
+		store = AbstractResponse.get_instance_store()
+		if (store != None and set_name in store.get("dNG.pas.data.text.url.links", { })): del(store['dNG.pas.data.text.url.links'][set_name])
+	#
+
+	@staticmethod
 	def escape(data):
 	#
 		"""
@@ -201,6 +215,23 @@ Escape the given data for embedding into (X)HTML.
 		"""
 
 		return XhtmlFormatting.escape(data)
+	#
+
+	@staticmethod
+	def get_store(set_name):
+	#
+		"""
+Returns all links defined for the given set name.
+
+:param set_name: Link set name
+
+:since: v0.1.01
+		"""
+
+		store = AbstractResponse.get_instance_store()
+
+		if (store != None and set_name in store.get("dNG.pas.data.text.url.links", { })): return store['dNG.pas.data.text.url.links'][set_name]
+		else: return [ ]
 	#
 
 	@staticmethod
@@ -224,39 +255,7 @@ Parses the given type parameter given as a string value.
 	#
 
 	@staticmethod
-	def store_clear(set_name):
-	#
-		"""
-Removes all links defined for the given set name.
-
-:param set_name: Link set name
-
-:since: v0.1.01
-		"""
-
-		store = AbstractResponse.get_instance_store()
-		if (store != None and "dNG.pas.data.text.url.links" in store and set_name in store['dNG.pas.data.text.url.links']): del(store['dNG.pas.data.text.url.links'][set_name])
-	#
-
-	@staticmethod
-	def store_get(set_name):
-	#
-		"""
-Returns all links defined for the given set name.
-
-:param set_name: Link set name
-
-:since: v0.1.01
-		"""
-
-		store = AbstractResponse.get_instance_store()
-
-		if (store != None and "dNG.pas.data.text.url.links" in store and set_name in store['dNG.pas.data.text.url.links']): return store['dNG.pas.data.text.url.links'][set_name]
-		else: return [ ]
-	#
-
-	@staticmethod
-	def store_set(set_name, _type, title, parameters = None, **kwargs):
+	def set_store(set_name, _type, title, parameters = None, **kwargs):
 	#
 		"""
 Adds a link to the given set name.
@@ -277,7 +276,7 @@ Adds a link to the given set name.
 			if ("dNG.pas.data.text.url.links" not in store): store['dNG.pas.data.text.url.links'] = { }
 			store = store['dNG.pas.data.text.url.links']
 
-			priority = (kwargs['priority'] if ("priority" in kwargs) else 5)
+			priority = kwargs.get("priority", 5)
 
 			link = { "title": title, "type": _type, "parameters": parameters, "priority": priority }
 			link.update(kwargs)

@@ -26,7 +26,7 @@ NOTE_END //n"""
 from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
 from dNG.pas.controller.predefined_http_request import PredefinedHttpRequest
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.http.translatable_exception import TranslatableException
+from dNG.pas.data.http.translatable_error import TranslatableError
 from .module import Module
 
 class Index(Module):
@@ -51,29 +51,31 @@ Action for "index"
 :since: v0.1.00
 		"""
 
-		default_page_settings = Settings.get("pas_http_site_page_default_{0}".format(self.request.get_lang()))
-		if (default_page_settings == None): default_page_settings = Settings.get("pas_http_site_page_default")
+		default_page_settings = Settings.get_lang_associated("pas_http_site_page_default", self.request.get_lang())
 
-		if (type(default_page_settings) == dict and ("module" in default_page_settings or "service" in default_page_settings or "action" in default_page_settings)):
+		if (type(default_page_settings) != dict
+		    or ("module" not in default_page_settings
+		        and "service" not in default_page_settings
+		        and "action" not in default_page_settings
+		       )
+		   ): raise TranslatableError("pas_http_core_site_unconfigured", 404)
+
+		redirect_request = PredefinedHttpRequest()
+		if ("module" in default_page_settings): redirect_request.set_module(default_page_settings['module'])
+		if ("service" in default_page_settings): redirect_request.set_module(default_page_settings['service'])
+		if ("action" in default_page_settings): redirect_request.set_module(default_page_settings['action'])
+
+		if ("dsd" in default_page_settings):
 		#
-			redirect_request = PredefinedHttpRequest()
-			if ("module" in default_page_settings): redirect_request.set_module(default_page_settings['module'])
-			if ("service" in default_page_settings): redirect_request.set_module(default_page_settings['service'])
-			if ("action" in default_page_settings): redirect_request.set_module(default_page_settings['action'])
+			dsd = (default_page_settings['dsd'] if (type(default_page_settings['dsd']) == dict) else AbstractHttpRequest.parse_dsd(default_page_settings['dsd']))
 
-			if ("dsd" in default_page_settings):
+			if (type(dsd) == dict):
 			#
-				dsd = (default_page_settings['dsd'] if (type(default_page_settings['dsd']) == dict) else AbstractHttpRequest.parse_dsd(default_page_settings['dsd']))
-
-				if (type(dsd) == dict):
-				#
-					for key in dsd: redirect_request.set_dsd(key, dsd[key])
-				#
+				for key in dsd: redirect_request.set_dsd(key, dsd[key])
 			#
-
-			self.request.redirect(redirect_request)
 		#
-		else: raise TranslatableException("pas_http_core_site_unconfigured", 404)
+
+		self.request.redirect(redirect_request)
 	#
 #
 

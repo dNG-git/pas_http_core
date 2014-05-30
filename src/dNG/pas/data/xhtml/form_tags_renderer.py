@@ -72,9 +72,13 @@ True if block level elements are allowed.
 		"""
 True if (X)HTML content is allowed.
 		"""
+		self.xhtml_title_top_level = 1
+		"""
+First level available for [title].
+		"""
 	#
 
-	def _match_change_b(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_b(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "b" tag.
@@ -93,7 +97,7 @@ Change data according to the "b" tag.
 		return ("<b>{0}</b>".format(enclosed_data) if (len(enclosed_data) > 0) else "")
 	#
 
-	def _match_change_center(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_center(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "center" tag.
@@ -121,7 +125,7 @@ Change data according to the "center" tag.
 		return _return
 	#
 
-	def _match_change_code(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_code(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "code" tag.
@@ -148,7 +152,7 @@ Change data according to the "code" tag.
 		return _return
 	#
 
-	def _match_change_color(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_color(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "color" tag.
@@ -173,7 +177,7 @@ Change data according to the "color" tag.
 		return _return
 	#
 
-	def _match_change_del(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_del(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "del" tag.
@@ -192,7 +196,7 @@ Change data according to the "del" tag.
 		return ("<del>{0}</del>".format(enclosed_data) if (len(enclosed_data) > 0) else "")
 	#
 
-	def _match_change_i(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_i(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "i" tag.
@@ -211,7 +215,7 @@ Change data according to the "i" tag.
 		return ("<i>{0}</i>".format(enclosed_data) if (len(enclosed_data) > 0) else "")
 	#
 
-	def _match_change_img(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_img(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "img" tag.
@@ -232,9 +236,9 @@ Change data according to the "img" tag.
 
 		if (len(url) > 0):
 		#
-			tag_params = FormTagsRenderer.parse_tag_parameters("img", data, tag_position, data_position)
+			url = Formatting.escape(url)
 
-			if (len(_return) < 1): url = Formatting.escape(url)
+			tag_params = FormTagsRenderer.parse_tag_parameters("img", data, tag_position, data_position)
 			title = (Formatting.escape(tag_params['title']) if ("title" in tag_params) else url)
 
 			_return = '<img href="{0}" title="{1}" />'.format(Formatting.escape(url), title)
@@ -243,7 +247,7 @@ Change data according to the "img" tag.
 		return _return
 	#
 
-	def _match_change_justify(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_justify(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "justify" tag.
@@ -271,7 +275,7 @@ Change data according to the "justify" tag.
 		return _return
 	#
 
-	def _match_change_left(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_left(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "left" tag.
@@ -299,7 +303,7 @@ Change data according to the "left" tag.
 		return _return
 	#
 
-	def _match_change_link(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_link(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "link" tag.
@@ -328,7 +332,7 @@ Change data according to the "link" tag.
 		return _return
 	#
 
-	def _match_change_margin(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_margin(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "margin" tag.
@@ -354,7 +358,7 @@ Change data according to the "margin" tag.
 		return _return
 	#
 
-	def _match_change_nobr(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_nobr(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "nobr" tag.
@@ -372,7 +376,7 @@ Change data according to the "nobr" tag.
 		return (data[12 + tag_position:] if (data[6 + tag_position:13 + tag_position] == "<br />\n") else data[6 + tag_position:])
 	#
 
-	def _match_change_right(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_right(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "right" tag.
@@ -400,7 +404,7 @@ Change data according to the "right" tag.
 		return _return
 	#
 
-	def _match_change_s(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_s(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "s" tag.
@@ -419,7 +423,7 @@ Change data according to the "s" tag.
 		return ("<span style='text-decoration: line-through'>{0}</span>".format(enclosed_data) if (len(enclosed_data) > 0) else "")
 	#
 
-	def _match_change_size(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_size(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "size" tag.
@@ -445,7 +449,7 @@ Change data according to the "size" tag.
 		return _return
 	#
 
-	def _match_change_title(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_title(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "title" tag.
@@ -464,14 +468,28 @@ Change data according to the "title" tag.
 
 		if (len(_return) > 0):
 		#
-			subtitle_level = 2
+			re_result = re.match("^\\[title=(\\d+)\\]", data[tag_position:data_position])
+			subtitle_level = self.xhtml_title_top_level
+
+			if (re_result != None):
+			#
+				try:
+				#
+					sublevel = int(re_result.group(1))
+					if (sublevel > 0): subtitle_level += sublevel
+				#
+				except ValueError: pass
+			#
+
+			if (subtitle_level > 6): subtitle_level = 6
+
 			_return = "<h{0:d}>{1}</h{0:d}>[nobr]".format(subtitle_level, _return)
 		#
 
 		return _return
 	#
 
-	def _match_change_u(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_u(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "u" tag.
@@ -490,7 +508,7 @@ Change data according to the "u" tag.
 		return ("<u>{0}</u>".format(enclosed_data) if (len(enclosed_data) > 0) else "")
 	#
 
-	def _match_change_url(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_url(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "url" tag.
@@ -527,7 +545,7 @@ Change data according to the "url" tag.
 		return _return
 	#
 
-	def _match_check_nobr(self, data):
+	def _check_match_nobr(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "nobr" tag.
@@ -538,10 +556,10 @@ Check if a possible tag match is a valid "nobr" tag.
 :since:  v0.1.01
 		"""
 
-		return self._match_check_simple_tag("nobr", data)
+		return self._check_match_simple_tag("nobr", data)
 	#
 
-	def _match_get_definition_nobr(self):
+	def _get_match_definition_nobr(self):
 	#
 		"""
 Returns the "nobr" tag definition for the parser.
@@ -608,6 +626,19 @@ Sets if (X)HTML encoding is allowed.
 		"""
 
 		self.is_xhtml_allowed = allowed
+	#
+
+	def set_xhtml_title_top_level(self, level):
+	#
+		"""
+Sets the first level available for [title].
+
+:param level: First level available
+
+:since: v0.1.01
+		"""
+
+		self.xhtml_title_top_level = level
 	#
 #
 

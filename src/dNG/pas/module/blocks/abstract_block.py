@@ -27,7 +27,7 @@ import re
 
 from dNG.pas.controller.abstract_request import AbstractRequest
 from dNG.pas.controller.abstract_response import AbstractResponse
-from dNG.pas.data.translatable_exception import TranslatableException
+from dNG.pas.data.http.translatable_exception import TranslatableException
 
 class AbstractBlock(object):
 #
@@ -128,7 +128,7 @@ Execute the requested action.
 		else:
 		#
 			if (self.primary_action and self.response.is_supported("headers")): self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
-			raise TranslatableException("core_unsupported_command", "Identified action '{0}' is not supported".format(self.action))
+			raise TranslatableException("core_unsupported_command", value = "Identified action '{0}' is not supported".format(self.action))
 		#
 
 		return ("" if (self.action_result == None) else self.action_result)

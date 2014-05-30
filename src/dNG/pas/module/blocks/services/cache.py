@@ -115,17 +115,17 @@ Action for "index"
 
 		if (is_valid and is_modified):
 		#
-			if (is_last_modified_supported):
-			#
-				if (last_modified_on_server < 1): last_modified_on_server = int(os.stat(file_pathname).st_mtime)
-				self.response.set_last_modified(last_modified_on_server)
-			#
-
 			re_tsc_result = re.search("\\.tsc\\.(css|js|svg)$", file_pathname, re.I)
 			re_result = (re.search("\\.(css|gif|jar|jpg|jpeg|js|png|svg|swf)$", file_pathname, re.I) if (re_tsc_result == None) else None)
 
 			self.response.set_content_dynamic(re_tsc_result != None)
 			self.response.init(True)
+
+			if (is_last_modified_supported):
+			#
+				if (last_modified_on_server < 1): last_modified_on_server = int(os.stat(file_pathname).st_mtime)
+				self.response.set_last_modified(last_modified_on_server)
+			#
 
 			if (re_tsc_result != None):
 			#

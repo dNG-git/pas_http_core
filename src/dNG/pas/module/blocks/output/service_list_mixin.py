@@ -41,7 +41,7 @@ The "ServiceListMixin" provides a standardized list of services view.
              Mozilla Public License, v. 2.0
 	"""
 
-	def _service_list_get_rendered_links(self, links):
+	def _get_rendered_service_list_links(self, links):
 	#
 		"""
 Returns a list of rendered links for the service menu.
@@ -55,13 +55,13 @@ Returns a list of rendered links for the service menu.
 		if (links != None):
 		#
 			links = self._filter_links(links)
-			for link in links: _return.append(self.options_block_render_link(link))
+			for link in links: _return.append(self.render_options_block_link(link))
 		#
 
 		return _return
 	#
 
-	def service_list_render_file(self, file_pathname):
+	def render_service_list_file(self, file_pathname):
 	#
 		"""
 Action for "render"
@@ -75,7 +75,7 @@ Action for "render"
 
 		if (type(json_data) == list):
 		#
-			rendered_links = self._service_list_get_rendered_links(json_data)
+			rendered_links = self._get_rendered_service_list_links(json_data)
 			if (len(rendered_links) > 0): _return = "<nav class='pageoptionsblock pageservicelist'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links))
 		#
 

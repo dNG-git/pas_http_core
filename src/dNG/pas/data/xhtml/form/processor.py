@@ -57,7 +57,7 @@ Returns all defined fields.
 		#
 			for field_data in section['fields']:
 			#
-				if (field_data['error'] != None): field_data['error'] = self._error_get_message(field_data['error'])
+				if (field_data['error'] != None): field_data['error'] = self._get_error_message(field_data['error'])
 			#
 		#
 

@@ -52,9 +52,9 @@ td:last-child, th:last-child { border-right: none }
 .designpage > *:last-child { margin-bottom: 0.5% }
 
 .designtitle { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 3em; font-weight: bold }
-.designtitle:before, .designtitle:after { position: absolute; top: 100%; width: 0; height: 0; border: 2px solid transparent; content: " " }
-.designtitle:before { left: 50%; margin-top: -9px; margin-left: -10px; border: 2px solid transparent; border-bottom-color: #375a9d; border-width: 10px }
-.designtitle:after { left: 50%; margin-top: -7px; margin-left: -9px; border: 2px solid transparent; border-bottom-color: #ffffff; border-width: 9px }
+.designtitle:before, .designtitle:after { position: absolute; top: 100%; content: " " }
+.designtitle:before { left: 50%; margin-top: -8px; margin-left: -9px; border: 9px solid transparent; border-bottom-color: #375a9d }
+.designtitle:after { left: 50%; margin-top: -7px; margin-left: -9px; border: 9px solid transparent; border-bottom-color: #ffffff }
 ]]></style>
 [each:content:css_files:file]
 <link href="[rewrite:settings]http_path_mmedia_versioned[/rewrite]/[rewrite:content]css_files.file.name[/rewrite]" rel="stylesheet" type="text/css" />

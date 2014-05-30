@@ -41,7 +41,7 @@ The OSet parser takes a template string to render the output.
              Mozilla Public License, v. 2.0
 	"""
 
-	def _match_change_center(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_center(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "center" tag.
@@ -71,7 +71,7 @@ Change data according to the "center" tag.
 		return _return
 	#
 
-	def _match_change_hr(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_hr(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "hr" tag.
@@ -99,7 +99,7 @@ Change data according to the "hr" tag.
 		return _return
 	#
 
-	def _match_change_justify(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_justify(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "justify" tag.
@@ -129,7 +129,7 @@ Change data according to the "justify" tag.
 		return _return
 	#
 
-	def _match_change_left(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_left(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "left" tag.
@@ -159,7 +159,7 @@ Change data according to the "left" tag.
 		return _return
 	#
 
-	def _match_change_margin(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_margin(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "margin" tag.
@@ -189,7 +189,7 @@ Change data according to the "margin" tag.
 		return _return
 	#
 
-	def _match_change_right(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_right(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "right" tag.
@@ -219,7 +219,7 @@ Change data according to the "right" tag.
 		return _return
 	#
 
-	def _match_change_size(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_size(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
 Change data according to the "size" tag.
@@ -249,7 +249,7 @@ Change data according to the "size" tag.
 		return _return
 	#
 
-	def _match_check_b(self, data):
+	def _check_match_b(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "b" tag that needs to be changed.
@@ -263,7 +263,7 @@ Check if a possible tag match is a valid "b" tag that needs to be changed.
 		return False
 	#
 
-	def _match_check_center(self, data):
+	def _check_match_center(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "center" tag that needs to be
@@ -278,7 +278,7 @@ changed.
 		return (re.match("^\\[center\\:box=(\\d+)\\]", data) != None)
 	#
 
-	def _match_check_color(self, data):
+	def _check_match_color(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "color" tag that needs to be
@@ -293,7 +293,7 @@ changed.
 		return False
 	#
 
-	def _match_check_code(self, data):
+	def _check_match_code(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "code" tag that needs to be
@@ -308,7 +308,7 @@ changed.
 		return False
 	#
 
-	def _match_check_del(self, data):
+	def _check_match_del(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "del" tag that needs to be changed.
@@ -322,7 +322,7 @@ Check if a possible tag match is a valid "del" tag that needs to be changed.
 		return False
 	#
 
-	def _match_check_face(self, data):
+	def _check_match_face(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "face" tag that needs to be
@@ -337,7 +337,7 @@ changed.
 		return False
 	#
 
-	def _match_check_hr(self, data):
+	def _check_match_hr(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "hr" tag that needs to be changed.
@@ -351,7 +351,7 @@ Check if a possible tag match is a valid "hr" tag that needs to be changed.
 		return (re.match("^\\[hr=(\\d+)\\]", data) != None)
 	#
 
-	def _match_check_i(self, data):
+	def _check_match_i(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "i" tag that needs to be changed.
@@ -365,7 +365,7 @@ Check if a possible tag match is a valid "i" tag that needs to be changed.
 		return False
 	#
 
-	def _match_check_img(self, data):
+	def _check_match_img(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "img" tag that needs to be changed.
@@ -379,7 +379,7 @@ Check if a possible tag match is a valid "img" tag that needs to be changed.
 		return False
 	#
 
-	def _match_check_justify(self, data):
+	def _check_match_justify(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "justify" tag that needs to be
@@ -394,7 +394,7 @@ changed.
 		return (re.match("^\\[justify\\:box=(\\d+)\\]", data) != None)
 	#
 
-	def _match_check_left(self, data):
+	def _check_match_left(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "left" tag that needs to be
@@ -409,7 +409,7 @@ changed.
 		return (re.match("^\\[left\\:box=(\\d+)\\]", data) != None)
 	#
 
-	def _match_check_link(self, data):
+	def _check_match_link(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "link" tag that needs to be
@@ -424,7 +424,7 @@ changed.
 		return False
 	#
 
-	def _match_check_margin(self, data):
+	def _check_match_margin(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "margin" tag that needs to be
@@ -439,7 +439,7 @@ changed.
 		return (re.match("^\\[margin=(\\d+)\\]", data) != None)
 	#
 
-	def _match_check_quote(self, data):
+	def _check_match_quote(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "quote" tag that needs to be
@@ -454,7 +454,7 @@ changed.
 		return False
 	#
 
-	def _match_check_right(self, data):
+	def _check_match_right(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "right" tag that needs to be
@@ -469,7 +469,7 @@ changed.
 		return (re.match("^\\[right\\:box=(\\d+)\\]", data) != None)
 	#
 
-	def _match_check_s(self, data):
+	def _check_match_s(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "s" tag that needs to be changed.
@@ -483,7 +483,7 @@ Check if a possible tag match is a valid "s" tag that needs to be changed.
 		return False
 	#
 
-	def _match_check_size(self, data):
+	def _check_match_size(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "size" tag that needs to be
@@ -498,7 +498,7 @@ changed.
 		return (re.match("^\\[size=(\\d+)\\]", data) != None)
 	#
 
-	def _match_check_title(self, data):
+	def _check_match_title(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "title" tag that needs to be
@@ -513,7 +513,7 @@ changed.
 		return False
 	#
 
-	def _match_check_u(self, data):
+	def _check_match_u(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "u" tag that needs to be changed.
@@ -527,7 +527,7 @@ Check if a possible tag match is a valid "u" tag that needs to be changed.
 		return False
 	#
 
-	def _match_check_url(self, data):
+	def _check_match_url(self, data):
 	#
 		"""
 Check if a possible tag match is a valid "url" tag that needs to be

@@ -27,14 +27,14 @@ from threading import Event
 from time import time
 from zlib import decompressobj, MAX_WBITS
 
-from dNG.pas.data.binary import Binary
+from dNG.net.http.chunked_reader_mixin import ChunkedReaderMixin
 from dNG.pas.data.byte_buffer import ByteBuffer
 from dNG.pas.data.settings import Settings
 from dNG.pas.runtime.thread import Thread
 from dNG.pas.runtime.io_exception import IOException
 from dNG.pas.runtime.value_exception import ValueException
 
-class RequestBody(dict, Thread):
+class RequestBody(dict, ChunkedReaderMixin, Thread):
 #
 	"""
 The class "RequestBody" implements method to read the request body.
@@ -59,6 +59,7 @@ Constructor __init__(RequestBody)
 		"""
 
 		dict.__init__(self)
+		ChunkedReaderMixin.__init__(self)
 		if (receive_in_thread): Thread.__init__(self)
 
 		self.decompressors = None
@@ -68,10 +69,6 @@ List of decompressors
 		self.input_chunk_encoded = False
 		"""
 True if the input is "chunked" encoded (and the size is unknown).
-		"""
-		self.input_data = None
-		"""
-Received file-like data object
 		"""
 		self.input_ptr = None
 		"""
@@ -84,6 +81,14 @@ Input size in bytes if known.
 		self.receive_in_thread = receive_in_thread
 		"""
 True if reading should happen in a separate thread.
+		"""
+		self.received_data = None
+		"""
+Received file-like data object
+		"""
+		self.received_data_size = 0
+		"""
+Size of the file-like data object
 		"""
 		self.received_event = Event()
 		"""
@@ -104,6 +109,26 @@ Absolute timeout to receive the request body.
 
 		if (self.socket_data_timeout < 1): self.socket_data_timeout = int(Settings.get("pas_global_socket_data_timeout", 30))
 		self.received_event.set()
+	#
+
+	def _append_received_data(self, data):
+	#
+		"""
+Handles data received.
+
+:param data: Data read from input
+
+:since: v0.1.01
+		"""
+
+		if (data == None): data = self.decompress(None)
+
+		if (data != None):
+		#
+			self.received_data_size += len(data)
+			if (self.received_size_max > 0 and self.received_data_size > self.received_size_max): raise ValueException("Input size exceeds allowed limit")
+			self.received_data.write(data)
+		#
 	#
 
 	def decompress(self, data):
@@ -179,9 +204,9 @@ Returns the request body.
 		if (self.input_ptr != None and (not self.receive_in_thread)): self.run(timeout)
 
 		if (not self.received_event.wait(timeout)): raise IOException("Input pointer could not be read before timeout occurred")
-		if (isinstance(self.input_data, Exception)): raise self.input_data
+		if (isinstance(self.received_data, Exception)): raise self.received_data
 
-		return self.input_data
+		return self.received_data
 	#
 
 	def run(self, timeout = None):
@@ -194,108 +219,40 @@ Sets a given pointer for the streamed post instance.
 
 		# pylint: disable=broad-except
 
+		if (timeout == None): timeout = self.timeout
+
+		self.received_data = ByteBuffer()
+		self.received_data_size = 0
+
 		try:
 		#
-			binary_newline = Binary.bytes("\r\n")
-			chunk_buffer = None
-			chunk_size = 0
-			input_data = ByteBuffer()
-			is_last_chunk = False
-			if (self.input_size < 0): self.input_size = 5
-			size_read = 0
-			size_read_max = self.received_size_max
-			size_unread = self.input_size
-			timeout_time = time() + (self.timeout if (timeout == None) else timeout)
-
-			while (size_unread > 0 and time() < timeout_time):
+			if (self.input_chunk_encoded): self._read_chunked_data(self.input_ptr.read, self._append_received_data,timeout = timeout)
+			else:
 			#
-				part_size = (4096 if (size_unread > 4096) else size_unread)
-				part_data = self.input_ptr.read(part_size)
-				part_size = len(part_data)
+				timeout_time = time() + timeout
+				size_unread = self.input_size
 
-				if (part_size < 1): raise IOException("Input pointer could not be read before socket timeout occurred")
-
-				if (self.input_chunk_encoded):
+				while (size_unread > 0 and time() < timeout_time):
 				#
-					"""
-Read remaining data from last chunk
-					"""
+					part_size = (4096 if (size_unread > 4096) else size_unread)
+					part_data = self.input_ptr.read(part_size)
+					part_size = len(part_data)
 
-					if (chunk_size > 0):
+					if (part_size < 1): raise IOException("Input pointer could not be read before socket timeout occurred")
+
+					if (part_size > 0):
 					#
-						chunk_size = (0 if (part_size >= chunk_size) else chunk_size - part_size)
-						input_data.write(self.decompress(part_data[:part_size]))
-
-						part_data = part_data[part_size:]
+						size_unread -= part_size
+						self._append_received_data(part_data)
 					#
-
-					"""
-Get size for next chunk
-					"""
-
-					if (chunk_size < 1):
-					#
-						if (chunk_buffer == None): newline_position = part_data.find(binary_newline)
-						else: newline_position = (chunk_buffer + part_data).find(binary_newline)
-
-						chunk_octets = None
-
-						if (newline_position < 0):
-						#
-							if (chunk_buffer == None): chunk_buffer = part_data
-							else: chunk_buffer += part_data
-
-							part_size = 0
-							self.input_size += 3
-						#
-						elif (chunk_buffer != None):
-						#
-							chunk_octets = (chunk_buffer + part_data)[:newline_position]
-							part_data = (chunk_buffer + part_data)[2 + newline_position:]
-							part_size = len(part_data)
-
-							chunk_buffer = None
-						#
-						elif (not is_last_chunk):
-						#
-							chunk_octets = part_data[:newline_position]
-							part_data = part_data[2 + newline_position:]
-
-							part_size = len(part_data)
-						#
-						else: part_size = 0
-
-						if (chunk_octets != None):
-						#
-							chunk_size = int(chunk_octets, 16)
-
-							if (chunk_size == 0): is_last_chunk = True
-							else:
-							#
-								self.input_size += chunk_size
-								size_unread += chunk_size
-							#
-						#
-					#
-				#
-
-				if (part_size > 0):
-				#
-					size_read += part_size
-					size_unread -= part_size
-
-					if (size_read_max > 0 and size_read >= size_read_max): raise ValueException("Input size exceeds allowed limit")
-					input_data.write(self.decompress(part_data))
 				#
 			#
+
+			self._append_received_data(None)
+			self.received_data.seek(0)
 		#
-		except Exception as handled_exception: self.input_data = handled_exception
+		except Exception as handled_exception: self.received_data = handled_exception
 
-		part_data = self.decompress(None)
-		if (part_data != None): input_data.write(part_data)
-		input_data.seek(0)
-
-		self.input_data = input_data
 		self.input_ptr = None
 
 		self.received_event.set()
@@ -310,7 +267,7 @@ used to read the body it is started here as well.
 :since: v0.1.00
 		"""
 
-		if (self.input_size < 0 and (not self.input_chunk_encoded)): self.input_data = IOException("Input size and expected first chunk size are unknown")
+		if (self.input_size < 0 and (not self.input_chunk_encoded)): self.received_data = IOException("Input size and expected first chunk size are unknown")
 		else:
 		#
 			if (hasattr(input_ptr, "settimeout")): input_ptr.settimeout(self.socket_data_timeout)

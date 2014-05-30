@@ -63,12 +63,11 @@ Renders a notification.
 			elif (data['type'] == NotificationStore.TYPE_ERROR): css_class = "pagenotification_error"
 			elif (data['type'] == NotificationStore.TYPE_INFO): css_class = "pagenotification_info"
 
-			content = {
-				"css_class": css_class,
-				"id": "pas_notification_{0}".format(Binary.str(hexlify(urandom(10)))),
-				"type": NotificationStore.get_type_string(data['type']),
-				"message": FormTags.render(data['message'], block_encoding_supported = False),
-			}
+			content = { "css_class": css_class,
+			            "id": "pas_notification_{0}".format(Binary.str(hexlify(urandom(10)))),
+			            "type": NotificationStore.get_type_string(data['type']),
+			            "message": FormTags.render(data['message'], block_encoding_supported = False),
+			          }
 
 			parser = FileParser()
 			parser.set_oset(self.response.get_oset())
