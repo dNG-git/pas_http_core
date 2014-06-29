@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.services.Index
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
 from dNG.pas.controller.predefined_http_request import PredefinedHttpRequest
@@ -32,7 +27,7 @@ from .module import Module
 class Index(Module):
 #
 	"""
-Service for "m=services;s=index" (default values)
+Service for "m=services" (default values)
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved

@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.output.Http
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 # pylint: disable=import-error,no-name-in-module
 
@@ -98,7 +93,7 @@ Action for "done"
 		#
 			content['link_title'] = l10n.get("core_continue")
 
-			target_iline = re.sub("\\[\\w+\\]", "", parameters_chained['target_iline'])
+			target_iline = re.sub("\\_\\_\\w+\\_\\_", "", parameters_chained['target_iline'])
 			content['link_url'] = Link().build_url(Link.TYPE_RELATIVE, { "__query__": target_iline })
 		#
 

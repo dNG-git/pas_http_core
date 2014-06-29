@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.VirtualConfig
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from dNG.pas.runtime.instance_lock import InstanceLock
 
@@ -97,7 +92,10 @@ Set the config for the given virtual path.
 		"""
 
 		if (setup_callback != None): config['setup_callback'] = setup_callback
-		virtual_config = { "path": path.lower(), "config": config }
+		path_normalized = path.lower()
+
+		if ("_path_prefix" not in config): config['_path_prefix'] = path_normalized
+		virtual_config = { "path": path_normalized, "config": config }
 
 		with VirtualConfig._lock: VirtualConfig._virtuals.append(virtual_config)
 	#

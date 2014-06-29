@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.Link
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,13 +16,13 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 # pylint: disable=import-error,invalid-name,no-name-in-module
 
 from collections import Iterable
 from math import floor
+import re
 
 try: from urllib.parse import urlsplit
 except ImportError: from urlparse import urlsplit
@@ -73,6 +69,10 @@ Optical URLs are used to show the target address.
 	"""
 Relative URLs like "index.py?..."
 	"""
+	TYPE_VIRTUAL_PATH = 16
+	"""
+Generates absolute URLs based on the "__virtual__" path parameter.
+	"""
 
 	def __init__(self, scheme = None, host = None, port = None, path = None):
 	#
@@ -98,6 +98,8 @@ Override for the URL port
 		"""
 Override for the URL scheme
 		"""
+
+		if (not Settings.is_defined("pas_http_site_preferred_url_base")): Settings.read_file("{0}/settings/pas_http.json".format(Settings.get("path_data")))
 	#
 
 	def _add_default_parameters(self, parameters):
@@ -123,7 +125,7 @@ This method appends default parameters if not already set.
 		if ("uuid" not in _return and SessionImplementation != None):
 		#
 			if (request == None): request = AbstractHttpRequest.get_instance()
-			session = request.get_session()
+			session = (None if (request == None) else request.get_session())
 			if (session != None and session.is_active() and (not session.is_persistent())): _return['uuid'] = SessionImplementation.get_class().get_uuid()
 		#
 
@@ -154,18 +156,39 @@ as a source for parameters.
 		if (parameters == None
 		    or _type & Link.TYPE_BASE_PATH == Link.TYPE_BASE_PATH
 		   ): parameters = { }
+		else: parameters = self._filter_parameters(parameters)
+
+		if (_type & Link.TYPE_VIRTUAL_PATH == Link.TYPE_VIRTUAL_PATH):
+		#
+			if (parameters == None or "__virtual__" not in parameters): raise ValueException("Virtual path URL requested but base path not defined")
+
+			virtual_parameters = parameters.copy()
+
+			virtual_base_path = (virtual_parameters['__virtual__'][1:]
+			                     if (virtual_parameters['__virtual__'][:1] == "/") else
+			                     virtual_parameters['__virtual__']
+			                    )
+
+			del(virtual_parameters['__virtual__'])
+
+			dsds = virtual_parameters.get("dsd")
+			if (dsds != None): del(virtual_parameters['dsd'])
+
+			_return += virtual_base_path
+			if (len(virtual_parameters) > 0): _return += "/" + self._build_url_formatted("{0}%20{1}", "/", virtual_parameters)
+			if (dsds != None): _return += "/" + self._build_url_formatted("dsd%20{0}%20{1}", "/", dsds)
+		#
 		else:
 		#
-			parameters = self._filter_parameters(parameters)
 			parameters = self._add_default_parameters(parameters)
-		#
 
-		if (len(parameters) > 0):
-		#
-			if ("?" not in _return): _return += "?"
-			elif (_return[-1:] != ";"): _return += ";"
+			if (len(parameters) > 0):
+			#
+				if ("?" not in _return): _return += "?"
+				elif (_return[-1:] != ";"): _return += ";"
 
-			_return += self._build_url_formatted("{0}={1}", ";", parameters)
+				_return += self._build_url_formatted("{0}={1}", ";", parameters)
+			#
 		#
 
 		if (_type & Link.TYPE_OPTICAL == Link.TYPE_OPTICAL):
@@ -175,7 +198,7 @@ A filter is required for really long URLs. First we will have a look at the
 "optical maximal length" setting, then if the URL is larger than the setting
 			"""
 
-			length_available = int(Settings.get("pas_html_url_optical_max_length", 100))
+			length_available = int(Settings.get("pas_http_url_optical_max_length", 100))
 
 			if (len(_return) > length_available):
 			#
@@ -357,17 +380,11 @@ Builds a URL DSD string.
 		#
 			for key in sorted(parameters.keys()):
 			#
-				value = parameters[key]
-				if (type(value) != str): value = str(value)
+				escaped_key = _escape(key)
+				escaped_value = _escape(parameters[key])
 
-				if (len(value) > 0):
-				#
-					escaped_key = _escape(key)
-					escaped_value = _escape(value)
-
-					if (_return != ""): _return += "++"
-					_return += "{0}+{1}".format(escaped_key, escaped_value)
-				#
+				if (_return != ""): _return += "++"
+				_return += "{0}+{1}".format(escaped_key, escaped_value)
 			#
 		#
 		elif (_type == str): _return = parameters
@@ -485,8 +502,7 @@ Returns the base URL for the given type and parameters.
 		#
 			request = AbstractHttpRequest.get_instance()
 
-			if (_type & Link.TYPE_RELATIVE == Link.TYPE_RELATIVE): _return = self._get_url_path(request)
-			else:
+			if (_type & Link.TYPE_ABSOLUTE == Link.TYPE_ABSOLUTE):
 			#
 				scheme = request.get_server_scheme()
 				if (scheme == None): raise ValueException("Can't construct a full URL from the received request if it is not provided")
@@ -499,14 +515,18 @@ Returns the base URL for the given type and parameters.
 				port = Link._filter_well_known_port(scheme, request.get_server_port())
 				if (port > 0): _return += ":{0:d}".format(port)
 
-				_return += self._get_url_path(request)
+				if (_type & Link.TYPE_BASE_PATH == Link.TYPE_BASE_PATH
+				    or _type & Link.TYPE_VIRTUAL_PATH == Link.TYPE_VIRTUAL_PATH
+				   ): _return += self._get_url_path(request, False)
+				else: _return += self._get_url_path(request)
 			#
+			else: _return = self._get_url_path(request)
 		#
 
 		return _return
 	#
 
-	def _get_url_path(self, request = None):
+	def _get_url_path(self, request = None, include_script_name = True):
 	#
 		"""
 Returns the base URL path for the given URL or the current handled one.
@@ -520,7 +540,7 @@ Returns the base URL path for the given URL or the current handled one.
 			if (request == None): request = AbstractHttpRequest.get_instance()
 			script_name = request.get_script_name()
 
-			if (script_name == None): path = "/"
+			if ((not include_script_name) or script_name == None): path = "/"
 			else:
 			#
 				script_name = Binary.str(script_name)
@@ -613,16 +633,24 @@ Filter well known ports defined for the given scheme.
 	#
 
 	@staticmethod
-	def get_preferred():
+	def get_preferred(context = None):
 	#
 		"""
 Returns a "Link" instance based on the defined preferred URL.
+
+:param context: Context for the preferred link
 
 :return: (object) Link instance
 :since:  v0.1.01
 		"""
 
-		url = Settings.get("pas_http_site_preferred_url_base")
+		if (not Settings.is_defined("pas_http_site_preferred_url_base")): Settings.read_file("{0}/settings/pas_http.json".format(Settings.get("path_data")))
+
+		url = None
+
+		if (context != None): url = Settings.get("pas_http_site_preferred_url_base_{0}".format(re.sub("\\W+", "_", context)))
+		if (url == None): url = Settings.get("pas_http_site_preferred_url_base")
+
 		if (url == None): raise ValueException("Preferred URL base setting is not defined")
 		url_elements = urlsplit(url)
 
@@ -644,6 +672,7 @@ Parses the given type parameter given as a string value.
 		if (_type == "elink"): _return = Link.TYPE_ABSOLUTE
 		elif (_type == "ilink"): _return = Link.TYPE_RELATIVE
 		elif (_type == "optical"): _return = Link.TYPE_OPTICAL
+		elif (_type == "vlink"): _return = Link.TYPE_VIRTUAL_PATH
 		else: _return = 0
 
 		return _return

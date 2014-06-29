@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.RequestBody
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,21 +16,19 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
-from threading import Event
 from time import time
 from zlib import decompressobj, MAX_WBITS
 
 from dNG.net.http.chunked_reader_mixin import ChunkedReaderMixin
 from dNG.pas.data.byte_buffer import ByteBuffer
 from dNG.pas.data.settings import Settings
-from dNG.pas.runtime.thread import Thread
+from dNG.pas.data.supports_mixin import SupportsMixin
 from dNG.pas.runtime.io_exception import IOException
 from dNG.pas.runtime.value_exception import ValueException
 
-class RequestBody(dict, ChunkedReaderMixin, Thread):
+class RequestBody(ChunkedReaderMixin, SupportsMixin):
 #
 	"""
 The class "RequestBody" implements method to read the request body.
@@ -50,7 +44,7 @@ The class "RequestBody" implements method to read the request body.
 
 	# pylint: disable=arguments-differ
 
-	def __init__(self, receive_in_thread = False):
+	def __init__(self):
 	#
 		"""
 Constructor __init__(RequestBody)
@@ -58,13 +52,16 @@ Constructor __init__(RequestBody)
 :since: v0.1.00
 		"""
 
-		dict.__init__(self)
 		ChunkedReaderMixin.__init__(self)
-		if (receive_in_thread): Thread.__init__(self)
+		SupportsMixin.__init__(self)
 
 		self.decompressors = None
 		"""
 List of decompressors
+		"""
+		self.headers = None
+		"""
+Dictionary with request headers
 		"""
 		self.input_chunk_encoded = False
 		"""
@@ -78,10 +75,6 @@ Input pointer
 		"""
 Input size in bytes if known.
 		"""
-		self.receive_in_thread = receive_in_thread
-		"""
-True if reading should happen in a separate thread.
-		"""
 		self.received_data = None
 		"""
 Received file-like data object
@@ -89,10 +82,6 @@ Received file-like data object
 		self.received_data_size = 0
 		"""
 Size of the file-like data object
-		"""
-		self.received_event = Event()
-		"""
-Event called after all data has been received.
 		"""
 		self.received_size_max = int(Settings.get("pas_http_site_request_body_size_max", 10485760))
 		"""
@@ -108,7 +97,6 @@ Absolute timeout to receive the request body.
 		"""
 
 		if (self.socket_data_timeout < 1): self.socket_data_timeout = int(Settings.get("pas_global_socket_data_timeout", 30))
-		self.received_event.set()
 	#
 
 	def _append_received_data(self, data):
@@ -201,10 +189,14 @@ Returns the request body.
 		# pylint: disable=arguments-differ,raising-bad-type
 
 		if (timeout == None): timeout = self.socket_data_timeout
-		if (self.input_ptr != None and (not self.receive_in_thread)): self.run(timeout)
 
-		if (not self.received_event.wait(timeout)): raise IOException("Input pointer could not be read before timeout occurred")
-		if (isinstance(self.received_data, Exception)): raise self.received_data
+		if (self.input_ptr != None):
+		#
+			if (hasattr(self.input_ptr, "settimeout")): self.input_ptr.settimeout(self.socket_data_timeout)
+
+			try: self.run(timeout)
+			finally: self.input_ptr = None
+		#
 
 		return self.received_data
 	#
@@ -224,58 +216,58 @@ Sets a given pointer for the streamed post instance.
 		self.received_data = ByteBuffer()
 		self.received_data_size = 0
 
-		try:
+		if (self.input_size < 0 and (not self.input_chunk_encoded)): raise IOException("Input size and expected first chunk size are unknown")
+
+		if (self.input_chunk_encoded): self._read_chunked_data(self.input_ptr.read, self._append_received_data,timeout = timeout)
+		else:
 		#
-			if (self.input_chunk_encoded): self._read_chunked_data(self.input_ptr.read, self._append_received_data,timeout = timeout)
-			else:
+			timeout_time = time() + timeout
+			size_unread = self.input_size
+
+			while (size_unread > 0 and time() < timeout_time):
 			#
-				timeout_time = time() + timeout
-				size_unread = self.input_size
+				part_size = (4096 if (size_unread > 4096) else size_unread)
+				part_data = self.input_ptr.read(part_size)
+				part_size = len(part_data)
 
-				while (size_unread > 0 and time() < timeout_time):
+				if (part_size < 1): raise IOException("Input pointer could not be read before socket timeout occurred")
+
+				if (part_size > 0):
 				#
-					part_size = (4096 if (size_unread > 4096) else size_unread)
-					part_data = self.input_ptr.read(part_size)
-					part_size = len(part_data)
-
-					if (part_size < 1): raise IOException("Input pointer could not be read before socket timeout occurred")
-
-					if (part_size > 0):
-					#
-						size_unread -= part_size
-						self._append_received_data(part_data)
-					#
+					size_unread -= part_size
+					self._append_received_data(part_data)
 				#
 			#
-
-			self._append_received_data(None)
-			self.received_data.seek(0)
 		#
-		except Exception as handled_exception: self.received_data = handled_exception
 
-		self.input_ptr = None
+		self._append_received_data(None)
+		self.received_data.seek(0)
+	#
 
-		self.received_event.set()
+	def set_headers(self, headers):
+	#
+		"""
+Sets a given pointer for the RequestBody instance.
+
+:param instance: File-like instance
+
+:since: v0.1.00
+		"""
+
+		self.headers = headers
 	#
 
 	def set_input_ptr(self, input_ptr):
 	#
 		"""
-Sets a given pointer for the streamed post instance. If a separate thread is
-used to read the body it is started here as well.
+Sets a given pointer for the RequestBody instance.
+
+:param instance: File-like instance
 
 :since: v0.1.00
 		"""
 
-		if (self.input_size < 0 and (not self.input_chunk_encoded)): self.received_data = IOException("Input size and expected first chunk size are unknown")
-		else:
-		#
-			if (hasattr(input_ptr, "settimeout")): input_ptr.settimeout(self.socket_data_timeout)
-			self.input_ptr = input_ptr
-			self.received_event.clear()
-
-			if (self.receive_in_thread): self.start()
-		#
+		self.input_ptr = input_ptr
 	#
 
 	def set_input_size(self, _bytes):
@@ -289,6 +281,19 @@ Sets the expected input size.
 		"""
 
 		self.input_size = _bytes
+	#
+
+	def set_timeout(self, timeout):
+	#
+		"""
+Sets the absolute timeout to receive the request body.
+
+:param timeout: Timeout in seconds
+
+:since: v0.1.00
+		"""
+
+		self.timeout = timeout
 	#
 #
 

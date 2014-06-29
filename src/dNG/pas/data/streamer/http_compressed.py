@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.streamer.HttpCompressed
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,11 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
-
-# pylint: disable=abstract-method
-# pylint 1.1.0 was unable to detect next = __next__ correctly
+"""
 
 from dNG.pas.data.binary import Binary
 from .abstract_encapsulated import AbstractEncapsulated
@@ -72,33 +64,33 @@ Reads from the current streamer session.
 :param _bytes: How many bytes to read from the current position (0 means
                until EOF)
 
-:return: (mixed) Data; False on error
+:return: (mixed) Data; None if EOF
 :since:  v0.1.00
 		"""
 
-		data = AbstractEncapsulated.read(self, _bytes)
+		_return = AbstractEncapsulated.read(self, _bytes)
 		is_data_uncompressed = True
 
 		while (self.compressor != None and is_data_uncompressed):
 		#
-			if (data == None or data == False):
+			if (_return == None):
 			#
-				data = self.compressor.flush()
+				_return = self.compressor.flush()
 
 				is_data_uncompressed = False
 				self.compressor = None
 			#
 			else:
 			#
-				data = self.compressor.compress(Binary.bytes(data))
+				_return = self.compressor.compress(Binary.bytes(_return))
 
 				# Feed compressor object with data until it returns at least one byte
-				is_data_uncompressed = (len(data) < 1)
-				if (is_data_uncompressed): data = AbstractEncapsulated.read(self, _bytes)
+				is_data_uncompressed = (len(_return) < 1)
+				if (is_data_uncompressed): _return = AbstractEncapsulated.read(self, _bytes)
 			#
 		#
 
-		return data
+		return _return
 	#
 #
 

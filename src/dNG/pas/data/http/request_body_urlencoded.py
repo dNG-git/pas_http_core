@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.RequestBodyUrlencoded
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,21 +16,20 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 # pylint: disable=import-error,no-name-in-module
 
+from collections import Mapping
 import re
 
 try: from urllib.parse import parse_qsl
 except ImportError: from urlparse import parse_qsl
 
 from dNG.pas.data.binary import Binary
-from dNG.pas.runtime.value_exception import ValueException
 from .request_body import RequestBody
 
-class RequestBodyUrlencoded(RequestBody):
+class RequestBodyUrlencoded(Mapping, RequestBody):
 #
 	"""
 "RequestBodyUrlencoded" parses an incoming request body as
@@ -49,14 +44,12 @@ class RequestBodyUrlencoded(RequestBody):
              Mozilla Public License, v. 2.0
 	"""
 
-	# pylint: disable=arguments-differ
-
 	RE_ARRAY = re.compile("^(.+)\\[(\\S*)\\]$")
 	"""
 RegEx for keys with array indices
 	"""
 
-	def __init__(self, parse_in_thread = False):
+	def __init__(self):
 	#
 		"""
 Constructor __init__(RequestBodyUrlencoded)
@@ -64,67 +57,58 @@ Constructor __init__(RequestBodyUrlencoded)
 :since: v0.1.00
 		"""
 
-		RequestBody.__init__(self, parse_in_thread)
+		RequestBody.__init__(self)
 
 		self.parsed_data = None
 		"""
 Parsed data
 		"""
+
+		self.supported_features['body_parser'] = True
 	#
 
-	def __getattr__(self, name):
+	def __getitem__(self, key):
 	#
 		"""
-python.org: Called when an attribute lookup has not found the attribute in
-the usual places (i.e. it is not an instance attribute nor is it found in the
-class tree for self).
+python.org: Called to implement evaluation of self[key].
 
-:param name: Attribute name
+:param key: Value key
 
-:return: (mixed) Instance attribute
+:return: (mixed) Value
 :since:  v0.1.00
 		"""
 
-		return self.get(name)
+		if (self.parsed_data == None): self.parse()
+		return self.parsed_data[key]
 	#
 
-	def get(self, name, timeout = None):
+	def __iter__(self):
 	#
 		"""
-python.org: Called when an attribute lookup has not found the attribute in
-the usual places (i.e. it is not an instance attribute nor is it found in the
-class tree for self).
+python.org: Return an iterator object.
 
-:param name: Attribute name
-
-:return: (mixed) Form content
+:return: (object) Iterator object
 :since:  v0.1.00
 		"""
 
-		self.parse(timeout)
-
-		if (name not in self.parsed_data): raise ValueException("Given key not found in data received")
-		return self.parsed_data[name]
+		if (self.parsed_data == None): self.parse()
+		return iter(self.parsed_data)
 	#
 
-	def get_dict(self, timeout = None):
+	def __len__(self):
 	#
 		"""
-python.org: Called when an attribute lookup has not found the attribute in
-the usual places (i.e. it is not an instance attribute nor is it found in the
-class tree for self).
+python.org: Called to implement the built-in function len().
 
-:param timeout: Timeout for reading input
-
-:return: (dict) Data read
+:return: (int) Length of the object
 :since:  v0.1.00
 		"""
 
-		self.parse(timeout)
-		return self.parsed_data
+		if (self.parsed_data == None): self.parse()
+		return len(self.parsed_data)
 	#
 
-	def parse(self, timeout = None):
+	def parse(self):
 	#
 		"""
 Sets a given pointer for the streamed post instance.
@@ -132,10 +116,10 @@ Sets a given pointer for the streamed post instance.
 :since: v0.1.00
 		"""
 
-		post_data = RequestBody.get(self, timeout)
+		byte_buffer = RequestBody.get(self)
 
 		field_arrays = { }
-		parsed_data = parse_qsl(Binary.str(post_data.read()), True, True)
+		parsed_data = parse_qsl(Binary.str(byte_buffer.read()), True, True)
 		self.parsed_data = { }
 
 		for parsed_field in parsed_data:

@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.output.menu.Service
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,14 +16,13 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from dNG.pas.data.xhtml.link import Link
-from dNG.pas.module.blocks.abstract_block import AbstractBlock
-from dNG.pas.module.blocks.output.options_block_mixin import OptionsBlockMixin
+from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
+from dNG.pas.module.controller.output.options_block_mixin import OptionsBlockMixin
 
-class Service(AbstractBlock, OptionsBlockMixin):
+class Service(AbstractHttpController, OptionsBlockMixin):
 #
 	"""
 The "Service" class implements a service menu view.

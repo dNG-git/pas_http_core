@@ -24,7 +24,7 @@ var djs_config = {
 var require = {
 	baseUrl: "[rewrite:settings]http_path_mmedia_versioned[/rewrite]",
 	paths: {
-		"jquery": "jquery/jquery-2.1.0.min",
+		"jquery": "jquery/jquery-2.1.1.min",
 	},
 };
 

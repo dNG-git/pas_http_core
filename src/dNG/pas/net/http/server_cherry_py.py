@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.ServerCherryPy
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 # pylint: disable=import-error
 
@@ -91,7 +86,7 @@ Configures the server
 		listener_data = ( listener_host, self.port )
 		self.server = CherryPyWSGIServer(listener_data, HttpWsgi1Request, numthreads = numthreads, server_name = self.host)
 
-		if (self.log_handler != None): self.log_handler.info("pas.http.core cherrypy server starts at '{0}:{1:d}'".format(listener_host, self.port))
+		if (self.log_handler != None): self.log_handler.info("pas.http.core cherrypy server starts at '{0}:{1:d}'", listener_host, self.port, context = "pas_http_core")
 
 		"""
 Configure common paths and settings
@@ -113,7 +108,7 @@ Runs the server
 		try: self.server.start()
 		except Exception as handled_exception:
 		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception)
+			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_http_core")
 		#
 	#
 

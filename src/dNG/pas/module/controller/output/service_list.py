@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.services.Module
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,15 +16,16 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
-from dNG.pas.module.blocks.abstract_block import AbstractBlock
+from dNG.pas.data.http.translatable_exception import TranslatableException
+from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
+from .service_list_mixin import ServiceListMixin
 
-class Module(AbstractBlock):
+class ServiceList(AbstractHttpController, ServiceListMixin):
 #
 	"""
-Module for "services"
+"ServiceList" is a navigation element providing links to other services.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -39,7 +36,17 @@ Module for "services"
              Mozilla Public License, v. 2.0
 	"""
 
-	pass
+	def execute_render(self):
+	#
+		"""
+Action for "render"
+
+:since: v0.1.00
+		"""
+
+		if ("file" in self.context): self.set_action_result(self.render_service_list_file(self.context['file']))
+		else: raise TranslatableException("core_unknown_error", value = "Missing service list to render")
+	#
 #
 
 ##j## EOF

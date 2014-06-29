@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.ServerWsgi
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from math import floor
 from time import time
@@ -80,7 +75,7 @@ Timestamp of service initialisation
 		#
 			Hook.set_log_handler(self.log_handler)
 			NamedLoader.set_log_handler(self.log_handler)
-			self.log_handler.debug("#echo(__FILEPATH__)# -ServerWsgi.__init__()- (#echo(__LINE__)#)")
+			self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.__init__()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 		#
 
 		Hook.call("dNG.pas.Status.onStartup")

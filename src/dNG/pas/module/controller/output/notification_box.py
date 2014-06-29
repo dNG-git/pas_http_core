@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.output.NotificationBox
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from binascii import hexlify
 from os import urandom
@@ -30,9 +25,9 @@ from dNG.pas.data.binary import Binary
 from dNG.pas.data.xhtml.form_tags import FormTags
 from dNG.pas.data.xhtml.notification_store import NotificationStore
 from dNG.pas.data.xhtml.oset.file_parser import FileParser
-from dNG.pas.module.blocks.abstract_block import AbstractBlock
+from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 
-class NotificationBox(AbstractBlock):
+class NotificationBox(AbstractHttpController):
 #
 	"""
 "NotificationBox" is a navigation element providing links to other services.
@@ -51,7 +46,7 @@ class NotificationBox(AbstractBlock):
 		"""
 Renders a notification.
 
-:return: (str) (X)HTML notification
+:return: (str) XHTML notification
 :since:  v0.1.01
 		"""
 

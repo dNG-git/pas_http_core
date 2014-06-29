@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.ServerImplementation
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from socket import getfqdn
 
@@ -99,8 +94,8 @@ Configures the server
 
 		Settings.set("http_path_mmedia_versioned", "/data/mmedia/{0}".format(site_version))
 
-		VirtualConfig.set_virtual_path("/data/mmedia/{0}/".format(site_version), { "s": "cache", "uri": "dfile", "uri_prefix": "{0}/".format(Settings.get("http_path_mmedia_versioned")) })
-		VirtualConfig.set_virtual_path("/data/mmedia/", { "s": "cache", "uri": "dfile", "uri_prefix": "/data/mmedia/" })
+		VirtualConfig.set_virtual_path("/data/mmedia/{0}/".format(site_version), { "s": "cache", "path": "dfile" })
+		VirtualConfig.set_virtual_path("/data/mmedia/", { "s": "cache", "path": "dfile" })
 
 		Hook.call("dNG.pas.http.Server.onConfigured", server = self)
 	#
@@ -201,8 +196,8 @@ Returns an HTTP server instance based on the configuration set.
 		try: _return = NamedLoader.get_instance("dNG.pas.net.http.Server{0}".format(server_implementation))
 		except Exception as handled_exception:
 		#
-			LogLine.error(handled_exception)
-			LogLine.warning("pas.http.core use fallback after an exception occurred while instantiating the HTTP implementation")
+			LogLine.error(handled_exception, context = "pas_http_site")
+			LogLine.warning("pas.http.core use fallback after an exception occurred while instantiating the HTTP implementation", context = "pas_http_site")
 
 			server_implementation = "Standalone"
 		#

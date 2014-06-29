@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.controller.AbstractHttpMixin
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from os import path
 
@@ -116,6 +111,7 @@ Requested response format handler
 		self.supported_features['accepted_formats'] = self._supports_accepted_formats
 		self.supported_features['compression'] = self._supports_compression
 		self.supported_features['headers'] = self._supports_headers
+		self.supported_features['session'] = True
 		self.supported_features['type'] = self._supports_type
 	#
 
@@ -128,11 +124,14 @@ Returns the formats the client accepts.
 :since:  v0.1.00
 		"""
 
-		_return = self.get_header("Accept")
-		if (_return != None): _return = Header.get_field_list_dict(_return)
-		if (_return == None): _return = [ ]
+		_return = [ ]
 
-		for position in range(0, len(_return)): _return[position] = _return[position].split(";")[0]
+		formats = self.get_header("Accept")
+		if (formats != None): formats = Header.get_field_list_dict(formats, field_separator = None)
+		if (formats == None): formats = [ ]
+
+		for _format in formats: _return.append(_format.split(";")[0])
+
 		return _return
 	#
 
@@ -157,11 +156,14 @@ Returns the compression formats the client accepts.
 :since:  v0.1.01
 		"""
 
-		_return = self.get_header("Accept-Encoding")
-		if (_return != None): _return = Header.get_field_list_dict(_return)
-		if (_return == None): _return = [ ]
+		_return = [ ]
 
-		for position in range(0, len(_return)): _return[position] = _return[position].split(";")[0]
+		formats = self.get_header("Accept-Encoding")
+		if (formats != None): formats = Header.get_field_list_dict(formats, field_separator = None)
+		if (formats == None): formats = [ ]
+
+		for _format in formats: _return.append(_format.split(";")[0])
+
 		return _return
 	#
 
@@ -209,7 +211,7 @@ Returns the DSD value for the specified parameter.
 :since:  v0.1.00
 		"""
 
-		return (self.dsd[key] if (self.is_dsd_set(key)) else default)
+		return (self.dsd[key] if (self.is_dsd_set(key) and len(self.dsd[key]) > 0) else default)
 	#
 
 	def get_dsd_dict(self):
@@ -424,6 +426,19 @@ Sets the DSD value for the specified parameter.
 		"""
 
 		self.dsd[key] = value
+	#
+
+	def set_dsd_dict(self, dsd_dict):
+	#
+		"""
+Sets the DSD parameters dictionary.
+
+:param dsd_dict: Request DSD values
+
+:since: v0.1.01
+		"""
+
+		self.dsd = dsd_dict
 	#
 
 	def set_header(self, name, value):

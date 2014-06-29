@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.form.Renderer
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,12 +16,12 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from binascii import hexlify
 from os import urandom
 
+from dNG.data.xml_parser import XmlParser
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.form_tags_renderer import FormTagsRenderer
@@ -36,7 +32,7 @@ from dNG.pas.runtime.value_exception import ValueException
 class Renderer(object):
 #
 	"""
-"Renderer" renders forms for output as (X)HTML.
+"Renderer" renders forms for output as XHTML 5.
 
 TODO: Code incomplete
 
@@ -138,6 +134,25 @@ Format and return XHTML for a email input field.
 		return self.render_text(field_data)
 	#
 
+	def render_info(self, field_data):
+	#
+		"""
+Format and return XHTML for a non-editable content field.
+
+:param field_data: Dict containing information about the form field
+
+:return: (str) Valid XHTML form field definition
+:since:  v0.1.00
+		"""
+
+		context = { "title": XHtmlFormatting.escape(field_data['title']),
+		            "value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content'])),
+		            "error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
+		          }
+
+		return self._render_oset_file("core/form/info", context)
+	#
+
 	def render_formtags_file(self, field_data):
 	#
 		"""
@@ -156,7 +171,10 @@ Format and return XHTML for a text input field.
 		            "id": XHtmlFormatting.escape(field_data['id']),
 		            "name": XHtmlFormatting.escape(field_data['name']),
 		            "title": XHtmlFormatting.escape(field_data['title']),
-		            "content": ("" if (field_data['content'] == None) else renderer.render(field_data['content'])),
+		            "content": (L10n.get("pas_http_core_form_error_internal_error")
+		                        if (field_data['content'] == None) else
+		                        renderer.render(field_data['content'])
+		                       ),
 		            "error_message": ("" if (field_data['error'] == None) else XHtmlFormatting.escape(field_data['error']))
 		          }
 
@@ -165,6 +183,29 @@ Format and return XHTML for a text input field.
 		else: context['size_percentage'] = "80%"
 
 		return self._render_oset_file("core/form/formtags_content", context)
+	#
+
+	def render_hidden(self, field_data):
+	#
+		"""
+Format and return XHTML for a hidden input field.
+
+:param field_data: Dict containing information about the form field
+
+:return: (str) Valid XHTML form field definition
+:since:  v0.1.00
+		"""
+
+		hidden_attributes = { "type": "hidden",
+		                      "name": XHtmlFormatting.escape(field_data['name']),
+		                      "value": ("" if (field_data['content'] == None) else XHtmlFormatting.escape(field_data['content']))
+		                    }
+
+		return XmlParser().dict_to_xml_item_encoder({ "tag": "input",
+		                                              "attributes": hidden_attributes
+		                                            },
+		                                            strict_standard_mode = False
+		                                           )
 	#
 
 	def _render_oset_file(self, file_pathname, content):
@@ -186,7 +227,7 @@ Render the form field using the given OSet template.
 			parser.set_oset(self.oset)
 			_return = parser.render(file_pathname, content)
 		#
-		except Exception: _return = "<div class='pageform_error'>{0}</div>".format(L10n.get("errors_pas_http_core_form_internal_error"))
+		except Exception: _return = "<div class='pageform_error'>{0}</div>".format(L10n.get("pas_http_core_form_error_internal_error"))
 
 		return _return
 	#
@@ -395,7 +436,7 @@ corresponding method to get valid XHTML for output.
 			if (_return != ""): _return += "\n"
 
 			if (type(output) == str): _return += output
-			else: _return += self._render_oset_file("core/form/error", { "error_message": L10n.get("errors_pas_http_core_form_internal_error") })
+			else: _return += self._render_oset_file("core/form/error", { "error_message": L10n.get("pas_http_core_form_error_internal_error") })
 		#
 
 		return _return
@@ -418,7 +459,7 @@ Render the form submit button.
 		return self._render_oset_file("core/form/button", context)
 	#
 
-	def render_text(self, field_data, rcp_active = False):
+	def render_text(self, field_data):
 	#
 		"""
 Format and return XHTML for a text input field.
@@ -495,7 +536,7 @@ $f_return .= ($f_rcp_active ? ("jQuery (function () {
 		return _return
 	#
 
-	def render_textarea(self, field_data, rcp_active = False):
+	def render_textarea(self, field_data):
 	#
 		"""
 Format and return XHTML for a textarea input field.

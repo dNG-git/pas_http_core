@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.PageLinksRenderer
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from math import floor
 
@@ -70,11 +65,11 @@ True to hide the last and next link
 		"""
 Page links shown before collapsing the list of links (...)
 		"""
-		self.page = page
+		self.page = (0 if (page < 1) else int(page))
 		"""
 Active page
 		"""
-		self.pages = pages
+		self.pages = (1 if (pages < 1) else int(pages))
 		"""
 Pages available
 		"""

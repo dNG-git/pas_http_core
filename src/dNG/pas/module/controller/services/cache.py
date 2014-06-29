@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.services.Cache
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from os import path
 import os
@@ -91,7 +86,7 @@ Action for "index"
 
 			if (is_last_modified_supported and self.request.get_header("If-Modified-Since") != None):
 			#
-				last_modified_on_client = RfcBasics.get_rfc2616_timestamp(self.request.get_header("If-Modified-Since"))
+				last_modified_on_client = RfcBasics.get_rfc7231_timestamp(self.request.get_header("If-Modified-Since"))
 
 				if (last_modified_on_client > -1):
 				#
@@ -149,7 +144,11 @@ Action for "index"
 			#
 			else: self.response.set_header("HTTP/1.1", "HTTP/1.1 415 Unsupported Media Type", True)
 		#
-		elif (not is_valid): self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+		elif (not is_valid):
+		#
+			if (self.log_handler != None): self.log_handler.warning("#echo(__FILEPATH__)# -Cache.execute_index()- reporting: Failed opening {0} - file not readable", dfile, context = "pas_http_core")
+			self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+		#
 	#
 #
 

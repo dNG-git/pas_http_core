@@ -1,11 +1,17 @@
 {
  "pas_http_core_edit": "Edit",
-
  "pas_http_core_js_required": "JavaScript required",
-
+ "pas_http_core_level_up": "Go up one category",
  "pas_http_core_pages": "Pages",
-
  "pas_http_core_service_list_empty": "Currently there are no functions available or you may have not proper permission to access restricted functions.",
+
+ "pas_http_core_user_author_bar_0": "Written by",
+ "pas_http_core_user_author_bar_1": "Written on ",
+ "pas_http_core_user_author_bar_2": " by",
+
+ "pas_http_core_user_publisher_bar_0": "Published by",
+ "pas_http_core_user_publisher_bar_1": "Published on ",
+ "pas_http_core_user_publisher_bar_2": " by",
 
  "errors_pas_http_core_400": "The transmitted request is erroneous and will not be processed.",
  "errors_pas_http_core_401": "Sorry, but you do not have sufficient rights to execute the current task successfully. Please log in using an account with proper permission if applicable.",

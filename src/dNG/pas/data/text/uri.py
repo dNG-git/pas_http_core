@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.Uri
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 # pylint: disable=import-error,no-name-in-module
 
@@ -72,8 +67,9 @@ Encode special characters for a RFC 2396 compliant URI.
 :since:  v0.1.00
 		"""
 
+		if (type(data) != str): data = str(data)
 		data = InputFilter.filter_control_chars(data).strip()
-		return ("" if (data == None) else quote(data, ""))
+		return quote(data, "")
 	#
 #
 

@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.controller.HttpWsgi1StreamResponse
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,16 +16,11 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
-
-# pylint: disable=abstract-method
-# pylint 1.1.0 was unable to detect next = __next__ correctly
-
-from collections import Iterator
+"""
 
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.streamer.http_compressed import HttpCompressed as HttpCompressedStreamer
+from dNG.pas.runtime.iterator import Iterator
 from .abstract_http_stream_response import AbstractHttpStreamResponse
 
 class HttpWsgi1StreamResponse(AbstractHttpStreamResponse, Iterator):
@@ -122,9 +113,7 @@ This iterator is only called for uncompressed data.
 			if (self.streamer != None):
 			#
 				_return = (None if (self.streamer.is_eof()) else self.streamer.read())
-
-				if (_return == False): _return = None
-				elif (_return != None): _return = self._prepare_output_data(_return)
+				if (_return != None): _return = self._prepare_output_data(_return)
 			#
 			elif (self.data != None):
 			#
@@ -141,7 +130,6 @@ This iterator is only called for uncompressed data.
 
 		return _return
 	#
-	next = __next__
 
 	def close(self):
 	#

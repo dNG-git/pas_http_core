@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.controller.AbstractHttpStreamResponse
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from time import time
 from zlib import compressobj
@@ -392,7 +387,7 @@ Sets a cookie.
 
 		timeout = (time() + timeout if (timeout > 0) else time() - 3600)
 
-		cookie = "{0}={1};Expires={2}".format(name, value, RfcBasics.get_rfc1123_datetime(timeout))
+		cookie = "{0}={1};Expires={2}".format(name, value, RfcBasics.get_rfc5322_datetime(timeout))
 		if (secure_only): cookie += ";Secure="
 		if (http_only): cookie += ";HttpOnly="
 

@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.FormTagsEncoder
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 import re
 
@@ -30,7 +25,7 @@ from .abstract_form_tags import AbstractFormTags
 class FormTagsEncoder(AbstractFormTags):
 #
 	"""
-The OSet parser takes a template string to render the output.
+Encodes data and validates FormTags.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -243,7 +238,9 @@ Change data according to the "size" tag.
 			enclosed_data = data[data_position:tag_end_position]
 			value = int(re_object.group(1))
 
-			_return = ("[size={0:d}%]{1}[/size]".format(value, enclosed_data) if (value > 0 and value <= 100) else enclosed_data)
+			if (value >= 8 and value <= 80): _return = "[size={0:d}px]{1}[/size]".format(value, enclosed_data)
+			elif (value > 0 and value <= 100): _return = "[size={0:d}%]{1}[/size]".format(value, enclosed_data)
+			else: _return = enclosed_data
 		#
 
 		return _return
@@ -545,9 +542,12 @@ changed.
 	def process(self, content):
 	#
 		"""
-Constructor __init__(FormTagsEncoder)
+Process the given content.
 
-:since: v0.1.01
+:param content: Raw content
+
+:return: (str) FormTags encoded content
+:since:  v0.1.01
 		"""
 
 		return self._parse(content)

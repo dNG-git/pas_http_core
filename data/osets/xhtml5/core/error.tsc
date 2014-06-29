@@ -1,4 +1,4 @@
-<article>
+<article class="pagecontent_core_error">
 <h1>[rewrite:content]title[/rewrite]</h1>
 <p>[rewrite:content]message[/rewrite]</p>
 [if:settings:pas_core_dev_mode == 1][if:content:details != ]

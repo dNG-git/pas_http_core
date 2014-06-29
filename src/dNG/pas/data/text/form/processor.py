@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.FormProcessor
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from binascii import hexlify
 from copy import copy
@@ -29,18 +24,18 @@ from os import urandom
 
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.cached_file import CachedFile
+from dNG.pas.data.text.input_filter import InputFilter
+from dNG.pas.data.text.link import Link
+from dNG.pas.data.text.l10n import L10n
+from dNG.pas.data.text.md5 import Md5
 from dNG.pas.runtime.type_exception import TypeException
 from dNG.pas.runtime.value_exception import ValueException
-from .input_filter import InputFilter
-from .link import Link
-from .l10n import L10n
-from .md5 import Md5
 
-class FormProcessor(object):
+class Processor(object):
 #
 	"""
-"FormProcessor" provides basic form methods used in protocol / format
-specific form instances.
+"Processor" provides basic form methods used in protocol / format specific
+form instances. It can be extended with custom form elements.
 
 @TODO: Support a generic way for external field definition classes derived
 from a interface with "add_instance()".
@@ -69,7 +64,6 @@ MD5 encoded password
 Password input repetition
 	"""
 	SPECIAL_FIELD_TYPES = [ "element",
-	                        "embed",
 	                        "formtags_file",
 	                        "hidden",
 	                        "info",
@@ -81,10 +75,10 @@ Password input repetition
 Special field types handled by "_set_special_field_entry()"
 	"""
 
-	def __init__(self):
+	def __init__(self, form_id = None):
 	#
 		"""
-Constructor __init__(FormProcessor)
+Constructor __init__(Processor)
 
 :since: v0.1.00
 		"""
@@ -105,9 +99,17 @@ Nameless form elements counter
 		"""
 Can be set to true using "set_input_available()"
 		"""
+		self.form_id = (None if (form_id == None or len(form_id) < 1) else form_id)
+		"""
+Form ID
+		"""
 		self.form_is_valid = None
 		"""
 Form validity check result variable
+		"""
+		self.validator_context = { }
+		"""
+Form validator context
 		"""
 
 		L10n.init("pas_http_core_form")
@@ -173,33 +175,6 @@ A single line text input field for eMail addresses.
 		return (field_data['error'] == None)
 	#
 
-	def add_embedded(self, field_data, url_parameters, is_iframe_only = False):
-	#
-		"""
-Embeds external resources into the current form.
-
-:param field_data: Form field data
-:param url_parameters: URL parameters for the embedded resource
-:param is_iframe_only: True if we should not try AJAX to embed the given URL
-
-:return: (bool) Currently always true
-:since:  v0.1.00
-		"""
-
-		field_data = self._set_entry_defaults(field_data)
-		field_data = self._set_entry_field_size(field_data)
-
-		if (len(field_data['content']) < 1): field_data['content'] = Binary.str(hexlify(urandom(10)))
-
-		field_data['iframe_only'] = is_iframe_only
-		url_parameters['tid'] = field_data['content']
-
-		field_data['url'] = Link().build_url(Link.TYPE_RELATIVE, url_parameters)
-
-		self._set_entry("embed", field_data)
-		return True
-	#
-
 	def add_entry(self, field_type, field_data = None):
 	#
 		"""
@@ -215,11 +190,11 @@ Creates spacing fields like "hidden", "element", "info", "spacer" or "subtitle".
 :since:  v0.1.00
 		"""
 
-		if (field_data['type'] == "element"
-		    or field_data['type'] == "hidden"
-		    or field_data['type'] == "info"
-		    or field_data['type'] == "spacer"
-		    or field_data['type'] == "subtitle"
+		if (field_type == "element"
+		    or field_type == "hidden"
+		    or field_type == "info"
+		    or field_type == "spacer"
+		    or field_type == "subtitle"
 		   ):
 		#
 			if (field_data == None): field_data = { }
@@ -345,9 +320,9 @@ Insert passwords (including optional a repetition check)
 
 		field_data['error'] = self._check_entry_length(field_data['content'], field_data['min'], field_data['max'], field_data['required'])
 
-		if (mode == None): mode = FormProcessor.PASSWORD_MD5
+		if (mode == None): mode = Processor.PASSWORD_MD5
 
-		if (mode & FormProcessor.PASSWORD_WITH_REPETITION == FormProcessor.PASSWORD_WITH_REPETITION):
+		if (mode & Processor.PASSWORD_WITH_REPETITION == Processor.PASSWORD_WITH_REPETITION):
 		#
 			repetition_name = "{0}_repetition".format(field_data['name'])
 			repetition_content = self.get_input(repetition_name)
@@ -360,7 +335,7 @@ Insert passwords (including optional a repetition check)
 		if (field_data['error'] == None): field_data['error'] = self._check_validators(field_data)
 
 		if (field_data['error'] != None): _return = False
-		elif (mode & FormProcessor.PASSWORD_MD5 == FormProcessor.PASSWORD_MD5): field_data['content_result'] = Md5.hash(field_data['content'])
+		elif (mode & Processor.PASSWORD_MD5 == Processor.PASSWORD_MD5): field_data['content_result'] = Md5.hash(field_data['content'])
 
 		self._set_entry(_type, field_data)
 		return _return
@@ -585,11 +560,7 @@ Checks the size for a given string.
 Checks for validator callbacks, executes them and returns the first error
 occuring.
 
-:param data: The string that should be checked
-:param _min: Defines the minimal range for a number or None to ignore
-:param _max: Defines the maximal range for a number or None for an unlimited
-            size
-:param required: True if the field is required to continue
+:param field_data: Form field data
 
 :return: (mixed) Error definition tuple; None if valid
 :since:  v0.1.00
@@ -601,7 +572,7 @@ occuring.
 		#
 			for _callable in field_data.get("validators"):
 			#
-				result = _callable(field_data)
+				result = _callable(field_data, self.validator_context)
 
 				if (result != None):
 				#
@@ -963,7 +934,7 @@ Sets an field entry based on the data given.
 
 		if (isinstance(field_data, dict) and "type" in field_data):
 		#
-			if (field_data['type'] in FormProcessor.SPECIAL_FIELD_TYPES): self._set_special_field_entry(field_data)
+			if (field_data['type'] in Processor.SPECIAL_FIELD_TYPES): self._set_special_field_entry(field_data)
 			else:
 			#
 				if (not hasattr(self, "add_{0}".format(field_data['type']))): raise ValueException("Given field type is not defined")
@@ -998,7 +969,7 @@ Handles special field types defined by "SPECIAL_FIELD_TYPES".
 
 		if (isinstance(field_data, dict)
 		    and "type" in field_data
-		    and field_data['type'] in FormProcessor.SPECIAL_FIELD_TYPES
+		    and field_data['type'] in Processor.SPECIAL_FIELD_TYPES
 		   ):
 		#
 			if (field_data['type'] == "element"
@@ -1007,13 +978,6 @@ Handles special field types defined by "SPECIAL_FIELD_TYPES".
 			    or field_data['type'] == "spacer"
 			    or field_data['type'] == "subtitle"
 			   ): self.add_entry(field_data['type'], field_data)
-			elif (field_data['type'] == "embed"):
-			#
-				if ("url_parameters" not in field_data): raise ValueException("Given field type is not defined correctly")
-
-				is_iframe_only = field_data.get("is_iframe_only", False)
-				self.add_embedded(field_data, field_data['url_parameters'], is_iframe_only)
-			#
 			elif (field_data['type'] == "formtags_file"):
 			#
 				if ("file_pathname" not in field_data): raise ValueException("Given field type is not defined correctly")
@@ -1027,6 +991,19 @@ Handles special field types defined by "SPECIAL_FIELD_TYPES".
 			else: raise ValueException("Given field type is not defined")
 		#
 		else: raise TypeException("Given data does not reflect a form field")
+	#
+
+	def set_validator_context(self, context):
+	#
+		"""
+Sets the validator context used for defined callbacks.
+
+:param context: Form validator context dict
+
+:since: v0.1.00
+		"""
+
+		self.validator_context = context
 	#
 
 	def update_entry(self, section, name, field_data):

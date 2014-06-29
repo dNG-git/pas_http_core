@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.controller.HttpXhtmlResponse
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 import re
 
@@ -110,7 +105,7 @@ Add the defined javascript file to the output.
 		"""
 
 		common_names = Settings.get("pas_http_theme_oset_js_aliases", { "jquery/jquery.min.js": "jquery/jquery-2.0.0.min.js" })
-		if (js_file in common_names): js_file= common_names[js_file]
+		if (js_file in common_names): js_file = common_names[js_file]
 		self.theme_renderer.add_js_file(js_file)
 	#
 
@@ -125,7 +120,7 @@ Add output content from an OSet template.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.add_oset_content({0}, content)- (#echo(__LINE__)#)".format(template_name))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.add_oset_content({1})- (#echo(__LINE__)#)", self, template_name, context = "pas_http_core")
 
 		parser = NamedLoader.get_instance("dNG.pas.data.xhtml.oset.FileParser")
 		parser.set_oset(self.oset)
@@ -188,7 +183,7 @@ compression setting and information about P3P.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.init(cache, compress)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.init()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 
 		AbstractHttpResponse.init(self, cache, compress)
 

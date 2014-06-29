@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.Streaming
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from os import path
 import re
@@ -30,6 +25,7 @@ from dNG.pas.controller.abstract_http_response import AbstractHttpResponse
 from dNG.pas.data.mime_type import MimeType
 from dNG.pas.data.translatable_exception import TranslatableException
 from dNG.pas.data.streamer.abstract import Abstract as AbstractStreamer
+from dNG.pas.data.http.translatable_exception import TranslatableException as TranslatableHttpException
 
 class Streaming(object):
 #
@@ -111,6 +107,7 @@ are met.
 					#
 				#
 
+				if (not is_valid): raise TranslatableHttpException("pas_http_core_400", 400)
 				if (not is_content_length_set): response.set_header("Content-Length", streamer.get_size())
 				response.set_streamer(streamer)
 			#

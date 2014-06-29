@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.FormTagsRenderer
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,10 +16,12 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
+
+import re
 
 from .abstract_form_tags import AbstractFormTags
+from .content_link_renderer import ContentLinkRenderer
 
 class FormTagsRenderer(AbstractFormTags):
 #
@@ -39,6 +37,384 @@ The OSet parser takes a template string to render the output.
              Mozilla Public License, v. 2.0
 	"""
 
+	# pylint: disable=unused-argument
+
+	def __init__(self):
+	#
+		"""
+Constructor __init__(AbstractFormTags)
+
+:since: v0.1.01
+		"""
+
+		AbstractFormTags.__init__(self)
+
+		self.null_byte_markup = False
+		"""
+NULL-bytes are used to mark special markup. They should be removed after
+processing is completed.
+		"""
+	#
+
+	def _change_plain_content(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to only contain the plain content.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		return data[data_position:tag_end_position]
+	#
+
+	_change_match_b = _change_plain_content
+	"""
+Change data according to the "b" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+	"""
+
+	def _change_match_center(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "center" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = data[data_position:tag_end_position]
+
+		if (len(_return) > 0):
+		#
+			tag_params = FormTagsRenderer.parse_tag_parameters("center", data, tag_position, data_position)
+			if ("box" in tag_params): _return = "---\n{0}\n---".format(_return)
+		#
+
+		return _return
+	#
+
+	def _change_match_code(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "code" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = data[data_position:tag_end_position]
+
+		if (len(_return) > 0 and "[" in _return):
+		#
+			self.null_byte_markup = True
+
+			_return = _return.replace("[", "\x00#91;")
+			_return = _return.replace("]", "\x00#93;")
+			_return = _return = "---\n{0}\n---".format(_return)
+		#
+
+		return _return
+	#
+
+	_change_match_color = _change_plain_content
+	"""
+Change data according to the "color" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+	"""
+
+	_change_match_del = _change_plain_content
+	"""
+Change data according to the "del" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+	"""
+
+	_change_match_i = _change_plain_content
+	"""
+Change data according to the "i" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+	"""
+
+	def _change_match_img(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "img" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = ""
+
+		url = data[data_position:tag_end_position]
+
+		if (len(url) > 0):
+		#
+			tag_params = FormTagsRenderer.parse_tag_parameters("img", data, tag_position, data_position)
+			_return = ("{0} ({1})".format(tag_params['title'], url) if ("title" in tag_params) else url)
+		#
+
+		return data[data_position:tag_end_position]
+	#
+
+	def _change_match_justify(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "justify" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = data[data_position:tag_end_position]
+
+		if (len(_return) > 0):
+		#
+			tag_params = FormTagsRenderer.parse_tag_parameters("justify", data, tag_position, data_position)
+			if ("box" in tag_params): _return = "---\n{0}\n---".format(_return)
+		#
+
+		return _return
+	#
+
+	_change_match_left = _change_plain_content
+	"""
+Change data according to the "left" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+	"""
+
+	def _change_match_link(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "link" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = data[data_position:tag_end_position]
+
+		if (len(_return) > 0):
+		#
+			renderer = ContentLinkRenderer()
+			if (self.datalinker_main_id != None): renderer.set_datalinker_main_id(self.datalinker_main_id)
+			tag_params = FormTagsRenderer.parse_tag_parameters("link", data, tag_position, data_position)
+
+			_return = renderer.render(_return, tag_params)
+		#
+
+		return _return
+	#
+
+	_change_match_margin = _change_plain_content
+	"""
+Change data according to the "margin" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+	"""
+
+	def _change_match_right(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "right" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = data[data_position:tag_end_position]
+
+		if (len(_return) > 0):
+		#
+			tag_params = FormTagsRenderer.parse_tag_parameters("right", data, tag_position, data_position)
+			if ("box" in tag_params): _return = "---\n{0}\n---".format(_return)
+		#
+
+		return _return
+	#
+
+	_change_match_s = _change_plain_content
+	"""
+Change data according to the "s" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+	"""
+
+	_change_match_size = _change_plain_content
+	"""
+Change data according to the "size" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+	"""
+
+	def _change_match_title(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "title" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		return "===\n{0}\n===".format(data[data_position:tag_end_position])
+	#
+
+	_change_match_u = _change_plain_content
+	"""
+Change data according to the "u" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+	"""
+
+	def _change_match_url(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "url" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = ""
+
+		re_result = re.match("^\\[url=(\\w+://.*|)\\]", data[tag_position:data_position])
+		enclosed_data = ""
+		url = None
+
+		if (re_result != None and len(re_result.group(1)) > 0):
+		#
+			enclosed_data = data[data_position:tag_end_position]
+			url = re_result.group(1)
+		#
+		else: url = data[data_position:tag_end_position]
+
+		if (url != None): _return = ("{0} ({1})".format(enclosed_data, url) if (len(enclosed_data) > 0) else url)
+
+		return _return
+	#
+
 	def render(self, content):
 	#
 		"""
@@ -50,7 +426,15 @@ Renders the given FormTags content.
 :since:  v0.1.01
 		"""
 
-		return self._parse(content)
+		_return = self._parse(content)
+
+		if (self.null_byte_markup):
+		#
+			_return = _return.replace("\x00#91;", "[")
+			_return = _return.replace("\x00#93;", "]")
+		#
+
+		return _return
 	#
 #
 

@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.FormTagsRenderer
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 import re
 
@@ -118,8 +113,8 @@ Change data according to the "center" tag.
 		#
 			tag_params = FormTagsRenderer.parse_tag_parameters("center", data, tag_position, data_position)
 
-			if ("box" in tag_params): _return= "<div style='text-align: center'><div class='pagecontent_box' style='display: inline-block; width: {0}'>{1}</div></div>[nobr]".format(tag_params['box'], _return)
-			else: _return= "<div class='pagecontent_box' style='text-align: center'>{0}</div>[nobr]".format(_return)
+			if ("box" in tag_params): _return = "<div style='text-align: center'><div class='pagecontent_box' style='display: inline-block; width: {0}'>{1}</div></div>[nobr]".format(tag_params['box'], _return)
+			else: _return = "<div class='pagecontent_box' style='text-align: center'>{0}</div>[nobr]".format(_return)
 		#
 
 		return _return

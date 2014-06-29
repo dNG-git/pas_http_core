@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.FormTags
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,16 +16,16 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
+from dNG.pas.data.text.form_tags_sanitizer import FormTagsSanitizer
 from .form_tags_encoder import FormTagsEncoder
 from .form_tags_renderer import FormTagsRenderer
 
 class FormTags(object):
 #
 	"""
-The static methods of this (X)HTML FormTags class are used for default
+The static methods of this XHTML FormTags class are used for default
 rendering purposes within an "article" tag or similar block level element.
 
 :author:     direct Netware Group
@@ -45,7 +41,9 @@ rendering purposes within an "article" tag or similar block level element.
 	def encode(content):
 	#
 		"""
-Encode (X)HTML FormTags and some typical (X)HTML statements.
+Encode XHTML FormTags and some typical (X)HTML statements.
+
+:param content: Content containing XHTML FormTags or (X)HTML statements
 
 :return: (str) FormTags encoded data
 :since:  v0.1.01
@@ -61,6 +59,7 @@ Encode (X)HTML FormTags and some typical (X)HTML statements.
 		"""
 Render FormTags as XHTML output and set given restrictions.
 
+:param content: FormTags encoded data
 :param block_encoding_supported: Do show block level encoded elements.
 :param main_id: DataLinker MainID for tag based links between pages
 
@@ -74,6 +73,22 @@ Render FormTags as XHTML output and set given restrictions.
 		if (main_id != None): renderer.set_datalinker_main_id(main_id)
 
 		return renderer.render(content)
+	#
+
+	@staticmethod
+	def sanitize(content):
+	#
+		"""
+Removes all FormTags from the given content
+
+:param content: FormTags encoded data
+
+:return: (str) Sanitized content
+:since:  v0.1.01
+		"""
+
+		sanitizer = FormTagsSanitizer()
+		return sanitizer.process(content)
 	#
 #
 

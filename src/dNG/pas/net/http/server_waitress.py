@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.ServerWaitress
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 # pylint: disable=import-error
 
@@ -80,7 +75,7 @@ Configures the server
 		else: self.host = listener_host
 
 		self.server = create_server(HttpWsgi1Request, self.sockets, host = listener_host, port = self.port, asyncore_loop_timeout = 5)
-		if (self.log_handler != None): self.log_handler.info("pas.http.core wsgiref server starts at '{0}:{1:d}'".format(self.host, self.port))
+		if (self.log_handler != None): self.log_handler.info("pas.http.core wsgiref server starts at '{0}:{1:d}'", self.host, self.port, context = "pas_http_core")
 
 		"""
 Configure common paths and settings
@@ -102,7 +97,7 @@ Runs the server
 		try: self.server.run()
 		except Exception as handled_exception:
 		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception)
+			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_http_core")
 		#
 	#
 

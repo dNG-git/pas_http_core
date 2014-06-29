@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.output.menu.File
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from os import path
 import os
@@ -29,11 +24,11 @@ import os
 from dNG.pas.data.cached_json_file import CachedJsonFile
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.xhtml.link import Link
-from dNG.pas.module.blocks.abstract_block import AbstractBlock
-from dNG.pas.module.blocks.output.filter_links_mixin import FilterLinksMixin
-from dNG.pas.module.blocks.output.options_block_mixin import OptionsBlockMixin
+from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
+from dNG.pas.module.controller.output.filter_links_mixin import FilterLinksMixin
+from dNG.pas.module.controller.output.options_block_mixin import OptionsBlockMixin
 
-class File(AbstractBlock, FilterLinksMixin, OptionsBlockMixin):
+class File(AbstractHttpController, FilterLinksMixin, OptionsBlockMixin):
 #
 	"""
 The "Main" class implements a main menu view.

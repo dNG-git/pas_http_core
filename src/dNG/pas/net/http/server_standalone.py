@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.net.http.ServerStandalone
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from wsgiref.simple_server import make_server
 
@@ -75,7 +70,7 @@ Configures the server
 
 		self.server = make_server(listener_host, self.port, HttpWsgi1Request)
 		self.server.socket.settimeout(5)
-		if (self.log_handler != None): self.log_handler.info("pas.http.core wsgiref server starts at '{0}:{1:d}'".format(self.host, self.port))
+		if (self.log_handler != None): self.log_handler.info("pas.http.core wsgiref server starts at '{0}:{1:d}'", self.host, self.port, context = "pas_http_core")
 
 		"""
 Configure common paths and settings
@@ -97,7 +92,7 @@ Runs the server
 		try: self.server.serve_forever(5)
 		except Exception as handled_exception:
 		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception)
+			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_http_core")
 		#
 	#
 

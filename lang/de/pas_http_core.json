@@ -1,11 +1,17 @@
 {
  "pas_http_core_edit": "Bearbeiten",
-
  "pas_http_core_js_required": "JavaScript wird benötigt",
-
+ "pas_http_core_level_up": "Zur übergeordneten Kategorie wechseln",
  "pas_http_core_pages": "Seiten",
-
  "pas_http_core_service_list_empty": "Derzeit sind keine Funktionen verfügbar oder du hast für die zugriffsbeschränkten Funktionen keine ausreichenden Rechte.",
+
+ "pas_http_core_user_author_bar_0": "Geschrieben durch",
+ "pas_http_core_user_author_bar_1": "Geschrieben am ",
+ "pas_http_core_user_author_bar_2": " durch",
+
+ "pas_http_core_user_publisher_bar_0": "Veröffentlicht durch",
+ "pas_http_core_user_publisher_bar_1": "Veröffentlicht am ",
+ "pas_http_core_user_publisher_bar_2": " durch",
 
  "errors_pas_http_core_400": "Die übermittelte Anfrage ist fehlerhaft und wird nicht verarbeitet.",
  "errors_pas_http_core_401": "Deine derzeitigen Zugangsrechte sind unzureichend, um die gewünschte Aufgabe erfolgreich auszuführen. Melde dich bitte gegebenenfalls mit einem zugangsberechtigten Account an.",

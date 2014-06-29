@@ -1,9 +1,9 @@
 <div class="pageform_element">
-	<div class="pageform_label"><strong>[rewrite:content]title[/rewrite][if:content:required == True] <em>*</em>[/if]</strong>:</div>
+	<div class="pageform_label"><strong>[rewrite:content]title[/rewrite][if:content:required== 1] <em>*</em>[/if]</strong>:</div>
 	<div class="pageform_field">
-		<select id="[rewrite:content]id[/rewrite]" name="[rewrite:content]name[/rewrite]"[if:content:required == True] required="required"[/if] class="pageform_select" size="1">
+		<select id="[rewrite:content]id[/rewrite]" name="[rewrite:content]name[/rewrite]"[if:content:required== 1] required="required"[/if] class="pageform_select" size="1">
 [each:content:choices:choice]
-			<option value="[rewrite:content]choices.choice.value[/rewrite]"[if:content:choices.choice.selected == True] selected="selected"[/if]>[rewrite:content]choices.choice.title[/rewrite]</option>
+			<option value="[rewrite:content]choices.choice.value[/rewrite]"[if:content:choices.choice.selected== 1] selected="selected"[/if]>[rewrite:content]choices.choice.title[/rewrite]</option>
 [/each]
 		</select><script type="text/javascript"><![CDATA[
 		require([ "djs/formX.min" ], function(formX) {

@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.controller.HttpWsgi1Request
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,14 +16,13 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
+from collections import Mapping
 from os import path
 import re
 
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.http.request_body_urlencoded import RequestBodyUrlencoded
 from dNG.pas.data.http.virtual_config import VirtualConfig
 from dNG.pas.runtime.io_exception import IOException
 from .abstract_http_request import AbstractHttpRequest
@@ -111,7 +106,7 @@ Request path after the script
 				elif (key == "REMOTE_ADDR" and self.client_host == None): self.client_host = wsgi_env[key]
 				elif (key == "REMOTE_HOST"): self.client_host = wsgi_env[key]
 				elif (key == "REMOTE_PORT"): self.client_port = wsgi_env[key]
-				elif (key == "REQUEST_METHOD"): self.type = wsgi_env[key]
+				elif (key == "REQUEST_METHOD"): self.type = wsgi_env[key].upper()
 				elif (key == "SCRIPT_NAME"): self.script_pathname = wsgi_env[key]
 				elif (key == "QUERY_STRING"): self.query_string = wsgi_env[key]
 				elif (key == "PATH_INFO"): self.virtual_pathname = wsgi_env[key]
@@ -149,7 +144,7 @@ Request path after the script
 		try: self.execute()
 		except Exception as handled_exception:
 		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception)
+			if (self.log_handler != None): self.log_handler.error(handled_exception, "pas_http_core")
 
 			# Died before output
 			if (not self.http_wsgi_stream_response.are_headers_sent()):
@@ -185,15 +180,11 @@ Returns the unparsed request parameters.
 
 		_return = AbstractHttpRequest.parse_iline(self.query_string)
 
-		request_body = RequestBodyUrlencoded()
-		request_body = self.configure_request_body(request_body, "application/x-www-form-urlencoded")
+		request_body = self.get_request_body(content_type_expected = "application/x-www-form-urlencoded")
 
-		if (request_body != None):
+		if (isinstance(request_body, Mapping)):
 		#
-			try: post_data = request_body.get_dict()
-			except Exception: post_data = { }
-
-			for key in post_data: _return[key] = post_data[key]
+			for key in request_body: _return[key] = request_body[key]
 		#
 
 		return _return

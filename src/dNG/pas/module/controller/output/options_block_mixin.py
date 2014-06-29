@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.output.OptionsBlockMixin
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from dNG.data.xml_parser import XmlParser
 from dNG.pas.data.settings import Settings
@@ -51,7 +46,7 @@ description and optional image.
 		"""
 Renders a link.
 
-:return: (str) Link (X)HTML
+:return: (str) Link XHTML
 :since:  v0.1.01
 		"""
 

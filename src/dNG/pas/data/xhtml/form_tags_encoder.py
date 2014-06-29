@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.FormTagsEncoder
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 import re
 
@@ -30,7 +25,8 @@ from dNG.pas.data.text.form_tags_encoder import FormTagsEncoder as _FormTagsEnco
 class FormTagsEncoder(_FormTagsEncoder):
 #
 	"""
-The OSet parser takes a template string to render the output.
+Encodes data as well as some typical (X)HTML statements and validates
+FormTags.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved

@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.controller.AbstractHttpRequest
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 # pylint: disable=import-error,invalid-name,no-name-in-module
 
@@ -36,6 +31,8 @@ except ImportError: from urllib import quote, unquote
 from dNG.data.rfc.header import Header
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.request_body import RequestBody
+from dNG.pas.data.http.request_body_multipart import RequestBodyMultipart
+from dNG.pas.data.http.request_body_urlencoded import RequestBodyUrlencoded
 from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.module.named_loader import NamedLoader
@@ -47,9 +44,9 @@ from .stdout_stream_response import StdoutStreamResponse
 try:
 #
 	from dNG.pas.data.session.http_adapter import HttpAdapter as HttpSessionAdapter
-	from dNG.pas.data.session.implementation import Implementation as SessionImplementation
+	from dNG.pas.data.session.implementation import Implementation as Session
 #
-except ImportError: SessionImplementation = None
+except ImportError: Session = None
 
 class AbstractHttpRequest(AbstractRequest, AbstractHttpMixin):
 #
@@ -111,6 +108,10 @@ Constructor __init__(AbstractHttpRequest)
 		"""
 Request body pointer
 		"""
+		self.body_instance = None
+		"""
+Request body instance
+		"""
 		self.inner_request = None
 		"""
 A inner request is used to support protocols based on other ones (e.g.
@@ -120,53 +121,6 @@ JSON-RPC based on HTTP).
 		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 
 		self.supported_features['inner_request'] = True
-	#
-
-	def configure_request_body(self, request_body, content_type_expected = None):
-	#
-		"""
-Configures the given RequestBody to be read by the Request implementation.
-
-:param request_body: RequestBody instance
-:param content_type_expected: Expected Content-Type header if any to use the
-                              RequestBody instance.
-
-:return: (object) Configured RequestBody instance
-:since:  v0.1.00
-		"""
-
-		_return = None
-
-		if (isinstance(request_body, RequestBody)):
-		#
-			if (content_type_expected != None):
-			#
-				content_type = InputFilter.filter_control_chars(self.get_header("Content-Type"))
-				if (content_type != None): content_type = content_type.lower().split(";", 1)[0]
-			#
-
-			content_length = InputFilter.filter_int(self.get_header("Content-Length"))
-
-			if (self.body_fp != None
-			    and (content_type_expected == None or (content_type != None and content_type == content_type_expected))
-			    and ((content_length != None and content_length > 0)
-			         or "chunked" in Header.get_field_list_dict(self.get_header("Transfer-Encoding"))
-			        )
-			   ):
-			#
-				if (content_length != None): request_body.set_input_size(content_length)
-				else: request_body.define_input_chunk_encoded(True)
-
-				content_encoding = self.get_header("Content-Encoding")
-				if (content_encoding != None): request_body.define_input_compression(content_encoding)
-
-				request_body.set_input_ptr(self.body_fp)
-				self.body_fp = None
-				_return = request_body
-			#
-		#
-
-		return _return
 	#
 
 	def execute(self):
@@ -212,7 +166,7 @@ Executes the incoming request.
 		#
 		except Exception as handled_exception:
 		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception)
+			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_http_core")
 			response.handle_exception(None, handled_exception)
 		#
 
@@ -230,9 +184,11 @@ Executes the given request and generate content for the given response.
 		requested_module = request.get_module()
 		requested_service = "".join([word.capitalize() for word in request.get_service().split("_")])
 
-		if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))):
+		if (self.log_handler != None): self.log_handler.debug("{0!r} has been called for 'dNG.pas.module.controller.{1}.{2}'", self, requested_module, requested_service, context = "pas_http_core")
+
+		if (NamedLoader.is_defined("dNG.pas.module.controller.{0}.{1}".format(requested_module, requested_service))):
 		#
-			instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.{1}".format(requested_module, requested_service))
+			instance = NamedLoader.get_instance("dNG.pas.module.controller.{0}.{1}".format(requested_module, requested_service))
 			if (self.log_handler != None): instance.set_log_handler(self.log_handler)
 
 			instance.init(request, response)
@@ -241,9 +197,9 @@ Executes the given request and generate content for the given response.
 		#
 		else:
 		#
-			if (NamedLoader.is_defined("dNG.pas.module.blocks.{0}.Module".format(requested_module))):
+			if (NamedLoader.is_defined("dNG.pas.module.controller.{0}.Module".format(requested_module))):
 			#
-				instance = NamedLoader.get_instance("dNG.pas.module.blocks.{0}.Module".format(requested_module))
+				instance = NamedLoader.get_instance("dNG.pas.module.controller.{0}.Module".format(requested_module))
 				if (self.log_handler != None): instance.set_log_handler(self.log_handler)
 
 				instance.init(request, response)
@@ -264,6 +220,54 @@ Returns the inner request instance.
 		"""
 
 		return self.inner_request
+	#
+
+	def get_request_body(self, request_body_instance = None, content_type_expected = None):
+	#
+		"""
+Returns a configured RequestBody instance to be read by the Request
+implementation.
+
+:param request_body_instance: RequestBody instance to be configured
+:param content_type_expected: Expected Content-Type header if any to use the
+                              RequestBody instance.
+
+:return: (object) Configured RequestBody instance
+:since:  v0.1.00
+		"""
+
+		content_type = InputFilter.filter_control_chars(self.get_header("Content-Type"))
+		if (content_type != None): content_type = content_type.lower().split(";", 1)[0]
+
+		_return = (self._init_request_body(content_type)
+		           if (request_body_instance == None) else
+		           request_body_instance
+		          )
+
+		if (isinstance(_return, RequestBody)):
+		#
+			content_length = InputFilter.filter_int(self.get_header("Content-Length"))
+
+			if (self.body_fp != None
+			    and (content_type_expected == None or (content_type != None and content_type == content_type_expected))
+			    and ((content_length != None and content_length > 0)
+			         or "chunked" in Header.get_field_list_dict(self.get_header("Transfer-Encoding"))
+			        )
+			   ):
+			#
+				if (content_length != None): _return.set_input_size(content_length)
+				else: _return.define_input_chunk_encoded(True)
+
+				content_encoding = self.get_header("Content-Encoding")
+				if (content_encoding != None): _return.define_input_compression(content_encoding)
+
+				_return.set_headers(self.get_headers())
+				_return.set_input_ptr(self.body_fp)
+				self.body_fp = None
+			#
+		#
+
+		return _return
 	#
 
 	def handle_missing_service(self, response):
@@ -298,6 +302,29 @@ logged in and/or its timezone is identified.
 		self.timezone = float(Settings.get("core_timezone", (timezone / 3600)))
 	#
 
+	def _init_request_body(self, content_type):
+	#
+		"""
+Returns the RequestBody instance to be read by the Request implementation
+matching the given content type.
+
+:param content_type: Content type to be handled by the RequestBody instance
+
+:return: (object) RequestBody instance; None if not supported
+:since:  v0.1.00
+		"""
+
+		_return = None
+
+		if (content_type == "application/x-www-form-urlencoded"): _return = RequestBodyUrlencoded()
+		elif (content_type[:10] == "multipart/"): _return = RequestBodyMultipart()
+		elif (self.get_header("Content-Length") != None
+		      or self.get_header("Transfer-Encoding") != None
+		     ): _return = RequestBody()
+
+		return _return
+	#
+
 	def _init_response(self):
 	#
 		"""
@@ -313,9 +340,9 @@ Initializes the matching response instance.
 
 		try:
 		#
-			if (SessionImplementation != None):
+			if (Session != None):
 			#
-				session_class = SessionImplementation.get_class()
+				session_class = Session.get_class()
 				session_class.set_adapter(HttpSessionAdapter)
 
 				session = session_class.load(session_create = False)
@@ -332,7 +359,7 @@ Initializes the matching response instance.
 		#
 		except Exception as handled_exception:
 		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception)
+			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_http_core")
 		#
 
 		if (self.lang == ""): self.lang = self.lang_default
@@ -432,21 +459,49 @@ instance.
 		"""
 
 		if (virtual_config == None): _return = None
+		elif ("path_parameters" in virtual_config and virtual_config['path_parameters']):
+		#
+			_return = NamedLoader.get_instance("dNG.pas.controller.PredefinedHttpRequest")
+
+			encoded_parameters = virtual_pathname[len(virtual_config['_path_prefix']):].split("/")
+
+			parameters = { }
+			dsds = { }
+
+			for encoded_parameter in encoded_parameters:
+			#
+				parameter = encoded_parameter.split(" ", 2)
+
+				if (len(parameter) == 2): parameters[parameter[0]] = parameter[1]
+				elif (len(parameter) == 3 and parameter[0] == "dsd"): dsds[parameter[1]] = parameter[2]
+			#
+
+			if ("m" in virtual_config): _return.set_module(virtual_config['m'])
+			elif ("m" in parameters): _return.set_module(parameters['m'])
+
+			if ("s" in virtual_config): _return.set_service(virtual_config['s'])
+			elif ("s" in parameters): _return.set_service(parameters['s'])
+
+			if ("a" in virtual_config): _return.set_action(virtual_config['a'])
+			elif ("a" in parameters): _return.set_action(parameters['a'])
+
+			for key in dsds: _return.set_dsd(key, dsds[key])
+		#
 		elif ("setup_callback" in virtual_config):
 		#
-			if ("uri" in virtual_config):
+			if ("path" in virtual_config):
 			#
-				uri = (virtual_pathname[len(virtual_config['uri_prefix']):]
-				       if ("uri_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['uri_prefix'])) else
-				       virtual_pathname
-				      )
+				path = (virtual_pathname[len(virtual_config['_path_prefix']):]
+				        if ("_path_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['_path_prefix'])) else
+				        virtual_pathname
+				       )
 
-				self.set_dsd(virtual_config['uri'], uri)
+				self.set_dsd(virtual_config['path'], path)
 			#
 
 			_return = virtual_config['setup_callback'](self, virtual_config)
 		#
-		elif ("m" in virtual_config or "s" in virtual_config or "a" in virtual_config or "uri" in virtual_config):
+		elif ("m" in virtual_config or "s" in virtual_config or "a" in virtual_config or "path" in virtual_config):
 		#
 			_return = NamedLoader.get_instance("dNG.pas.controller.PredefinedHttpRequest")
 
@@ -459,14 +514,14 @@ instance.
 				for key in virtual_config['dsd']: _return.set_dsd(key, virtual_config['dsd'][key])
 			#
 
-			if ("uri" in virtual_config):
+			if ("path" in virtual_config):
 			#
-				uri = (virtual_pathname[len(virtual_config['uri_prefix']):]
-				       if ("uri_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['uri_prefix'])) else
-				       virtual_pathname
-				      )
+				path = (virtual_pathname[len(virtual_config['_path_prefix']):]
+				        if ("_path_prefix" in virtual_config and virtual_pathname.lower().startswith(virtual_config['_path_prefix'])) else
+				        virtual_pathname
+				       )
 
-				_return.set_dsd(virtual_config['uri'], uri)
+				_return.set_dsd(virtual_config['path'], path)
 			#
 		#
 
@@ -509,7 +564,7 @@ Respond the request with the given response.
 		#
 		except Exception as handled_exception:
 		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception)
+			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_http_core")
 		#
 
 		AbstractRequest._respond(self, response)
@@ -525,8 +580,22 @@ Sets the inner request object.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Request.set_inner_request(+request)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_inner_request()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 		self.inner_request = request
+	#
+
+	def set_session(self, session):
+	#
+		"""
+Sets the associated session.
+
+:param session: (object) Session instance
+
+:since: v0.1.00
+		"""
+
+		AbstractHttpMixin.set_session(self, session)
+		if (isinstance(self.inner_request, AbstractInnerRequest) and self.inner_request.is_supported("session")): self.inner_request.set_session(session)
 	#
 
 	@staticmethod

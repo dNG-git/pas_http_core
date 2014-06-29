@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.tag_parser.RewriteDateTimeXhtmlMixin
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,12 +16,10 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from dNG.data.rfc.basics import Basics as RfcBasics
 from dNG.data.xml_parser import XmlParser
-from dNG.pas.data.text.date_time import DateTime
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.text.tag_parser.rewrite_date_time_mixin import RewriteDateTimeMixin
 
@@ -47,16 +41,18 @@ formatted date and time XHTML tagged strings.
 	def render_rewrite_date_time_xhtml(self, source, key, _type):
 	#
 		"""
-Checks and renders the rewrite statement.
+Renders a date and time XHTML 5 tag based on the given presentation type.
 
 :param source: Source for rewrite
 :param key: Key in source for rewrite
+:param _type: Presentation type
 
 :return: (str) Rewritten statement if successful
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time_xhtml(source, {1}, {2})- (#echo(__LINE__)#)".format(self, key, _type))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time_xhtml({1}, {2})- (#echo(__LINE__)#)", self, key, _type, context = "pas_tag_parser")
+		_return = L10n.get("core_unknown")
 
 		timestamp = self.get_source_value(source, key)
 

@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.AbstractBlock
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,19 +16,19 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 import re
 
 from dNG.pas.controller.abstract_request import AbstractRequest
 from dNG.pas.controller.abstract_response import AbstractResponse
 from dNG.pas.data.http.translatable_exception import TranslatableException
+from .abstract import Abstract as AbstractController
 
-class AbstractBlock(object):
+class AbstractHttp(AbstractController):
 #
 	"""
-"AbstractBlock" provides methods for module and service implementations.
+"AbstractHttp" provides methods for HTTP module and service implementations.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -46,10 +42,12 @@ class AbstractBlock(object):
 	def __init__(self):
 	#
 		"""
-Constructor __init__(AbstractBlock)
+Constructor __init__(AbstractHttp)
 
 :since: v0.1.00
 		"""
+
+		AbstractController.__init__(self)
 
 		self.action = None
 		"""
@@ -63,40 +61,16 @@ Action result
 		"""
 Secondary action context
 		"""
-		self.log_handler = None
-		"""
-The LogHandler is called whenever debug messages should be logged or errors
-happened.
-		"""
 		self.primary_action = True
 		"""
 True if action is the primary requested one
 		"""
-		self.request = None
-		"""
-Request instance
-		"""
-		self.response = None
-		"""
-Response instance
-		"""
-	#
-
-	def __del__(self):
-	#
-		"""
-Destructor __del__(AbstractBlock)
-
-:since: v0.1.00
-		"""
-
-		pass
 	#
 
 	def init(self, request, response):
 	#
 		"""
-Initialize block from the given request and response.
+Initializes the controller from the given request and response.
 
 :param request: Request object
 :param response: Response object
@@ -104,9 +78,8 @@ Initialize block from the given request and response.
 :since: v0.1.00
 		"""
 
+		AbstractController.init(self, request, response)
 		self.action = request.get_action()
-		self.request = request
-		self.response = response
 	#
 
 	def execute(self):
@@ -117,7 +90,7 @@ Execute the requested action.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("pas.http.core.Block identified action '{0}'".format(self.action))
+		if (self.log_handler != None): self.log_handler.debug("{0!r} identified action '{1}'", self, self.action, context = "pas_http_core")
 		method = "execute_{0}".format(re.sub("\\W", "_", self.action))
 
 		if (hasattr(self, method)):
@@ -148,8 +121,9 @@ Sets an block action for execution.
 		self.action = action
 		self.context = context
 		self.primary_action = False
-		self.request = AbstractRequest.get_instance()
-		self.response = AbstractResponse.get_instance()
+
+		if (self.request == None): self.request = AbstractRequest.get_instance()
+		if (self.response == None): self.response = AbstractResponse.get_instance()
 	#
 
 	def set_action_result(self, result):
@@ -163,19 +137,6 @@ Sets an action result.
 		"""
 
 		self.action_result = result
-	#
-
-	def set_log_handler(self, log_handler):
-	#
-		"""
-Sets the LogHandler.
-
-:param log_handler: LogHandler to use
-
-:since: v0.1.00
-		"""
-
-		self.log_handler = log_handler
 	#
 #
 

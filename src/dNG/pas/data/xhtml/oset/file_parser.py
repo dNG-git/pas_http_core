@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.oset.FileParser
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from os import path
 import os
@@ -31,6 +26,7 @@ from dNG.pas.data.settings import Settings
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.runtime.io_exception import IOException
+from dNG.pas.runtime.type_exception import TypeException
 from .parser import Parser
 
 class FileParser(Parser):
@@ -87,11 +83,13 @@ Renders content ready for output from the given OSet template.
 
 		# pylint: disable=broad-except
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1}, +content)- (#echo(__LINE__)#)".format(self, template_name))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, template_name, context = "pas_http_core")
 		_return = ("<span>{0}</span>".format(L10n.get("errors_pas_http_core_oset_not_viewable")) if (default == None) else default)
 
 		try:
 		#
+			if (type(template_name) != str): raise TypeException("Given OSet template name is not valid")
+
 			file_pathname = path.normpath("{0}/{1}/{2}.tsc".format(self.path, self.oset, template_name.replace(".", "/")))
 			if (not os.access(file_pathname, os.R_OK)): file_pathname = path.normpath("{0}/{1}/{2}.tsc".format(self.path, Settings.get("pas_http_theme_oset_default", "xhtml5"), template_name.replace(".", "/")))
 
@@ -113,7 +111,7 @@ Renders content ready for output from the given OSet template.
 		#
 		except Exception as handled_exception:
 		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception)
+			if (self.log_handler != None): self.log_handler.error(handled_exception, "pas_http_core")
 		#
 
 		return _return

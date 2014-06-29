@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.tag_parser.RewriteFormTagsXhtmlMixin
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.text.tag_parser.source_value_mixin import SourceValueMixin
@@ -45,16 +40,16 @@ safe XHTML compliant output.
 	def render_rewrite_form_tags_xhtml(self, source, key):
 	#
 		"""
-Checks and renders the rewrite statement.
+Renders the FormTags content for XHTML output.
 
 :param source: Source for rewrite
 :param key: Key in source for rewrite
 
-:return: (str) Rewritten statement if successful
+:return: (str) Rendered XHTML content
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_formtags_xhtml(source, {1})- (#echo(__LINE__)#)".format(self, key))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_formtags_xhtml({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
 
 		content = None
 		data = self.get_source_value(source, key)
@@ -63,11 +58,14 @@ Checks and renders the rewrite statement.
 		if (not isinstance(data, dict)): content = Binary.str(data)
 		elif ("content" in data):
 		#
-			content = data['content']
+			content = Binary.str(data['content'])
 			if ("main_id" in data): main_id = data['main_id']
 		#
 
-		if (type(content) == str): _return = FormTags.render(content, main_id = main_id)
+		_return = (FormTags.render(content, main_id = main_id)
+		           if (type(content) == str) else
+		           ""
+		          )
 
 		return _return
 	#

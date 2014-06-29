@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.module.blocks.output.Module
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,12 +16,11 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
-from dNG.pas.module.blocks.abstract_block import AbstractBlock
+from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 
-class Module(AbstractBlock):
+class Module(AbstractHttpController):
 #
 	"""
 Module for "output"

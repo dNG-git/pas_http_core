@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.controller.AbstractHttpResponse
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from time import time
 
@@ -137,7 +132,7 @@ Returns the current HTTP Content-Type header.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.get_content_type()- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.get_content_type()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 		self.get_header("Content-Type")
 	#
 
@@ -153,7 +148,7 @@ Returns an already defined header.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.get_header({0}, +name_as_key)- (#echo(__LINE__)#)".format(name))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.get_header({1})- (#echo(__LINE__)#)", self, name, context = "pas_http_core")
 
 		if (not self.stream_response.is_supported("headers")): return None
 		else: return self.stream_response.get_header(name, name_as_key)
@@ -314,7 +309,7 @@ compression setting and information about P3P.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.init(cache, compress)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.init()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 
 		expires = self.expires
 		last_modified = self.last_modified
@@ -419,7 +414,7 @@ Sets the charset used for the response.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_charset({0})- (#echo(__LINE__)#)".format(charset))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_charset({1})- (#echo(__LINE__)#)", self, charset, context = "pas_http_core")
 		self.charset = charset
 	#
 
@@ -463,7 +458,7 @@ the last modified timestamp with the current time.
 :since: v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_content_dynamic(mode)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_content_dynamic()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 
 		if (mode and self.initialized):
 		#
@@ -486,7 +481,7 @@ Sets the HTTP Content-Type header.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_content_type({0})- (#echo(__LINE__)#)".format(content_type))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_content_type({1})- (#echo(__LINE__)#)", self, content_type, context = "pas_http_core")
 		self.set_header("Content-Type", content_type)
 	#
 
@@ -506,7 +501,7 @@ Sets a cookie.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_cookie({0}, +value, {1:d}, +secure_only, +http_only, +domain, +path)- (#echo(__LINE__)#)".format(name, timeout))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_cookie({1}, {2:d})- (#echo(__LINE__)#)", self, name, timeout, context = "pas_http_core")
 		if (self.stream_response.is_supported("headers")): self.stream_response.set_cookie(name, value, timeout, secure_only, http_only, domain, path)
 	#
 
@@ -533,10 +528,10 @@ Sets a expires value.
 :since: v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response._set_expires({0:d})- (#echo(__LINE__)#)".format(timestamp))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._set_expires({1:d})- (#echo(__LINE__)#)", self, timestamp, context = "pas_http_core")
 
 		self.expires = timestamp
-		if (self.initialized and self.stream_response.is_supported("headers") and (not self.headers_sent)): self.stream_response.set_header("Expires", RfcBasics.get_rfc1123_datetime(self.expires))
+		if (self.initialized and self.stream_response.is_supported("headers") and (not self.headers_sent)): self.stream_response.set_header("Expires", RfcBasics.get_rfc5322_datetime(self.expires))
 	#
 
 	def set_expires_relative(self, timespan):
@@ -566,7 +561,7 @@ Sets a header.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_header({0}, +value, +name_as_key, +value_append)- (#echo(__LINE__)#)".format(name))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_header({1})- (#echo(__LINE__)#)", self, name, context = "pas_http_core")
 		if (self.stream_response.is_supported("headers")): self.stream_response.set_header(name, value, name_as_key, value_append)
 	#
 
@@ -593,10 +588,10 @@ Sets a last modified value.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response._set_last_modified({0:d})- (#echo(__LINE__)#)".format(timestamp))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._set_last_modified({1:d})- (#echo(__LINE__)#)", self, timestamp, context = "pas_http_core")
 
 		self.last_modified = timestamp
-		if (self.initialized and self.stream_response.is_supported("headers") and (not self.headers_sent)): self.stream_response.set_header("Last-Modified", RfcBasics.get_rfc1123_datetime(self.last_modified))
+		if (self.initialized and self.stream_response.is_supported("headers") and (not self.headers_sent)): self.stream_response.set_header("Last-Modified", RfcBasics.get_rfc5322_datetime(self.last_modified))
 	#
 
 	def set_raw_data(self, data):
@@ -626,7 +621,7 @@ Sets the called script name.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_script_name({0})- (#echo(__LINE__)#)".format(script_name))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_script_name({1})- (#echo(__LINE__)#)", self, script_name, context = "pas_http_core")
 		self.script_name = script_name
 	#
 
@@ -676,7 +671,7 @@ Sets the streamer to create response data when requested.
 :since: v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("{0!r} starts streaming with an IO chunk size of {1:d}".format(self, streamer.get_io_chunk_size()))
+		if (self.log_handler != None): self.log_handler.debug("{0!r} starts streaming with an IO chunk size of {1:d}", self, streamer.get_io_chunk_size(), context = "pas_http_core")
 		self.stream_response.set_streamer(streamer)
 	#
 
@@ -690,7 +685,7 @@ Sets the title set for the response.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Response.set_title({0})- (#echo(__LINE__)#)".format(title))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_title({1})- (#echo(__LINE__)#)", self, title, context = "pas_http_core")
 		self.title = title
 	#
 

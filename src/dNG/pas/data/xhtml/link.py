@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.Link
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from dNG.pas.controller.abstract_response import AbstractResponse
 from dNG.pas.controller.http_xhtml_response import HttpXhtmlResponse
@@ -46,19 +41,19 @@ TODO: Code incomplete
 
 	# pylint: disable=arguments-differ
 
-	TYPE_FORM_FIELDS = 16
+	TYPE_FORM_FIELDS = 32
 	"""
 Hidden input fields
 	"""
-	TYPE_FORM_URL = 32
+	TYPE_FORM_URL = 64
 	"""
 Form action URL
 	"""
-	TYPE_JS_REQUIRED = 64
+	TYPE_JS_REQUIRED = 128
 	"""
 JavaScript is required
 	"""
-	TYPE_QUERY_STRING = 128
+	TYPE_QUERY_STRING = 256
 	"""
 Generate the query string
 	"""

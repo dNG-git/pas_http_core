@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.text.AbstractFormTags
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 import re
 
@@ -31,7 +26,7 @@ from dNG.pas.module.named_loader import NamedLoader
 class AbstractFormTags(AbstractTagParser):
 #
 	"""
-The OSet parser takes a template string to render the output.
+Abstract parser to handle FormTags.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved

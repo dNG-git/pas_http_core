@@ -1,17 +1,17 @@
 <div class="pageform_element pageform_element_radio">
-	<div class="pageform_label"><strong>[rewrite:content]title[/rewrite][if:content:required == True] <em>*</em>[/if]</strong>:</div>
+	<div class="pageform_label"><strong>[rewrite:content]title[/rewrite][if:content:required== 1] <em>*</em>[/if]</strong>:</div>
 	<div class="pageform_field">
-		<ul class="pageform_radio">
+		<p><ul class="pageform_radio">
 [each:content:choices:choice]
-			<li><label for="[rewrite:content]choices.choice.id[/rewrite]" class="pageform_radio_label"><input id="[rewrite:content]choices.choice.id[/rewrite]" type="radio" name="[rewrite:content]name[/rewrite]" value="[rewrite:content]choices.choice.value[/rewrite]"[if:content:choices.choice.selected == True] checked="checked"[/if] /> [rewrite:content]choices.choice.title[/rewrite]</label><script type="text/javascript"><![CDATA[
+			<li><label for="[rewrite:content]choices.choice.id[/rewrite]" class="pageform_radio_label"><input id="[rewrite:content]choices.choice.id[/rewrite]" type="radio" name="[rewrite:content]name[/rewrite]" value="[rewrite:content]choices.choice.value[/rewrite]"[if:content:choices.choice.selected== 1] checked="checked"[/if] /> [rewrite:content]choices.choice.title[/rewrite]</label><script type="text/javascript"><![CDATA[
 			require([ "djs/formX.min" ], function(formX) {
 				formX.init({ id: "[rewrite:content]choices.choice.id[/rewrite]", type: "radio" });
 			});
 			]]></script></li>
 [/each]
-		</ul>
+		</ul></p>
 [if:content:error_message != ]
-		<span class="pageform_error">[rewrite:content]error_message[/rewrite]</span>
+		<p class="pageform_error">[rewrite:content]error_message[/rewrite]</p>
 [/if]
 	</div>
 </div>

@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.theme.Renderer
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from copy import copy
 from os import path
@@ -35,13 +30,13 @@ from dNG.pas.data.settings import Settings
 from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.text.tag_parser.abstract import Abstract as AbstractTagParser
-from dNG.pas.data.text.tag_parser.block_mixin import BlockMixin
 from dNG.pas.data.text.tag_parser.each_mixin import EachMixin
 from dNG.pas.data.text.tag_parser.if_condition_mixin import IfConditionMixin
 from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
 from dNG.pas.data.xhtml.content_link_renderer import ContentLinkRenderer
 from dNG.pas.data.xhtml.formatting import Formatting
 from dNG.pas.data.xhtml.link import Link
+from dNG.pas.data.xhtml.tag_parser.block_mixin import BlockMixin
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.runtime.io_exception import IOException
 
@@ -322,7 +317,7 @@ Renders content ready for output from the given OSet template.
 
 		# pylint: disable=no-member
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Renderer.render(template_data, content)- (#echo(__LINE__)#)")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 
 		theme = self.theme
 		theme_subtype = self.theme_subtype
@@ -400,7 +395,7 @@ Sets the theme to use.
 		"""
 
 		theme = Binary.str(theme)
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Renderer.set({0})- (#echo(__LINE__)#)".format(theme))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set({1})- (#echo(__LINE__)#)", self, theme, context = "pas_http_core")
 
 		theme = theme.replace(".", "/")
 		file_pathname = path.normpath("{0}/{1}/site.tsc".format(self.path, theme))
@@ -505,7 +500,7 @@ Sets the theme subtype to use.
 		"""
 
 		subtype = Binary.str(subtype)
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Renderer.set_subtype({0})- (#echo(__LINE__)#)".format(subtype))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_subtype({1})- (#echo(__LINE__)#)", self, subtype, context = "pas_http_core")
 
 		self.theme_subtype = subtype
 	#
@@ -520,7 +515,7 @@ Sets the title to use.
 		"""
 
 		title = Binary.str(title)
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -Renderer.set_title({0})- (#echo(__LINE__)#)".format(title))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_title({1})- (#echo(__LINE__)#)", self, title, context = "pas_http_core")
 
 		self.title = title
 	#

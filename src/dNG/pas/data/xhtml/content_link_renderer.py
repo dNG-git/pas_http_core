@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.ContentLinkRenderer
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,15 +16,15 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 import re
 
 from dNG.data.xml_parser import XmlParser
+from dNG.pas.data.text.content_link_renderer import ContentLinkRenderer as _ContentLinkRenderer
 from dNG.pas.data.xhtml.link import Link
 
-class ContentLinkRenderer(object):
+class ContentLinkRenderer(_ContentLinkRenderer):
 #
 	"""
 The link renderer parses and renders internal links to DataLinker and other
@@ -43,77 +39,56 @@ sources.
              Mozilla Public License, v. 2.0
 	"""
 
-	def __init__(self):
+	def _get_link_parameters(self, data):
 	#
 		"""
-Constructor __init__(ContentLinkRenderer)
+Returns a dict of parameters to be used with a Link instance.
 
-:since: v0.1.01
+:param data: Link definition
+
+:return: (dict) Link parameters
+:since:  v0.1.01
 		"""
 
-		self.datalinker_main_id = None
-		"""
-DataLinker main ID for tags
-		"""
+		_return = { }
+
+		if ("id" in data): _return = _ContentLinkRenderer._get_link_parameters(self, data)
+		elif ("link" in data and data['link'] == "params"):
+		#
+			if ("m" in data): _return['m'] = data['m']
+			if ("s" in data): _return['s'] = data['s']
+			if ("a" in data): _return['a'] = data['a']
+
+			if ("dsd" in data):
+			#
+				_return['dsd'] = data['dsd']
+				if ("__source__" in data['dsd']): _return['dsd'] = re.sub("\\_\\_source\\_\\_", Link.encode_query_value(Link().build_url(Link.TYPE_QUERY_STRING, { "__request__": True })), _return['dsd'])
+				_return['dsd'] = re.sub("\\_\\_\\w+\\\\_\\_", "", _return['dsd'])
+			#
+		#
+		elif ("tag" in data and self.datalinker_main_id != None): _ContentLinkRenderer._get_link_parameters(self, data)
+
+		return _return
 	#
 
-	def render(self, content, data):
+	def _render(self, content, link_type, link_parameters):
 	#
 		"""
-Renders a link ready for output.
+Renders a link with the parsed parameters ready for output.
 
 :param content: Content data
-:param data: Link parameters
+:param link_type: Link type
+:param link_parameters: Link parameters
 
 :return: (str) Rendered content
 :since:  v0.1.01
 		"""
 
-		_return = content
+		link_arguments = { "tag": "a",
+		                   "attributes": { "href": Link().build_url(link_type, link_parameters) }
+		                 }
 
-		if ("type" in data): _type = (data['type'] if (type(data['type']) == int) else Link.get_type(data['type']))
-		else: _type = Link.TYPE_RELATIVE
-
-		if ("id" in data): parameters = { "m": "datalinker", "a": "related", "dsd": { "oid": data['id'] } }
-		elif ("link" in data and data['link'] == "params"):
-		#
-			parameters = { }
-			if ("m" in data): parameters['m'] = data['m']
-			if ("s" in data): parameters['s'] = data['s']
-			if ("a" in data): parameters['a'] = data['a']
-
-			if ("dsd" in data):
-			#
-				parameters['dsd'] = data['dsd']
-				if ("__source__" in data['dsd']): parameters['dsd'] = re.sub("\\_\\_source\\_\\_", Link.encode_query_value(Link().build_url(Link.TYPE_QUERY_STRING, { "__request__": True })), parameters['dsd'])
-				parameters['dsd'] = re.sub("\\[\\w+\\]", "", parameters['dsd'])
-			#
-		#
-		elif ("tag" in data and self.datalinker_main_id != None): parameters = { "m": "datalinker", "a": "related", "dsd": { "otag": data['tag'], "omid": self.datalinker_main_id } }
-		else: parameters = { }
-
-		if (len(parameters) > 0):
-		#
-			link_arguments = { "tag": "a",
-			                   "attributes": { "href": Link().build_url(_type, parameters) }
-			                 }
-
-			_return = "{0}{1}</a>".format(XmlParser().dict_to_xml_item_encoder(link_arguments, False), content)
-
-		return _return
-	#
-
-	def set_datalinker_main_id(self, id_main):
-	#
-		"""
-Sets the DataLinker main ID for tags.
-
-:param id_main: DataLinker main ID
-
-:since: v0.1.01
-		"""
-
-		self.datalinker_main_id = id_main
+		return "{0}{1}</a>".format(XmlParser().dict_to_xml_item_encoder(link_arguments, False), content)
 	#
 #
 

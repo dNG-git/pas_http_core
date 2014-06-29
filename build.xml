@@ -16,6 +16,16 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 	<dirname property="pas.basedir" file="${ant.file}" />
 	<property file="${pas.basedir}/_extras/build.properties" />
 
+	<target name="compile.pas.css" description="Compile data.css ${ant.project.name}">
+		<exec executable="python">
+			<arg file="${cssBuilder.filePathName}" />
+			<arg value="--filetype=${cssBuilder.fileTypes}" />
+			<arg value="--include=${pas.basedir}/data/" />
+			<arg value="--strip_prefix=${pas.basedir}/" />
+			<arg value="--output_dirs_chmod=0755" />
+		</exec>
+	</target>
+
 	<target name="compile.pas.src" description="Compile src.py ${ant.project.name}">
 		<exec executable="python">
 			<arg file="${pyBuilder.filePathName}" />

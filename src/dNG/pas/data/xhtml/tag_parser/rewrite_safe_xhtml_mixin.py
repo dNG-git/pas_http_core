@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.tag_parser.RewriteSafeXhtmlMixin
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
 from dNG.pas.data.xhtml.formatting import Formatting
@@ -44,16 +39,16 @@ safe XHTML compliant output.
 	def render_rewrite_safe_xhtml(self, source, key):
 	#
 		"""
-Checks and renders the rewrite statement.
+Renders the content for safe (escaped) XHTML output.
 
 :param source: Source for rewrite
 :param key: Key in source for rewrite
 
-:return: (str) Rewritten statement if successful
+:return: (str) Rendered XHTML content
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_safe_xhtml(source, {1})- (#echo(__LINE__)#)".format(self, key))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_safe_xhtml({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
 		return Formatting.escape(self.render_rewrite(source, key))
 	#
 #

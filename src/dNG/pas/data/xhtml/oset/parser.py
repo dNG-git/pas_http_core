@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.xhtml.oset.Parser
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 import re
 
@@ -29,9 +24,10 @@ from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.text.tag_parser.abstract import Abstract as AbstractTagParser
-from dNG.pas.data.text.tag_parser.block_mixin import BlockMixin
 from dNG.pas.data.text.tag_parser.each_mixin import EachMixin
 from dNG.pas.data.text.tag_parser.if_condition_mixin import IfConditionMixin
+from dNG.pas.data.xhtml.content_link_renderer import ContentLinkRenderer
+from dNG.pas.data.xhtml.tag_parser.block_mixin import BlockMixin
 from dNG.pas.data.xhtml.tag_parser.rewrite_date_time_xhtml_mixin import RewriteDateTimeXhtmlMixin
 from dNG.pas.data.xhtml.tag_parser.rewrite_form_tags_xhtml_mixin import RewriteFormTagsXhtmlMixin
 from dNG.pas.data.xhtml.tag_parser.rewrite_safe_xhtml_mixin import RewriteSafeXhtmlMixin
@@ -153,6 +149,13 @@ Change data according to the matched tag.
 				elif (source == "settings"): _return += self.render_if_condition(self._update_mapped_element("settings", Settings.get_dict()), key, operator, value, data[data_position:tag_end_position])
 			#
 		#
+		elif (tag_definition['tag'] == "link"):
+		#
+			renderer = ContentLinkRenderer()
+			tag_params = Parser.parse_tag_parameters("link", data, tag_position, data_position)
+
+			_return += renderer.render(data[data_position:tag_end_position], tag_params)
+		#
 		elif (tag_definition['tag'] == "rewrite"):
 		#
 			source = re.match("^\\[rewrite:(\\w+)(:[\\w:]+)*\\]", data[tag_position:data_position]).group(1)
@@ -168,7 +171,9 @@ Change data according to the matched tag.
 				re_result = re.match("^\\[rewrite:timestamp:([\\w]+)\\]", data[tag_position:data_position])
 				_return += self.render_rewrite_date_time_xhtml(self._update_mapped_element("content", self.content), key, ("date_time_short" if (re_result == None) else re_result.group(1)))
 			#
+			elif (source == "user_author_bar"): _return += self.render_rewrite_user_xhtml_author_bar(self._update_mapped_element("content", self.content), key)
 			elif (source == "user_linked"): _return += self.render_rewrite_user_xhtml_link(self._update_mapped_element("content", self.content), key)
+			elif (source == "user_publisher_bar"): _return += self.render_rewrite_user_xhtml_publisher_bar(self._update_mapped_element("content", self.content), key)
 		#
 
 		_return += data_closed
@@ -190,7 +195,7 @@ Check if a possible tag match is a false positive.
 		_return = None
 
 		i = 0
-		tags = [ "block", "each", "if", "rewrite" ]
+		tags = [ "block", "each", "if", "link", "rewrite" ]
 		tags_length = len(tags)
 
 		while (_return == None and i < tags_length):
@@ -213,12 +218,26 @@ Check if a possible tag match is a false positive.
 				re_result = re.match("^\\[if:\\w+:[\\w\\.]+\\s*(\\!=|==).*?\\]", data)
 				if (re_result != None): _return = { "tag": "if", "tag_end": "[/if]", "type": "top_down" }
 			#
+			elif (data_match == "link"):
+			#
+				re_result = re.match("^\\[link:(.+)\\]", data)
+				if (re_result != None): _return = { "tag": "link", "tag_end": "[/link]" }
+			#
 			elif (data_match == "rewrite"):
 			#
 				re_result = re.match("^\\[rewrite:(\\w+)(:[\\w:]+)*\\]", data)
 
 				if (re_result != None
-				    and re_result.group(1) in [ "content", "formtags_content", "l10n", "safe_content", "settings", "timestamp", "user_linked" ]
+				    and re_result.group(1) in [ "content",
+				                                "formtags_content",
+				                                "l10n",
+				                                "safe_content",
+				                                "settings",
+				                                "timestamp",
+				                                "user_author_bar",
+				                                "user_linked",
+				                                "user_publisher_bar"
+				                              ]
 				   ): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
 			#
 
@@ -240,7 +259,7 @@ Renders content ready for output from the given OSet template.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render(template_data, content)- (#echo(__LINE__)#)".format(self))
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 
 		self.content = content
 		return self._parse(template_data)

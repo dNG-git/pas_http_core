@@ -2,10 +2,6 @@
 ##j## BOF
 
 """
-dNG.pas.data.http.ChunkedMixin
-"""
-"""n// NOTE
-----------------------------------------------------------------------------
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -20,8 +16,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-----------------------------------------------------------------------------
-NOTE_END //n"""
+"""
 
 from dNG.net.http.chunked_reader_mixin import ChunkedReaderMixin
 from dNG.pas.data.binary import Binary
