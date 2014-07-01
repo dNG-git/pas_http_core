@@ -68,7 +68,8 @@ are met.
 				is_content_length_set = False
 				is_valid = False
 
-				if (request.get_header('range') != None):
+				if (request.get_header('range') == None): is_valid = True
+				else:
 				#
 					streamer_size = streamer.get_size()
 					range_start = 0
@@ -93,9 +94,7 @@ are met.
 							range_end = streamer_size - 1
 						#
 
-						if (is_valid and range_start > 0): is_valid = streamer.is_supported("seeking")
-
-						if (is_valid and (range_start > 0 or range_end < streamer_size)):
+						if (is_valid):
 						#
 							response.set_header("HTTP/1.1", "HTTP/1.1 206 Partial Content", True)
 							response.set_header("Content-Length", 1 + (range_end - range_start))

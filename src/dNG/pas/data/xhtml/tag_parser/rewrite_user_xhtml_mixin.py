@@ -25,8 +25,10 @@ from dNG.pas.data.text.date_time import DateTime
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
 from dNG.pas.data.xhtml.formatting import Formatting
-from dNG.pas.database.nothing_matched_exception import NothingMatchedException
 from dNG.pas.module.named_loader import NamedLoader
+
+try: from dNG.pas.database.nothing_matched_exception import NothingMatchedException
+except ImportError: from dNG.pas.runtime.value_exception import ValueException as NothingMatchedException
 
 class RewriteUserXhtmlMixin(RewriteMixin):
 #

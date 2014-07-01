@@ -422,7 +422,7 @@ Initialize l10n
 
 		lang = (AbstractHttpRequest.filter_parameter(self.parameters['lang']) if ("lang" in self.parameters) else "")
 
-		if (lang != "" and os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang)), os.R_OK)): self.lang = lang
+		if (lang != "" and os.access(path.join(Settings.get("path_lang"), lang, "core.json"), os.R_OK)): self.lang = lang
 		else:
 		#
 			if (self.lang_default == ""): lang_rfc_region = Settings.get("core_lang", "en_US")
@@ -434,8 +434,8 @@ Initialize l10n
 			if (Settings.is_defined("pas_http_site_lang_{0}".format(lang_rfc_region))): lang_rfc_region = Settings.get("pas_http_site_lang_{0}".format(lang_rfc_region))
 			elif (Settings.is_defined("pas_http_site_lang_{0}".format(lang_domain))): lang_domain = Settings.get("pas_http_site_lang_{0}".format(lang_domain))
 
-			if (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_rfc_region)), os.R_OK)): self.lang_default = lang_rfc_region
-			elif (os.access(path.normpath("{0}/{1}/core.json".format(Settings.get("path_lang"), lang_domain)), os.R_OK)): self.lang_default = lang_domain
+			if (os.access(path.join(Settings.get("path_lang"), lang_rfc_region, "core.json"), os.R_OK)): self.lang_default = lang_rfc_region
+			elif (os.access(path.join(Settings.get("path_lang"), lang_domain, "core.json"), os.R_OK)): self.lang_default = lang_domain
 			else: self.lang_default = Settings.get("core_lang", "en")
 		#
 

@@ -21,10 +21,10 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 from dNG.pas.data.binary import Binary
 from .abstract_encapsulated import AbstractEncapsulated
 
-class HttpCompressed(AbstractEncapsulated):
+class HttpWsgi1(AbstractEncapsulated):
 #
 	"""
-Compressing streamer based on the given compressor.
+WSGI 1.0 compliant streamer.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -35,27 +35,6 @@ Compressing streamer based on the given compressor.
              Mozilla Public License, v. 2.0
 	"""
 
-	def __init__(self, streamer, compressor):
-	#
-		"""
-Constructor __init__(HttpCompressed)
-
-:param streamer: Encapsulated streamer instance
-:param compressor: Compression object
-
-:since: v0.1.00
-		"""
-
-		AbstractEncapsulated.__init__(self, streamer)
-
-		self.compressor = compressor
-		"""
-Compression function
-		"""
-
-		self.set_io_chunk_size(1048576)
-	#
-
 	def read(self, _bytes = None):
 	#
 		"""
@@ -64,32 +43,12 @@ Reads from the current streamer session.
 :param _bytes: How many bytes to read from the current position (0 means
                until EOF)
 
-:return: (bytes) Data; None if EOF
+:return: (bytes) Data; Empty byte string if EOF
 :since:  v0.1.00
 		"""
 
 		_return = AbstractEncapsulated.read(self, _bytes)
-		is_data_uncompressed = True
-
-		while (self.compressor != None and is_data_uncompressed):
-		#
-			if (_return == None):
-			#
-				_return = self.compressor.flush()
-
-				is_data_uncompressed = False
-				self.compressor = None
-			#
-			else:
-			#
-				_return = self.compressor.compress(Binary.bytes(_return))
-
-				# Feed compressor object with data until it returns at least one byte
-				is_data_uncompressed = (len(_return) < 1)
-				if (is_data_uncompressed): _return = AbstractEncapsulated.read(self, _bytes)
-			#
-		#
-
+		if (_return == None): _return = Binary.BYTES_TYPE()
 		return _return
 	#
 #

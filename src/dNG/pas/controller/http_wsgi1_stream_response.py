@@ -20,13 +20,14 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.streamer.http_compressed import HttpCompressed as HttpCompressedStreamer
+from dNG.pas.data.streamer.http_wsgi1 import HttpWsgi1 as HttpWsgi1Streamer
 from dNG.pas.runtime.iterator import Iterator
 from .abstract_http_stream_response import AbstractHttpStreamResponse
 
 class HttpWsgi1StreamResponse(AbstractHttpStreamResponse, Iterator):
 #
 	"""
-This stream response instance will write all data to the underlying WSGI
+This stream response instance will write all data to the underlying WSGI 1.0
 implementation.
 
 :author:     direct Netware Group
@@ -87,6 +88,7 @@ python.org: Return an iterator object.
 			#
 			else: streamer = self.streamer
 
+			streamer = HttpWsgi1Streamer(streamer)
 			_return = self.wsgi_file_wrapper(streamer)
 		#
 
@@ -98,7 +100,7 @@ python.org: Return an iterator object.
 		"""
 python.org: Return the next item from the container.
 
-:return: (str) Response data
+:return: (bytes) Response data
 :since:  v0.1.00
 		"""
 

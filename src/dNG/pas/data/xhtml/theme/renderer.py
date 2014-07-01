@@ -148,7 +148,7 @@ Checks if the given theme and subtype is supported.
 
 		if (theme != None):
 		#
-			file_pathname = path.normpath("{0}/{1}/{2}.tsc".format(self.path, theme.replace(".", "/"), ("site" if (subtype == None) else subtype)))
+			file_pathname = path.join(self.path, theme.replace(".", "/"), "{0}.tsc".format("site" if (subtype == None) else subtype))
 			_return = os.access(file_pathname, os.R_OK)
 		#
 
@@ -322,11 +322,11 @@ Renders content ready for output from the given OSet template.
 		theme = self.theme
 		theme_subtype = self.theme_subtype
 
-		file_pathname = path.normpath("{0}/{1}/{2}.tsc".format(self.path, theme, theme_subtype))
+		file_pathname = path.join(self.path, theme, "{0}.tsc".format(theme_subtype))
 
 		if (theme_subtype != "site" and (not os.access(file_pathname, os.R_OK))):
 		#
-			file_pathname = path.normpath("{0}/{1}/site.tsc".format(self.path, theme))
+			file_pathname = path.join(self.path, theme, "site.tsc")
 			theme_subtype = "site"
 		#
 
@@ -398,7 +398,7 @@ Sets the theme to use.
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set({1})- (#echo(__LINE__)#)", self, theme, context = "pas_http_core")
 
 		theme = theme.replace(".", "/")
-		file_pathname = path.normpath("{0}/{1}/site.tsc".format(self.path, theme))
+		file_pathname = path.join(self.path, theme, "site.tsc")
 
 		"""
 Retry with default theme
@@ -408,7 +408,7 @@ Retry with default theme
 		else:
 		#
 			self.theme = Settings.get("pas_http_theme_default", "simple").replace(".", "/")
-			file_pathname = path.normpath("{0}/{1}/site.tsc".format(self.path, self.theme))
+			file_pathname = path.normpath(self.path, self.theme, "site.tsc")
 		#
 
 		"""

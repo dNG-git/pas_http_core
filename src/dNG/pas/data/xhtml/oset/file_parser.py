@@ -90,8 +90,15 @@ Renders content ready for output from the given OSet template.
 		#
 			if (type(template_name) != str): raise TypeException("Given OSet template name is not valid")
 
-			file_pathname = path.normpath("{0}/{1}/{2}.tsc".format(self.path, self.oset, template_name.replace(".", "/")))
-			if (not os.access(file_pathname, os.R_OK)): file_pathname = path.normpath("{0}/{1}/{2}.tsc".format(self.path, Settings.get("pas_http_theme_oset_default", "xhtml5"), template_name.replace(".", "/")))
+			file_pathname = path.join(self.path, self.oset, "{0}.tsc".format(template_name.replace(".", "/")))
+
+			if (not os.access(file_pathname, os.R_OK)):
+			#
+				file_pathname = path.join(self.path,
+				                          Settings.get("pas_http_theme_oset_default", "xhtml5"),
+				                          "{0}.tsc".format(template_name.replace(".", "/"))
+				                         )
+			#
 
 			template_data = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_pathname))
 
