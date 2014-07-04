@@ -421,6 +421,20 @@ changed.
 		return False
 	#
 
+	def _check_match_list(self, data):
+	#
+		"""
+Check if a possible tag match is a valid "list" tag that needs to be changed.
+
+:param data: Data starting with the possible tag
+
+:return: (bool) True if change required
+:since:  v0.1.01
+		"""
+
+		return False
+	#
+
 	def _check_match_margin(self, data):
 	#
 		"""

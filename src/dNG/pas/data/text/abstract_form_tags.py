@@ -46,7 +46,7 @@ Abstract parser to handle FormTags.
 	TAGS = [ "b", "i", "s", "u", "color", "del", "face", "size",
 	         "center", "justify", "left", "right",
 	         "code", "link", "margin", "quote", "title", "url",
-	         "hr", "img"
+	         "hr", "img", "list"
 	       ]
 	"""
 Known tags used for en- and decoding.
@@ -159,9 +159,9 @@ Check if a possible tag match is a valid "center" tag.
 		if (tag_element_end_position > 8):
 		#
 			tag_params = AbstractFormTags.parse_tag_parameters("center", data, 0, tag_element_end_position)
-			if (data.find("[center:") == 0 and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
+			if (data[:8] == "[center:" and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
 		#
-		else: _return = (data.find("[center]") == 0)
+		else: _return = (data[:8] == "[center]")
 
 		return _return
 	#
@@ -269,11 +269,11 @@ Check if a possible tag match is a valid "img" tag.
 		#
 			tag_params = AbstractFormTags.parse_tag_parameters("img", data, 0, tag_element_end_position)
 
-			_return = (data.find("[img:") == 0)
+			_return = (data[:5] == "[img:")
 			if (_return and "width" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['width']) or AbstractFormTags.check_size_px(tag_params['width']))
 			if (_return and "height" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['height']) or AbstractFormTags.check_size_px(tag_params['height']))
 		#
-		else: _return = (data.find("[img]") == 0)
+		else: _return = (data[:5] == "[img]")
 
 		return _return
 	#
@@ -296,9 +296,9 @@ Check if a possible tag match is a valid "justify" tag.
 		if (tag_element_end_position > 9):
 		#
 			tag_params = AbstractFormTags.parse_tag_parameters("justify", data, 0, tag_element_end_position)
-			if (data.find("[justify:") == 0 and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
+			if (data[:9] == "[justify:" and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
 		#
-		else: _return = (data.find("[justify]") == 0)
+		else: _return = (data[:9] == "[justify]")
 
 		return _return
 	#
@@ -321,9 +321,9 @@ Check if a possible tag match is a valid "left" tag.
 		if (tag_element_end_position > 6):
 		#
 			tag_params = AbstractFormTags.parse_tag_parameters("left", data, 0, tag_element_end_position)
-			if (data.find("[left:") == 0 and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
+			if (data[:6] == "[left:" and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
 		#
-		else: _return = (data.find("[left]") == 0)
+		else: _return = (data[:6] == "[left]")
 
 		return _return
 	#
@@ -347,13 +347,38 @@ Check if a possible tag match is a valid "link" tag.
 		#
 			tag_params = AbstractFormTags.parse_tag_parameters("link", data, 0, tag_element_end_position)
 
-			if (data.find("[link:") == 0):
+			if (data[:6] == "[link:"):
 			#
 				if ("id" in tag_params): _return = (len(tag_params['id'].strip()) > 0)
 				elif (tag_params.get("link") == "params"): _return = (len(tag_params) > 1)
 				elif ("tag" in tag_params): _return = (len(tag_params['tag'].strip()) > 0)
 			#
 		#
+
+		return _return
+	#
+
+	def _check_match_list(self, data):
+	#
+		"""
+Check if a possible tag match is a valid "list" tag.
+
+:param data: Data starting with the possible tag
+
+:return: (bool) True if valid
+:since:  v0.1.01
+		"""
+
+		_return = False
+
+		tag_element_end_position = self._find_tag_end_position(data, 5)
+
+		if (tag_element_end_position > 6):
+		#
+			tag_params = AbstractFormTags.parse_tag_parameters("list", data, 0, tag_element_end_position)
+			_return = (data[:6] == "[list:" and "type" in tag_params)
+		#
+		else: _return = (data[:6] == "[list]")
 
 		return _return
 	#
@@ -414,9 +439,9 @@ Check if a possible tag match is a valid "right" tag.
 		if (tag_element_end_position > 7):
 		#
 			tag_params = AbstractFormTags.parse_tag_parameters("right", data, 0, tag_element_end_position)
-			if (data.find("[right:") == 0 and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
+			if (data[:7] == "[right:" and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
 		#
-		else: _return = (data.find("[right]") == 0)
+		else: _return = (data[:7] == "[right]")
 
 		return _return
 	#
@@ -446,7 +471,7 @@ Check if a possible tag matches the given expected, simple tag.
 :since:  v0.1.01
 		"""
 
-		return (data.find("[{0}]".format(tag)) == 0)
+		return (data[:len(tag) + 2] == "[{0}]".format(tag))
 	#
 
 	def _check_match_size(self, data):
@@ -657,6 +682,18 @@ Returns the "link" tag definition for the parser.
 		"""
 
 		return { "tag": "link", "tag_end": "[/link]" }
+	#
+
+	def _get_match_definition_list(self):
+	#
+		"""
+Returns the "list" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v0.1.01
+		"""
+
+		return { "tag": "list", "tag_end": "[/list]" }
 	#
 
 	def _get_match_definition_quote(self):

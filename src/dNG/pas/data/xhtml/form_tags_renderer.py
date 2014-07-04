@@ -327,6 +327,43 @@ Change data according to the "link" tag.
 		return _return
 	#
 
+	def _change_match_list(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "list" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = ""
+
+		list_content = data[data_position:tag_end_position]
+
+		if (len(list_content) > 0):
+		#
+			list_items = list_content.split("[*]")
+
+			_return = "<ul>"
+
+			for item in list_items:
+			#
+				item = item.strip()
+				if (len(item) > 0): _return += "<li>{0}</li>".format(item)
+			#
+
+			_return += "</ul>[nobr]"
+		#
+
+		return _return
+	#
+
 	def _change_match_margin(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
@@ -368,7 +405,7 @@ Change data according to the "nobr" tag.
 :since:  v0.1.01
 		"""
 
-		return (data[12 + tag_position:] if (data[6 + tag_position:13 + tag_position] == "<br />\n") else data[6 + tag_position:])
+		return (data[7 + tag_position:] if (data[6 + tag_position:7 + tag_position] == "\n") else data[6 + tag_position:])
 	#
 
 	def _change_match_right(self, data, tag_position, data_position, tag_end_position):
@@ -578,8 +615,8 @@ Renders the given FormTags content.
 		"""
 
 		if (not self.is_xhtml_allowed): content = Formatting.escape(content)
-		content = content.replace("\n", "<br />\n")
 		content = self._parse(content).strip()
+		content = content.replace("\n", "<br />\n")
 
 		return content
 	#
