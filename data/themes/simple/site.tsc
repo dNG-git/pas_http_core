@@ -18,8 +18,13 @@ a:visited { color: #2f2f2f }
 a:link, a:visited, a:focus { text-decoration: underline }
 a:active, a:hover, a:focus { color: #000000; text-decoration: none }
 
-body { margin: 0; padding: 0 31px; background-color: #ffffff }
-body { font-family: "Nimbus Sans L", "Lucida Grande", "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet MS", Helvetica, Verdana, Arial, sans-serif; font-size: 0.9em; font-style: normal; line-height: normal; font-weight: normal; color: #000000 }
+body {
+	margin: 0; padding: 0 10%; background-color: #eaeaea; border-top: 3em solid #375a9d;
+	font-family: "Nimbus Sans L", "Lucida Grande", "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet MS", Helvetica, Verdana, Arial, sans-serif; font-size: 0.9em; font-style: normal; line-height: normal; font-weight: normal; color: #202020
+}
+
+form { margin: 0; padding: 0 }
+
 h1, h2, h3, h4, h5, h6, summary { font-weight: bold }
 h1 { font-size: 1.75em }
 h2 { font-size: 1.70em }
@@ -27,8 +32,18 @@ h3 { font-size: 1.65em }
 h4 { font-size: 1.60em }
 h5 { font-size: 1.55em }
 h6, summary { font-size: 1.50em }
-header { margin: 10px 0; text-align: right }
-form { margin: 0; padding: 0 }
+
+header {
+	margin: -2px -2px 0 -2px; padding: 0.25em 2px; background-color: #193879; border-radius: 0.5em 0.5em 0 0;
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #193879), color-stop(1, #375a9d));
+	background-image: -o-linear-gradient(#193879 0%, #375a9d 100%);
+	background-image: -moz-linear-gradient(#193879 0%, #375a9d 100%);
+	background-image: -webkit-linear-gradient(#193879 0%, #375a9d 100%);
+	background-image: -ms-linear-gradient(#193879 0%, #375a9d 100%);
+	background-image: linear-gradient(#193879 0%, #375a9d 100%);
+	text-align: right
+}
+
 img { border: none }
 
 table { margin: 0; table-layout: fixed; border: none; border-collapse: collapse; border-spacing: 0 }
@@ -37,7 +52,7 @@ td:first-child, th:first-child { border-left: none }
 td:last-child, th:last-child { border-right: none }
 
 .designcopyright {
-	clear: both; margin: 0 -0.75% -0.25% -0.75%; padding: 0.5% 0.75% 0 0.75%; border-top: 1px solid #375a9d;
+	clear: both; margin: 0 -0.75% -0.15% -0.75%; padding: 0.6% 0.75% 0 0.75%; border-top: 1px solid #375a9d;
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(90, 90, 90, 0.2)), color-stop(1, rgba(255, 255, 255, 0)));
 	background-image: -o-linear-gradient(rgba(90, 90, 90, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
 	background-image: -moz-linear-gradient(rgba(90, 90, 90, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
@@ -50,22 +65,28 @@ td:last-child, th:last-child { border-right: none }
 .designcopyright a, .designcopyright a:link, .designcopyright a:active, .designcopyright a:visited, .designcopyright a:hover, .designcopyright a:focus { color: #202020 }
 
 .designmainblock {
-	padding: 0.75%; background-color: #ffffff; border: 1px solid #375a9d; border-radius: 0.5em; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+	margin: -1.5em 0; padding: 4px; background-color: #fdfdfd; border: 1px solid #193879; border-radius: 0.5em; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 	text-align: left; vertical-align: middle
 }
 
 .designpage > :first-child { margin-top: 0.5% }
 .designpage > :last-child { margin-bottom: 0.5% }
 
-.designtitle { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 3em; font-weight: bold }
+.designtitle { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 1.2em; font-weight: bold; color: #fafafa }
 
-.designtitle:before, .designtitle:after {
-	position: absolute; top: 100%;
-	content: " "
+@media only screen and (max-width: 46em) {
+	body { padding: 0 0.5em; border-top-width: 1em }
+	header { margin: -1px -1px 0 -1px; padding: 0.25em 1px }
+
+	.designmainblock { margin: -0.5em 0; padding: 2px }
 }
 
-.designtitle:before { left: 50%; margin-top: -8px; margin-left: -9px; border: 9px solid transparent; border-bottom-color: #375a9d }
-.designtitle:after { left: 50%; margin-top: -7px; margin-left: -9px; border: 9px solid transparent; border-bottom-color: #ffffff }
+@media only screen and (min-width: 46em) and (max-width: 62em) {
+	body { padding: 0 5%; border-top-width: 2em }
+	header { margin: -1px -1px 0 -1px; padding: 0.25em 1px }
+
+	.designmainblock { margin: -1em 0; padding: 2px }
+}
 ]]></style>
 [each:content:css_files:file]
 <link href="[rewrite:settings]http_path_mmedia_versioned[/rewrite]/[rewrite:content]css_files.file.name[/rewrite]" rel="stylesheet" type="text/css" />
@@ -74,26 +95,24 @@ td:last-child, th:last-child { border-right: none }
 [/each]
 </head>
 
-<body>
-<header><div style='display: inline-block; position: relative'>
+<body><div class='designmainblock'>
+	<header>
 [if:settings:pas_http_site_title_xhtml != ]
-	<span class='designtitle'>[rewrite:settings]pas_http_site_title_xhtml[/rewrite]</span>
+		<span class='designtitle'>[rewrite:settings]pas_http_site_title_xhtml[/rewrite]</span>
 [/if][if:settings:pas_http_site_title_xhtml == ]
-	<span class='designtitle'><i>direct</i> Netware Group</span>
+		<span class='designtitle'><i>direct</i> Netware Group</span>
 [/if]
-</div></header>
-<div class='designmainblock'>
+	</header>
 [block:settings:pas_http_site_menu_main]output.menu.File.render[/block]
-<div class='designpage'>
+	<div class='designpage'>
 [block]output.menu.Service.render_primary[/block]
 [block]output.NotificationBox.render[/block]
-<main>
+		<main>
 [rewrite:content]page_content[/rewrite]
-</main>
+		</main>
 [block]output.menu.Service.render_secondary[/block]
-</div>
-<footer class='designcopyright'>&#169; <i>direct</i> Netware Group - All rights reserved</footer>
-</div>
-</body>
+	</div>
+	<footer class='designcopyright'>&#169; <i>direct</i> Netware Group - All rights reserved</footer>
+</div></body>
 
 </html>

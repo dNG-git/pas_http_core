@@ -53,6 +53,14 @@ Constructor __init__(HttpXhtmlResponse)
 
 		AbstractHttpResponse.__init__(self)
 
+		self.css_files_cache = [ ]
+		"""
+CSS files to be added.
+		"""
+		self.js_files_cache = [ ]
+		"""
+JavaScript files to be added.
+		"""
 		self.html_canonical_url = ""
 		"""
 (X)HTML canonical URL of the response
@@ -77,6 +85,10 @@ Output theme (requested or configured)
 		"""
 Selected output theme
 		"""
+		self.theme_css_files_cache = [ ]
+		"""
+CSS files to be added.
+		"""
 		self.theme_renderer = None
 		"""
 Selected theme renderer
@@ -91,22 +103,41 @@ Response page title
 		"""
 
 		self.supported_features['html_canonical_url'] = True
+		self.supported_features['html_css_files'] = True
+		self.supported_features['html_js_files'] = True
 		self.supported_features['html_page_description'] = True
+		self.supported_features['html_theme'] = True
+	#
+
+	def add_css_file(self, css_file):
+	#
+		"""
+Add the defined Cascading Stylesheet file to the output.
+
+:param css_file: CSS file name
+
+:since: v0.1.00
+		"""
+
+		if (self.theme_renderer == None): self.css_files_cache.append(css_file)
+		else: self.theme_renderer.add_css_file(css_file)
 	#
 
 	def add_js_file(self, js_file):
 	#
 		"""
-Add the defined javascript file to the output.
+Add the defined JavaScript file to the output.
 
 :param js_file: JS file name
 
 :since: v0.1.00
 		"""
 
-		common_names = Settings.get("pas_http_theme_oset_js_aliases", { "jquery/jquery.min.js": "jquery/jquery-2.0.0.min.js" })
+		common_names = Settings.get("pas_http_theme_oset_js_aliases", { "jquery/jquery.min.js": "jquery/jquery-2.1.1.min.js" })
 		if (js_file in common_names): js_file = common_names[js_file]
-		self.theme_renderer.add_js_file(js_file)
+
+		if (self.theme_renderer == None): self.js_files_cache.append(js_file)
+		else: self.theme_renderer.add_js_file(js_file)
 	#
 
 	def add_oset_content(self, template_name, content = None):
@@ -131,6 +162,27 @@ Add output content from an OSet template.
 		#
 			if (self.content == None): self.content = ""
 			self.content += data
+		#
+	#
+
+	def add_theme_css_file(self, css_file):
+	#
+		"""
+Adds the requested CSS sprites to the output.
+
+:param css_file: Theme CSS file
+
+:since: v0.1.01
+		"""
+
+		if (self.theme_renderer == None): self.theme_css_files_cache.append(css_file)
+		else:
+		#
+			theme_css_file = "themes/{0}/{1}".format(self.get_theme_active(),
+			                                         css_file
+			                                        )
+
+			self.add_css_file(theme_css_file)
 		#
 	#
 
@@ -249,6 +301,10 @@ Set up theme framework
 
 			if (self.html_page_description != ""): self.theme_renderer.set_page_description(self.html_page_description)
 			if (p3p_url != ""): self.theme_renderer.set_p3p_url(p3p_url)
+
+			for css_file in self.css_files_cache: self.add_css_file(css_file)
+			for js_file in self.js_files_cache: self.add_js_file(js_file)
+			for theme_css_file in self.theme_css_files_cache: self.add_theme_css_file(theme_css_file)
 		#
 
 		if (self.oset == None):

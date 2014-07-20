@@ -119,10 +119,23 @@ Page title
 		"""
 	#
 
+	def add_css_file(self, css_file):
+	#
+		"""
+Add the defined Cascading Stylesheet file to the output.
+
+:param css_file: CSS file name
+
+:since: v0.1.01
+		"""
+
+		if (css_file not in self.css_files): self.css_files.append({ "name": css_file })
+	#
+
 	def add_js_file(self, js_file):
 	#
 		"""
-Add the defined javascript file to the output.
+Add the defined JavaScript file to the output.
 
 :param js_file: JS file name
 
@@ -295,7 +308,10 @@ Check if a possible tag match is a false positive.
 			elif (data_match == "rewrite"):
 			#
 				re_result = re.match("^\\[rewrite:(\\w+)(:.*|)\\]", data)
-				if (re_result != None and re_result.group(1) in [ "content", "l10n", "settings" ]): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
+
+				if (re_result != None
+				    and re_result.group(1) in [ "content", "l10n", "settings" ]
+				   ): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
 			#
 
 			i += 1

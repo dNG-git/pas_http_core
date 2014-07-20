@@ -23,6 +23,7 @@ from time import time
 
 from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
 from dNG.pas.data.settings import Settings
+from dNG.pas.data.text.l10n import L10n
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.plugins.hook import Hook
 from .server_implementation import ServerImplementation

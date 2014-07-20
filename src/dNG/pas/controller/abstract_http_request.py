@@ -117,6 +117,10 @@ Request body instance
 A inner request is used to support protocols based on other ones (e.g.
 JSON-RPC based on HTTP).
 		"""
+		self.query_string = ""
+		"""
+Request query string
+		"""
 
 		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 
@@ -222,6 +226,18 @@ Returns the inner request instance.
 		return self.inner_request
 	#
 
+	def get_query_string(self):
+	#
+		"""
+Returns the raw request query string.
+
+:return: (str) Raw query string
+:since:  v0.1.01
+		"""
+
+		return self.query_string
+	#
+
 	def get_request_body(self, request_body_instance = None, content_type_expected = None):
 	#
 		"""
@@ -237,7 +253,7 @@ implementation.
 		"""
 
 		content_type = InputFilter.filter_control_chars(self.get_header("Content-Type"))
-		if (content_type != None): content_type = content_type.lower().split(";", 1)[0]
+		if (content_type != None): content_type = content_type.split(";", 1)[0].lower()
 
 		_return = (self._init_request_body(content_type)
 		           if (request_body_instance == None) else

@@ -41,6 +41,74 @@ description and optional image.
              Mozilla Public License, v. 2.0
 	"""
 
+	def _add_options_block_css_sprite(self, css_sprite_data):
+	#
+		"""
+Adds the requested CSS sprites to the output.
+
+:param css_sprite_data: CSS sprite as string or list
+
+:since: v0.1.01
+		"""
+
+		if (self.response.is_supported("html_css_files") and self.response.is_supported("html_theme")):
+		#
+			css_sprites = [ ]
+
+			if (isinstance(css_sprite_data, list)): css_sprites = css_sprite_data
+			elif (type(css_sprite_data) == str): css_sprites.append(css_sprite_data)
+
+			if (len(css_sprites) > 0):
+			#
+				for css_sprite in css_sprites: self.response.add_theme_css_file(css_sprite)
+			#
+		#
+	#
+
+	def _render_options_block_icon(self, icon, title):
+	#
+		"""
+Renders an "OptionsBlock" CSS sprite icon.
+
+:param icon: Icon name
+
+:return: (str) "img" XHTML tag
+:since:  v0.1.01
+		"""
+
+		img_attributes = { "tag": "img",
+		                   "attributes": { "src": "{0}/spacer.png".format(Settings.get("http_path_mmedia_versioned")),
+		                                   "class": "{0}-icon".format(icon)
+		                                 },
+		                   "alt": title
+		                 }
+
+		return "{0}".format(XmlParser().dict_to_xml_item_encoder(img_attributes, strict_standard_mode = False))
+	#
+
+	def _render_options_block_image(self, image, title):
+	#
+		"""
+Renders an "OptionsBlock" image.
+
+:param image: Relative image file path
+
+:return: (str) "img" XHTML tag
+:since:  v0.1.01
+		"""
+
+		img_attributes = { "tag": "img",
+		                   "attributes": { "src": "{0}/themes/{1}/{2}.png".format(Settings.get("http_path_mmedia_versioned"),
+		                                                                          self.response.get_theme_active(),
+		                                                                          image
+		                                                                         )
+		                                 },
+		                   "alt": title
+		                 }
+
+		return "{0}".format(XmlParser().dict_to_xml_item_encoder(img_attributes, strict_standard_mode = False))
+	#
+
 	def render_options_block_link(self, data, include_image = True):
 	#
 		"""
@@ -54,7 +122,7 @@ Renders a link.
 
 		if ("title" in data and "type" in data and "parameters" in data):
 		#
-			_type = (data['type'] if (type(data['type']) == int) else Link.get_type(data['type']))
+			_type = (data['type'] if (type(data['type']) == int) else Link.get_type_int(data['type']))
 
 			url = Link().build_url(_type, data['parameters'])
 			xml_parser = XmlParser()
@@ -72,18 +140,10 @@ Renders a link.
 			l10n_title_id = "title_{0}".format(self.request.get_lang())
 			title = (data[l10n_title_id] if (l10n_title_id in data) else data['title'])
 
-			if (include_image and "image" in data):
+			if (include_image):
 			#
-				img_attributes = { "tag": "img",
-				                   "attributes": { "src": "{0}/themes/{1}/{2}.png".format(Settings.get("http_path_mmedia_versioned"),
-				                                                                          self.response.get_theme_active(),
-				                                                                          data['image']
-				                                                                         )
-				                                 },
-				                   "alt": title
-				                 }
-
-				_return += "{0}".format(xml_parser.dict_to_xml_item_encoder(img_attributes, strict_standard_mode = False))
+				if ("icon" in data): _return += self._render_options_block_icon(data['icon'], title)
+				elif ("image" in data): _return += self._render_options_block_image(data['image'], title)
 			#
 
 			_return += "{0}".format(XHtmlFormatting.escape(title))
@@ -104,6 +164,8 @@ require([ "djs/uiX.min" ], function(uiX) {{
 				""".format(link_id).strip()
 			#
 			else: _return += "</a>"
+
+			if (include_image and "css_sprite" in data and "icon" in data): self._add_options_block_css_sprite(data['css_sprite'])
 		#
 
 		return _return

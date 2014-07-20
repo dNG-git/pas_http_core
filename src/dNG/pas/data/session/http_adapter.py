@@ -69,11 +69,7 @@ Returns true if the defined session is valid.
 
 		passcode = self.session.get("uuids.passcode")
 
-		if (not self.session.is_persistent()):
-		#
-			if (passcode == None): self._renew_passcode()
-			_return = True
-		#
+		if (not self.session.is_persistent()): _return = True
 		elif (passcode != None):
 		#
 			cookie_passcode = None
@@ -200,7 +196,7 @@ Saves changes of the uuIDs instance.
 		return True
 	#
 
-	def set_cookie(self, mode):
+	def set_cookie(self, mode = True):
 	#
 		"""
 Sets a cookie to store the uuID.

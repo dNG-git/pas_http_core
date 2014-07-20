@@ -75,7 +75,7 @@ as a source for parameters.
 :since:  v0.1.00
 		"""
 
-		if (type(_type) != int): _type = self.__class__.get_type(_type)
+		if (type(_type) != int): _type = self.__class__.get_type_int(_type)
 
 		if (parameters == None): parameters = { }
 		xhtml_escape = escape
@@ -230,7 +230,7 @@ Returns all links defined for the given set name.
 	#
 
 	@staticmethod
-	def get_type(_type):
+	def get_type_int(_type):
 	#
 		"""
 Parses the given type parameter given as a string value.
@@ -241,10 +241,15 @@ Parses the given type parameter given as a string value.
 :since:  v0.1.01
 		"""
 
-		if (_type == "js_elink"): _return = Link.TYPE_ABSOLUTE & Link.TYPE_JS_REQUIRED
-		elif (_type == "js_ilink"): _return = Link.TYPE_RELATIVE & Link.TYPE_JS_REQUIRED
-		elif (_type == "query_string"): _return = Link.TYPE_QUERY_STRING
-		else: _return = _Link.get_type(_type)
+		_return = _Link.get_type_int(_type)
+
+		type_set = _type.split("+")
+
+		for _type in type_set:
+		#
+			if (_type == "js"): _return |= Link.TYPE_JS_REQUIRED
+			elif (_type == "query_string"): _return |= Link.TYPE_QUERY_STRING
+		#
 
 		return _return
 	#

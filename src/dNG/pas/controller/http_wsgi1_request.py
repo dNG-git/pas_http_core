@@ -64,10 +64,6 @@ Constructor __init__(HttpWsgi1Request)
 		"""
 The WSGI stream response instance
 		"""
-		self.query_string = ""
-		"""
-Request query string
-		"""
 		self.virtual_pathname = ""
 		"""
 Request path after the script
@@ -118,30 +114,38 @@ Request path after the script
 		re_result = (None if (self.client_host == None) else re.match("^::ffff:(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)$", self.client_host))
 		if (re_result != None): self.client_host = "{0}.{1}.{2}.{3}".format(re_result.group(1), re_result.group(2), re_result.group(3), re_result.group(4))
 
-		wsgi_file_wrapper = wsgi_env.get("wsgi.file_wrapper")
-
-		self.http_wsgi_stream_response = HttpWsgi1StreamResponse(wsgi_header_response, wsgi_file_wrapper)
-		if (wsgi_env.get("SERVER_PROTOCOL") == "HTTP/1.0"): self.http_wsgi_stream_response.set_http_version(1)
-
-		self.body_fp = wsgi_env['wsgi.input']
-		self.server_scheme = wsgi_env['wsgi.url_scheme']
-		if (self.script_pathname == None): self.script_pathname = ""
-
-		self.init()
-
-		virtual_config = VirtualConfig.get_config(self.virtual_pathname)
-
-		if (virtual_config == None and self.virtual_pathname != ""):
+		try:
 		#
-			virtual_config = VirtualConfig.get_config(self.script_pathname)
-			virtual_pathname = self.script_pathname
+			wsgi_file_wrapper = wsgi_env.get("wsgi.file_wrapper")
+
+			self.http_wsgi_stream_response = HttpWsgi1StreamResponse(wsgi_header_response, wsgi_file_wrapper)
+			if (wsgi_env.get("SERVER_PROTOCOL") == "HTTP/1.0"): self.http_wsgi_stream_response.set_http_version(1)
+
+			self.body_fp = wsgi_env['wsgi.input']
+			self.server_scheme = wsgi_env['wsgi.url_scheme']
+			if (self.script_pathname == None): self.script_pathname = ""
+
+			self.init()
+
+			virtual_config = VirtualConfig.get_config(self.virtual_pathname)
+
+			if (virtual_config == None and self.virtual_pathname != ""):
+			#
+				virtual_config = VirtualConfig.get_config(self.script_pathname)
+				virtual_pathname = self.script_pathname
+			#
+			else: virtual_pathname = self.virtual_pathname
+
+			inner_request = self._parse_virtual_config(virtual_config, virtual_pathname)
+
+			if (isinstance(inner_request, AbstractInnerRequest)):
+			#
+				self.query_string = ""
+				self.set_inner_request(inner_request)
+			#
+
+			self.execute()
 		#
-		else: virtual_pathname = self.virtual_pathname
-
-		inner_request = self._parse_virtual_config(virtual_config, virtual_pathname)
-		if (isinstance(inner_request, AbstractInnerRequest)): self.set_inner_request(inner_request)
-
-		try: self.execute()
 		except Exception as handled_exception:
 		#
 			if (self.log_handler != None): self.log_handler.error(handled_exception, "pas_http_core")

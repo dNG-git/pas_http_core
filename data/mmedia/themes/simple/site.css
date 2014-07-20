@@ -100,9 +100,7 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 .pageform_element { overflow: auto; border-bottom: 1px solid #eeeeee; box-shadow: 0 2px 5px -5px rgba(0, 0, 0, 0.2) }
 .pageform_element .pageform_error { display: inline-block; margin-top: 10px }
 
-.pageform_element_radio .pageform_label {
-	padding: 0.6% 0.4%
-}
+.pageform_element_radio .pageform_label { padding: 0.6% 0.4% }
 
 .pageform_error { clear: both; padding: 0.25%; background-color: #fae0e0; border: 1px solid #e02222; border-radius: 0.2em }
 
@@ -144,19 +142,13 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 }
 
 .pagemainmenu {
-	margin: -0.25% -0.75% 0 -0.75%; padding: 0.4em 0.75em 0.5em 0.75em; border-bottom: 1px solid #375a9d;
-	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255, 255, 255, 0)), color-stop(1, rgba(55, 90, 157, 0.2)));
-	background-image: -o-linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(55, 90, 157, 0.2) 100%);
-	background-image: -moz-linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(55, 90, 157, 0.2) 100%);
-	background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(55, 90, 157, 0.2) 100%);
-	background-image: -ms-linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(55, 90, 157, 0.2) 100%);
-	background-image: linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(55, 90, 157, 0.2) 100%);
-	font-size: 1.1em; font-weight: bold; color: #375a9d
+	margin: 0 -2px; padding: 0.5em; background-color: #375a9d; border-top: 1px solid #5f75a0; border-bottom: 1px solid #fafafa; box-shadow: 0 0.75em 1em -1em #193879;
+	font-size: 1.2em; font-weight: bold; color: #fafafa
 }
 
 .pagemainmenu a { display: inline-block }
-.pagemainmenu a:link, .pagemainmenu a:visited { color: #375a9d; text-decoration: none }
-.pagemainmenu a:active, .pagemainmenu a:hover, .pagemainmenu a:focus { color: #000000; text-decoration: underline }
+.pagemainmenu a:link, .pagemainmenu a:visited { color: #fafafa; text-decoration: none }
+.pagemainmenu a:active, .pagemainmenu a:hover, .pagemainmenu a:focus { color: #afafaf; text-decoration: underline }
 
 .pagemainmenu li {
 	display: inline-block;
@@ -179,19 +171,22 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 .pageservicemenu a:link, .pageservicemenu a:visited { color: #375a9d; text-decoration: none }
 .pageservicemenu a:active, .pageservicemenu a:hover, .pageservicemenu a:focus { color: #000000; text-decoration: none }
 
-.pageservicemenu img { padding-bottom: 2%; vertical-align: middle }
+.pageservicemenu img {
+	margin: 0 0.2em 0.2em 0;
+	vertical-align: middle
+}
 
 .pageservicemenu li { display: inline-block }
 .pageservicemenu li:not(:last-child):after { margin-right: 0.3em; content: ", " }
 .pageservicemenu ul { position: relative; margin: 0; padding: 0; list-style: none inside none }
 
 .pageservicemenu_p {
-	padding: 0.4% 0.4% 0 0.4%;
+	padding: 0.2em 0.2em 0 0.2em;
 	text-align: left
 }
 
 .pageservicemenu_s {
-	clear: both; padding: 0.4%;
+	clear: both; padding: 0.2em;
 	text-align: right; font-size: 0.8em
 }
 
@@ -264,13 +259,19 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 		box-sizing: border-box; -moz-box-sizing: border-box; -ms-box-sizing: border-box; -opera-box-sizing: border-box; -webkit-box-sizing: border-box
 	}
 
+	.pagemainmenu { margin: 0 -1px; padding: 0.1em 0.2em }
+
 	.pageoptionsblock li { width: 100%; margin: 0; padding: 0 }
 
+	.pageservicemenu img { margin-bottom: 0 }
+
 	.pageservicemenu_p {
+		padding: 0;
 		text-align: center
 	}
 
 	.pageservicemenu_s {
+		padding: 0;
 		text-align: center
 	}
 
@@ -283,7 +284,13 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 	.pagetable td { display: block }
 
 	.pagetable td:before {
-		display: block; border-bottom: 1px dotted #808080;
+		display: block; margin: 0 -0.3em 0.2em -0.3em; padding: 0 0.3em 0.1em 0.3em; border-bottom: 1px solid #d8deeb;
+		background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255, 255, 255, 0)), color-stop(1, #fafafa));
+		background-image: -o-linear-gradient(rgba(255, 255, 255, 0) 0%, #fafafa 100%);
+		background-image: -moz-linear-gradient(rgba(255, 255, 255, 0) 0%, #fafafa 100%);
+		background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0) 0%, #fafafa 100%);
+		background-image: -ms-linear-gradient(rgba(255, 255, 255, 0) 0%, #fafafa 100%);
+		background-image: linear-gradient(rgba(255, 255, 255, 0) 0%, #fafafa 100%);
 		font-weight: bold; font-size: 1.1em; content: attr(data-th) ": "
 	}
 
@@ -304,5 +311,17 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 		text-align: left
 	}
 
+	.pagemainmenu { margin: 0 -1px; padding: 0.2em 0.4em }
+
 	.pageoptionsblock li { width: 50%; margin: 0; padding: 0 }
+
+	.pageservicemenu_p {
+		padding: 0.1em 0.1em 0 0.1em;
+		text-align: center
+	}
+
+	.pageservicemenu_s {
+		padding: 0.1em;
+		text-align: center
+	}
 }

@@ -56,10 +56,30 @@ Returns a list of rendered links for the service menu.
 		return _return
 	#
 
+	def render_service_list_entries(self, entries):
+	#
+		"""
+Renders the given service list entries.
+
+:param entries: Service list entries
+
+:since: v0.1.00
+		"""
+
+		_return = ""
+
+		rendered_links = self._get_rendered_service_list_links(entries)
+		if (len(rendered_links) > 0): _return = "<nav class='pageoptionsblock pageservicelist'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links))
+
+		return _return
+	#
+
 	def render_service_list_file(self, file_pathname):
 	#
 		"""
-Action for "render"
+Renders the content of the given service list file.
+
+:param file_pathname: Service list file path
 
 :since: v0.1.00
 		"""

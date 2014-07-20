@@ -97,7 +97,7 @@ Initializes default values from the original request.
 		if (request.is_supported("headers")): self.headers = request.get_headers()
 		self.lang = request.get_lang()
 		self.lang_default = request.get_lang_default()
-		self.session = request.get_session()
+		if (self.session == None): self.session = request.get_session()
 		if (request.is_supported("type")): self.type = request.get_type()
 
 		self.set_script_pathname(request.get_script_pathname())

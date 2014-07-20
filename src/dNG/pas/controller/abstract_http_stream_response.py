@@ -431,8 +431,8 @@ Sets a header.
 			if (self.http_version == 1):
 			#
 				if (value == "HTTP/1.1 203 Non-Authoritative Information"): value = "HTTP/1.1 200 OK"
-				elif (value == "HTTP/1.1 303 See Other"): value = "HTTP/1.0 302 Found"
-				elif (value == "HTTP/1.1 307 Temporary Redirect"): value = "HTTP/1.0 302 Found"
+				elif (value == "HTTP/1.1 303 See Other"): value = "HTTP/1.1 302 Found"
+				elif (value == "HTTP/1.1 307 Temporary Redirect"): value = "HTTP/1.1 302 Found"
 			#
 		#
 

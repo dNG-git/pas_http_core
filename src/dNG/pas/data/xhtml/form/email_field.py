@@ -18,37 +18,60 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.data.http.translatable_exception import TranslatableException
-from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
-from .service_list_mixin import ServiceListMixin
+from dNG.pas.data.text.input_filter import InputFilter
+from .text_field import TextField
 
-class ServiceList(AbstractHttpController, ServiceListMixin):
+class EMailField(TextField):
 #
 	"""
-"ServiceList" is a navigation element providing links to other services.
+"EMailField" provides an e-mail input field.
 
 :author:     direct Netware Group
-:copyright:  (C) direct Netware Group - All rights reserved
+:copyright:  direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.1.00
+:since:      v0.1.01
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
 
-	def execute_render(self):
+	def check(self, force = False):
 	#
 		"""
-Action for "render"
+Checks if the field value is valid.
 
-:since: v0.1.00
+:param force: True to force revalidation
+
+:return: (bool) True if all checks are passed
+:since:  v0.1.01
 		"""
 
-		if ("css_sprite" in self.context): self._add_options_block_css_sprite(self.context['css_sprite'])
+		_return = TextField.check(self, force)
 
-		if ("file" in self.context): self.set_action_result(self.render_service_list_file(self.context['file']))
-		elif (isinstance(self.context.get("entries"), list)): self.set_action_result(self.render_service_list_entries(self.context['entries']))
-		else: raise TranslatableException("core_unknown_error", value = "Missing service list to render")
+		if (_return
+		    and len(self.value) > 0
+		    and InputFilter.filter_email_address(self.value) == ""
+		   ):
+		#
+			_return = False
+
+			self.error_data = "format_invalid"
+			self.valid = False
+		#
+
+		return _return
+	#
+
+	def get_type(self):
+	#
+		"""
+Returns the field type.
+
+:return: (str) Field type
+:since:  v0.1.01
+		"""
+
+		return "email"
 	#
 #
 

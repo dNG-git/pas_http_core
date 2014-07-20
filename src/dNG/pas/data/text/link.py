@@ -149,7 +149,7 @@ as a source for parameters.
 :since:  v0.1.00
 		"""
 
-		if (type(_type) != int): _type = self.__class__.get_type(_type)
+		if (type(_type) != int): _type = self.__class__.get_type_int(_type)
 
 		_return = self.get_url_base(_type, parameters)
 
@@ -658,7 +658,7 @@ Returns a "Link" instance based on the defined preferred URL.
 	#
 
 	@staticmethod
-	def get_type(_type):
+	def get_type_int(_type):
 	#
 		"""
 Parses the given type parameter given as a string value.
@@ -669,11 +669,17 @@ Parses the given type parameter given as a string value.
 :since:  v0.1.01
 		"""
 
-		if (_type == "elink"): _return = Link.TYPE_ABSOLUTE
-		elif (_type == "ilink"): _return = Link.TYPE_RELATIVE
-		elif (_type == "optical"): _return = Link.TYPE_OPTICAL
-		elif (_type == "vlink"): _return = Link.TYPE_VIRTUAL_PATH
-		else: _return = 0
+		_return = 0
+
+		type_set = _type.split("+")
+
+		for _type in type_set:
+		#
+			if (_type == "elink"): _return |= Link.TYPE_ABSOLUTE
+			elif (_type == "ilink"): _return |= Link.TYPE_RELATIVE
+			elif (_type == "optical"): _return |= Link.TYPE_OPTICAL
+			elif (_type == "vlink"): _return |= Link.TYPE_VIRTUAL_PATH
+		#
 
 		return _return
 	#

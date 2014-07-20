@@ -347,6 +347,24 @@ compression setting and information about P3P.
 		#
 	#
 
+	def redirect(self, url):
+	#
+		"""
+Redirect the requesting client to the given URL.
+
+:param url: Target URL
+
+:since: v0.1.00
+		"""
+
+		if (not self.initialized): self.init()
+
+		if (self.expires <= time()): self.set_header("HTTP/1.1", "HTTP/1.1 307 Temporary Redirect", True)
+		else: self.set_header("HTTP/1.1", "HTTP/1.1 303 See Other", True)
+
+		self.set_header("Location", url)
+	#
+
 	def reset(self):
 	#
 		"""
