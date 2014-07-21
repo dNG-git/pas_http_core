@@ -24,7 +24,7 @@ from dNG.pas.runtime.type_exception import TypeException
 class ChoicesMixin(object):
 #
 	"""
-"ChoicesMixin" provides a methods to handle selectable options.
+"ChoicesMixin" provides methods to handle selectable options.
 
 :author:     direct Netware Group
 :copyright:  direct Netware Group - All rights reserved

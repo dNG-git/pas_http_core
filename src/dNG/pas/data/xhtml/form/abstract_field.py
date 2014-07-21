@@ -149,7 +149,10 @@ Checks the length of value.
 		error_data = None
 
 		if (self.required and data_length < 1): error_data = "required_element"
-		elif (self.limit_min != None and self.limit_min > data_length): error_data = ( "string_min", str(self.limit_min) )
+		elif (self.limit_min != None
+		      and (self.required or data_length > 0)
+		      and self.limit_min > data_length
+		     ): error_data = ( "string_min", str(self.limit_min) )
 		elif (self.limit_max != None and self.limit_max < data_length): error_data = ( "string_max", str(self.limit_max) )
 
 		if (error_data != None): self.error_data = error_data
