@@ -18,14 +18,20 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 ------------------------------------------------------------------------- */
 
 var djs_config = {
-	formX_focused_class: "pageform_input_focused"
+	formX_focused_class: 'pageform_input_focused',
+	ResponsiveTable_class: 'pagetable_responsive'
 };
 
 var require = {
-	baseUrl: "[rewrite:settings]http_path_mmedia_versioned[/rewrite]",
+	baseUrl: '[rewrite:settings]http_path_mmedia_versioned[/rewrite]',
 	paths: {
-		"jquery": "jquery/jquery-2.1.1.min",
+		'jquery': 'jquery/jquery-2.1.1.min',
+		'jquery.placeholder': 'jquery/jquery.placeholder.min',
+		'Modernizr': 'xhtml5/modernizr.min'
 	},
+	shim: {
+		'Modernizr': { exports: 'Modernizr' }
+	}
 };
 
 //j// EOF

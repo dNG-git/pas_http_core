@@ -18,6 +18,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+from dNG.pas.data.binary import Binary
 from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.oset.file_parser import FileParser
@@ -64,10 +65,6 @@ Constructor __init__(AbstractField)
 		self.form_context = { }
 		"""
 Form context
-		"""
-		self.form_position = None
-		"""
-Form field position
 		"""
 		self.error_data = None
 		"""
@@ -227,7 +224,10 @@ Returns the field content.
 :since:  v0.1.01
 		"""
 
-		return ("" if (self.value == None) else self.value)
+		_return = ("" if (self.value == None) else Binary.str(self.value))
+		if (type(_return) != str): _return = str(_return)
+
+		return _return
 	#
 
 	def get_error_data(self):
@@ -298,10 +298,7 @@ Returns the field ID.
 :since:  v0.1.01
 		"""
 
-		return ("pas_http_form_{0:d}".format(self.form_position)
-		        if (self.id == None) else
-		        self.id
-		       )
+		return self.id
 	#
 
 	def get_name(self):
@@ -364,6 +361,18 @@ Returns the field value given or transmitted.
 		"""
 
 		return self.value
+	#
+
+	def is_id_set(self):
+	#
+		"""
+Returns true if a field ID has been set.
+
+:return: (bool) True if Field ID has been set
+:since: v0.1.01
+		"""
+
+		return (self.id != None)
 	#
 
 	def is_required(self):
@@ -464,19 +473,6 @@ Sets the form context.
 		self.form_context = context
 	#
 
-	def _set_form_position(self, position):
-	#
-		"""
-Sets the form field position.
-
-:param position: Position
-
-:since: v0.1.01
-		"""
-
-		self.form_position = position
-	#
-
 	def _set_form_value(self, form):
 	#
 		"""
@@ -489,6 +485,19 @@ Sets the field value based on the given form.
 
 		value = form.get_input(self.name)
 		if (value != None): self.set_value(value)
+	#
+
+	def set_id(self, _id):
+	#
+		"""
+Sets the field ID.
+
+:param _id: Field ID
+
+:since: v0.1.01
+		"""
+
+		self.id = _id
 	#
 
 	def set_limits(self, _min = None, _max = None):

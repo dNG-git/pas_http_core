@@ -342,7 +342,7 @@ Sends the prepared response.
 			if (not is_xhtml_supported):
 			#
 				self.stream_response.set_compression(False)
-				self.theme_renderer.add_js_file("html5shiv/html5shiv.min.js")
+				self.theme_renderer.add_js_file("xhtml5/html5shiv.min.js")
 			#
 
 			if (self.get_content_type() == None):

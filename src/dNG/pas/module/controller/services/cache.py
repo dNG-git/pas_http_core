@@ -110,8 +110,7 @@ Action for "index"
 
 		if (is_valid and is_modified):
 		#
-			re_tsc_result = re.search("\\.tsc\\.(css|js|svg)$", file_pathname, re.I)
-			re_result = (re.search("\\.(css|gif|jar|jpg|jpeg|js|png|svg|swf)$", file_pathname, re.I) if (re_tsc_result == None) else None)
+			re_tsc_result = re.search("\\.tsc\\.(css|js|min\\.css|min\\.js|min\\.svg|svg)$", file_pathname, re.I)
 
 			self.response.set_content_dynamic(re_tsc_result != None)
 			self.response.init(True)
@@ -133,7 +132,7 @@ Action for "index"
 				parser = MmediaParser()
 				self.response.set_raw_data(parser.render(file_pathname))
 			#
-			elif (re_result != None):
+			else:
 			#
 				self.response.set_expires_relative(+63072000)
 
@@ -142,7 +141,6 @@ Action for "index"
 				if (streamer == None): self.response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
 				else: Streaming.run(self.request, streamer, "file:///{0}".format(file_pathname), self.response)
 			#
-			else: self.response.set_header("HTTP/1.1", "HTTP/1.1 415 Unsupported Media Type", True)
 		#
 		elif (not is_valid):
 		#

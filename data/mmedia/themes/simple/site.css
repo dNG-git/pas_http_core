@@ -1,14 +1,16 @@
 hr {
 	height: 1px; border: 0;
-	background-image: -webkit-gradient(linear, left top, right top, color-stop(0, rgba(215, 222, 235, 0)), color-stop(0.3, #d7deeb), color-stop(0.7, #d7deeb), color-stop(1, rgba(215, 222, 235, 0)));
-	background-image: -o-linear-gradient(right, rgba(215, 222, 235, 0) 0%, #d7deeb 30%, #d7deeb 70%, rgba(215, 222, 235, 0) 100%);
-	background-image: -moz-linear-gradient(right, rgba(215, 222, 235, 0) 0%, #d7deeb 30%, #d7deeb 70%, rgba(215, 222, 235, 0) 100%);
-	background-image: -webkit-linear-gradient(left, rgba(215, 222, 235, 0) 0%, #d7deeb 30%, #d7deeb 70%, rgba(215, 222, 235, 0) 100%);
-	background-image: -ms-linear-gradient(left, rgba(215, 222, 235, 0) 0%, #d7deeb 30%, #d7deeb 70%, rgba(215, 222, 235, 0) 100%);
-	background-image: linear-gradient(to right, rgba(215, 222, 235, 0) 0%, #d7deeb 30%, #d7deeb 70%, rgba(215, 222, 235, 0) 100%);
+	background-image: -webkit-gradient(linear, left top, right top, color-stop(0, rgba(215, 222, 235, 0)), color-stop(0.3, #d8deeb), color-stop(0.7, #d8deeb), color-stop(1, rgba(215, 222, 235, 0)));
+	background-image: -o-linear-gradient(right, rgba(215, 222, 235, 0) 0%, #d8deeb 30%, #d8deeb 70%, rgba(215, 222, 235, 0) 100%);
+	background-image: -moz-linear-gradient(right, rgba(215, 222, 235, 0) 0%, #d8deeb 30%, #d8deeb 70%, rgba(215, 222, 235, 0) 100%);
+	background-image: -webkit-linear-gradient(left, rgba(215, 222, 235, 0) 0%, #d8deeb 30%, #d8deeb 70%, rgba(215, 222, 235, 0) 100%);
+	background-image: -ms-linear-gradient(left, rgba(215, 222, 235, 0) 0%, #d8deeb 30%, #d8deeb 70%, rgba(215, 222, 235, 0) 100%);
+	background-image: linear-gradient(to right, rgba(215, 222, 235, 0) 0%, #d8deeb 30%, #d8deeb 70%, rgba(215, 222, 235, 0) 100%);
 }
 
 small { font-size: 0.75em }
+
+.pagecontent_box { border-radius: 0.2em }
 
 .pagecontent_box_infoblock {
 	display: inline-block; clear: right; float: right; margin: 0 0 0.2em 0.2em;
@@ -32,12 +34,12 @@ small { font-size: 0.75em }
 }
 
 .pagecontent_datalinker_parent_box {
-	clear: both; padding: 0.4em; background-color: #fafafa; border: 1px solid #d8deeb; border-radius: 0.2em;
+	clear: both; padding: 0.4em; background-color: #fafafa; border: 1px solid #d8deeb;
 	font-weight: bold
 }
 
 .pagecontent_datalinker_sub_entries_box {
-	clear: right; float: right; width: 35%; padding: 0.4em; border: 1px solid #ececec; border-radius: 0.2em;
+	clear: right; float: right; width: 35%; padding: 0.4em; border: 1px solid #ececec;
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255, 255, 255, 0)), color-stop(1, #e6e8eb));
 	background-image: -o-linear-gradient(rgba(255, 255, 255, 0) 0%, #e6e8eb 100%);
 	background-image: -moz-linear-gradient(rgba(255, 255, 255, 0) 0%, #e6e8eb 100%);
@@ -54,6 +56,33 @@ small { font-size: 0.75em }
 .pagecontent_datalinker_sub_entries_box li { margin: 0; padding: 0 }
 .pagecontent_datalinker_sub_entries_box li:nth-child(n+2) { border-top: 1px #e6e8eb dotted }
 .pagecontent_datalinker_sub_entries_box ul { margin: 0; padding: 0; list-style: none inside none }
+
+.pagecontent_highlight_box {
+	padding: 0.4em; background-color: #d8deeb; border: 1px solid #d8deeb;
+	background-image: -webkit-gradient(linear, left top, right bottom,
+		color-stop(0.25, rgba(255, 255, 255, 0.2)), color-stop(0.25, transparent),
+		color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.2)),
+		color-stop(0.75, rgba(255, 255, 255, 0.2)), color-stop(0.75, transparent),
+		to(transparent));
+	background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%,
+		transparent 50%, rgba(255, 255, 255, 0.2) 50%,
+		rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+	background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%,
+		transparent 50%, rgba(255, 255, 255, 0.2) 50%,
+		rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+	background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%,
+		transparent 50%, rgba(255, 255, 255, 0.2) 50%,
+		rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+	background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%,
+		transparent 50%, rgba(255, 255, 255, 0.2) 50%,
+		rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+	background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%,
+		transparent 50%, rgba(255, 255, 255, 0.2) 50%,
+		rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+	-moz-background-size: 40pt 40pt;
+	-webkit-background-size: 40pt 40pt;
+	background-size: 40pt 40pt
+}
 
 .pagecontent_monospace_box { overflow: auto; font-family: "Nimbus Mono L", Monaco, "Lucida Sans Typewriter", "Lucida Console", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace }
 
@@ -93,7 +122,7 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 }
 
 .pageform_button {
-	margin: 0.2%; padding: 0.1% 0.2%; background-color: #ffffff; border: 1px solid #375a9d; border-radius: 0.2em;
+	margin: 0.2%; padding: 0.1% 0.2%; background-color: #ffffff; border: 1px solid #808080; border-radius: 0.2em;
 	font-size: 1.2em
 }
 
@@ -117,7 +146,7 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 	text-align: left
 }
 
-.pageform_input_focused { background-color: #e6e8eb }
+.pageform_input_focused { border-color: #375a9d !important; box-shadow: 0 0 0.2em 0.2em #d8deeb }
 
 .pageform_label {
 	display: inline-block; width: 25%; margin: 0; padding: 0.75em 0.4%; font-weight: bold;
@@ -132,17 +161,17 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 .pageform_radio_label { vertical-align: middle }
 
 .pageform_textnpassword {
-	padding: 0.4%; border: 1px solid #d8deeb; border-bottom: 1px solid #375a9d; border-radius: 0.2em;
-	font-size: 1.2em
+	padding: 0.4%; border: 1px solid #d8deeb; border-bottom-color: #808080; border-radius: 0.2em;
+	font-size: 1em
 }
 
 .pageform_select {
-	margin: 0.2%; padding: 0.2%; background-color: #ffffff; border: 1px solid #d8deeb; border-bottom: 1px solid #375a9d; border-radius: 0.2em;
-	font-size: 1.2em
+	margin: 0.2%; padding: 0.2%; background-color: #ffffff; border: 1px solid #d8deeb; border-radius: 0.2em;
+	font-size: 1em
 }
 
 .pagemainmenu {
-	margin: 0 -2px; padding: 0.5em; background-color: #375a9d; border-top: 1px solid #5f75a0; border-bottom: 1px solid #fafafa; box-shadow: 0 0.75em 1em -1em #193879;
+	margin: 0 -2px; padding: 0.5em; background-color: #375a9d; border-top: 1px solid #5f75a0; border-bottom-color: #fafafa; box-shadow: 0 0.75em 1em -1em #193879;
 	font-size: 1.2em; font-weight: bold; color: #fafafa
 }
 
@@ -275,15 +304,15 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 		text-align: center
 	}
 
-	.pagetable { margin: 0.4em 0 }
+	.pagetable_responsive { margin: 0.4em 0 }
 
-	.pagetable tr { border-top: 1px solid #808080; border-bottom: 1px solid #808080 }
+	.pagetable_responsive tr { border-top: 1px solid #808080; border-bottom: 1px solid #808080 }
 
-	.pagetable th { display: none }
+	.pagetable_responsive th { display: none }
 
-	.pagetable td { display: block }
+	.pagetable_responsive td { display: block }
 
-	.pagetable td:before {
+	.pagetable_responsive td:before {
 		display: block; margin: 0 -0.3em 0.2em -0.3em; padding: 0 0.3em 0.1em 0.3em; border-bottom: 1px solid #d8deeb;
 		background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255, 255, 255, 0)), color-stop(1, #fafafa));
 		background-image: -o-linear-gradient(rgba(255, 255, 255, 0) 0%, #fafafa 100%);
@@ -294,7 +323,7 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 		font-weight: bold; font-size: 1.1em; content: attr(data-th) ": "
 	}
 
-	.pagetable td { text-align: left !important }
+	.pagetable_responsive td { text-align: left !important }
 }
 
 @media only screen and (min-width: 46em) and (max-width: 62em) {

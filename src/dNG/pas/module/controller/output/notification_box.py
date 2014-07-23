@@ -64,6 +64,8 @@ Renders a notification.
 			            "message": FormTags.render(data['message'], block_encoding_supported = False),
 			          }
 
+			if (data['type'] == NotificationStore.TYPE_COMPLETED_INFO): content['auto_close'] = True
+
 			parser = FileParser()
 			parser.set_oset(self.response.get_oset())
 			_return = parser.render("core.notification", content)

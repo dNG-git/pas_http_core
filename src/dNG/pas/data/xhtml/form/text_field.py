@@ -18,10 +18,11 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
+from dNG.pas.data.xhtml.formatting import Formatting
 from .abstract_field import AbstractField
+from .placeholder_mixin import PlaceholderMixin
 
-class TextField(AbstractField):
+class TextField(AbstractField, PlaceholderMixin):
 #
 	"""
 "TextField" provides a text input field.
@@ -34,6 +35,20 @@ class TextField(AbstractField):
 :license:    http://www.direct-netware.de/redirect.py?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
+
+	def __init__(self, name = None):
+	#
+		"""
+Constructor __init__(TextField)
+
+:param name: Form field name
+
+:since: v0.1.01
+		"""
+
+		AbstractField.__init__(self, name)
+		PlaceholderMixin.__init__(self)
+	#
 
 	def check(self, force = False):
 	#
@@ -59,7 +74,7 @@ Returns the field content.
 :since:  v0.1.01
 		"""
 
-		return XHtmlFormatting.escape(AbstractField._get_content(self))
+		return Formatting.escape(AbstractField._get_content(self))
 	#
 
 	def get_type(self):
@@ -83,13 +98,14 @@ Renders the given field.
 :since:  v0.1.01
 		"""
 
-		context = { "type": XHtmlFormatting.escape(self.get_type()),
-		            "id": XHtmlFormatting.escape(self.get_id()),
-		            "name": XHtmlFormatting.escape(self.name),
-		            "title": XHtmlFormatting.escape(self.get_title()),
+		context = { "type": Formatting.escape(self.get_type()),
+		            "id": "pas_{0}".format(Formatting.escape(self.get_id())),
+		            "name": Formatting.escape(self.name),
+		            "title": Formatting.escape(self.get_title()),
+		            "placeholder": Formatting.escape(self.get_placeholder()),
 		            "value": self._get_content(),
 		            "required": self.required,
-		            "error_message": ("" if (self.error_data == None) else XHtmlFormatting.escape(self.get_error_message()))
+		            "error_message": ("" if (self.error_data == None) else Formatting.escape(self.get_error_message()))
 		          }
 
 		if (self.size == TextField.SIZE_SMALL):

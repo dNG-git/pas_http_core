@@ -90,6 +90,19 @@ Adds a new notification about a completed task.
 		self.store.append({ "type": NotificationStore.TYPE_COMPLETED_INFO, "message": message })
 	#
 
+	def add_info(self, message):
+	#
+		"""
+Adds a new informational notification about a task.
+
+:param message: Notification message
+
+:since: v0.1.00
+		"""
+
+		self.store.append({ "type": NotificationStore.TYPE_INFO, "message": message })
+	#
+
 	def export(self):
 	#
 		"""

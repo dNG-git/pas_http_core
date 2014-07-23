@@ -21,7 +21,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 from dNG.pas.data.cached_file import CachedFile
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.form_tags_renderer import FormTagsRenderer
-from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
+from dNG.pas.data.xhtml.formatting import Formatting
 from .abstract_field import AbstractField
 from .read_only_field_mixin import ReadOnlyFieldMixin
 
@@ -106,14 +106,14 @@ Renders the given field.
 
 		content = self._get_content()
 
-		context = { "id": XHtmlFormatting.escape(self.get_id()),
-		            "name": XHtmlFormatting.escape(self.name),
-		            "title": XHtmlFormatting.escape(self.get_title()),
+		context = { "id": "pas_{0}".format(Formatting.escape(self.get_id())),
+		            "name": Formatting.escape(self.name),
+		            "title": Formatting.escape(self.get_title()),
 		            "content": (L10n.get("pas_http_core_form_error_internal_error")
 		                        if (content == None) else
 		                        renderer.render(content)
 		                       ),
-		            "error_message": ("" if (self.error_data == None) else XHtmlFormatting.escape(self.get_error_message()))
+		            "error_message": ("" if (self.error_data == None) else Formatting.escape(self.get_error_message()))
 		          }
 
 		if (self.size == FormTagsFileField.SIZE_MEDIUM): context['size_percentage'] = "55%"

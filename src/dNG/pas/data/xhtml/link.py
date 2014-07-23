@@ -21,7 +21,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 from dNG.pas.controller.abstract_response import AbstractResponse
 from dNG.pas.controller.http_xhtml_response import HttpXhtmlResponse
 from dNG.pas.data.text.link import Link as _Link
-from dNG.pas.data.xhtml.formatting import Formatting as XhtmlFormatting
+from dNG.pas.data.xhtml.formatting import Formatting
 
 class Link(_Link):
 #
@@ -209,7 +209,7 @@ Escape the given data for embedding into (X)HTML.
 :since:  v0.1.01
 		"""
 
-		return XhtmlFormatting.escape(data)
+		return Formatting.escape(data)
 	#
 
 	@staticmethod
@@ -320,7 +320,7 @@ Unescape the given data.
 :since:  v0.1.01
 		"""
 
-		return XhtmlFormatting.unescape(data)
+		return Formatting.unescape(data)
 	#
 #
 

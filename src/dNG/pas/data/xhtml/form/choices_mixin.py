@@ -82,7 +82,7 @@ Parses the given choices to find selected values.
 		#
 			if ("id" not in choice):
 			#
-				choice['id'] = "pas_http_form_{0:d}_{1:d}".format(self.form_position, choice_position)
+				choice['id'] = "pas_{0}_{1:d}".format(self.id, choice_position)
 				choice_position += 1
 			#
 

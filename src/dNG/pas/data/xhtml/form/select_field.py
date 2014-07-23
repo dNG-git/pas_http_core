@@ -18,7 +18,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
+from dNG.pas.data.xhtml.formatting import Formatting
 from dNG.pas.runtime.type_exception import TypeException
 from .abstract_field import AbstractField
 from .choices_mixin import ChoicesMixin
@@ -102,9 +102,9 @@ Returns the field content.
 		#
 			if ("value" in choice):
 			#
-				choice['value'] = XHtmlFormatting.escape(choice['value'])
+				choice['value'] = Formatting.escape(choice['value'])
 
-				choice['title'] = (XHtmlFormatting.escape(choice['title'])
+				choice['title'] = (Formatting.escape(choice['title'])
 				                   if ("title" in choice) else
 				                   choice['value']
 				                  )
@@ -169,12 +169,12 @@ Renders the given field.
 :since:  v0.1.01
 		"""
 
-		context = { "id": XHtmlFormatting.escape(self.get_id()),
-		            "name": XHtmlFormatting.escape(self.name),
-		            "title": XHtmlFormatting.escape(self.get_title()),
+		context = { "id": "pas_{0}".format(Formatting.escape(self.get_id())),
+		            "name": Formatting.escape(self.name),
+		            "title": Formatting.escape(self.get_title()),
 		            "choices": self._get_content(),
 		            "required": self.required,
-		            "error_message": ("" if (self.error_data == None) else XHtmlFormatting.escape(self.get_error_message()))
+		            "error_message": ("" if (self.error_data == None) else Formatting.escape(self.get_error_message()))
 		          }
 
 		return self._render_oset_file("core/form/select", context)

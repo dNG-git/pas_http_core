@@ -23,7 +23,7 @@ from os import urandom
 
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.text.l10n import L10n
-from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
+from dNG.pas.data.xhtml.formatting import Formatting
 from dNG.pas.data.xhtml.form.abstract_field import AbstractField
 from dNG.pas.data.xhtml.oset.file_parser import FileParser
 from dNG.pas.runtime.type_exception import TypeException
@@ -208,7 +208,7 @@ Render the form submit button.
 
 		context = { "type": "submit",
 		            "id": "{0}_submit".format(self.form_id),
-		            "title": XHtmlFormatting.escape(L10n.get(title))
+		            "title": Formatting.escape(L10n.get(title))
 		          }
 
 		return self._render_oset_file("core/form/button", context)

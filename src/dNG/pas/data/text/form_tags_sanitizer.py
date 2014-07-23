@@ -76,9 +76,9 @@ Change data according to the "code" tag.
 		return _return
 	#
 
-	_change_match_justify = FormTagsRenderer._change_plain_content
+	_change_match_highlight = FormTagsRenderer._change_plain_content
 	"""
-Change data according to the "justify" tag.
+Change data according to the "highlight" tag.
 
 :param tag_definition: Matched tag definition
 :param data: Data to be parsed
@@ -90,9 +90,9 @@ Change data according to the "justify" tag.
 :since:  v0.1.01
 	"""
 
-	_change_match_left = FormTagsRenderer._change_plain_content
+	_change_match_justify = FormTagsRenderer._change_plain_content
 	"""
-Change data according to the "left" tag.
+Change data according to the "justify" tag.
 
 :param tag_definition: Matched tag definition
 :param data: Data to be parsed

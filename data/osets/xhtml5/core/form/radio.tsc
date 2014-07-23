@@ -1,5 +1,5 @@
 <div class="pageform_element pageform_element_radio">
-	<div class="pageform_label"><strong>[rewrite:content]title[/rewrite][if:content:required== 1] <em>*</em>[/if]</strong>:</div>
+	<div class="pageform_label"><strong>[rewrite:content]title[/rewrite][if:content:required == 1] <em>*</em>[/if]</strong>:</div>
 	<div class="pageform_field">
 		<p><ul class="pageform_radio">
 [each:content:choices:choice]

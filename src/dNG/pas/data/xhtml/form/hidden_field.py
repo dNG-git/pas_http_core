@@ -19,7 +19,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 """
 
 from dNG.data.xml_parser import XmlParser
-from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
+from dNG.pas.data.xhtml.formatting import Formatting
 from .abstract_field import AbstractField
 
 class HiddenField(AbstractField):
@@ -60,7 +60,7 @@ Returns the field content.
 :since:  v0.1.01
 		"""
 
-		return XHtmlFormatting.escape(AbstractField._get_content(self))
+		return Formatting.escape(AbstractField._get_content(self))
 	#
 
 	def get_type(self):
@@ -85,7 +85,7 @@ Renders the given field.
 		"""
 
 		hidden_attributes = { "type": "hidden",
-		                      "name": XHtmlFormatting.escape(self.name),
+		                      "name": Formatting.escape(self.name),
 		                      "value": self._get_content()
 		                    }
 

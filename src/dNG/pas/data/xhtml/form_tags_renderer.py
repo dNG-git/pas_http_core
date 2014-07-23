@@ -109,7 +109,7 @@ Change data according to the "center" tag.
 
 		_return = data[data_position:tag_end_position]
 
-		if (len(_return) > 0):
+		if (self.is_block_encoding_supported and len(_return) > 0):
 		#
 			tag_params = FormTagsRenderer.parse_tag_parameters("center", data, tag_position, data_position)
 
@@ -191,6 +191,34 @@ Change data according to the "del" tag.
 		return ("<del>{0}</del>".format(enclosed_data) if (len(enclosed_data) > 0) else "")
 	#
 
+	def _change_match_highlight(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "highlight" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = data[data_position:tag_end_position]
+
+		if (self.is_block_encoding_supported and len(_return) > 0):
+		#
+			tag_params = FormTagsRenderer.parse_tag_parameters("highlight", data, tag_position, data_position)
+			css_style = (" style='width: {0}'".format(tag_params['box']) if ("box" in tag_params) else "")
+
+			_return = "<div class='pagecontent_box pagecontent_highlight_box'{0}>{1}</div>[nobr]".format(css_style, _return)
+		#
+
+		return _return
+	#
+
 	def _change_match_i(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
@@ -259,7 +287,7 @@ Change data according to the "justify" tag.
 
 		_return = data[data_position:tag_end_position]
 
-		if (len(_return) > 0):
+		if (self.is_block_encoding_supported and len(_return) > 0):
 		#
 			tag_params = FormTagsRenderer.parse_tag_parameters("justify", data, tag_position, data_position)
 			css_style = ("float: left; width: {0}; ".format(tag_params['box']) if ("box" in tag_params) else "")
@@ -287,7 +315,7 @@ Change data according to the "left" tag.
 
 		_return = data[data_position:tag_end_position]
 
-		if (len(_return) > 0):
+		if (self.is_block_encoding_supported and len(_return) > 0):
 		#
 			tag_params = FormTagsRenderer.parse_tag_parameters("left", data, tag_position, data_position)
 			css_style = ("float: left; width: {0}".format(tag_params['box']) if ("box" in tag_params) else "text-align: left")
@@ -346,7 +374,7 @@ Change data according to the "list" tag.
 
 		list_content = data[data_position:tag_end_position]
 
-		if (len(list_content) > 0):
+		if (self.is_block_encoding_supported and len(list_content) > 0):
 		#
 			list_items = list_content.split("[*]")
 
@@ -381,7 +409,7 @@ Change data according to the "margin" tag.
 
 		_return = data[data_position:tag_end_position]
 
-		if (len(_return) > 0):
+		if (self.is_block_encoding_supported and len(_return) > 0):
 		#
 			re_result = re.match("^\\[margin=(.+?)\\]", data[tag_position:data_position])
 			if (re_result != None): _return = "<div style='padding: {0}'>{1}</div>[nobr]".format(re_result.group(1), _return)
@@ -425,7 +453,7 @@ Change data according to the "right" tag.
 
 		_return = data[data_position:tag_end_position]
 
-		if (len(_return) > 0):
+		if (self.is_block_encoding_supported and len(_return) > 0):
 		#
 			tag_params = FormTagsRenderer.parse_tag_parameters("right", data, tag_position, data_position)
 			css_style = ("float: right; width: {0}".format(tag_params['box']) if ("box" in tag_params) else "text-align: right")

@@ -171,6 +171,32 @@ Change data according to the "del" tag.
 :since:  v0.1.01
 	"""
 
+	def _change_match_highlight(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "highlight" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = data[data_position:tag_end_position]
+
+		if (len(_return) > 0):
+		#
+			tag_params = FormTagsRenderer.parse_tag_parameters("highlight", data, tag_position, data_position)
+			if ("box" in tag_params): _return = "---\n{0}\n---".format(_return)
+		#
+
+		return _return
+	#
+
 	_change_match_i = _change_plain_content
 	"""
 Change data according to the "i" tag.

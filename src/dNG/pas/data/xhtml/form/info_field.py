@@ -18,7 +18,8 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
+from dNG.data.xml_parser import XmlParser
+from dNG.pas.data.xhtml.formatting import Formatting
 from .abstract_field import AbstractField
 from .read_only_field_mixin import ReadOnlyFieldMixin
 
@@ -48,6 +49,11 @@ Constructor __init__(InfoField)
 
 		AbstractField.__init__(self, name)
 		ReadOnlyFieldMixin.__init__(self)
+
+		self.link = None
+		"""
+Link used for the field content
+		"""
 	#
 
 	def _get_content(self):
@@ -59,7 +65,19 @@ Returns the field content.
 :since:  v0.1.01
 		"""
 
-		return XHtmlFormatting.escape(AbstractField._get_content(self))
+		content = AbstractField._get_content(self)
+
+		_return = (Formatting.escape(content)
+		           if (self.link == None) else
+		           XmlParser().dict_to_xml_item_encoder({ "tag": "a",
+		                                                  "attributes": { "href": self.link },
+		                                                  "value": content
+		                                                },
+		                                                strict_standard_mode = False
+		                                               )
+		          )
+
+		return _return
 	#
 
 	def get_type(self):
@@ -83,13 +101,26 @@ Renders the given field.
 :since:  v0.1.01
 		"""
 
-		context = { "title": XHtmlFormatting.escape(self.get_title()),
+		context = { "title": Formatting.escape(self.get_title()),
 		            "value": self._get_content(),
 		            "required": self.required,
-		            "error_message": ("" if (self.error_data == None) else XHtmlFormatting.escape(self.get_error_message()))
+		            "error_message": ("" if (self.error_data == None) else Formatting.escape(self.get_error_message()))
 		          }
 
 		return self._render_oset_file("core/form/info", context)
+	#
+
+	def set_link(self, link):
+	#
+		"""
+Sets the link used for the field content.
+
+:param link: Link URL
+
+:since: v0.1.01
+		"""
+
+		self.link = link
 	#
 #
 

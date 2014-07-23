@@ -45,7 +45,8 @@ Abstract parser to handle FormTags.
 	"""
 	TAGS = [ "b", "i", "s", "u", "color", "del", "face", "size",
 	         "center", "justify", "left", "right",
-	         "code", "link", "margin", "quote", "title", "url",
+	         "link", "title", "url", 
+	         "code", "highlight", "margin", "quote", 
 	         "hr", "img", "list"
 	       ]
 	"""
@@ -220,6 +221,31 @@ Check if a possible tag match is a valid "b" tag.
 		"""
 
 		return False # TODO: Implement me
+	#
+
+	def _check_match_highlight(self, data):
+	#
+		"""
+Check if a possible tag match is a valid "highlight" tag.
+
+:param data: Data starting with the possible tag
+
+:return: (bool) True if valid
+:since:  v0.1.01
+		"""
+
+		_return = False
+
+		tag_element_end_position = self._find_tag_end_position(data, 10)
+
+		if (tag_element_end_position > 11):
+		#
+			tag_params = AbstractFormTags.parse_tag_parameters("highlight", data, 0, tag_element_end_position)
+			if (data[:11] == "[highlight:" and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
+		#
+		else: _return = (data[:11] == "[highlight]")
+
+		return _return
 	#
 
 	def _check_match_hr(self, data):
@@ -610,6 +636,18 @@ Returns the "face" tag definition for the parser.
 		"""
 
 		return { "tag": "face", "tag_end": "[/face]" }
+	#
+
+	def _get_match_definition_highlight(self):
+	#
+		"""
+Returns the "highlight" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v0.1.01
+		"""
+
+		return { "tag": "highlight", "tag_end": "[/highlight]" }
 	#
 
 	def _get_match_definition_hr(self):

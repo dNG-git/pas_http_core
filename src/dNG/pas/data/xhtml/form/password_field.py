@@ -19,10 +19,11 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 """
 
 from dNG.pas.data.text.md5 import Md5
-from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
+from dNG.pas.data.xhtml.formatting import Formatting
+from .placeholder_mixin import PlaceholderMixin
 from .text_field import TextField
 
-class PasswordField(TextField):
+class PasswordField(TextField, PlaceholderMixin):
 #
 	"""
 "PasswordField" provides  password fields (including optional a repetition
@@ -61,6 +62,7 @@ Constructor __init__(AbstractField)
 		"""
 
 		TextField.__init__(self, name)
+		PlaceholderMixin.__init__(self)
 
 		self.mode = PasswordField.PASSWORD_MD5
 		"""
@@ -193,13 +195,14 @@ Renders the given field.
 :since:  v0.1.01
 		"""
 
-		context = { "type": XHtmlFormatting.escape(self.get_type()),
-		            "id": XHtmlFormatting.escape(self.get_id()),
-		            "name": XHtmlFormatting.escape(self.name),
-		            "title": XHtmlFormatting.escape(self.get_title()),
+		context = { "type": Formatting.escape(self.get_type()),
+		            "id": "pas_{0}".format(Formatting.escape(self.get_id())),
+		            "name": Formatting.escape(self.name),
+		            "title": Formatting.escape(self.get_title()),
+		            "placeholder": Formatting.escape(self.get_placeholder()),
 		            "value": self._get_content(),
 		            "required": self.required,
-		            "error_message": ("" if (self.error_data == None) else XHtmlFormatting.escape(self.get_error_message()))
+		            "error_message": ("" if (self.error_data == None) else Formatting.escape(self.get_error_message()))
 		          }
 
 		if (self.size == TextField.SIZE_SMALL):

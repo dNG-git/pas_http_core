@@ -53,6 +53,9 @@ class Processor(object):
 		"""
 Constructor __init__(Processor)
 
+:param form_id: Form ID used for CSRF protection; Use false to explicitly
+                deactive this feature.
+
 :since: v0.1.00
 		"""
 
@@ -76,7 +79,7 @@ Nameless form field counter
 		"""
 Can be set to true using "set_input_available()"
 		"""
-		self.form_id = (None if (form_id == None or len(form_id) < 1) else form_id)
+		self.form_id = None
 		"""
 Form ID
 		"""
@@ -95,7 +98,8 @@ Form validity check result variable
 
 		L10n.init("pas_http_core_form")
 
-		if (self.form_id == None):
+		if (form_id == False): self.form_id = Binary.str(hexlify(urandom(16)))
+		elif (form_id == None or len(form_id) < 1):
 		#
 			self.form_id = Binary.str(hexlify(urandom(16)))
 			self.form_id_value = Binary.str(hexlify(urandom(16)))
@@ -109,22 +113,27 @@ Form validity check result variable
 		#
 			try:
 			#
-				self.form_store = KeyStore.load_key(self.form_id)
+				self.form_store = KeyStore.load_key(form_id)
 				self.form_store.set_data_attributes(validity_end_time = time() + 300)
 			#
 			except NothingMatchedException: raise TranslatableError("core_access_denied")
+
+			self.form_id = form_id
 		#
 
-		form_data = self.form_store.get_value_dict()
-		form_id_value = form_data.get("form_id_value")
+		if (self.form_store != None):
+		#
+			form_data = self.form_store.get_value_dict()
+			form_id_value = form_data.get("form_id_value")
 
-		field = ReadOnlyHiddenField("form_id")
-		field.set_value(self.form_id)
-		self.add(field)
+			field = ReadOnlyHiddenField("form_id")
+			field.set_value(self.form_id)
+			self.add(field)
 
-		field = ReadOnlyHiddenField(self.form_id)
-		field.set_value(form_id_value)
-		self.add(field)
+			field = ReadOnlyHiddenField(self.form_id)
+			field.set_value(form_id_value)
+			self.add(field)
+		#
 	#
 
 	def add(self, field, section = ""):
@@ -141,7 +150,10 @@ Adds a custom form field.
 
 		if (not isinstance(field, AbstractField)): raise TypeException("Given field type is invalid")
 
-		field._set_form_position(self.field_counter)
+		if (self.form_id != None
+		    and (not field.is_id_set())
+		   ): field.set_id("{0}_{1:d}".format(self.get_form_id(), self.field_counter))
+
 		self.field_counter += 1
 
 		field._set_form_value(self)
@@ -184,7 +196,7 @@ Parses all previously defined form fields and checks them.
 
 		_return = (self.valid if (self.valid != None) else True)
 
-		if (self.form_id != None):
+		if (self.form_store != None):
 		#
 			form_data = self.form_store.get_value_dict()
 			form_id_value = (self.get_input(self.form_id) if (self.form_id_value == None) else self.form_id_value)
@@ -278,6 +290,18 @@ untranslated as well as the translated error message.
 		#
 
 		return _return
+	#
+
+	def get_form_id(self):
+	#
+		"""
+Returns the form ID.
+
+:return: (str) Form ID
+:since:  v0.1.01
+		"""
+
+		return self.form_id
 	#
 
 	def get_input(self, name):

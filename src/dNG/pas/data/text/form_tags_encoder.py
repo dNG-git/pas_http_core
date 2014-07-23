@@ -66,6 +66,36 @@ Change data according to the "center" tag.
 		return _return
 	#
 
+	def _change_match_highlight(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "highlight" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = ""
+
+		re_object = re.match("^\\[highlight\\:box=(\\d+)\\]", data[tag_position:data_position])
+
+		if (re_object != None):
+		#
+			enclosed_data = data[data_position:tag_end_position]
+			value = int(re_object.group(1))
+
+			_return = ("[highlight:box={0:d}%]{1}[/highlight]".format(value, enclosed_data) if (value > 0 and value <= 100) else enclosed_data)
+		#
+
+		return _return
+	#
+
 	def _change_match_hr(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
@@ -332,6 +362,21 @@ changed.
 		"""
 
 		return False
+	#
+
+	def _check_match_highlight(self, data):
+	#
+		"""
+Check if a possible tag match is a valid "highlight" tag that needs to be
+changed.
+
+:param data: Data starting with the possible tag
+
+:return: (bool) True if change required
+:since:  v0.1.01
+		"""
+
+		return (re.match("^\\[highlight\\:box=(\\d+)\\]", data) != None)
 	#
 
 	def _check_match_hr(self, data):
