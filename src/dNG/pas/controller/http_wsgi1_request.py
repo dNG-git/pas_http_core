@@ -111,6 +111,26 @@ Request path after the script
 			#
 		#
 
+		remote_address_headers = Settings.get("pas_http_server_remote_address_headers", [ ])
+
+		for remote_address_header in remote_address_headers:
+		#
+			remote_address_header = remote_address_header.upper()
+
+			remote_address_value = (wsgi_env[remote_address_header].strip()
+			                        if (remote_address_header in wsgi_env
+			                            and wsgi_env[remote_address_header] != None
+			                           ) else
+			                        ""
+			                       )
+
+			if (remote_address_value != ""):
+			#
+				self.client_host = remote_address_value.split(",")[0]
+				self.client_port = None
+			#
+		#
+
 		re_result = (None if (self.client_host == None) else re.match("^::ffff:(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)$", self.client_host))
 		if (re_result != None): self.client_host = "{0}.{1}.{2}.{3}".format(re_result.group(1), re_result.group(2), re_result.group(3), re_result.group(4))
 
