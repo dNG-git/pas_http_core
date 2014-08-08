@@ -34,8 +34,8 @@ from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.runtime.value_exception import ValueException
 from .uri import Uri
 
-try: from dNG.pas.data.session.implementation import Implementation as SessionImplementation
-except ImportError: SessionImplementation = None
+try: from dNG.pas.data.session.implementation import Implementation as Session
+except ImportError: Session = None
 
 class Link(Uri):
 #
@@ -122,11 +122,11 @@ This method appends default parameters if not already set.
 			if (request != None and request.get_lang() != request.get_lang_default()): _return['lang'] = request.get_lang()
 		#
 
-		if ("uuid" not in _return and SessionImplementation != None):
+		if ("uuid" not in _return and Session != None):
 		#
 			if (request == None): request = AbstractHttpRequest.get_instance()
 			session = (None if (request == None) else request.get_session())
-			if (session != None and session.is_active() and (not session.is_persistent())): _return['uuid'] = SessionImplementation.get_class().get_uuid()
+			if (session != None and session.is_active() and (not session.is_persistent())): _return['uuid'] = Session.get_class().get_thread_uuid()
 		#
 
 		return _return

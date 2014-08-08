@@ -644,6 +644,8 @@ Renders the given FormTags content.
 
 		if (not self.is_xhtml_allowed): content = Formatting.escape(content)
 		content = self._parse(content).strip()
+		content = content.replace("[", "&#91;")
+		content = content.replace("]", "&#93;")
 		content = content.replace("\n", "<br />\n")
 
 		return content

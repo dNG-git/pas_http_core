@@ -23,6 +23,7 @@ from os import path
 from dNG.data.rfc.header import Header
 from dNG.pas.data.translatable_exception import TranslatableException
 from dNG.pas.data.text.input_filter import InputFilter
+from dNG.pas.runtime.not_implemented_exception import NotImplementedException
 from .abstract_inner_request import AbstractInnerRequest
 from .abstract_response import AbstractResponse
 
@@ -88,10 +89,6 @@ Request path to the script
 		self.service = None
 		"""
 Requested service
-		"""
-		self.session = None
-		"""
-Associated session to request
 		"""
 		self.timezone = None
 		"""
@@ -289,6 +286,18 @@ Returns the requested module.
 		return ("services" if (self.module == None) else self.module)
 	#
 
+	def _get_parent_request(self):
+	#
+		"""
+Returns the parent request if any.
+
+:return: (dict) Request instance
+:since:  v0.1.01
+		"""
+
+		return self.parent_request
+	#
+
 	def get_output_handler(self):
 	#
 		"""
@@ -358,7 +367,7 @@ Returns the associated session.
 :since:  v0.1.00
 		"""
 
-		return self.session
+		raise NotImplementedException()
 	#
 
 	def get_type(self):
@@ -402,11 +411,10 @@ requested by the client. It will reset the response and its cached values.
 
 		if (isinstance(request, AbstractInnerRequest)):
 		#
-			parent_request = (self if (self.parent_request == None) else self.parent_request)
+			parent_request = self._get_parent_request()
+			if (parent_request == None): parent_request = self
 
 			request.init(self)
-			if (isinstance(request, AbstractHttpMixin)): request._set_parent_request(parent_request)
-
 			if (not isinstance(response, AbstractResponse)): response = AbstractResponse.get_instance()
 
 			parent_request._execute(request, response)
@@ -500,7 +508,7 @@ Sets the associated session.
 :since: v0.1.00
 		"""
 
-		self.session = session
+		raise NotImplementedException()
 	#
 
 	def _supports_accepted_formats(self):

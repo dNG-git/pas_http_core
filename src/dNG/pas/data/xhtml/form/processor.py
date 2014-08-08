@@ -156,6 +156,7 @@ Adds a custom form field.
 
 		self.field_counter += 1
 
+		field._set_form_context(self.context)
 		field._set_form_value(self)
 
 		name = field.get_name()

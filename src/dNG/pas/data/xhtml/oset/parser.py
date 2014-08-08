@@ -174,6 +174,7 @@ Change data according to the matched tag.
 			elif (source == "user_author_bar"): _return += self.render_rewrite_user_xhtml_author_bar(self._update_mapped_element("content", self.content), key)
 			elif (source == "user_linked"): _return += self.render_rewrite_user_xhtml_link(self._update_mapped_element("content", self.content), key)
 			elif (source == "user_publisher_bar"): _return += self.render_rewrite_user_xhtml_publisher_bar(self._update_mapped_element("content", self.content), key)
+			elif (source == "user_signature_box"): _return += self.render_rewrite_user_xhtml_signature_box(self._update_mapped_element("content", self.content), key)
 		#
 
 		_return += data_closed
@@ -228,7 +229,7 @@ Check if a possible tag match is a false positive.
 				re_result = re.match("^\\[rewrite:(\\w+)(:[\\w:]+)*\\]", data)
 
 				if (re_result != None
-				    and re_result.group(1) in [ "content",
+				    and re_result.group(1) in ( "content",
 				                                "formtags_content",
 				                                "l10n",
 				                                "safe_content",
@@ -236,8 +237,9 @@ Check if a possible tag match is a false positive.
 				                                "timestamp",
 				                                "user_author_bar",
 				                                "user_linked",
-				                                "user_publisher_bar"
-				                              ]
+				                                "user_publisher_bar",
+				                                "user_signature_box"
+				                              )
 				   ): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
 			#
 

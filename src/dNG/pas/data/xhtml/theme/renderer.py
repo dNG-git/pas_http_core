@@ -310,7 +310,7 @@ Check if a possible tag match is a false positive.
 				re_result = re.match("^\\[rewrite:(\\w+)(:.*|)\\]", data)
 
 				if (re_result != None
-				    and re_result.group(1) in [ "content", "l10n", "settings" ]
+				    and re_result.group(1) in ( "content", "l10n", "settings" )
 				   ): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
 			#
 

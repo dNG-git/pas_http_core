@@ -18,7 +18,8 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from socket import getfqdn
+from socket import error as socket_error
+from socket import getaddrinfo, gethostname, getfqdn
 
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.virtual_config import VirtualConfig
@@ -67,10 +68,21 @@ happened.
 		"""
 Configured server port
 		"""
-		self.socket_hostname = getfqdn().lower()
+		self.socket_hostname = None
 		"""
 Socket server hostname
 		"""
+
+		socket_hostname = getfqdn()
+
+		try:
+		#
+			getaddrinfo(socket_hostname, None)
+			self.socket_hostname = socket_hostname
+		#
+		except socket_error: self.socket_hostname = gethostname()
+
+		self.socket_hostname = self.socket_hostname.lower()
 
 		Hook.register("dNG.pas.http.Server.getHost", self.get_host)
 		Hook.register("dNG.pas.http.Server.getPort", self.get_port)

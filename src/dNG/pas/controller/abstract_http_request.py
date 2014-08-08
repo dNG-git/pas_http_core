@@ -35,7 +35,9 @@ from dNG.pas.data.http.request_body_multipart import RequestBodyMultipart
 from dNG.pas.data.http.request_body_urlencoded import RequestBodyUrlencoded
 from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.text.l10n import L10n
+from dNG.pas.database.transaction_context import TransactionContext
 from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.runtime.exception_log_trap import ExceptionLogTrap
 from .abstract_http_mixin import AbstractHttpMixin
 from .abstract_inner_request import AbstractInnerRequest
 from .abstract_request import AbstractRequest
@@ -121,6 +123,10 @@ JSON-RPC based on HTTP).
 		"""
 Request query string
 		"""
+		self.session = None
+		"""
+Associated session to request
+		"""
 
 		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 
@@ -193,10 +199,9 @@ Executes the given request and generate content for the given response.
 		if (NamedLoader.is_defined("dNG.pas.module.controller.{0}.{1}".format(requested_module, requested_service))):
 		#
 			instance = NamedLoader.get_instance("dNG.pas.module.controller.{0}.{1}".format(requested_module, requested_service))
-			if (self.log_handler != None): instance.set_log_handler(self.log_handler)
-
 			instance.init(request, response)
 			instance.execute()
+
 			del(instance)
 		#
 		else:
@@ -204,9 +209,8 @@ Executes the given request and generate content for the given response.
 			if (NamedLoader.is_defined("dNG.pas.module.controller.{0}.Module".format(requested_module))):
 			#
 				instance = NamedLoader.get_instance("dNG.pas.module.controller.{0}.Module".format(requested_module))
-				if (self.log_handler != None): instance.set_log_handler(self.log_handler)
-
 				instance.init(request, response)
+
 				del(instance)
 			#
 
@@ -286,6 +290,18 @@ implementation.
 		return _return
 	#
 
+	def get_session(self):
+	#
+		"""
+Returns the associated session.
+
+:return: (object) Session instance
+:since:  v0.1.00
+		"""
+
+		return self.session
+	#
+
 	def handle_missing_service(self, response):
 	#
 		"""
@@ -354,28 +370,30 @@ Initializes the matching response instance.
 
 		response = NamedLoader.get_instance("dNG.pas.controller.{0}Response".format("".join([word.capitalize() for word in self.output_handler.split("_")])))
 
-		try:
+		with ExceptionLogTrap("pas_http_core"):
 		#
-			if (Session != None):
+			session = self.get_session()
+			session_class = (None if (Session == None) else Session.get_class())
+
+			if (session_class != None):
 			#
-				session_class = Session.get_class()
 				session_class.set_adapter(HttpSessionAdapter)
 
-				session = session_class.load(session_create = False)
-
-				if (session != None):
+				if (session == None):
 				#
-					response.set_content_dynamic(True)
+					session = Session.get_class().load(session_create = False)
 					self.set_session(session)
-
-					user_profile = session.get_user_profile()
-					if (user_profile != None): self.lang_default = user_profile.get_lang()
 				#
+				else: session.set_thread_default()
 			#
-		#
-		except Exception as handled_exception:
-		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_http_core")
+
+			if (session != None):
+			#
+				response.set_content_dynamic(True)
+
+				user_profile = session.get_user_profile()
+				if (user_profile != None): self.lang_default = user_profile.get_lang()
+			#
 		#
 
 		if (self.lang == ""): self.lang = self.lang_default
@@ -556,7 +574,7 @@ Respond the request with the given response.
 
 		# pylint: disable=broad-except,star-args
 
-		try:
+		with ExceptionLogTrap("pas_http_core"):
 		#
 			if (self.session != None and self.session.is_active()):
 			#
@@ -564,23 +582,22 @@ Respond the request with the given response.
 
 				if (user_profile != None):
 				#
-					user_profile_data = { "lang": self.lang,
-					                      "lastvisit_time": time(),
-					                      "lastvisit_ip": self.client_host
-					                    }
+					with TransactionContext():
+					#
+						user_profile_data = { "lang": self.lang,
+						                      "lastvisit_time": time(),
+						                      "lastvisit_ip": self.client_host
+						                    }
 
-					if ("theme" in self.parameters): user_profile_data['theme'] = self.parameters['theme']
+						if ("theme" in self.parameters): user_profile_data['theme'] = self.parameters['theme']
 
-					user_profile.set_data_attributes(**user_profile_data)
-					user_profile.save()
+						user_profile.set_data_attributes(**user_profile_data)
+						user_profile.save()
+
+						self.session.save()
+					#
 				#
-
-				self.session.save()
 			#
-		#
-		except Exception as handled_exception:
-		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_http_core")
 		#
 
 		AbstractRequest._respond(self, response)
@@ -610,8 +627,7 @@ Sets the associated session.
 :since: v0.1.00
 		"""
 
-		AbstractHttpMixin.set_session(self, session)
-		if (isinstance(self.inner_request, AbstractInnerRequest) and self.inner_request.is_supported("session")): self.inner_request.set_session(session)
+		self.session = session
 	#
 
 	@staticmethod

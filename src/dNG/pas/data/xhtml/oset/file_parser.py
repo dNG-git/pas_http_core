@@ -25,6 +25,7 @@ from dNG.data.file import File
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.runtime.exception_log_trap import ExceptionLogTrap
 from dNG.pas.runtime.io_exception import IOException
 from dNG.pas.runtime.type_exception import TypeException
 from .parser import Parser
@@ -81,12 +82,10 @@ Renders content ready for output from the given OSet template.
 :since:  v0.1.00
 		"""
 
-		# pylint: disable=broad-except
-
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, template_name, context = "pas_http_core")
 		_return = ("<span>{0}</span>".format(L10n.get("errors_pas_http_core_oset_not_viewable")) if (default == None) else default)
 
-		try:
+		with ExceptionLogTrap("pas_http_core"):
 		#
 			if (type(template_name) != str): raise TypeException("Given OSet template name is not valid")
 
@@ -115,10 +114,6 @@ Renders content ready for output from the given OSet template.
 			#
 
 			_return = Parser.render(self, template_data, content)
-		#
-		except Exception as handled_exception:
-		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception, "pas_http_core")
 		#
 
 		return _return

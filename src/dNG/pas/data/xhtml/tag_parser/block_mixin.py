@@ -21,6 +21,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.data.text.tag_parser.mapped_element_mixin import MappedElementMixin
 from dNG.pas.data.text.tag_parser.source_value_mixin import SourceValueMixin
+from dNG.pas.runtime.exception_log_trap import ExceptionLogTrap
 
 class BlockMixin(MappedElementMixin, SourceValueMixin):
 #
@@ -50,12 +51,10 @@ Checks and renders the block statement.
 :since:  v0.1.01
 		"""
 
-		# pylint: disable=broad-except
-
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_block()- (#echo(__LINE__)#)", self, context = "pas_tag_parser")
 		_return = ""
 
-		try:
+		with ExceptionLogTrap("pas_tag_parser"):
 		#
 			content = (self.content if (source_key == None) else self.get_source_value(source, key))
 
@@ -66,14 +65,9 @@ Checks and renders the block statement.
 			if (NamedLoader.is_defined("dNG.pas.module.controller.{0}".format(service))):
 			#
 				instance = NamedLoader.get_instance("dNG.pas.module.controller.{0}".format(service))
-				if (self.log_handler != None): instance.set_log_handler(self.log_handler)
 				instance.set_action(action, content)
 				_return = instance.execute()
 			#
-		#
-		except Exception as handled_exception:
-		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_tag_parser")
 		#
 
 		return _return

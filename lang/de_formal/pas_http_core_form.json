@@ -1,5 +1,11 @@
 {
- "pas_http_file_form_done_message": "Die Formulardaten wurden erfolgreich verarbeitet.",
+ "pas_http_core_form_abbreviation_reply_1": "AW: ",
+ "pas_http_core_form_abbreviation_reply_2": "",
+
+ "pas_http_core_form_case_sensitive_placeholder": "Feld prüft Groß-/Kleinschreibung",
+ "pas_http_core_form_password_repetition": "Bitte geben Sie das Passwort im nachfolgenden Feld erneut ein.",
+
+ "pas_http_core_form_done_message": "Die Formulardaten wurden erfolgreich verarbeitet.",
 
  "pas_http_core_form_error_format_invalid": "Der Inhalt dieses Eingabefeldes besitzt nicht das richtige Format.",
 
@@ -19,7 +25,5 @@
  "pas_http_core_form_error_string_max_2": " Zeichen besitzen.",
 
  "pas_http_core_form_error_string_min_1": "Dieses Feld muss mindestens ",
- "pas_http_core_form_error_string_min_2": " Zeichen besitzen.",
-
- "pas_http_core_form_password_repetition": "Bitte geben Sie das Passwort im nachfolgenden Feld erneut ein."
+ "pas_http_core_form_error_string_min_2": " Zeichen besitzen."
 }

@@ -22,6 +22,7 @@ from wsgiref.simple_server import make_server
 
 from dNG.pas.data.settings import Settings
 from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
+from dNG.pas.runtime.exception_log_trap import ExceptionLogTrap
 from .server_implementation import ServerImplementation
 
 class ServerStandalone(ServerImplementation):
@@ -68,9 +69,10 @@ Configures the server
 		if (listener_host == ""): self.host = Settings.get("pas_http_server_preferred_hostname", self.socket_hostname)
 		else: self.host = listener_host
 
+		if (self.log_handler != None): self.log_handler.info("pas.http.core wsgiref server starts at '{0}:{1:d}'", self.host, self.port, context = "pas_http_core")
+
 		self.server = make_server(listener_host, self.port, HttpWsgi1Request)
 		self.server.socket.settimeout(5)
-		if (self.log_handler != None): self.log_handler.info("pas.http.core wsgiref server starts at '{0}:{1:d}'", self.host, self.port, context = "pas_http_core")
 
 		"""
 Configure common paths and settings
@@ -87,13 +89,7 @@ Runs the server
 :since: v0.1.00
 		"""
 
-		# pylint: disable=broad-except
-
-		try: self.server.serve_forever(5)
-		except Exception as handled_exception:
-		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_http_core")
-		#
+		with ExceptionLogTrap("pas_http_core"): self.server.serve_forever(5)
 	#
 
 	def stop(self, params = None, last_return = None):

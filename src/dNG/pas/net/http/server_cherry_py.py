@@ -27,6 +27,7 @@ import socket
 from dNG.pas.data.settings import Settings
 from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
 from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.runtime.exception_log_trap import ExceptionLogTrap
 from .server_implementation import ServerImplementation
 
 class ServerCherryPy(ServerImplementation):
@@ -83,10 +84,10 @@ Configures the server
 		config.update({ "response.stream": True })
 		numthreads = Settings.get("pas_http_cherrypy_server_numthreads", 10)
 
+		if (self.log_handler != None): self.log_handler.info("pas.http.core cherrypy server starts at '{0}:{1:d}'", listener_host, self.port, context = "pas_http_core")
+
 		listener_data = ( listener_host, self.port )
 		self.server = CherryPyWSGIServer(listener_data, HttpWsgi1Request, numthreads = numthreads, server_name = self.host)
-
-		if (self.log_handler != None): self.log_handler.info("pas.http.core cherrypy server starts at '{0}:{1:d}'", listener_host, self.port, context = "pas_http_core")
 
 		"""
 Configure common paths and settings
@@ -103,13 +104,7 @@ Runs the server
 :since: v0.1.01
 		"""
 
-		# pylint: disable=broad-except
-
-		try: self.server.start()
-		except Exception as handled_exception:
-		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_http_core")
-		#
+		with ExceptionLogTrap("pas_http_core"): self.server.start()
 	#
 
 	def stop(self, params = None, last_return = None):

@@ -1,5 +1,11 @@
 {
- "pas_http_file_form_done_message": "The form content has been processed successfully.",
+ "pas_http_core_form_abbreviation_reply_1": "Re: ",
+ "pas_http_core_form_abbreviation_reply_2": "",
+
+ "pas_http_core_form_case_sensitive_placeholder": "Field is case-sensitive",
+ "pas_http_core_form_password_repetition": "Please re-enter your password in the following field.",
+
+ "pas_http_core_form_done_message": "The form content has been processed successfully.",
 
  "pas_http_core_form_error_format_invalid": "The content of this field does not match the required format.",
 
@@ -19,7 +25,5 @@
  "pas_http_core_form_error_string_max_2": " characters is allowed for this field.",
 
  "pas_http_core_form_error_string_min_1": "A minimal length of ",
- "pas_http_core_form_error_string_min_2": " characters is allowed for this field.",
-
- "pas_http_core_form_password_repetition": "Please re-enter your password in the following field."
+ "pas_http_core_form_error_string_min_2": " characters is allowed for this field."
 }

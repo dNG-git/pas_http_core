@@ -76,7 +76,11 @@ td:last-child, th:last-child { border-right: none }
 
 @media only screen and (max-width: 46em) {
 	body { padding: 0 0.5em; border-top-width: 1em }
-	header { margin: -1px -1px 0 -1px; padding: 0.1em }
+
+	header {
+		margin: -1px -1px 0 -1px; padding: 0.1em;
+		text-align: center
+	}
 
 	.designcopyright { margin: 0 -1px -1px -1px; padding: 1px 0.1em 0 0.1em }
 	.designmainblock { margin: -0.5em 0; padding: 2px }

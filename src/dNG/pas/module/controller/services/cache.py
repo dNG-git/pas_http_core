@@ -86,7 +86,7 @@ Action for "index"
 
 			if (is_last_modified_supported and self.request.get_header("If-Modified-Since") != None):
 			#
-				last_modified_on_client = RfcBasics.get_rfc7231_timestamp(self.request.get_header("If-Modified-Since"))
+				last_modified_on_client = RfcBasics.get_rfc7231_timestamp(self.request.get_header("If-Modified-Since").split(";")[0])
 
 				if (last_modified_on_client > -1):
 				#

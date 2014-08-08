@@ -47,7 +47,7 @@ protocol specific functionality.
 	def is_persistent(self):
 	#
 		"""
-Returns true if the uuID session set persistently at the client.
+Returns true if the uuID session is set persistently at the client.
 
 :return: (bool) True if set
 :since:  v0.1.00
@@ -76,7 +76,7 @@ Returns true if the defined session is valid.
 			request = NamedLoader.get_singleton("dNG.pas.controller.AbstractHttpRequest", False)
 			response = AbstractHttpResponse.get_instance()
 
-			if (request != None and hasattr(request, "get_cookie")):
+			if (request != None):
 			#
 				uuids_cookie = request.get_cookie("uuids")
 
@@ -192,6 +192,16 @@ Saves changes of the uuIDs instance.
 				response.set_cookie("uuids", "{0}:{1}".format(self.session.get_uuid(), passcode_hashed))
 			#
 		#
+		elif (not self.is_persistent()):
+		#
+			instance = NamedLoader.get_singleton("dNG.pas.controller.AbstractHttpRequest", False)
+
+			if (instance != None and instance.get_cookie("uuids") != None):
+			#
+				response = AbstractHttpResponse.get_instance()
+				if (isinstance(response, AbstractHttpResponse)): response.set_cookie("uuids", "", 0)
+			#
+		#
 
 		return True
 	#
@@ -221,7 +231,7 @@ Returns the uuID.
 
 		instance = NamedLoader.get_singleton("dNG.pas.controller.AbstractHttpRequest", False)
 
-		if (instance != None and hasattr(instance, "get_cookie")):
+		if (instance != None):
 		#
 			uuids_cookie = instance.get_cookie("uuids")
 			_return = (None if (uuids_cookie == None) else uuids_cookie.split(":", 1)[0])

@@ -47,7 +47,7 @@ Returns a list of rendered links for the service menu.
 
 		_return = [ ]
 
-		if (links != None):
+		if (isinstance(links, list)):
 		#
 			links = self._filter_links(links)
 			for link in links: _return.append(self.render_options_block_link(link))

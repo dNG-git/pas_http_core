@@ -80,6 +80,21 @@ Returns the compression formats the client accepts.
 		return self.compression_formats
 	#
 
+	def get_session(self):
+	#
+		"""
+Returns the associated session.
+
+:return: (object) Session instance
+:since:  v0.1.00
+		"""
+
+		return (None
+		        if (self.parent_request == None) else
+		        self.parent_request.get_session()
+		       )
+	#
+
 	def init(self, request):
 	#
 		"""
@@ -92,15 +107,30 @@ Initializes default values from the original request.
 
 		AbstractInnerRequest.init(self, request)
 
+		self.parent_request = request._get_parent_request()
+		if (self.parent_request == None): self.parent_request = request
+
 		if (request.is_supported("accepted_formats")): self.accepted_formats = request.get_accepted_formats()
 		if (request.is_supported("compression")): self.compression_formats = request.get_compression_formats()
 		if (request.is_supported("headers")): self.headers = request.get_headers()
 		self.lang = request.get_lang()
 		self.lang_default = request.get_lang_default()
-		if (self.session == None): self.session = request.get_session()
 		if (request.is_supported("type")): self.type = request.get_type()
 
 		self.set_script_pathname(request.get_script_pathname())
+	#
+
+	def set_session(self, session):
+	#
+		"""
+Sets the associated session.
+
+:param session: (object) Session instance
+
+:since: v0.1.00
+		"""
+
+		if (self.parent_request != None): self.parent_request.set_session(session)
 	#
 
 	def _supports_accepted_formats(self):

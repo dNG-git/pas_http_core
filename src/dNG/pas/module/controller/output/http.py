@@ -73,7 +73,7 @@ Action for "done"
 		if (not isinstance(self.request, AbstractInnerRequest)): raise TranslatableException("pas_http_core_400", 400)
 
 		parameters_chained = self.request.get_parameters_chained()
-		is_parameters_chained_valid = ("title" in parameters_chained and "message" in parameters_chained and "target_iline" in parameters_chained)
+		is_parameters_chained_valid = ("title" in parameters_chained and "message" in parameters_chained)
 
 		if (not is_parameters_chained_valid): raise TranslatableException("pas_http_core_500")
 
