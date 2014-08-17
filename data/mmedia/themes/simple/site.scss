@@ -20,7 +20,7 @@ small { font-size: 0.75em }
 }
 
 .pagecontent_box_infoblock div {
-	display: inline-block; padding: 0.4em; border: 1px solid $dark_grey; border-radius: 0.2em;
+	display: inline-block; padding: 0.4em; border: 1px solid $dark_grey;
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(#{$white_rgba}, 0)), color-stop(1, $light_steel));
 	background-image: -o-linear-gradient(rgba(#{$white_rgba}, 0) 0%, $light_steel 100%);
 	background-image: -moz-linear-gradient(rgba(#{$white_rgba}, 0) 0%, $light_steel 100%);
@@ -95,7 +95,7 @@ small { font-size: 0.75em }
 
 .pagecontent_monospace_box { overflow: auto; font-family: "Nimbus Mono L", Monaco, "Lucida Sans Typewriter", "Lucida Console", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace }
 
-.pagecontent_page_navigation { clear: both; padding: 0.4em; background-color: $light_grey; border: 1px solid $light_blue; border-radius: 0.2em }
+.pagecontent_page_navigation { clear: both; padding: 0.4em; background-color: $light_grey; border: 1px solid $light_blue }
 section .pagecontent_page_navigation { font-size: 0.75em }
 
 .pagecontent_page_navigation ul { display: inline-block; margin: 0; padding: 0; list-style: none }
@@ -107,7 +107,14 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 
 .pagecontent_page_navigation li:not(:last-child):after { margin: 0 0.3em; content: "•" }
 
-.pagecontent_user_above_wrote { padding: 0.4em; background-color: $white; border: 1px solid $dark_grey; border-radius: 0.2em }
+.pagecontent_quote_box { padding: 0.4em; background-color: $light_grey; border: 1px solid $dark_grey }
+
+.pagecontent_quote_box:first-child:before {
+	display: block; float: left; padding-bottom: 0.4em; padding-right: 0.4em;
+	font-size: 200%; content: open-quote
+}
+
+.pagecontent_user_above_wrote { padding: 0.4em; background-color: $white; border: 1px solid $dark_grey }
 
 .pagecontent_user_above_wrote:before, .pagecontent_user_above_wrote:after {
 	position: absolute; top: 0;
@@ -121,7 +128,7 @@ section .pagecontent_page_navigation { font-size: 0.75em }
 .pagecontent_user_above_wrote > :last-child { margin-bottom: 0 }
 
 .pagecontent_user_bar { clear: left; margin: 1em 0 }
-.pagecontent_user_bar > div { display: inline-block; min-width: 25%; padding: 0.4em; background-color: $light_grey; border: 1px solid $dark_grey; border-radius: 0.2em }
+.pagecontent_user_bar > div { display: inline-block; min-width: 25%; padding: 0.4em; background-color: $light_grey; border: 1px solid $dark_grey }
 
 .pagecontent_user_quote { margin: 1em 0; position: relative }
 

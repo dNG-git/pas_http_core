@@ -167,7 +167,7 @@ Change data according to the "color" tag.
 		if (len(_return) > 0):
 		#
 			color = Formatting.escape(data[(7 + tag_position):(data_position - 1)])
-			_return = "<span style='color: {0}'>{1}</span>".format(color, _return)
+			_return = '<span style="color: {0}">{1}</span>'.format(color, _return)
 
 		return _return
 	#
@@ -211,7 +211,7 @@ Change data according to the "highlight" tag.
 		if (self.is_block_encoding_supported and len(_return) > 0):
 		#
 			tag_params = FormTagsRenderer.parse_tag_parameters("highlight", data, tag_position, data_position)
-			css_style = (" style='width: {0}'".format(tag_params['box']) if ("box" in tag_params) else "")
+			css_style = (' style="width: {0}"'.format(tag_params['box']) if ("box" in tag_params) else "")
 
 			_return = "<div class='pagecontent_box pagecontent_highlight_box'{0}>{1}</div>[nobr]".format(css_style, _return)
 		#
@@ -292,7 +292,7 @@ Change data according to the "justify" tag.
 			tag_params = FormTagsRenderer.parse_tag_parameters("justify", data, tag_position, data_position)
 			css_style = ("float: left; width: {0}; ".format(tag_params['box']) if ("box" in tag_params) else "")
 
-			_return = "<div class='pagecontent_box' style='{0}text-align: justify'>{1}</div>[nobr]".format(css_style, _return)
+			_return = '<div class="pagecontent_box" style="{0}text-align: justify">{1}</div>[nobr]'.format(css_style, _return)
 		#
 
 		return _return
@@ -320,7 +320,7 @@ Change data according to the "left" tag.
 			tag_params = FormTagsRenderer.parse_tag_parameters("left", data, tag_position, data_position)
 			css_style = ("float: left; width: {0}".format(tag_params['box']) if ("box" in tag_params) else "text-align: left")
 
-			_return = "<div class='pagecontent_box' style='{0}'>{1}</div>[nobr]".format(css_style, _return)
+			_return = '<div class="pagecontent_box" style="{0}">{1}</div>[nobr]'.format(css_style, _return)
 		#
 
 		return _return
@@ -412,7 +412,7 @@ Change data according to the "margin" tag.
 		if (self.is_block_encoding_supported and len(_return) > 0):
 		#
 			re_result = re.match("^\\[margin=(.+?)\\]", data[tag_position:data_position])
-			if (re_result != None): _return = "<div style='padding: {0}'>{1}</div>[nobr]".format(re_result.group(1), _return)
+			if (re_result != None): _return = '<div style="padding: {0}">{1}</div>[nobr]'.format(re_result.group(1), _return)
 		#
 
 		return _return
@@ -434,6 +434,28 @@ Change data according to the "nobr" tag.
 		"""
 
 		return (data[7 + tag_position:] if (data[6 + tag_position:7 + tag_position] == "\n") else data[6 + tag_position:])
+	#
+
+	def _change_match_quote(self, data, tag_position, data_position, tag_end_position):
+	#
+		"""
+Change data according to the "quote" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+		"""
+
+		_return = data[data_position:tag_end_position]
+
+		if (self.is_block_encoding_supported and len(_return) > 0): _return = "<blockquote class='pagecontent_box pagecontent_quote_box'>{0}</blockquote>[nobr]".format(_return)
+
+		return _return
 	#
 
 	def _change_match_right(self, data, tag_position, data_position, tag_end_position):
@@ -458,7 +480,7 @@ Change data according to the "right" tag.
 			tag_params = FormTagsRenderer.parse_tag_parameters("right", data, tag_position, data_position)
 			css_style = ("float: right; width: {0}".format(tag_params['box']) if ("box" in tag_params) else "text-align: right")
 
-			_return = "<div class='pagecontent_box' style='{0}'>{1}</div>[nobr]".format(css_style, _return)
+			_return = '<div class="pagecontent_box" style="{0}">{1}</div>[nobr]'.format(css_style, _return)
 		#
 
 		return _return
@@ -503,7 +525,7 @@ Change data according to the "size" tag.
 		if (len(_return) > 0):
 		#
 			re_result = re.match("^\\[size=(.+?)\\]", data[tag_position:data_position])
-			if (re_result != None): _return = "<span style='font-size: {0}'>{1}</span>".format(re_result.group(1), _return)
+			if (re_result != None): _return = '<span style="font-size: {0}">{1}</span>'.format(re_result.group(1), _return)
 		#
 
 		return _return

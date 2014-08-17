@@ -1,0 +1,4 @@
+<article class="pagecontent_core_simple_content">
+	<h1>[rewrite:content]title[/rewrite]</h1>
+	<p>[rewrite:content]content[/rewrite]</p>
+</article>
