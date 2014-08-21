@@ -56,7 +56,7 @@ Constructor __init__(FileParser)
 
 		Parser.__init__(self)
 
-		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.Cache", False)
+		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.cache.Content", False)
 		"""
 Cache instance
 		"""

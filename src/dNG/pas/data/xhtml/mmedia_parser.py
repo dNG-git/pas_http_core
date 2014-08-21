@@ -54,7 +54,7 @@ Constructor __init__(MmediaParser)
 
 		AbstractTagParser.__init__(self)
 
-		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.Cache", False)
+		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.cache.Content", False)
 		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 	#
 

@@ -21,8 +21,8 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 from os import path
 import os
 
-from dNG.pas.data.cached_json_file import CachedJsonFile
 from dNG.pas.data.settings import Settings
+from dNG.pas.data.cache.json_file_content import JsonFileContent
 from dNG.pas.data.xhtml.link import Link
 from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 from dNG.pas.module.controller.output.filter_links_mixin import FilterLinksMixin
@@ -85,7 +85,7 @@ Returns a list of rendered links for the service menu.
 			#
 			else: file_pathname = path.join(Settings.get("path_base"), file_pathname)
 
-			json_data = CachedJsonFile.read(file_pathname)
+			json_data = JsonFileContent.read(file_pathname)
 			if (type(json_data) == list): links = json_data
 		#
 

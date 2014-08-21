@@ -381,7 +381,7 @@ Builds a URL DSD string.
 			for key in sorted(parameters.keys()):
 			#
 				escaped_key = _escape(key)
-				escaped_value = _escape(parameters[key])
+				escaped_value = Link.encode_query_value(parameters[key])
 
 				if (_return != ""): _return += "++"
 				_return += "{0}+{1}".format(escaped_key, escaped_value)

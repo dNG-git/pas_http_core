@@ -51,6 +51,8 @@ Sets the requested action.
 		"""
 Sets all parameters defined in the given URI request string.
 
+:param iline: URI request string
+
 :since: v0.1.00
 		"""
 

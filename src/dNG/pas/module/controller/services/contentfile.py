@@ -21,7 +21,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 from os import path
 import re
 
-from dNG.pas.data.cached_file import CachedFile
+from dNG.pas.data.cache.file_content import FileContent
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.translatable_error import TranslatableError
 from dNG.pas.data.text.input_filter import InputFilter
@@ -82,8 +82,8 @@ Action for "view"
 			               Link.TYPE_RELATIVE,
 			               L10n.get("core_back"),
 			               { "__query__": re.sub("\\_\\_\\w+\\_\\_", "", source_iline) },
-			               icon = "mini_default_back",
-			               priority = 2
+			               icon = "mini-default-back",
+			               priority = 7
 			              )
 		#
 
@@ -92,7 +92,7 @@ Action for "view"
 		    or "filepath" not in contentfiles[cid]
 		   ): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
 
-		file_content = CachedFile.read(contentfiles[cid]['filepath'])
+		file_content = FileContent.read(contentfiles[cid]['filepath'])
 		if (file_content == None): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
 
 		if (path.splitext(contentfiles[cid]['filepath'])[1].lower() == ".ftg"): file_content = FormTags.render(file_content)

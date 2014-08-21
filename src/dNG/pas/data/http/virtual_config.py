@@ -45,12 +45,12 @@ List with registered virtual paths
 	"""
 
 	@staticmethod
-	def get_config(pathname):
+	def get_config(path):
 	#
 		"""
 Return the config for the given virtual path.
 
-:param pathname: Virtual path to check
+:param path: Virtual path to check
 
 :return: (dict) Config if matched; None otherwise
 :since:  v0.1.00
@@ -58,17 +58,51 @@ Return the config for the given virtual path.
 
 		_return = None
 
-		if (len(pathname) > 0):
+		if (len(path) > 0):
 		#
 			with VirtualConfig._lock:
 			#
-				pathname = pathname.lower()
+				path = path.lower()
 
 				for virtual_path_config in VirtualConfig._virtuals:
 				#
-					if (pathname.startswith(virtual_path_config['path'])):
+					if (path.startswith(virtual_path_config['path'])):
 					#
 						_return = virtual_path_config['config']
+						break
+					#
+				#
+			#
+		#
+
+		return _return
+	#
+
+	@staticmethod
+	def isset_virtual_path(path):
+	#
+		"""
+Returns true if the given virtual path is already defined.
+
+:param path: Virtual path
+
+:return: (bool) True if found
+:since:  v0.1.00
+		"""
+
+		_return = False
+
+		if (len(path) > 0):
+		#
+			with VirtualConfig._lock:
+			#
+				path = path.lower()
+
+				for virtual_path_config in VirtualConfig._virtuals:
+				#
+					if (path.startswith(virtual_path_config['path'])):
+					#
+						_return = True
 						break
 					#
 				#

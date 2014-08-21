@@ -23,8 +23,8 @@ import os
 import re
 
 from dNG.data.rfc.basics import Basics as RfcBasics
-from dNG.pas.data.cached_file import CachedFile
 from dNG.pas.data.settings import Settings
+from dNG.pas.data.cache.file_content import FileContent
 from dNG.pas.data.http.streaming import Streaming
 from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.xhtml.mmedia_parser import MmediaParser
@@ -67,7 +67,7 @@ Action for "index"
 			#
 				if (file_pathname.endswith(".paslink.url")):
 				#
-					file_content = CachedFile.read(file_pathname)
+					file_content = FileContent.read(file_pathname)
 					if (file_content != None): file_content = path.normpath(file_content)
 					file_pathname = ("" if (file_content == None or (not path.exists(file_content)) or (not os.access(file_content, os.R_OK))) else file_content)
 				#

@@ -22,6 +22,7 @@ from collections import Mapping
 from os import path
 import re
 
+from dNG.pas.controller.predefined_http_request import PredefinedHttpRequest
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.virtual_config import VirtualConfig
 from dNG.pas.runtime.io_exception import IOException

@@ -52,7 +52,7 @@ Constructor __init__(ServerWsgi)
 :since: v0.1.00
 		"""
 
-		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.Cache", False)
+		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.cache.Content", False)
 		"""
 Cache instance
 		"""
@@ -61,7 +61,7 @@ Cache instance
 Timestamp of service initialisation
 		"""
 
-		self.cache_instance.disable()
+		if (self.cache_instance != None): self.cache_instance.disable()
 
 		# Call super after we disabled the cache
 		ServerImplementation.__init__(self)

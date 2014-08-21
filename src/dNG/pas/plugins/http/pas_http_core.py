@@ -47,7 +47,10 @@ Called for "dNG.pas.http.Server.onStartup" and "dNG.pas.http.Wsgi.onStartup"
 :since:  v0.1.00
 	"""
 
-	VirtualConfig.set_virtual_path("/tsc/view/", { "s": "tsc", "path_parameters": True })
+	VirtualConfig.set_virtual_path("/contentfile/", { "path": "cid" })
+	if (not VirtualConfig.isset_virtual_path("/favicon.ico")): VirtualConfig.set_virtual_path("/favicon.ico", { "s": "cache", "dsd": { "dfile": "favicon.ico" } })
+	VirtualConfig.set_virtual_path("/robots.txt", { "m": "output", "s": "http", "a": "error", "dsd": { "code": "404" } })
+
 	return last_return
 #
 

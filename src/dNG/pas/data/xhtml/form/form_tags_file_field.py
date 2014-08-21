@@ -18,7 +18,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.data.cached_file import CachedFile
+from dNG.pas.data.cache.file_content import FileContent
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.form_tags_renderer import FormTagsRenderer
 from dNG.pas.data.xhtml.formatting import Formatting
@@ -75,7 +75,7 @@ Returns the field content.
 
 		if (self.formtags_content == None
 		    and self.formtags_filepath != None
-		   ): self.formtags_content = CachedFile.read(self.formtags_filepath)
+		   ): self.formtags_content = FileContent.read(self.formtags_filepath)
 
 		return ("" if (self.formtags_content == None) else self.formtags_content)
 	#

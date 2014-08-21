@@ -18,7 +18,7 @@ http://www.direct-netware.de/redirect.py?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.data.cached_json_file import CachedJsonFile
+from dNG.pas.data.cache.json_file_content import JsonFileContent
 from .filter_links_mixin import FilterLinksMixin
 from .options_block_mixin import OptionsBlockMixin
 
@@ -86,7 +86,7 @@ Renders the content of the given service list file.
 
 		_return = ""
 
-		json_data = CachedJsonFile.read(file_pathname)
+		json_data = JsonFileContent.read(file_pathname)
 
 		if (type(json_data) == list):
 		#

@@ -86,6 +86,10 @@ RegExp to find non-word characters at the end of the string
 	"""
 RegExp to find non-word characters at the beginning of the string
 	"""
+	RE_PARAMETER_PLUS_ENCODED_CHAR = re.compile("%2b", re.I)
+	"""
+RegExp to find URL-encoded plus characters
+	"""
 	RE_PARAMETER_PLUS_CHAR = re.compile("\\+")
 	"""
 RegExp to find plus characters
@@ -131,6 +135,7 @@ Associated session to request
 		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 
 		self.supported_features['inner_request'] = True
+		self.supported_features['query_string'] = True
 	#
 
 	def execute(self):
@@ -440,9 +445,9 @@ Parses request parameters.
 
 		self.parameters = self._get_request_parameters()
 
-		self.action = (AbstractHttpRequest.filter_parameter_word(self.parameters['a']) if ("a" in self.parameters) else "")
-		self.module = (AbstractHttpRequest.filter_parameter_word(self.parameters['m']) if ("m" in self.parameters) else "")
-		self.service = (AbstractHttpRequest.filter_parameter_service(self.parameters['s']) if ("s" in self.parameters) else "")
+		if ("a" in self.parameters): self.action = AbstractHttpRequest.filter_parameter_word(self.parameters['a'])
+		if ("m" in self.parameters): self.module = AbstractHttpRequest.filter_parameter_word(self.parameters['m'])
+		if ("s" in self.parameters): self.service = AbstractHttpRequest.filter_parameter_service(self.parameters['s'])
 
 		if ("dsd" in self.parameters): self.dsd = AbstractHttpRequest.parse_dsd(self.parameters['dsd'])
 
@@ -472,14 +477,6 @@ Initialize l10n
 			elif (os.access(path.join(Settings.get("path_lang"), lang_domain, "core.json"), os.R_OK)): self.lang_default = lang_domain
 			else: self.lang_default = Settings.get("core_lang", "en")
 		#
-
-		"""
-Set some standard values
-		"""
-
-		if (self.action == ""): self.action = "index"
-		if (self.module == ""): self.module = "services"
-		if (self.service == ""): self.service = "index"
 	#
 
 	def _parse_virtual_config(self, virtual_config, virtual_pathname):
@@ -694,7 +691,9 @@ news, topics, ... Take care for injection attacks!
 :since:  v0.1.00
 		"""
 
-		if (" " in dsd): dsd = quote(dsd)
+		if ("+" not in dsd and AbstractHttpRequest.RE_PARAMETER_PLUS_ENCODED_CHAR.search(dsd) != None): dsd = unquote(dsd)
+		elif (" " in dsd): dsd = quote(dsd)
+
 		dsd = AbstractHttpRequest.RE_PARAMETER_DSD_PLUS_SPAM_CHAR.sub("++", dsd)
 
 		dsd_list = dsd.split("++")

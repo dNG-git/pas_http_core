@@ -68,7 +68,7 @@ Constructor __init__(Renderer)
 		IfConditionMixin.__init__(self)
 		RewriteMixin.__init__(self)
 
-		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.Cache", False)
+		self.cache_instance = NamedLoader.get_singleton("dNG.pas.data.cache.Content", False)
 		"""
 Cache instance
 		"""
