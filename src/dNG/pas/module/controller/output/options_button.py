@@ -49,8 +49,8 @@ Renders the options button.
 
 		rendered_content = """
 {0}<script type="text/javascript"><![CDATA[
-require([ "djs/uiX.min" ], function(uiX) {{
-	uiX.option_button_init({{ id: "{1}", button_content: "{2}" }});
+require([ "djs/OptionButton.min" ], function(OptionButton) {{
+	new OptionButton({{ id: "{1}", button_content: "{2}" }});
 }});
 ]]></script>
 		""".format(self._render_options_bar_links(_id), _id, L10n.get("pas_http_core_additional_options"))

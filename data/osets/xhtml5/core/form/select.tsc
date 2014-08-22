@@ -6,8 +6,8 @@
 			<option value="[rewrite:content]choices.choice.value[/rewrite]"[if:content:choices.choice.selected== 1] selected="selected"[/if]>[rewrite:content]choices.choice.title[/rewrite]</option>
 [/each]
 		</select><script type="text/javascript"><![CDATA[
-		require([ "djs/formX.min" ], function(formX) {
-			formX.init({ id: "[rewrite:content]id[/rewrite]", type: "select" });
+		require([ "djs/XHtml5FormElement.min" ], function(XHtml5FormElement) {
+			new XHtml5FormElement({ id: "[rewrite:content]id[/rewrite]", type: "select" });
 		});
 		]]></script>
 [if:content:error_message != ]

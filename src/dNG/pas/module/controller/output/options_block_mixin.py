@@ -157,8 +157,8 @@ Renders a link.
 			#
 				_return += """
 </span><script type="text/javascript"><![CDATA[
-require([ "djs/uiX.min" ], function(uiX) {{
-	uiX.show_link_if_js_supported({{ id: "{0}" }});
+require([ "djs/JsLink.min" ], function(JsLink) {{
+	new JsLink({{ id: "{0}" }});
 }});
 ]]></script>
 				""".format(link_id).strip()
