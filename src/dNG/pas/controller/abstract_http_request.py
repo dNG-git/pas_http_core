@@ -37,6 +37,7 @@ from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.database.transaction_context import TransactionContext
 from dNG.pas.module.named_loader import NamedLoader
+from dNG.pas.plugins.hook import Hook
 from dNG.pas.runtime.exception_log_trap import ExceptionLogTrap
 from .abstract_http_mixin import AbstractHttpMixin
 from .abstract_inner_request import AbstractInnerRequest
@@ -177,6 +178,8 @@ Executes the incoming request.
 			#
 
 			if (response.is_supported("script_name")): response.set_script_name(request.get_script_name())
+
+			Hook.call("dNG.pas.http.Request.onExecute", request = request, response = response)
 			self._execute(request, response)
 		#
 		except Exception as handled_exception:
