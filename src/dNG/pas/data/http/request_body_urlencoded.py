@@ -119,7 +119,7 @@ Sets a given pointer for the streamed post instance.
 		byte_buffer = RequestBody.get(self)
 
 		field_arrays = { }
-		parsed_data = parse_qsl(Binary.str(byte_buffer.read()), True, True)
+		parsed_data = ({ } if (byte_buffer == None) else parse_qsl(Binary.str(byte_buffer.read()), True, True))
 		self.parsed_data = { }
 
 		for parsed_field in parsed_data:

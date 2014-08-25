@@ -109,7 +109,7 @@ Sets a given pointer for the streamed post instance.
 		if (self.headers == None): raise ValueException("Request body can't be read without HTTP headers")
 
 		byte_buffer = RequestBody.get(self)
-		self.parsed_data = FieldStorage(byte_buffer, self.headers, environ = { }, keep_blank_values = True)
+		if (byte_buffer != None): self.parsed_data = FieldStorage(byte_buffer, self.headers, environ = { }, keep_blank_values = True)
 	#
 #
 

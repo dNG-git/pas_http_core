@@ -22,7 +22,6 @@ from collections import Mapping
 from os import path
 import re
 
-from dNG.pas.controller.predefined_http_request import PredefinedHttpRequest
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.virtual_config import VirtualConfig
 from dNG.pas.runtime.io_exception import IOException
@@ -143,7 +142,10 @@ Request path after the script
 			if (wsgi_env.get("SERVER_PROTOCOL") == "HTTP/1.0"): self.http_wsgi_stream_response.set_http_version(1)
 
 			self.body_fp = wsgi_env['wsgi.input']
-			self.server_scheme = wsgi_env['wsgi.url_scheme']
+
+			scheme_header = Settings.get("pas_http_server_scheme_header", "")
+			self.server_scheme = (wsgi_env['wsgi.url_scheme'] if (scheme_header == "") else wsgi_env.get(scheme_header.upper().replace("-", "_")))
+
 			if (self.script_pathname == None): self.script_pathname = ""
 
 			self.init()
