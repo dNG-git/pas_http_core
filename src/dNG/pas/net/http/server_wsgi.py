@@ -141,7 +141,7 @@ Returns the time (timestamp) this service had been initialized.
 :param last_return: The return value from the last hook called.
 
 :return: (int) Unix timestamp
-:since:  v1.0.0
+:since:  v0.1.00
 		"""
 
 		return self.time_started

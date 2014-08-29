@@ -115,10 +115,6 @@ Constructor __init__(AbstractHttpRequest)
 		"""
 Request body pointer
 		"""
-		self.body_instance = None
-		"""
-Request body instance
-		"""
 		self.inner_request = None
 		"""
 A inner request is used to support protocols based on other ones (e.g.
@@ -291,6 +287,7 @@ implementation.
 
 				_return.set_headers(self.get_headers())
 				_return.set_input_ptr(self.body_fp)
+
 				self.body_fp = None
 			#
 		#
