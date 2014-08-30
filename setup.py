@@ -64,7 +64,7 @@ with TemporaryDirectory(dir = ".") as build_directory:
 	      author = "direct Netware Group",
 	      author_email = "web@direct-netware.de",
 	      license = "MPL2",
-	      url = "https://www.direct-netware.de/redirect?pas;http_core",
+	      url = "https://www.direct-netware.de/redirect?pas;http;core",
 
 	      package_dir = { "": _build_path },
 	      packages = [ "dNG" ],
