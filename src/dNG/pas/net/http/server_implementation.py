@@ -84,8 +84,8 @@ Socket server hostname
 
 		self.socket_hostname = self.socket_hostname.lower()
 
-		Hook.register("dNG.pas.http.Server.getHost", self.get_host)
-		Hook.register("dNG.pas.http.Server.getPort", self.get_port)
+		Hook.register_weakref("dNG.pas.http.Server.getHost", self.get_host)
+		Hook.register_weakref("dNG.pas.http.Server.getPort", self.get_port)
 	#
 
 	def _configure(self):
