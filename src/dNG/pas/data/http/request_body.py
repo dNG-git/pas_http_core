@@ -87,7 +87,7 @@ Size of the file-like data object
 		"""
 Timeout for each network read.
 		"""
-		self.socket_data_timeout = int(Settings.get("pas_global_server_socket_data_timeout", 0))
+		self.socket_data_timeout = int(Settings.get("pas_http_core_request_body_socket_data_timeout", 0))
 		"""
 Timeout for each network read.
 		"""
@@ -96,6 +96,7 @@ Timeout for each network read.
 Absolute timeout to receive the request body.
 		"""
 
+		if (self.socket_data_timeout < 1): self.socket_data_timeout = int(Settings.get("pas_global_client_socket_data_timeout", 0))
 		if (self.socket_data_timeout < 1): self.socket_data_timeout = int(Settings.get("pas_global_socket_data_timeout", 30))
 	#
 

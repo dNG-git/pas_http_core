@@ -55,63 +55,66 @@ are met.
 		if (not isinstance(response, AbstractHttpResponse)): raise TranslatableException("pas_http_core_500")
 
 		if (streamer == None): response.set_header("HTTP/1.1", "HTTP/1.1 501 Not Implemented", True)
-		else:
+		elif (streamer.open_url(url)):
 		#
-			url_ext = path.splitext(url)[1]
-			mimetype_definition = MimeType.get_instance().get(url_ext[1:])
+			is_valid = True
 
-			if (mimetype_definition != None and streamer.open_url(url)):
+			if (response.get_header("Accept-Ranges") == None): response.set_header("Accept-Ranges", "bytes")
+
+			if (response.get_header("Content-Type") == None):
 			#
-				if (response.get_header("Accept-Ranges") == None): response.set_header("Accept-Ranges", "bytes")
-				if (response.get_header("Content-Type") == None): response.set_header("Content-Type", mimetype_definition['type'])
+				url_ext = path.splitext(url)[1]
+				mimetype_definition = MimeType.get_instance().get(url_ext[1:])
 
-				is_content_length_set = False
+				if (mimetype_definition == None): is_valid = False
+				else: response.set_header("Content-Type", mimetype_definition['type'])
+			#
+
+			is_content_length_set = False
+
+			if (is_valid and request.get_header('range') != None):
+			#
 				is_valid = False
+				streamer_size = streamer.get_size()
+				range_start = 0
+				range_end = 0
+				re_result = re.match("^bytes(.*)=(.*)\\-(.*)$", request.get_header('range'), re.I)
 
-				if (request.get_header('range') == None): is_valid = True
-				else:
+				if (re_result != None):
 				#
-					streamer_size = streamer.get_size()
-					range_start = 0
-					range_end = 0
-					re_result = re.match("^bytes(.*)=(.*)\\-(.*)$", request.get_header('range'), re.I)
+					range_start = re.sub("(\\D+)", "", re_result.group(2))
+					range_end = re.sub("(\\D+)", "", re_result.group(3))
 
-					if (re_result != None):
+					if (range_start != ""): range_start = int(range_start)
+
+					if (range_end != ""):
 					#
-						range_start = re.sub("(\\D+)", "", re_result.group(2))
-						range_end = re.sub("(\\D+)", "", re_result.group(3))
+						range_end = int(range_end)
+						if (range_start >= 0 and range_start <= range_end and range_end < streamer_size): is_valid = True
+					#
+					elif (range_start >= 0 and range_start < streamer_size):
+					#
+						is_valid = True
+						range_end = streamer_size - 1
+					#
 
-						if (range_start != ""): range_start = int(range_start)
+					if (is_valid):
+					#
+						response.set_header("HTTP/1.1", "HTTP/1.1 206 Partial Content", True)
+						response.set_header("Content-Length", 1 + (range_end - range_start))
+						response.set_header("Content-Range", "bytes {0:d}-{1:d}/{2:d}".format(range_start, range_end, streamer_size))
 
-						if (range_end != ""):
-						#
-							range_end = int(range_end)
-							if (range_start >= 0 and range_start <= range_end and range_end < streamer_size): is_valid = True
-						#
-						elif (range_start >= 0 and range_start < streamer_size):
-						#
-							is_valid = True
-							range_end = streamer_size - 1
-						#
-
-						if (is_valid):
-						#
-							response.set_header("HTTP/1.1", "HTTP/1.1 206 Partial Content", True)
-							response.set_header("Content-Length", 1 + (range_end - range_start))
-							response.set_header("Content-Range", "bytes {0:d}-{1:d}/{2:d}".format(range_start, range_end, streamer_size))
-
-							is_content_length_set = True
-							is_valid = streamer.set_range(range_start, range_end)
-						#
+						is_content_length_set = True
+						is_valid = streamer.set_range(range_start, range_end)
 					#
 				#
-
-				if (not is_valid): raise TranslatableHttpException("pas_http_core_400", 400)
-				if (not is_content_length_set): response.set_header("Content-Length", streamer.get_size())
-				response.set_streamer(streamer)
 			#
-			else: response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+
+			if (not is_valid): raise TranslatableHttpException("pas_http_core_400", 400)
+			if (not is_content_length_set): response.set_header("Content-Length", streamer.get_size())
+			response.set_streamer(streamer)
 		#
+		else: response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
 	#
 #
 

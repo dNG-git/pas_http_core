@@ -69,24 +69,25 @@ Reads from the current streamer session.
 		"""
 
 		_return = AbstractEncapsulated.read(self, _bytes)
-		is_data_uncompressed = True
 
-		while (self.compressor != None and is_data_uncompressed):
+		is_data_uncompressed = (self.compressor != None)
+
+		while (is_data_uncompressed):
 		#
 			if (_return == None):
 			#
 				_return = self.compressor.flush()
-
-				is_data_uncompressed = False
 				self.compressor = None
+
+				break
 			#
 			else:
 			#
 				_return = self.compressor.compress(Binary.bytes(_return))
 
 				# Feed compressor object with data until it returns at least one byte
-				is_data_uncompressed = (len(_return) < 1)
-				if (is_data_uncompressed): _return = AbstractEncapsulated.read(self, _bytes)
+				if (len(_return) < 1): _return = AbstractEncapsulated.read(self, _bytes)
+				else: is_data_uncompressed = False
 			#
 		#
 
