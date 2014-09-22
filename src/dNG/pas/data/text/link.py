@@ -501,11 +501,11 @@ Returns the base URL for the given type and parameters.
 		else:
 		#
 			request = AbstractHttpRequest.get_instance()
+			if (request == None): raise ValueException("Can't construct an URL from a request instance if it is not provided")
 
 			if (_type & Link.TYPE_ABSOLUTE == Link.TYPE_ABSOLUTE):
 			#
 				scheme = request.get_server_scheme()
-				if (scheme == None): raise ValueException("Can't construct a full URL from the received request if it is not provided")
 
 				_return = "{0}://".format(Binary.str(scheme))
 
@@ -538,6 +538,8 @@ Returns the base URL path for the given URL or the current handled one.
 		if (self.path == None):
 		#
 			if (request == None): request = AbstractHttpRequest.get_instance()
+			if (request == None): raise ValueException("Can't construct an URL from a request instance if it is not provided")
+
 			script_name = request.get_script_name()
 
 			if ((not include_script_name) or script_name == None): path = "/"
