@@ -111,18 +111,24 @@ Stop the server
 
 		if (self.server != None):
 		#
+			self.server = None
+
 			while (len(self.sockets) > 0):
 			#
 				sockets = self.sockets.copy()
 
 				for _socket in sockets:
 				#
-					try: sockets[_socket].close()
+					try:
+					#
+						self.sockets.remove(_socket)
+						sockets[_socket].close()
+					#
 					except socket_error: pass
 				#
 			#
 
-			self.server = None
+			self.sockets = { }
 		#
 
 		return ServerImplementation.stop(self, params, last_return)
