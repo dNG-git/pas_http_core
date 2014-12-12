@@ -2,7 +2,7 @@
 [if:content:auto_close == 1]
 <script type="text/javascript"><![CDATA[
 require([ "djs/ClosingBlock.min" ], function(ClosingBlock) {
-	new ClosingBlock({ id: "[rewrite:content]id[/rewrite]", timeout: 5, width: "18%", height: "18%", css_style: { float: "right" } });
+	new ClosingBlock({ id: "[rewrite:content]id[/rewrite]", timeout: 5, width: "18%", height: "18%", Spinner_style: { float: "right" } });
 });
 ]]></script>
 [/if]

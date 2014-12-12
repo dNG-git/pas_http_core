@@ -125,32 +125,32 @@ Check if a possible tag match is a false positive.
 		return _return
 	#
 
-	def render(self, file_pathname):
+	def render(self, file_path_name):
 	#
 		"""
 Renders content ready for output from the given "mmedia" file.
 
-:param file_pathname: mmedia file path and name
+:param file_path_name: mmedia file path and name
 
 :return: (str) Rendered "mmedia" file
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, file_pathname, context = "pas_http_core")
+		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, file_path_name, context = "pas_http_core")
 
-		file_pathname = path.normpath(file_pathname)
-		file_content = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_pathname))
+		file_path_name = path.normpath(file_path_name)
+		file_content = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_path_name))
 
 		if (file_content == None):
 		#
 			file_obj = File()
-			if (not file_obj.open(file_pathname, True, "r")): raise IOException("Failed to open mmedia file '{0}'".format(file_pathname))
+			if (not file_obj.open(file_path_name, True, "r")): raise IOException("Failed to open mmedia file '{0}'".format(file_path_name))
 
 			file_content = file_obj.read()
 			file_obj.close()
 
-			if (file_content == False): raise IOException("Failed to read mmedia file '{0}'".format(file_pathname))
-			if (self.cache_instance != None): self.cache_instance.set_file(file_pathname, file_content)
+			if (file_content == False): raise IOException("Failed to read mmedia file '{0}'".format(file_path_name))
+			if (self.cache_instance != None): self.cache_instance.set_file(file_path_name, file_content)
 		#
 
 		return self._parse(file_content)

@@ -89,28 +89,28 @@ Renders content ready for output from the given OSet template.
 		#
 			if (type(template_name) != str): raise TypeException("Given OSet template name is not valid")
 
-			file_pathname = path.join(self.path, self.oset, "{0}.tsc".format(template_name.replace(".", "/")))
+			file_path_name = path.join(self.path, self.oset, "{0}.tsc".format(template_name.replace(".", "/")))
 
-			if (not os.access(file_pathname, os.R_OK)):
+			if (not os.access(file_path_name, os.R_OK)):
 			#
-				file_pathname = path.join(self.path,
+				file_path_name = path.join(self.path,
 				                          Settings.get("pas_http_theme_oset_default", "xhtml5"),
 				                          "{0}.tsc".format(template_name.replace(".", "/"))
 				                         )
 			#
 
-			template_data = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_pathname))
+			template_data = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_path_name))
 
 			if (template_data == None):
 			#
 				file_obj = File()
-				if (not file_obj.open(file_pathname, True, "r")): raise IOException("Failed to open OSet file for '{0}'".format(template_name))
+				if (not file_obj.open(file_path_name, True, "r")): raise IOException("Failed to open OSet file for '{0}'".format(template_name))
 
 				template_data = file_obj.read()
 				file_obj.close()
 
 				if (template_data == False): raise IOException("Failed to read OSet file for '{0}'".format(template_name))
-				if (self.cache_instance != None): self.cache_instance.set_file(file_pathname, template_data)
+				if (self.cache_instance != None): self.cache_instance.set_file(file_path_name, template_data)
 			#
 
 			_return = Parser.render(self, template_data, content)

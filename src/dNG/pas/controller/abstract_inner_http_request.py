@@ -117,7 +117,7 @@ Initializes default values from the original request.
 		self.lang_default = request.get_lang_default()
 		if (request.is_supported("type")): self.type = request.get_type()
 
-		self.set_script_pathname(request.get_script_pathname())
+		self.set_script_path_name(request.get_script_path_name())
 	#
 
 	def set_session(self, session):

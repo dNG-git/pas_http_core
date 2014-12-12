@@ -42,13 +42,78 @@ HTTP streaming returns data on demand for output.
 	"""
 
 	@staticmethod
-	def run(request, streamer, url, response):
+	def handle(request, streamer, response):
 	#
 		"""
-Parses, configures and activates the given streamer if all prerequisites
-are met.
+Uses the given streamer if all prerequisites are met.
 
-:since: v0.1.01
+:since: v0.1.03
+		"""
+
+		if (not isinstance(streamer, AbstractStreamer)): raise TranslatableException("pas_http_core_400")
+		if (not isinstance(response, AbstractHttpResponse)): raise TranslatableException("pas_http_core_500")
+
+		if (not streamer.is_resource_valid()
+		    or response.get_header("Content-Type") == None
+		   ): raise TranslatableException("pas_http_core_500")
+
+		if (response.get_header("Accept-Ranges") == None): response.set_header("Accept-Ranges", "bytes")
+		if (response.get_header("X-Content-Type-Options") == None): response.set_header("X-Content-Type-Options", "nosniff")
+
+		is_content_length_set = False
+		is_valid = True
+
+		if (is_valid and request.get_header('range') != None):
+		#
+			is_valid = False
+			streamer_size = streamer.get_size()
+			range_start = 0
+			range_end = 0
+			re_result = re.match("^bytes(.*)=(.*)\\-(.*)$", request.get_header('range'), re.I)
+
+			if (re_result != None):
+			#
+				range_start = re.sub("(\\D+)", "", re_result.group(2))
+				range_end = re.sub("(\\D+)", "", re_result.group(3))
+
+				if (range_start != ""): range_start = int(range_start)
+
+				if (range_end != ""):
+				#
+					range_end = int(range_end)
+					if (range_start >= 0 and range_start <= range_end and range_end < streamer_size): is_valid = True
+				#
+				elif (range_start >= 0 and range_start < streamer_size):
+				#
+					is_valid = True
+					range_end = streamer_size - 1
+				#
+
+				if (is_valid):
+				#
+					response.set_header("HTTP/1.1", "HTTP/1.1 206 Partial Content", True)
+					response.set_header("Content-Length", 1 + (range_end - range_start))
+					response.set_header("Content-Range", "bytes {0:d}-{1:d}/{2:d}".format(range_start, range_end, streamer_size))
+
+					is_content_length_set = True
+					is_valid = streamer.set_range(range_start, range_end)
+				#
+			#
+		#
+		elif (streamer.is_supported("seeking")): streamer.seek(0)
+
+		if (not is_valid): raise TranslatableHttpException("pas_http_core_400", 400)
+		if (not is_content_length_set): response.set_header("Content-Length", streamer.get_size())
+		response.set_streamer(streamer)
+	#
+
+	@staticmethod
+	def handle_url(request, streamer, url, response):
+	#
+		"""
+Uses the given streamer and URL if all prerequisites are met.
+
+:since: v0.1.03
 		"""
 
 		if (not isinstance(streamer, AbstractStreamer)): raise TranslatableException("pas_http_core_400")
@@ -57,65 +122,18 @@ are met.
 		if (streamer == None): response.set_header("HTTP/1.1", "HTTP/1.1 501 Not Implemented", True)
 		elif (streamer.open_url(url)):
 		#
-			is_valid = True
-
-			if (response.get_header("Accept-Ranges") == None): response.set_header("Accept-Ranges", "bytes")
-
 			if (response.get_header("Content-Type") == None):
 			#
 				url_ext = path.splitext(url)[1]
 				mimetype_definition = MimeType.get_instance().get(url_ext[1:])
-
-				if (mimetype_definition == None): is_valid = False
-				else: response.set_header("Content-Type", mimetype_definition['type'])
+				if (mimetype_definition != None): response.set_header("Content-Type", mimetype_definition['type'])
 			#
 
-			is_content_length_set = False
-
-			if (is_valid and request.get_header('range') != None):
-			#
-				is_valid = False
-				streamer_size = streamer.get_size()
-				range_start = 0
-				range_end = 0
-				re_result = re.match("^bytes(.*)=(.*)\\-(.*)$", request.get_header('range'), re.I)
-
-				if (re_result != None):
-				#
-					range_start = re.sub("(\\D+)", "", re_result.group(2))
-					range_end = re.sub("(\\D+)", "", re_result.group(3))
-
-					if (range_start != ""): range_start = int(range_start)
-
-					if (range_end != ""):
-					#
-						range_end = int(range_end)
-						if (range_start >= 0 and range_start <= range_end and range_end < streamer_size): is_valid = True
-					#
-					elif (range_start >= 0 and range_start < streamer_size):
-					#
-						is_valid = True
-						range_end = streamer_size - 1
-					#
-
-					if (is_valid):
-					#
-						response.set_header("HTTP/1.1", "HTTP/1.1 206 Partial Content", True)
-						response.set_header("Content-Length", 1 + (range_end - range_start))
-						response.set_header("Content-Range", "bytes {0:d}-{1:d}/{2:d}".format(range_start, range_end, streamer_size))
-
-						is_content_length_set = True
-						is_valid = streamer.set_range(range_start, range_end)
-					#
-				#
-			#
-
-			if (not is_valid): raise TranslatableHttpException("pas_http_core_400", 400)
-			if (not is_content_length_set): response.set_header("Content-Length", streamer.get_size())
-			response.set_streamer(streamer)
+			Streaming.handle(request, streamer, response)
 		#
 		else: response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
 	#
+
 #
 
 ##j## EOF

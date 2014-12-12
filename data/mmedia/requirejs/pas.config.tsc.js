@@ -18,8 +18,6 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 ------------------------------------------------------------------------- */
 
 var djs_config = {
-	OptionButton_class: 'pageoptionsbar_button',
-	OptionButton_widget_class: 'pageoptionsbar_widget',
 	ResponsiveTable_class: 'pagetable_responsive',
 	XHtml5FormElement_focused_class: 'pageform_input_focused',
 };

@@ -120,7 +120,7 @@ $f_return = ((isset ($f_section) ? "<p class='pagecontenttitle ui-accordion-head
 		return _return
 	#
 
-	def _render_oset_file(self, file_pathname, content):
+	def _render_oset_file(self, file_path_name, content):
 	#
 		"""
 Render the form field using the given OSet template.
@@ -137,7 +137,7 @@ Render the form field using the given OSet template.
 		#
 			parser = FileParser()
 			parser.set_oset(self.oset)
-			_return = parser.render(file_pathname, content)
+			_return = parser.render(file_path_name, content)
 		#
 		except Exception: _return = "<div class='pageform_error'>{0}</div>".format(L10n.get("pas_http_core_form_error_internal_error"))
 

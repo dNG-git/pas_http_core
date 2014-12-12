@@ -442,7 +442,7 @@ Renders the given field.
 		raise NotImplementedException()
 	#
 
-	def _render_oset_file(self, file_pathname, content):
+	def _render_oset_file(self, file_path_name, content):
 	#
 		"""
 Render the form field using the given OSet template.
@@ -457,7 +457,7 @@ Render the form field using the given OSet template.
 
 		parser = FileParser()
 		parser.set_oset(self.oset)
-		return parser.render(file_pathname, content)
+		return parser.render(file_path_name, content)
 	#
 
 	def _set_form_context(self, context):

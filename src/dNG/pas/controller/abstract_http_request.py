@@ -175,7 +175,7 @@ Executes the incoming request.
 
 			if (response.is_supported("script_name")): response.set_script_name(request.get_script_name())
 
-			Hook.call("dNG.pas.http.Request.onExecute", request = request, response = response)
+			if (Settings.get("pas_http_site_events_call_on_execute", False)): Hook.call("dNG.pas.http.Request.onExecute", request = request, response = response)
 			self._execute(request, response)
 		#
 		except Exception as handled_exception:
@@ -184,6 +184,7 @@ Executes the incoming request.
 			response.handle_exception(None, handled_exception)
 		#
 
+		if (Settings.get("pas_http_site_events_call_on_reponse", False)): Hook.call("dNG.pas.http.Request.onResponse", request = request, response = response)
 		self._respond(response)
 	#
 
@@ -503,8 +504,8 @@ instance.
 			#
 				parameter = encoded_parameter.split(" ", 2)
 
-				if (len(parameter) == 2): parameters[parameter[0]] = parameter[1]
-				elif (len(parameter) == 3 and parameter[0] == "dsd"): dsds[parameter[1]] = parameter[2]
+				if (len(parameter) == 2): parameters[unquote(parameter[0])] = unquote(parameter[1])
+				elif (len(parameter) == 3 and parameter[0] == "dsd"): dsds[unquote(parameter[1])] = unquote(parameter[2])
 			#
 
 			if ("m" in virtual_config): _return.set_module(virtual_config['m'])
@@ -579,15 +580,15 @@ Respond the request with the given response.
 
 				if (user_profile != None):
 				#
+					user_profile_data = { "lang": self.lang,
+					                      "lastvisit_time": time(),
+					                      "lastvisit_ip": self.client_host
+					                    }
+
+					if ("theme" in self.parameters): user_profile_data['theme'] = self.parameters['theme']
+
 					with TransactionContext():
 					#
-						user_profile_data = { "lang": self.lang,
-						                      "lastvisit_time": time(),
-						                      "lastvisit_ip": self.client_host
-						                    }
-
-						if ("theme" in self.parameters): user_profile_data['theme'] = self.parameters['theme']
-
 						user_profile.set_data_attributes(**user_profile_data)
 						user_profile.save()
 

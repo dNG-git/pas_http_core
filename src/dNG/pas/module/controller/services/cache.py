@@ -55,24 +55,24 @@ Action for "index"
 
 		dfile = InputFilter.filter_file_path(self.request.get_dsd("dfile", ""))
 
-		file_pathname = ""
+		file_path_name = ""
 
 		self.response.set_header("X-Robots-Tag", "noindex")
 
 		if (dfile != None and dfile != ""):
 		#
-			file_pathname = path.abspath("{0}/mmedia/{1}".format(Settings.get("path_data"), dfile))
+			file_path_name = path.abspath("{0}/mmedia/{1}".format(Settings.get("path_data"), dfile))
 
-			if (path.exists(file_pathname) and os.access(file_pathname, os.R_OK)):
+			if (path.exists(file_path_name) and os.access(file_path_name, os.R_OK)):
 			#
-				if (file_pathname.endswith(".paslink.url")):
+				if (file_path_name.endswith(".paslink.url")):
 				#
-					file_content = FileContent.read(file_pathname)
+					file_content = FileContent.read(file_path_name)
 					if (file_content != None): file_content = path.normpath(file_content)
-					file_pathname = ("" if (file_content == None or (not path.exists(file_content)) or (not os.access(file_content, os.R_OK))) else file_content)
+					file_path_name = ("" if (file_content == None or (not path.exists(file_content)) or (not os.access(file_content, os.R_OK))) else file_content)
 				#
 			#
-			else: file_pathname = ""
+			else: file_path_name = ""
 		#
 
 		is_last_modified_supported = (Settings.get("pas_http_cache_modification_check", True))
@@ -80,7 +80,7 @@ Action for "index"
 		is_valid = False
 		last_modified_on_server = 0
 
-		if (file_pathname != ""):
+		if (file_path_name != ""):
 		#
 			is_valid = True
 
@@ -90,7 +90,7 @@ Action for "index"
 
 				if (last_modified_on_client > -1):
 				#
-					last_modified_on_server = int(os.stat(file_pathname).st_mtime)
+					last_modified_on_server = int(os.stat(file_path_name).st_mtime)
 
 					if (last_modified_on_server <= last_modified_on_client):
 					#
@@ -110,14 +110,14 @@ Action for "index"
 
 		if (is_valid and is_modified):
 		#
-			re_tsc_result = re.search("\\.tsc\\.(css|js|min\\.css|min\\.js|min\\.svg|svg)$", file_pathname, re.I)
+			re_tsc_result = re.search("\\.tsc\\.(css|js|min\\.css|min\\.js|min\\.svg|svg)$", file_path_name, re.I)
 
 			self.response.set_content_dynamic(re_tsc_result != None)
 			self.response.init(True)
 
 			if (is_last_modified_supported):
 			#
-				if (last_modified_on_server < 1): last_modified_on_server = int(os.stat(file_pathname).st_mtime)
+				if (last_modified_on_server < 1): last_modified_on_server = int(os.stat(file_path_name).st_mtime)
 				self.response.set_last_modified(last_modified_on_server)
 			#
 
@@ -130,7 +130,7 @@ Action for "index"
 				elif (file_extension == "svg"): self.response.set_header("Content-Type", "text/svg+xml")
 
 				parser = MmediaParser()
-				self.response.set_raw_data(parser.render(file_pathname))
+				self.response.set_raw_data(parser.render(file_path_name))
 			#
 			else:
 			#
@@ -139,7 +139,7 @@ Action for "index"
 				streamer = NamedLoader.get_instance("dNG.pas.data.streamer.File", False)
 
 				if (streamer == None): self.response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
-				else: Streaming.run(self.request, streamer, "file:///{0}".format(file_pathname), self.response)
+				else: Streaming.handle_url(self.request, streamer, "file:///{0}".format(file_path_name), self.response)
 			#
 		#
 		elif (not is_valid):

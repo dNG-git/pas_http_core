@@ -56,7 +56,7 @@ Constructor __init__(HttpWsgi1Request)
 
 		# pylint: disable=broad-except
 
-		if ("wsgi.version" not in wsgi_env or (wsgi_env['wsgi.version'] != ( 1, 0 ) and wsgi_env['wsgi.version'] != ( 1, 1 ))): raise IOException("WSGI protocol unsupported")
+		if ("wsgi.version" not in wsgi_env or (wsgi_env['wsgi.version'] not in ( ( 1, 0 ), ( 1, 1 ) ))): raise IOException("WSGI protocol unsupported")
 
 		AbstractHttpRequest.__init__(self)
 
@@ -72,19 +72,24 @@ Request path after the script
 		self.server_host = Settings.get("pas_http_server_forced_hostname")
 		self.server_port = Settings.get("pas_http_server_forced_port")
 
-		# Handle HTTP_FORWARDED_HOST and HTTP_X_HOST
-		if ("HTTP_HOST" in wsgi_env):
+		host_definition_headers = Settings.get("pas_http_server_host_definition_headers", [ "HTTP_HOST" ])
+
+		for host_definition_header in host_definition_headers:
 		#
-			host_parts = wsgi_env['HTTP_HOST'].rsplit(":", 2)
-
-			if (len(host_parts) < 2 or host_parts[1][-1:] == "]"): self.server_host = wsgi_env['HTTP_HOST']
-			else:
+			if (host_definition_header in wsgi_env):
 			#
-				self.server_host = host_parts[0]
-				if (self.server_port == None): self.server_port = int(host_parts[1])
-			#
+				host_parts = wsgi_env[host_definition_header].rsplit(":", 2)
 
-			del(wsgi_env['HTTP_HOST'])
+				if (len(host_parts) < 2 or host_parts[1][-1:] == "]"): self.server_host = wsgi_env[host_definition_header]
+				else:
+				#
+					self.server_host = host_parts[0]
+					if (self.server_port == None): self.server_port = int(host_parts[1])
+				#
+
+				del(wsgi_env[host_definition_header])
+				break
+			#
 		#
 
 		if (self.server_host == None):
@@ -103,7 +108,7 @@ Request path after the script
 				elif (key == "REMOTE_HOST"): self.client_host = wsgi_env[key]
 				elif (key == "REMOTE_PORT"): self.client_port = wsgi_env[key]
 				elif (key == "REQUEST_METHOD"): self.type = wsgi_env[key].upper()
-				elif (key == "SCRIPT_NAME"): self.script_pathname = wsgi_env[key]
+				elif (key == "SCRIPT_NAME"): self.script_path_name = wsgi_env[key]
 				elif (key == "QUERY_STRING"): self.query_string = wsgi_env[key]
 				elif (key == "PATH_INFO"): self.virtual_pathname = wsgi_env[key]
 				elif (self.server_host == None and key == "SERVER_NAME"): self.server_host = wsgi_env[key]
@@ -146,7 +151,7 @@ Request path after the script
 			scheme_header = Settings.get("pas_http_server_scheme_header", "")
 			self.server_scheme = (wsgi_env['wsgi.url_scheme'] if (scheme_header == "") else wsgi_env.get(scheme_header.upper().replace("-", "_")))
 
-			if (self.script_pathname == None): self.script_pathname = ""
+			if (self.script_path_name == None): self.script_path_name = ""
 
 			self.init()
 
@@ -154,8 +159,8 @@ Request path after the script
 
 			if (virtual_config == None and self.virtual_pathname != ""):
 			#
-				virtual_config = VirtualConfig.get_config(self.script_pathname)
-				virtual_pathname = self.script_pathname
+				virtual_config = VirtualConfig.get_config(self.script_path_name)
+				virtual_pathname = self.script_path_name
 			#
 			else: virtual_pathname = self.virtual_pathname
 
@@ -225,7 +230,7 @@ Do preparations for request handling.
 :since: v0.1.00
 		"""
 
-		self.script_name = path.basename(self.script_pathname)
+		self.script_name = path.basename(self.script_path_name)
 
 		AbstractHttpRequest.init(self)
 	#

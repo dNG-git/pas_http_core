@@ -49,8 +49,13 @@ Renders the options button.
 
 		rendered_content = """
 {0}<script type="text/javascript"><![CDATA[
-require([ "djs/OptionButton.min" ], function(OptionButton) {{
-	new OptionButton({{ id: "{1}", button_content: "{2}" }});
+require([ "djs/OverlayButton.min" ], function(OverlayButton) {{
+	new OverlayButton({{
+		id: "{1}",
+		button_content: "{2}",
+		OverlayButton_class: "pageoptionsbar_button",
+		OverlayButton_widget_class: "pageoptionsbar_widget"
+	}});
 }});
 ]]></script>
 		""".format(self._render_options_bar_links(_id), _id, L10n.get("pas_http_core_additional_options"))

@@ -228,15 +228,16 @@ Change data according to the "img" tag.
 
 		_return = ""
 
+		tag_params = FormTagsRenderer.parse_tag_parameters("img", data, tag_position, data_position)
 		url = data[data_position:tag_end_position]
 
-		if (len(url) > 0):
+		if (len(url) > 0 and "title" in tag_params):
 		#
-			tag_params = FormTagsRenderer.parse_tag_parameters("img", data, tag_position, data_position)
-			_return = ("{0} ({1})".format(tag_params['title'], url) if ("title" in tag_params) else url)
+			img_text = ("- {0} ({1}) -" if ("align" in tag_params) else "{0} ({1})")
+			_return = img_text.format(tag_params['title'], url)
 		#
 
-		return data[data_position:tag_end_position]
+		return _return
 	#
 
 	def _change_match_justify(self, data, tag_position, data_position, tag_end_position):
@@ -391,7 +392,7 @@ Change data according to the "title" tag.
 :since:  v0.1.01
 		"""
 
-		return "===\n{0}\n===".format(data[data_position:tag_end_position])
+		return "\n===\n{0}\n===\n".format(data[data_position:tag_end_position])
 	#
 
 	_change_match_u = _change_plain_content
@@ -425,7 +426,7 @@ Change data according to the "url" tag.
 
 		_return = ""
 
-		re_result = re.match("^\\[url=(\\w+://.*|)\\]", data[tag_position:data_position])
+		re_result = re.match("^\\[url=(\\w+:.*|)\\]", data[tag_position:data_position])
 		enclosed_data = ""
 		url = None
 

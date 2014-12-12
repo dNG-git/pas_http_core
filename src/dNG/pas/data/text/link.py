@@ -542,11 +542,11 @@ Returns the base URL path for the given URL or the current handled one.
 
 			script_name = request.get_script_name()
 
-			if ((not include_script_name) or script_name == None): path = "/"
+			if ((not include_script_name) or script_name == ""): path = "/"
 			else:
 			#
 				script_name = Binary.str(script_name)
-				path = (script_name if (script_name[:1] == "/") else "/{0}".format(script_name))
+				path = (script_name if (script_name[:1] == "/") else "/{0}?".format(script_name))
 			#
 		#
 		else: path = Binary.str(self.path)

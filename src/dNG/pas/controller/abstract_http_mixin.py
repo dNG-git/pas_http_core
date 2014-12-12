@@ -82,7 +82,7 @@ Requested module block
 		"""
 Called script
 		"""
-		self.script_pathname = None
+		self.script_path_name = None
 		"""
 Request path to the script
 		"""
@@ -334,7 +334,7 @@ Returns the script name.
 		return self.script_name
 	#
 
-	def get_script_pathname(self):
+	def get_script_path_name(self):
 	#
 		"""
 Returns the script path and name of the request.
@@ -343,7 +343,7 @@ Returns the script path and name of the request.
 :since:  v0.1.00
 		"""
 
-		return self.script_pathname
+		return self.script_path_name
 	#
 
 	def get_service(self):
@@ -481,20 +481,20 @@ Sets the parent request used for execution of chained requests.
 		self.parent_request = parent_request
 	#
 
-	def set_script_pathname(self, script_pathname):
+	def set_script_path_name(self, script_path_name):
 	#
 		"""
 Sets the script path and name of the request.
 
-:param script_pathname: Script path and name
+:param script_path_name: Script path and name
 
 :since: v0.1.01
 		"""
 
-		if (script_pathname != None):
+		if (script_path_name != None):
 		#
-			self.script_name = path.basename(script_pathname)
-			self.script_pathname = script_pathname
+			self.script_name = path.basename(script_path_name)
+			self.script_path_name = script_path_name
 		#
 	#
 

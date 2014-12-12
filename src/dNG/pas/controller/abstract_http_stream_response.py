@@ -235,7 +235,7 @@ Returns the HTTP response code.
 :since:  v0.1.00
 		"""
 
-		return self.http_code
+		return (200 if (self.http_code == None) else self.http_code)
 	#
 
 	def is_compressing(self):

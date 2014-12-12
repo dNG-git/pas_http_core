@@ -161,8 +161,8 @@ Checks if the given theme and subtype is supported.
 
 		if (theme != None):
 		#
-			file_pathname = path.join(self.path, theme.replace(".", "/"), "{0}.tsc".format("site" if (subtype == None) else subtype))
-			_return = os.access(file_pathname, os.R_OK)
+			file_path_name = path.join(self.path, theme.replace(".", "/"), "{0}.tsc".format("site" if (subtype == None) else subtype))
+			_return = os.access(file_path_name, os.R_OK)
 		#
 
 		return _return
@@ -338,34 +338,34 @@ Renders content ready for output from the given OSet template.
 		theme = self.theme
 		theme_subtype = self.theme_subtype
 
-		file_pathname = path.join(self.path, theme, "{0}.tsc".format(theme_subtype))
+		file_path_name = path.join(self.path, theme, "{0}.tsc".format(theme_subtype))
 
-		if (theme_subtype != "site" and (not os.access(file_pathname, os.R_OK))):
+		if (theme_subtype != "site" and (not os.access(file_path_name, os.R_OK))):
 		#
-			file_pathname = path.join(self.path, theme, "site.tsc")
+			file_path_name = path.join(self.path, theme, "site.tsc")
 			theme_subtype = "site"
 		#
 
-		theme_data = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_pathname))
+		theme_data = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_path_name))
 
 		if (theme_data == None):
 		#
 			file_obj = File()
-			if (not file_obj.open(file_pathname, True, "r")): raise IOException("Failed to open theme file for '{0}'".format(self.theme))
+			if (not file_obj.open(file_path_name, True, "r")): raise IOException("Failed to open theme file for '{0}'".format(self.theme))
 
 			theme_data = file_obj.read()
 			file_obj.close()
 
 			if (theme_data == False): raise IOException("Failed to read theme file for '{0}'".format(self.theme))
-			if (self.cache_instance != None): self.cache_instance.set_file(file_pathname, theme_data)
+			if (self.cache_instance != None): self.cache_instance.set_file(file_path_name, theme_data)
 		#
 
 		"""
 Read corresponding theme configuration
 		"""
 
-		file_pathname = file_pathname[:-3] + "json"
-		Settings.read_file(file_pathname)
+		file_path_name = file_path_name[:-3] + "json"
+		Settings.read_file(file_path_name)
 
 		if (self.title == None): self.title = Settings.get("pas_html_title", "Unconfigured site")
 
@@ -414,25 +414,25 @@ Sets the theme to use.
 		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set({1})- (#echo(__LINE__)#)", self, theme, context = "pas_http_core")
 
 		theme = theme.replace(".", "/")
-		file_pathname = path.join(self.path, theme, "site.tsc")
+		file_path_name = path.join(self.path, theme, "site.tsc")
 
 		"""
 Retry with default theme
 		"""
 
-		if (os.access(file_pathname, os.R_OK)): self.theme = theme
+		if (os.access(file_path_name, os.R_OK)): self.theme = theme
 		else:
 		#
 			self.theme = Settings.get("pas_http_theme_default", "simple").replace(".", "/")
-			file_pathname = path.normpath(self.path, self.theme, "site.tsc")
+			file_path_name = path.normpath(self.path, self.theme, "site.tsc")
 		#
 
 		"""
 Read corresponding theme configuration
 		"""
 
-		file_pathname = file_pathname[:-3] + "json"
-		Settings.read_file(file_pathname)
+		file_path_name = file_path_name[:-3] + "json"
+		Settings.read_file(file_path_name)
 	#
 
 	def set_canonical_url(self, url):

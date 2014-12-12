@@ -74,19 +74,19 @@ Renders the given service list entries.
 		return _return
 	#
 
-	def render_service_list_file(self, file_pathname):
+	def render_service_list_file(self, file_path_name):
 	#
 		"""
 Renders the content of the given service list file.
 
-:param file_pathname: Service list file path
+:param file_path_name: Service list file path
 
 :since: v0.1.00
 		"""
 
 		_return = ""
 
-		json_data = JsonFileContent.read(file_pathname)
+		json_data = JsonFileContent.read(file_path_name)
 
 		if (type(json_data) == list):
 		#

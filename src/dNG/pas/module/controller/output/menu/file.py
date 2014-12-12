@@ -56,7 +56,7 @@ Action for "render"
 		if (len(rendered_links) > 0): self.set_action_result("<nav class='pagemainmenu'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
 	#
 
-	def _get_rendered_links(self, file_pathname = None, include_image = True):
+	def _get_rendered_links(self, file_path_name = None, include_image = True):
 	#
 		"""
 Returns a list of rendered links for the service menu.
@@ -67,25 +67,25 @@ Returns a list of rendered links for the service menu.
 
 		_return = [ ]
 
-		if (file_pathname == None): links = Link.get_store("mainmenu")
+		if (file_path_name == None): links = Link.get_store("mainmenu")
 		else:
 		#
 			links = None
 
-			if ("__lang__" in file_pathname):
+			if ("__lang__" in file_path_name):
 			#
-				expanded_file_pathname = file_pathname.replace("__lang__", self.request.get_lang())
+				expanded_file_path_name = file_path_name.replace("__lang__", self.request.get_lang())
 
-				if (not os.access(path.join(Settings.get("path_base"), expanded_file_pathname), os.R_OK)):
+				if (not os.access(path.join(Settings.get("path_base"), expanded_file_path_name), os.R_OK)):
 				#
-					expanded_file_pathname = file_pathname.replace("__lang__", Settings.get("core_lang"))
+					expanded_file_path_name = file_path_name.replace("__lang__", Settings.get("core_lang"))
 				#
 
-				file_pathname = expanded_file_pathname
+				file_path_name = expanded_file_path_name
 			#
-			else: file_pathname = path.join(Settings.get("path_base"), file_pathname)
+			else: file_path_name = path.join(Settings.get("path_base"), file_path_name)
 
-			json_data = JsonFileContent.read(file_pathname)
+			json_data = JsonFileContent.read(file_path_name)
 			if (type(json_data) == list): links = json_data
 		#
 
