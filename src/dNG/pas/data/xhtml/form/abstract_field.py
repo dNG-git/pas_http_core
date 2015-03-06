@@ -127,7 +127,7 @@ Checks if the field value is valid.
 :since:  v0.1.01
 		"""
 
-		self.valid = (self.valid if (self.valid != None) else (self.error_data == None))
+		self.valid = (self.valid if (self.valid is not None) else (self.error_data is None))
 		if (self.valid): self.valid = self._check_validators()
 
 		return self.valid
@@ -142,18 +142,18 @@ Checks the length of value.
 :since:  v0.1.00
 		"""
 
-		data_length = (0 if (self.value == None) else len(self.value))
+		data_length = (0 if (self.value is None) else len(self.value))
 		error_data = None
 
 		if (self.required and data_length < 1): error_data = "required_element"
-		elif (self.limit_min != None
+		elif (self.limit_min is not None
 		      and (self.required or data_length > 0)
 		      and self.limit_min > data_length
 		     ): error_data = ( "string_min", str(self.limit_min) )
-		elif (self.limit_max != None and self.limit_max < data_length): error_data = ( "string_max", str(self.limit_max) )
+		elif (self.limit_max is not None and self.limit_max < data_length): error_data = ( "string_max", str(self.limit_max) )
 
-		if (error_data != None): self.error_data = error_data
-		return (error_data == None)
+		if (error_data is not None): self.error_data = error_data
+		return (error_data is None)
 	#
 
 	def _check_range(self):
@@ -167,21 +167,21 @@ Checks the range of value.
 
 		error_data = None
 
-		if (self.value != None and len(self.value) > 0):
+		if (self.value is not None and len(self.value) > 0):
 		#
 			number = InputFilter.filter_float(self.value)
 
-			if (number != None):
+			if (number is not None):
 			#
-				if (self.limit_min != None and self.limit_min > number): error_data = ( "number_min", str(self.limit_min) )
-				elif (self.limit_max != None and self.limit_max < number): error_data = ( "number_max", str(self.limit_max) )
+				if (self.limit_min is not None and self.limit_min > number): error_data = ( "number_min", str(self.limit_min) )
+				elif (self.limit_max is not None and self.limit_max < number): error_data = ( "number_max", str(self.limit_max) )
 			#
 			else: error_data = "format_invalid"
 		#
 		elif (self.required): error_data = "required_element"
 
-		if (error_data != None): self.error_data = error_data
-		return (error_data == None)
+		if (error_data is not None): self.error_data = error_data
+		return (error_data is None)
 	#
 
 	def _check_validators(self):
@@ -199,12 +199,12 @@ Checks for validator callbacks, executes them and exits on the first error.
 		#
 			result = _callable(self, self.form_context)
 
-			if (result != None):
+			if (result is not None):
 			#
 				_return = False
 
 				self.error_data = (result
-				                   if (type(result) == tuple) else
+				                   if (type(result) is tuple) else
 				                   ( "validator_failed", result )
 				                  )
 
@@ -224,8 +224,8 @@ Returns the field content.
 :since:  v0.1.01
 		"""
 
-		_return = ("" if (self.value == None) else Binary.str(self.value))
-		if (type(_return) != str): _return = str(_return)
+		_return = ("" if (self.value is None) else Binary.str(self.value))
+		if (type(_return) is not str): _return = str(_return)
 
 		return _return
 	#
@@ -253,7 +253,7 @@ Returns the error message.
 
 		_return = None
 
-		error_type = (self.error_data[0] if (type(self.error_data) == tuple) else self.error_data)
+		error_type = (self.error_data[0] if (type(self.error_data) is tuple) else self.error_data)
 
 		if (error_type == "number_max"):
 		#
@@ -284,7 +284,7 @@ Returns the error message.
 			                            )
 		#
 		elif (error_type == "validator_failed"): _return = self.error_data[1]
-		elif (error_type != None): _return = L10n.get("pas_http_core_form_error_{0}".format(error_type))
+		elif (error_type is not None): _return = L10n.get("pas_http_core_form_error_{0}".format(error_type))
 
 		return _return
 	#
@@ -334,7 +334,7 @@ Returns the field title.
 :since:  v0.1.01
 		"""
 
-		return ("" if (self.title == None) else self.title)
+		return ("" if (self.title is None) else self.title)
 	#
 
 	def get_type(self):
@@ -372,7 +372,7 @@ Returns true if a field ID has been set.
 :since: v0.1.01
 		"""
 
-		return (self.id != None)
+		return (self.id is not None)
 	#
 
 	def is_required(self):
@@ -416,7 +416,7 @@ Loads the field configuration from the given definition.
 		self.title = field_definition.get("title")
 
 		value = field_definition.get("content")
-		if (value != None): self.set_value(value)
+		if (value is not None): self.set_value(value)
 
 		required = field_definition.get("required", False)
 		self.required = (required == True or required == "1")
@@ -424,10 +424,10 @@ Loads the field configuration from the given definition.
 		_max = field_definition.get("max")
 		_min = field_definition.get("min")
 
-		if (_max != None or _min != None): self.set_limits(_min, _max)
+		if (_max is not None or _min is not None): self.set_limits(_min, _max)
 
 		size = field_definition.get("size")
-		if (size != None): self.set_size(size)
+		if (size is not None): self.set_size(size)
 	#
 
 	def render(self):
@@ -484,7 +484,7 @@ Sets the field value based on the given form.
 		"""
 
 		value = form.get_input(self.name)
-		if (value != None): self.set_value(value)
+		if (value is not None): self.set_value(value)
 	#
 
 	def set_id(self, _id):
@@ -525,7 +525,7 @@ Sets the field name if not already set.
 :since: v0.1.01
 		"""
 
-		if (self.name == None): self.name = name
+		if (self.name is None): self.name = name
 	#
 
 	def set_oset(self, oset):

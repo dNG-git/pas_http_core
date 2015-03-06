@@ -84,7 +84,7 @@ Request path after the script
 				else:
 				#
 					self.server_host = host_parts[0]
-					if (self.server_port == None): self.server_port = int(host_parts[1])
+					if (self.server_port is None): self.server_port = int(host_parts[1])
 				#
 
 				del(wsgi_env[host_definition_header])
@@ -92,10 +92,10 @@ Request path after the script
 			#
 		#
 
-		if (self.server_host == None):
+		if (self.server_host is None):
 		#
 			self.server_host = Settings.get("pas_http_server_preferred_hostname")
-			if (self.server_port == None): self.server_port = Settings.get("pas_http_server_preferred_port")
+			if (self.server_port is None): self.server_port = Settings.get("pas_http_server_preferred_port")
 		#
 
 		for key in wsgi_env:
@@ -104,15 +104,15 @@ Request path after the script
 			#
 				if (key[:5] == "HTTP_"): self.set_header(key[5:].replace("_", "-"), wsgi_env[key])
 				elif (key == "CONTENT_LENGTH" or key == "CONTENT_TYPE"): self.set_header(key.replace("_", "-"), wsgi_env[key])
-				elif (key == "REMOTE_ADDR" and self.client_host == None): self.client_host = wsgi_env[key]
+				elif (key == "REMOTE_ADDR" and self.client_host is None): self.client_host = wsgi_env[key]
 				elif (key == "REMOTE_HOST"): self.client_host = wsgi_env[key]
 				elif (key == "REMOTE_PORT"): self.client_port = wsgi_env[key]
 				elif (key == "REQUEST_METHOD"): self.type = wsgi_env[key].upper()
 				elif (key == "SCRIPT_NAME"): self.script_path_name = wsgi_env[key]
 				elif (key == "QUERY_STRING"): self.query_string = wsgi_env[key]
 				elif (key == "PATH_INFO"): self.virtual_pathname = wsgi_env[key]
-				elif (self.server_host == None and key == "SERVER_NAME"): self.server_host = wsgi_env[key]
-				elif (self.server_port == None and key == "SERVER_PORT"): self.server_port = int(wsgi_env[key])
+				elif (self.server_host is None and key == "SERVER_NAME"): self.server_host = wsgi_env[key]
+				elif (self.server_port is None and key == "SERVER_PORT"): self.server_port = int(wsgi_env[key])
 			#
 		#
 
@@ -124,7 +124,7 @@ Request path after the script
 
 			remote_address_value = (wsgi_env[remote_address_header].strip()
 			                        if (remote_address_header in wsgi_env
-			                            and wsgi_env[remote_address_header] != None
+			                            and wsgi_env[remote_address_header] is not None
 			                           ) else
 			                        ""
 			                       )
@@ -136,8 +136,8 @@ Request path after the script
 			#
 		#
 
-		re_result = (None if (self.client_host == None) else re.match("^::ffff:(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)$", self.client_host))
-		if (re_result != None): self.client_host = "{0}.{1}.{2}.{3}".format(re_result.group(1), re_result.group(2), re_result.group(3), re_result.group(4))
+		re_result = (None if (self.client_host is None) else re.match("^::ffff:(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)$", self.client_host))
+		if (re_result is not None): self.client_host = "{0}.{1}.{2}.{3}".format(re_result.group(1), re_result.group(2), re_result.group(3), re_result.group(4))
 
 		try:
 		#
@@ -151,13 +151,13 @@ Request path after the script
 			scheme_header = Settings.get("pas_http_server_scheme_header", "")
 			self.server_scheme = (wsgi_env['wsgi.url_scheme'] if (scheme_header == "") else wsgi_env.get(scheme_header.upper().replace("-", "_")))
 
-			if (self.script_path_name == None): self.script_path_name = ""
+			if (self.script_path_name is None): self.script_path_name = ""
 
 			self.init()
 
 			virtual_config = VirtualConfig.get_config(self.virtual_pathname)
 
-			if (virtual_config == None and self.virtual_pathname != ""):
+			if (virtual_config is None and self.virtual_pathname != ""):
 			#
 				virtual_config = VirtualConfig.get_config(self.script_path_name)
 				virtual_pathname = self.script_path_name
@@ -176,7 +176,7 @@ Request path after the script
 		#
 		except Exception as handled_exception:
 		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception, "pas_http_core")
+			if (self.log_handler is not None): self.log_handler.error(handled_exception, "pas_http_core")
 
 			# Died before output
 			if (not self.http_wsgi_stream_response.are_headers_sent()):

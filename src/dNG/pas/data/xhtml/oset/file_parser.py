@@ -82,12 +82,12 @@ Renders content ready for output from the given OSet template.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, template_name, context = "pas_http_core")
-		_return = ("<span>{0}</span>".format(L10n.get("errors_pas_http_core_oset_not_viewable")) if (default == None) else default)
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, template_name, context = "pas_http_core")
+		_return = ("<span>{0}</span>".format(L10n.get("errors_pas_http_core_oset_not_viewable")) if (default is None) else default)
 
 		with ExceptionLogTrap("pas_http_core"):
 		#
-			if (type(template_name) != str): raise TypeException("Given OSet template name is not valid")
+			if (type(template_name) is not str): raise TypeException("Given OSet template name is not valid")
 
 			file_path_name = path.join(self.path, self.oset, "{0}.tsc".format(template_name.replace(".", "/")))
 
@@ -99,9 +99,9 @@ Renders content ready for output from the given OSet template.
 				                         )
 			#
 
-			template_data = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_path_name))
+			template_data = (None if (self.cache_instance is None) else self.cache_instance.get_file(file_path_name))
 
-			if (template_data == None):
+			if (template_data is None):
 			#
 				file_obj = File()
 				if (not file_obj.open(file_path_name, True, "r")): raise IOException("Failed to open OSet file for '{0}'".format(template_name))
@@ -110,7 +110,7 @@ Renders content ready for output from the given OSet template.
 				file_obj.close()
 
 				if (template_data == False): raise IOException("Failed to read OSet file for '{0}'".format(template_name))
-				if (self.cache_instance != None): self.cache_instance.set_file(file_path_name, template_data)
+				if (self.cache_instance is not None): self.cache_instance.set_file(file_path_name, template_data)
 			#
 
 			_return = Parser.render(self, template_data, content)

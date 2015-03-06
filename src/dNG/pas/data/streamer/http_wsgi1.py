@@ -48,7 +48,7 @@ Reads from the current streamer session.
 		"""
 
 		_return = AbstractEncapsulated.read(self, _bytes)
-		if (_return == None): _return = Binary.BYTES_TYPE()
+		if (_return is None): _return = Binary.BYTES_TYPE()
 		return _return
 	#
 #

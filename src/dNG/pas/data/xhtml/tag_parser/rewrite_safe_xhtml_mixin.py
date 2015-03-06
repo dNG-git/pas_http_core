@@ -48,7 +48,7 @@ Renders the content for safe (escaped) XHTML output.
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_safe_xhtml({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_safe_xhtml({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
 		return Formatting.escape(self.render_rewrite(source, key))
 	#
 #

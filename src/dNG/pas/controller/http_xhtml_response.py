@@ -119,7 +119,7 @@ Add the defined Cascading Stylesheet file to the output.
 :since: v0.1.00
 		"""
 
-		if (self.theme_renderer == None): self.css_files_cache.append(css_file)
+		if (self.theme_renderer is None): self.css_files_cache.append(css_file)
 		else: self.theme_renderer.add_css_file(css_file)
 	#
 
@@ -136,7 +136,7 @@ Add the defined JavaScript file to the output.
 		common_names = Settings.get("pas_http_theme_oset_js_aliases", { "jquery/jquery.min.js": "jquery/jquery-2.1.1.min.js" })
 		if (js_file in common_names): js_file = common_names[js_file]
 
-		if (self.theme_renderer == None): self.js_files_cache.append(js_file)
+		if (self.theme_renderer is None): self.js_files_cache.append(js_file)
 		else: self.theme_renderer.add_js_file(js_file)
 	#
 
@@ -151,7 +151,7 @@ Add output content from an OSet template.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.add_oset_content({1})- (#echo(__LINE__)#)", self, template_name, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.add_oset_content({1})- (#echo(__LINE__)#)", self, template_name, context = "pas_http_core")
 
 		parser = NamedLoader.get_instance("dNG.pas.data.xhtml.oset.FileParser")
 		parser.set_oset(self.oset)
@@ -160,7 +160,7 @@ Add output content from an OSet template.
 
 		if (data != ""):
 		#
-			if (self.content == None): self.content = ""
+			if (self.content is None): self.content = ""
 			self.content += data
 		#
 	#
@@ -175,7 +175,7 @@ Adds the requested CSS sprites to the output.
 :since: v0.1.01
 		"""
 
-		if (self.theme_renderer == None): self.theme_css_files_cache.append(css_file)
+		if (self.theme_renderer is None): self.theme_css_files_cache.append(css_file)
 		else:
 		#
 			theme_css_file = "themes/{0}/{1}".format(self.get_theme_active(),
@@ -235,7 +235,7 @@ compression setting and information about P3P.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.init()- (#echo(__LINE__)#)", self, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.init()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 
 		AbstractHttpResponse.init(self, cache, compress)
 
@@ -264,7 +264,7 @@ Send P3P header if defined
 			#
 		#
 
-		if (self.theme_renderer == None):
+		if (self.theme_renderer is None):
 		#
 			"""
 Set up theme framework
@@ -272,16 +272,16 @@ Set up theme framework
 
 			Settings.read_file("{0}/settings/pas_http_theme.json".format(Settings.get("path_data")))
 
-			if (self.theme == None):
+			if (self.theme is None):
 			#
 				theme = AbstractHttpRequest.get_instance().get_parameter("theme")
-				if (theme != None): self.set_theme(theme)
+				if (theme is not None): self.set_theme(theme)
 			#
 
 			theme = (Hook.call("dNG.pas.http.Theme.checkCandidates", theme = self.theme) if (Settings.get("pas_http_theme_plugins_supported", True)) else None)
 			self.theme_renderer = NamedLoader.get_instance("dNG.pas.data.xhtml.theme.Renderer")
 
-			if (theme != None):
+			if (theme is not None):
 			#
 				theme = re.sub("\\W", "", theme)
 
@@ -289,8 +289,8 @@ Set up theme framework
 				else: theme = None
 			#
 
-			if (theme == None and (not self.theme_renderer.is_supported(self.theme))): self.theme = Settings.get("pas_http_site_theme_default", "simple")
-			if (self.theme_active == None): self.theme_active = (self.theme if (self.theme_renderer.is_supported(self.theme)) else "simple")
+			if (theme is None and (not self.theme_renderer.is_supported(self.theme))): self.theme = self.theme_renderer.__class__.get_default_theme()
+			if (self.theme_active is None): self.theme_active = (self.theme if (self.theme_renderer.is_supported(self.theme)) else "simple")
 
 			self.theme_renderer.set(self.theme_active)
 			self.theme_renderer.set_log_handler(self.log_handler)
@@ -307,14 +307,14 @@ Set up theme framework
 			for theme_css_file in self.theme_css_files_cache: self.add_theme_css_file(theme_css_file)
 		#
 
-		if (self.oset == None):
+		if (self.oset is None):
 		#
 			"""
 Get the corresponding OSet name
 			"""
 
 			self.oset = Settings.get("pas_http_theme_{0}_oset".format(self.theme_active))
-			if (self.oset == None): self.oset = Settings.get("pas_http_theme_oset_default", "xhtml5")
+			if (self.oset is None): self.oset = Settings.get("pas_http_theme_oset_default", "xhtml5")
 		#
 	#
 
@@ -326,16 +326,16 @@ Sends the prepared response.
 :since: v0.1.00
 		"""
 
-		if (self.data != None or self.stream_response.is_streamer_set()):
+		if (self.data is not None or self.stream_response.is_streamer_set()):
 		#
 			if (not self.initialized): self.init()
 			self.send_headers()
 
-			if (self.data != None): AbstractHttpResponse.send(self)
+			if (self.data is not None): AbstractHttpResponse.send(self)
 		#
-		elif (self.content != None):
+		elif (self.content is not None):
 		#
-			if (self.title != None): self.theme_renderer.set_title(self.title)
+			if (self.title is not None): self.theme_renderer.set_title(self.title)
 
 			is_xhtml_supported = ("application/xhtml+xml" in self.stream_response.get_accepted_formats())
 
@@ -345,7 +345,7 @@ Sends the prepared response.
 				self.theme_renderer.add_js_file("xhtml5/html5shiv.min.js")
 			#
 
-			if (self.get_content_type() == None):
+			if (self.get_content_type() is None):
 			#
 				if (is_xhtml_supported): self.set_content_type("application/xhtml+xml; charset={0}".format(self.charset))
 				else: self.set_content_type("text/html; charset={0}".format(self.charset))
@@ -367,12 +367,12 @@ occurred if they are not sent and all buffers are "None".
 			self.init(False, True)
 			self.content = ""
 
-			if (self.errors == None):
+			if (self.errors is None):
 			#
 				header = self.get_header("HTTP/1.1", True)
-				if (header == None): self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+				if (header is None): self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
 
-				error = { "title": L10n.get("core_title_error_critical"), "message": (L10n.get("errors_core_unknown_error") if (header == None) else header) }
+				error = { "title": L10n.get("core_title_error_critical"), "message": (L10n.get("errors_core_unknown_error") if (header is None) else header) }
 
 				self.add_oset_content("core.error", error)
 				self.set_title(error['title'])
@@ -401,7 +401,7 @@ Sets the (X)HTML canonical URL of the response.
 		"""
 
 		self.html_canonical_url = url
-		if (self.initialized and self.theme_renderer != None): self.theme_renderer.set_canonical_url(url)
+		if (self.initialized and self.theme_renderer is not None): self.theme_renderer.set_canonical_url(url)
 	#
 
 	def set_html_canonical_url_parameters(self, parameters):
@@ -416,7 +416,7 @@ given.
 		"""
 
 		self.html_canonical_url_parameters = parameters
-		if (self.initialized and self.theme_renderer != None): self.theme_renderer.set_canonical_url_parameters(parameters)
+		if (self.initialized and self.theme_renderer is not None): self.theme_renderer.set_canonical_url_parameters(parameters)
 	#
 
 	def set_html_page_description(self, description):
@@ -430,7 +430,7 @@ Sets the (X)HTML head description of the response.
 		"""
 
 		self.html_page_description = description
-		if (self.initialized and self.theme_renderer != None): self.theme_renderer.set_page_description(description)
+		if (self.initialized and self.theme_renderer is not None): self.theme_renderer.set_page_description(description)
 	#
 
 	def set_oset(self, oset):
@@ -457,7 +457,7 @@ Sets the theme to use.
 		"""
 
 		self.theme = re.sub("\\W", "", theme)
-		if (self.theme_renderer != None and self.theme_renderer.is_supported(theme)): self.theme_renderer.set(theme)
+		if (self.theme_renderer is not None and self.theme_renderer.is_supported(theme)): self.theme_renderer.set(theme)
 	#
 
 	def set_title(self, title):

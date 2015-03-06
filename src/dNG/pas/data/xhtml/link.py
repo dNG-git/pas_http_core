@@ -22,6 +22,7 @@ from dNG.pas.controller.abstract_response import AbstractResponse
 from dNG.pas.controller.http_xhtml_response import HttpXhtmlResponse
 from dNG.pas.data.text.link import Link as _Link
 from dNG.pas.data.xhtml.formatting import Formatting
+from dNG.pas.module.named_loader import NamedLoader
 
 class Link(_Link):
 #
@@ -41,7 +42,7 @@ TODO: Code incomplete
 
 	# pylint: disable=arguments-differ
 
-	TYPE_FORM_FIELDS = 32
+	TYPE_FORM_FIELDS = 128
 	"""
 Hidden input fields
 	"""
@@ -49,7 +50,7 @@ Hidden input fields
 	"""
 Form action URL
 	"""
-	TYPE_JS_REQUIRED = 128
+	TYPE_JS_REQUIRED = 512
 	"""
 JavaScript is required
 	"""
@@ -75,9 +76,9 @@ as a source for parameters.
 :since:  v0.1.00
 		"""
 
-		if (type(_type) != int): _type = self.__class__.get_type_int(_type)
+		if (type(_type) is not int): _type = self.__class__.get_type_int(_type)
 
-		if (parameters == None): parameters = { }
+		if (parameters is None): parameters = { }
 		xhtml_escape = escape
 
 		#if (_type == "asis"): _return = self.build_url(data)
@@ -111,12 +112,12 @@ value='de' />". Automatically add language, theme and uuid fields.
 		#
 		elif (_type & Link.TYPE_FORM_URL == Link.TYPE_FORM_URL):
 		#
-			if (_type == Link.TYPE_FORM_URL): _type |= Link.TYPE_RELATIVE
+			if (_type == Link.TYPE_FORM_URL): _type |= Link.TYPE_RELATIVE_URL
 			_return = _Link.build_url(self, _type)
 		#
 		elif (_type & Link.TYPE_QUERY_STRING == Link.TYPE_QUERY_STRING):
 		#
-			if (_type == Link.TYPE_FORM_URL): _type = Link.TYPE_RELATIVE
+			if (_type == Link.TYPE_FORM_URL): _type = Link.TYPE_RELATIVE_URL
 			parameters = self._filter_parameters(parameters)
 			parameters = self._add_default_parameters(parameters)
 
@@ -151,8 +152,10 @@ This method appends default parameters if not already set.
 
 			if (isinstance(response, HttpXhtmlResponse)):
 			#
+				default_theme = NamedLoader.get_class("dNG.pas.data.xhtml.theme.Renderer").get_default_theme()
 				theme = response.get_theme()
-				if (theme != None): _return['theme'] = theme
+
+				if (theme is not None and theme != default_theme): _return['theme'] = theme
 			#
 		#
 
@@ -194,7 +197,7 @@ Removes all links defined for the given set name.
 		"""
 
 		store = AbstractResponse.get_instance_store()
-		if (store != None and set_name in store.get("dNG.pas.data.text.url.links", { })): del(store['dNG.pas.data.text.url.links'][set_name])
+		if (store is not None and set_name in store.get("dNG.pas.data.text.url.links", { })): del(store['dNG.pas.data.text.url.links'][set_name])
 	#
 
 	@staticmethod
@@ -225,7 +228,7 @@ Returns all links defined for the given set name.
 
 		store = AbstractResponse.get_instance_store()
 
-		if (store != None and set_name in store.get("dNG.pas.data.text.url.links", { })): return store['dNG.pas.data.text.url.links'][set_name]
+		if (store is not None and set_name in store.get("dNG.pas.data.text.url.links", { })): return store['dNG.pas.data.text.url.links'][set_name]
 		else: return [ ]
 	#
 
@@ -268,10 +271,10 @@ Adds a link to the given set name.
 :since: v0.1.01
 		"""
 
-		if (parameters == None): parameters = { }
+		if (parameters is None): parameters = { }
 		store = AbstractResponse.get_instance_store()
 
-		if (store != None):
+		if (store is not None):
 		#
 			if ("dNG.pas.data.text.url.links" not in store): store['dNG.pas.data.text.url.links'] = { }
 			store = store['dNG.pas.data.text.url.links']

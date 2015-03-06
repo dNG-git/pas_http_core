@@ -94,7 +94,7 @@ Action for "done"
 			content['link_title'] = l10n.get("core_continue")
 
 			target_iline = re.sub("\\_\\_\\w+\\_\\_", "", parameters_chained['target_iline'])
-			content['link_url'] = Link().build_url(Link.TYPE_RELATIVE, { "__query__": target_iline })
+			content['link_url'] = Link().build_url(Link.TYPE_RELATIVE_URL, { "__query__": target_iline })
 		#
 
 		self.response.init()

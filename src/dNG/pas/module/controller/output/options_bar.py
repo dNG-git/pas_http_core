@@ -22,7 +22,7 @@ from dNG.data.xml_parser import XmlParser
 from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 from .options_block_mixin import OptionsBlockMixin
 
-class OptionsBar(AbstractHttpController, OptionsBlockMixin):
+class OptionsBar(OptionsBlockMixin, AbstractHttpController):
 #
 	"""
 An "OptionsBar" contains of several options formatted with title and
@@ -86,7 +86,7 @@ Returns rendered XHTML for the options bar.
 			                   "attributes": { "class": "pageoptionsbar" }
 			                 }
 
-			if (_id != None): nav_attributes['attributes']['id'] = _id
+			if (_id is not None): nav_attributes['attributes']['id'] = _id
 
 			_return = "{0}<ul><li>{1}</li></ul></nav>".format(XmlParser().dict_to_xml_item_encoder(nav_attributes, False),
 			                                                  "</li><li>".join(rendered_links)

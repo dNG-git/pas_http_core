@@ -77,7 +77,7 @@ Pages available
 		"""
 Parameters used to render each page link
 		"""
-		self.type = (_type if (_type != None) else Link.TYPE_RELATIVE)
+		self.type = (_type if (_type is not None) else Link.TYPE_RELATIVE_URL)
 		"""
 Page link type
 		"""

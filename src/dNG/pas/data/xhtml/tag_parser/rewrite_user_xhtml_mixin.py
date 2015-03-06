@@ -26,7 +26,6 @@ from dNG.pas.data.text.date_time import DateTime
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
 from dNG.pas.data.xhtml.form_tags_renderer import FormTagsRenderer
-from dNG.pas.data.xhtml.formatting import Formatting
 from dNG.pas.data.xhtml.link import Link
 from dNG.pas.module.named_loader import NamedLoader
 
@@ -72,20 +71,20 @@ Returns the user profile instance for the given user ID.
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._get_user_profile()- (#echo(__LINE__)#)", self, context = "pas_tag_parser")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._get_user_profile()- (#echo(__LINE__)#)", self, context = "pas_tag_parser")
 		_return = None
 
 		user_profile_class = NamedLoader.get_class("dNG.pas.data.user.Profile")
 
-		if (user_profile_class != None and user_value != None):
+		if (user_profile_class is not None and user_value is not None):
 		#
 			try:
 			#
-				if (type(user_value) == dict and "id" in user_value): _return = user_profile_class.load_id(user_value['id'])
+				if (type(user_value) is dict and "id" in user_value): _return = user_profile_class.load_id(user_value['id'])
 				else:
 				#
 					user_value = Binary.str(user_value)
-					if (type(user_value) == str): _return = user_profile_class.load_id(user_value)
+					if (type(user_value) is str): _return = user_profile_class.load_id(user_value)
 				#
 			#
 			except NothingMatchedException: pass
@@ -122,7 +121,7 @@ Renders a XHTML based user bar with avatar, user name and link.
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_bar({1}, {2})- (#echo(__LINE__)#)", self, key, bar_type, context = "pas_tag_parser")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_bar({1}, {2})- (#echo(__LINE__)#)", self, key, bar_type, context = "pas_tag_parser")
 
 		user_bar_data = self.get_source_value(source, key)
 		user_profile = self._get_user_profile(user_bar_data)
@@ -131,20 +130,20 @@ Renders a XHTML based user bar with avatar, user name and link.
 		                              DateTime.format_l10n(DateTime.TYPE_DATE_TIME_SHORT, int(user_bar_data['time_published'])),
 		                              L10n.get("pas_http_core_user_{0}_bar_2".format(bar_type))
 		                             )
-		           if (user_bar_data != None and "time_published" in user_bar_data) else
+		           if (user_bar_data is not None and "time_published" in user_bar_data) else
 		           L10n.get("pas_http_core_user_{0}_bar_0".format(bar_type))
 		          )
 
 		content = "<small>{0}</small><br />".format(content)
 
-		if (user_profile == None): content += "<b>{0}</b>".format(L10n.get("core_unknown_entity"))
+		if (user_profile is None): content += "<b>{0}</b>".format(L10n.get("core_unknown_entity"))
 		else:
 		#
 			user_profile_data = user_profile.get_data_attributes("id", "name")
 
 			source_iline = Link().build_url(Link.TYPE_QUERY_STRING, { "__request__": True })
 
-			user_link = Link().build_url(Link.TYPE_RELATIVE,
+			user_link = Link().build_url(Link.TYPE_RELATIVE_URL,
 			                             { "m": "user",
 			                               "s": "profile",
 			                               "dsd": { "upid": user_profile_data['id'],
@@ -178,18 +177,18 @@ Renders the user name and link to the profile.
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_link({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_link({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
 		_return = L10n.get("core_unknown_entity")
 
 		user_profile = self._get_user_profile(self.get_source_value(source, key))
 
-		if (user_profile != None):
+		if (user_profile is not None):
 		#
 			user_profile_data = user_profile.get_data_attributes("id", "name")
 
 			source_iline = Link().build_url(Link.TYPE_QUERY_STRING, { "__request__": True })
 
-			user_link = Link().build_url(Link.TYPE_RELATIVE,
+			user_link = Link().build_url(Link.TYPE_RELATIVE_URL,
 			                             { "m": "user",
 			                               "s": "profile",
 			                               "dsd": { "upid": user_profile_data['id'],
@@ -238,16 +237,16 @@ Renders a XHTML based publisher user bar with avatar, user name and link.
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_signature_box({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_signature_box({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
 		_return = ""
 
 		signature = ""
 		user_profile = self._get_user_profile(self.get_source_value(source, key))
 
-		if (user_profile != None):
+		if (user_profile is not None):
 		#
 			user_profile_data = user_profile.get_data_attributes("signature")
-			if (user_profile_data['signature'] != None): signature = user_profile_data['signature'].strip()
+			if (user_profile_data['signature'] is not None): signature = user_profile_data['signature'].strip()
 		#
 
 		if (len(signature) > 0):

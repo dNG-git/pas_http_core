@@ -22,7 +22,7 @@ from dNG.pas.data.xhtml.formatting import Formatting
 from .abstract_field import AbstractField
 from .placeholder_mixin import PlaceholderMixin
 
-class TextField(AbstractField, PlaceholderMixin):
+class TextField(PlaceholderMixin, AbstractField):
 #
 	"""
 "TextField" provides a text input field.
@@ -61,7 +61,7 @@ Checks if the field value is valid.
 :since:  v0.1.01
 		"""
 
-		if (self.valid == None or force): self.valid = self._check_length()
+		if (self.valid is None or force): self.valid = self._check_length()
 		return AbstractField.check(self, force)
 	#
 
@@ -105,7 +105,7 @@ Renders the given field.
 		            "placeholder": Formatting.escape(self.get_placeholder()),
 		            "value": self._get_content(),
 		            "required": self.required,
-		            "error_message": ("" if (self.error_data == None) else Formatting.escape(self.get_error_message()))
+		            "error_message": ("" if (self.error_data is None) else Formatting.escape(self.get_error_message()))
 		          }
 
 		if (self.size == TextField.SIZE_SMALL):

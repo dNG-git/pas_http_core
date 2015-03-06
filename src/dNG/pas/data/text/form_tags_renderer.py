@@ -88,10 +88,10 @@ Change data according to the "b" tag.
 :since:  v0.1.01
 	"""
 
-	def _change_match_center(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_box(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
-Change data according to the "center" tag.
+Change data according to the "box" tag.
 
 :param tag_definition: Matched tag definition
 :param data: Data to be parsed
@@ -104,15 +104,24 @@ Change data according to the "center" tag.
 		"""
 
 		_return = data[data_position:tag_end_position]
-
-		if (len(_return) > 0):
-		#
-			tag_params = FormTagsRenderer.parse_tag_parameters("center", data, tag_position, data_position)
-			if ("box" in tag_params): _return = "---\n{0}\n---".format(_return)
-		#
+		if (len(_return) > 0): _return = "---\n{0}\n---".format(_return)
 
 		return _return
 	#
+
+	_change_match_center = _change_plain_content
+	"""
+Change data according to the "center" tag.
+
+:param tag_definition: Matched tag definition
+:param data: Data to be parsed
+:param tag_position: Tag starting position
+:param data_position: Data starting position
+:param tag_end_position: Starting position of the closing tag
+
+:return: (str) Converted data
+:since:  v0.1.01
+	"""
 
 	def _change_match_code(self, data, tag_position, data_position, tag_end_position):
 	#
@@ -191,7 +200,7 @@ Change data according to the "highlight" tag.
 		if (len(_return) > 0):
 		#
 			tag_params = FormTagsRenderer.parse_tag_parameters("highlight", data, tag_position, data_position)
-			if ("box" in tag_params): _return = "---\n{0}\n---".format(_return)
+			if ("width" in tag_params): _return = "---\n{0}\n---".format(_return)
 		#
 
 		return _return
@@ -240,9 +249,8 @@ Change data according to the "img" tag.
 		return _return
 	#
 
-	def _change_match_justify(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+	justify = _change_plain_content
+	"""
 Change data according to the "justify" tag.
 
 :param tag_definition: Matched tag definition
@@ -253,18 +261,7 @@ Change data according to the "justify" tag.
 
 :return: (str) Converted data
 :since:  v0.1.01
-		"""
-
-		_return = data[data_position:tag_end_position]
-
-		if (len(_return) > 0):
-		#
-			tag_params = FormTagsRenderer.parse_tag_parameters("justify", data, tag_position, data_position)
-			if ("box" in tag_params): _return = "---\n{0}\n---".format(_return)
-		#
-
-		return _return
-	#
+	"""
 
 	_change_match_left = _change_plain_content
 	"""
@@ -300,7 +297,7 @@ Change data according to the "link" tag.
 		if (len(_return) > 0):
 		#
 			renderer = ContentLinkRenderer()
-			if (self.datalinker_main_id != None): renderer.set_datalinker_main_id(self.datalinker_main_id)
+			if (self.datalinker_main_id is not None): renderer.set_datalinker_main_id(self.datalinker_main_id)
 			tag_params = FormTagsRenderer.parse_tag_parameters("link", data, tag_position, data_position)
 
 			_return = renderer.render(_return, tag_params)
@@ -323,9 +320,8 @@ Change data according to the "margin" tag.
 :since:  v0.1.01
 	"""
 
-	def _change_match_right(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+	_change_match_right = _change_plain_content
+	"""
 Change data according to the "right" tag.
 
 :param tag_definition: Matched tag definition
@@ -336,18 +332,7 @@ Change data according to the "right" tag.
 
 :return: (str) Converted data
 :since:  v0.1.01
-		"""
-
-		_return = data[data_position:tag_end_position]
-
-		if (len(_return) > 0):
-		#
-			tag_params = FormTagsRenderer.parse_tag_parameters("right", data, tag_position, data_position)
-			if ("box" in tag_params): _return = "---\n{0}\n---".format(_return)
-		#
-
-		return _return
-	#
+	"""
 
 	_change_match_s = _change_plain_content
 	"""
@@ -430,14 +415,14 @@ Change data according to the "url" tag.
 		enclosed_data = ""
 		url = None
 
-		if (re_result != None and len(re_result.group(1)) > 0):
+		if (re_result is not None and len(re_result.group(1)) > 0):
 		#
 			enclosed_data = data[data_position:tag_end_position]
 			url = re_result.group(1)
 		#
 		else: url = data[data_position:tag_end_position]
 
-		if (url != None): _return = ("{0} ({1})".format(enclosed_data, url) if (len(enclosed_data) > 0) else url)
+		if (url is not None): _return = ("{0} ({1})".format(enclosed_data, url) if (len(enclosed_data) > 0) else url)
 
 		return _return
 	#

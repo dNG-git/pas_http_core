@@ -1,7 +1,7 @@
 <div class="pageform_element">
 	<div class="pageform_label"><strong>[rewrite:content]title[/rewrite][if:content:required == 1] <em>*</em>[/if]</strong>:</div>
 	<div class="pageform_field">
-		<select id="[rewrite:content]id[/rewrite]" name="[rewrite:content]name[/rewrite]"[if:content:required == 1] required="required"[/if] class="pageform_select" size="[rewrite:content]rows[/rewrite]">
+		<select id="[rewrite:content]id[/rewrite]" name="[rewrite:content]name[/rewrite]"[if:content:required == 1] required="required"[/if] class="pageform_select" size="[rewrite:content]rows[/rewrite]" multiple='multiple'>
 [each:content:choices:choice]
 			<option[if:content:choices.choice.value != ] value="[rewrite:content]choices.choice.value[/rewrite]"[/if][if:content:choices.choice.selected == 1] selected="selected"[/if]>[rewrite:content]choices.choice.title[/rewrite]</option>
 [/each]

@@ -60,7 +60,7 @@ cherrypy server
 		"""
 
 		log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
-		if (log_handler != None): log_handler.add_logger("{0}.error.{1}".format(log.logger_root, log.appid))
+		if (log_handler is not None): log_handler.add_logger("{0}.error.{1}".format(log.logger_root, log.appid))
 	#
 
 	def _configure(self):
@@ -84,7 +84,7 @@ Configures the server
 		config.update({ "response.stream": True })
 		numthreads = Settings.get("pas_http_cherrypy_server_numthreads", 10)
 
-		if (self.log_handler != None): self.log_handler.info("pas.http.core cherrypy server starts at '{0}:{1:d}'", listener_host, self.port, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.info("pas.http.core cherrypy server starts at '{0}:{1:d}'", listener_host, self.port, context = "pas_http_core")
 
 		listener_data = ( listener_host, self.port )
 		self.server = CherryPyWSGIServer(listener_data, HttpWsgi1Request, numthreads = numthreads, server_name = self.host)
@@ -119,7 +119,7 @@ Stop the server
 :since:  v0.1.01
 		"""
 
-		if (self.server != None): self.server.stop()
+		if (self.server is not None): self.server.stop()
 		return ServerImplementation.stop(self, params, last_return)
 	#
 #

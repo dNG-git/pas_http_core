@@ -44,9 +44,9 @@ Abstract parser to handle FormTags.
 
 	"""
 	TAGS = [ "b", "i", "s", "u", "color", "del", "face", "size",
-	         "center", "justify", "left", "right",
-	         "link", "title", "url", 
-	         "code", "highlight", "margin", "quote", 
+	         "box", "center", "justify", "left", "right",
+	         "link", "title", "url",
+	         "code", "highlight", "margin", "quote",
 	         "hr", "img", "list"
 	       ]
 	"""
@@ -89,7 +89,7 @@ Change data according to the matched tag.
 
 		method = (getattr(self, "_change_match_{0}".format(tag_definition['tag'])) if (hasattr(self, "_change_match_{0}".format(tag_definition['tag']))) else None)
 
-		if (method != None): _return += method(data, tag_position, data_position, tag_end_position)
+		if (method is not None): _return += method(data, tag_position, data_position, tag_end_position)
 		if ("type" not in tag_definition or tag_definition['type'] != "simple"): _return += data[self._find_tag_end_position(data, tag_end_position):]
 
 		return _return
@@ -111,7 +111,7 @@ Check if a possible tag match is a false positive.
 		i = 0
 		tags_length = len(self.__class__.TAGS)
 
-		while (_return == None and i < tags_length):
+		while (_return is None and i < tags_length):
 		#
 			tag = self.__class__.TAGS[i]
 			data_match = data[1:1 + len(tag)]
@@ -119,7 +119,7 @@ Check if a possible tag match is a false positive.
 			if (data_match == tag):
 			#
 				method = (getattr(self, "_check_match_{0}".format(tag)) if (hasattr(self, "_check_match_{0}".format(tag))) else None)
-				if (method != None and method(data)): _return = getattr(self, "_get_match_definition_{0}".format(tag))()
+				if (method is not None and method(data)): _return = getattr(self, "_get_match_definition_{0}".format(tag))()
 			#
 
 			i += 1
@@ -140,6 +140,35 @@ Check if a possible tag match is a valid "b" tag.
 		"""
 
 		return self._check_match_simple_tag("b", data)
+	#
+
+	def _check_match_box(self, data):
+	#
+		"""
+Check if a possible tag match is a valid "box" tag.
+
+:param data: Data starting with the possible tag
+
+:return: (bool) True if valid
+:since:  v0.1.01
+		"""
+
+		_return = False
+
+		tag_element_end_position = self._find_tag_end_position(data, 4)
+
+		if (tag_element_end_position > 5):
+		#
+			tag_params = AbstractFormTags.parse_tag_parameters("box", data, 0, tag_element_end_position)
+
+			_return = (data[:5] == "[box:")
+			if (_return and "align" in tag_params): _return = (tag_params['align'].lower() in ( "left", "center", "right" ))
+			if (_return and "clear" in tag_params): _return = (tag_params['clear'].lower() in ( "both", "left", "right" ))
+			if (_return and "width" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['width']) or AbstractFormTags.check_size_px(tag_params['width'], 50))
+		#
+		else: _return = (data[:5] == "[box]")
+
+		return _return
 	#
 
 	def _check_match_center(self, data):
@@ -192,7 +221,7 @@ Check if a possible tag match is a valid "color" tag.
 :since:  v0.1.01
 		"""
 
-		return (re.match("^\\[color=#[0-9a-f]{6}\\]", data) != None)
+		return (re.match("^\\[color=#[0-9a-f]{6}\\]", data) is not None)
 	#
 
 	def _check_match_del(self, data):
@@ -212,7 +241,7 @@ Check if a possible tag match is a valid "del" tag.
 	def _check_match_face(self, data):
 	#
 		"""
-Check if a possible tag match is a valid "b" tag.
+Check if a possible tag match is a valid "face" tag.
 
 :param data: Data starting with the possible tag
 
@@ -241,7 +270,7 @@ Check if a possible tag match is a valid "highlight" tag.
 		if (tag_element_end_position > 11):
 		#
 			tag_params = AbstractFormTags.parse_tag_parameters("highlight", data, 0, tag_element_end_position)
-			if (data[:11] == "[highlight:" and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
+			if (data[:11] == "[highlight:" and "width" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['width']) or AbstractFormTags.check_size_px(tag_params['width'], 50))
 		#
 		else: _return = (data[:11] == "[highlight]")
 
@@ -315,18 +344,7 @@ Check if a possible tag match is a valid "justify" tag.
 :since:  v0.1.01
 		"""
 
-		_return = False
-
-		tag_element_end_position = self._find_tag_end_position(data, 8)
-
-		if (tag_element_end_position > 9):
-		#
-			tag_params = AbstractFormTags.parse_tag_parameters("justify", data, 0, tag_element_end_position)
-			if (data[:9] == "[justify:" and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
-		#
-		else: _return = (data[:9] == "[justify]")
-
-		return _return
+		return self._check_match_simple_tag("justify", data)
 	#
 
 	def _check_match_left(self, data):
@@ -340,18 +358,7 @@ Check if a possible tag match is a valid "left" tag.
 :since:  v0.1.01
 		"""
 
-		_return = False
-
-		tag_element_end_position = self._find_tag_end_position(data, 5)
-
-		if (tag_element_end_position > 6):
-		#
-			tag_params = AbstractFormTags.parse_tag_parameters("left", data, 0, tag_element_end_position)
-			if (data[:6] == "[left:" and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
-		#
-		else: _return = (data[:6] == "[left]")
-
-		return _return
+		return self._check_match_simple_tag("left", data)
 	#
 
 	def _check_match_link(self, data):
@@ -424,7 +431,7 @@ Check if a possible tag match is a valid "margin" tag.
 
 		re_result = re.match("^\\[margin=(.+?)\\]", data)
 
-		if (re_result != None):
+		if (re_result is not None):
 		#
 			value = re_result.group(1)
 			_return = (AbstractFormTags.check_size_percent(value, _max = 49) or AbstractFormTags.check_size_px(value, 1))
@@ -458,18 +465,7 @@ Check if a possible tag match is a valid "right" tag.
 :since:  v0.1.01
 		"""
 
-		_return = False
-
-		tag_element_end_position = self._find_tag_end_position(data, 6)
-
-		if (tag_element_end_position > 7):
-		#
-			tag_params = AbstractFormTags.parse_tag_parameters("right", data, 0, tag_element_end_position)
-			if (data[:7] == "[right:" and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
-		#
-		else: _return = (data[:7] == "[right]")
-
-		return _return
+		return self._check_match_simple_tag("right", data)
 	#
 
 	def _check_match_s(self, data):
@@ -515,7 +511,7 @@ Check if a possible tag match is a valid "size" tag.
 
 		re_result = re.match("^\\[size=(.+?)\\]", data)
 
-		if (re_result != None):
+		if (re_result is not None):
 		#
 			value = re_result.group(1)
 			_return = (AbstractFormTags.check_size_percent(value, 60, 500) or AbstractFormTags.check_size_px(value, _max = 80))
@@ -535,7 +531,20 @@ Check if a possible tag match is a valid "title" tag.
 :since:  v0.1.01
 		"""
 
-		return (re.match("^\\[title(=\\d|)\\]", data) != None)
+		_return = False
+
+		tag_element_end_position = self._find_tag_end_position(data, 6)
+
+		if (tag_element_end_position > 7):
+		#
+			tag_params = AbstractFormTags.parse_tag_parameters("title", data, 0, tag_element_end_position)
+
+			_return = (data[:7] in ( "[title:", "[title=" ))
+			if (_return and "clear" in tag_params): _return = (tag_params['clear'] in ( "both", "left", "right" ))
+		#
+		else: _return = (data[:7] == "[title]")
+
+		return _return
 	#
 
 	def _check_match_u(self, data):
@@ -563,7 +572,7 @@ Check if a possible tag match is a valid "url" tag.
 :since:  v0.1.01
 		"""
 
-		return (re.match("^(\\[url=\\w+://.*\\]|\\[url\\]\\w+://.*)", data) != None)
+		return (re.match("^(\\[url=\\w+:.*\\]|\\[url\\]\\w+:.*)", data) is not None)
 	#
 
 	def _get_match_definition_b(self):
@@ -576,6 +585,18 @@ Returns the "b" tag definition for the parser.
 		"""
 
 		return { "tag": "b", "tag_end": "[/b]" }
+	#
+
+	def _get_match_definition_box(self):
+	#
+		"""
+Returns the "box" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v0.1.01
+		"""
+
+		return { "tag": "box", "tag_end": "[/box]" }
 	#
 
 	def _get_match_definition_center(self):
@@ -844,9 +865,9 @@ Check if a possible tag match is a valid "center" tag.
 
 		_type = type(value)
 
-		_return = (_type == int or _type == float)
-		if (_return and _min != None and value < _min): _return = False
-		if (_return and _max != None and value > _max): _return = False
+		_return = (_type in ( int, float ))
+		if (_return and _min is not None and value < _min): _return = False
+		if (_return and _max is not None and value > _max): _return = False
 
 		return _return
 	#
@@ -867,7 +888,7 @@ Check if a possible tag match is a valid "center" tag.
 
 		if (value[-1:] == "%"):
 		#
-			if (AbstractFormTags.RE_NUMBER.match(value[:-1]) != None): _return = AbstractFormTags._check_number(int(value[:-1]), _min, _max)
+			if (AbstractFormTags.RE_NUMBER.match(value[:-1]) is not None): _return = AbstractFormTags._check_number(int(value[:-1]), _min, _max)
 		#
 
 		return _return
@@ -889,7 +910,7 @@ Check if a possible tag match is a valid "center" tag.
 
 		if (value[-2:] == "px"):
 		#
-			if (AbstractFormTags.RE_NUMBER.match(value[:-2]) != None): _return = AbstractFormTags._check_number(int(value[:-2]), _min, _max)
+			if (AbstractFormTags.RE_NUMBER.match(value[:-2]) is not None): _return = AbstractFormTags._check_number(int(value[:-2]), _min, _max)
 		#
 
 		return _return

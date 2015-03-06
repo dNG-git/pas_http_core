@@ -114,18 +114,18 @@ Checks the length of value.
 :since:  v0.1.00
 		"""
 
-		data_length = (0 if (self.raw_value == None) else len(self.raw_value))
+		data_length = (0 if (self.raw_value is None) else len(self.raw_value))
 		error_data = None
 
 		if (self.required and data_length < 1): error_data = "required_element"
-		elif (self.limit_min != None
+		elif (self.limit_min is not None
 		      and (self.required or data_length > 0)
 		      and self.limit_min > data_length
 		     ): error_data = ( "string_min", str(self.limit_min) )
-		elif (self.limit_max != None and self.limit_max < data_length): error_data = ( "string_max", str(self.limit_max) )
+		elif (self.limit_max is not None and self.limit_max < data_length): error_data = ( "string_max", str(self.limit_max) )
 
-		if (error_data != None): self.error_data = error_data
-		return (error_data == None)
+		if (error_data is not None): self.error_data = error_data
+		return (error_data is None)
 	#
 
 	def _encrypt_value(self, value):
@@ -138,7 +138,7 @@ Encrypts the given form field value based on the defined mode.
 :return: (str) Encrypted value
 		"""
 
-		return (value if (value == None) else Md5.hash(value))
+		return (value if (value is None) else Md5.hash(value))
 	#
 
 	def get_type(self):
@@ -183,7 +183,7 @@ Loads the field configuration from the given definition.
 		TextField.load_definition(self, field_definition)
 
 		mode = field_definition.get("mode")
-		if (mode != None): self.set_mode(self.__class__.get_mode_int(mode))
+		if (mode is not None): self.set_mode(self.__class__.get_mode_int(mode))
 	#
 
 	def render(self):
@@ -202,7 +202,7 @@ Renders the given field.
 		            "placeholder": Formatting.escape(self.get_placeholder()),
 		            "value": self._get_content(),
 		            "required": self.required,
-		            "error_message": ("" if (self.error_data == None) else Formatting.escape(self.get_error_message()))
+		            "error_message": ("" if (self.error_data is None) else Formatting.escape(self.get_error_message()))
 		          }
 
 		if (self.size == TextField.SIZE_SMALL):
@@ -254,7 +254,7 @@ Sets the password field mode.
 :since: v0.1.01
 		"""
 
-		if (type(mode) != int): mode = self.__class__.get_mode_int(mode)
+		if (type(mode) is not int): mode = self.__class__.get_mode_int(mode)
 		self.mode = mode
 	#
 

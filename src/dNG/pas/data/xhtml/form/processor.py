@@ -99,7 +99,7 @@ Form validity check result variable
 		L10n.init("pas_http_core_form")
 
 		if (form_id == False): self.form_id = Binary.str(hexlify(urandom(16)))
-		elif (form_id == None or len(form_id) < 1):
+		elif (form_id is None or len(form_id) < 1):
 		#
 			self.form_id = Binary.str(hexlify(urandom(16)))
 			self.form_id_value = Binary.str(hexlify(urandom(16)))
@@ -121,7 +121,7 @@ Form validity check result variable
 			self.form_id = form_id
 		#
 
-		if (self.form_store != None):
+		if (self.form_store is not None):
 		#
 			form_data = self.form_store.get_value_dict()
 			form_id_value = form_data.get("form_id_value")
@@ -150,7 +150,7 @@ Adds a custom form field.
 
 		if (not isinstance(field, AbstractField)): raise TypeException("Given field type is invalid")
 
-		if (self.form_id != None
+		if (self.form_id is not None
 		    and (not field.is_id_set())
 		   ): field.set_id("{0}_{1:d}".format(self.get_form_id(), self.field_counter))
 
@@ -195,17 +195,17 @@ Parses all previously defined form fields and checks them.
 :since:  v0.1.00
 		"""
 
-		_return = (self.valid if (self.valid != None) else True)
+		_return = (self.valid if (self.valid is not None) else True)
 
-		if (self.form_store != None):
+		if (self.form_store is not None):
 		#
 			form_data = self.form_store.get_value_dict()
-			form_id_value = (self.get_input(self.form_id) if (self.form_id_value == None) else self.form_id_value)
+			form_id_value = (self.get_input(self.form_id) if (self.form_id_value is None) else self.form_id_value)
 
 			if (form_data.get("form_id_value") != form_id_value): raise TranslatableError("core_access_denied")
 		#
 
-		if (len(self.cache) > 0 and (force or self.valid == None)):
+		if (len(self.cache) > 0 and (force or self.valid is None)):
 		#
 			for section in self.cache:
 			#
@@ -265,13 +265,13 @@ untranslated as well as the translated error message.
 
 		_return =  [ ]
 
-		if (section == None): sections = self.cache_sections
+		if (section is None): sections = self.cache_sections
 		else: sections = ([ self.cache_sections[section] ] if (section in self.cache_sections) else None)
 
-		if (type(types_hidden) == list): types_hidden = [ "hidden", "info", "subtitle" ]
+		if (type(types_hidden) is list): types_hidden = [ "hidden", "info", "subtitle" ]
 		else: types_hidden += [ "hidden", "info", "subtitle" ]
 
-		if (sections != None):
+		if (sections is not None):
 		#
 			for section in sections:
 			#
@@ -334,7 +334,7 @@ Returns the field value given or transmitted.
 
 		_return = None
 
-		if (section == None): sections = self.cache
+		if (section is None): sections = self.cache
 		else: sections = ([ self.cache[self.cache_sections[section]] ] if (section in self.cache_sections) else [ ])
 
 		for section in sections:

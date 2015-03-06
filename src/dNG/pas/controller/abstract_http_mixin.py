@@ -124,8 +124,8 @@ Returns the formats the client accepts.
 		_return = [ ]
 
 		formats = self.get_header("Accept")
-		if (formats != None): formats = Header.get_field_list_dict(formats, field_separator = None)
-		if (formats == None): formats = [ ]
+		if (formats is not None): formats = Header.get_field_list_dict(formats, field_separator = None)
+		if (formats is None): formats = [ ]
 
 		for _format in formats: _return.append(_format.split(";")[0])
 
@@ -141,7 +141,7 @@ Returns the requested action.
 :since:  v0.1.00
 		"""
 
-		return ("index" if (self.action == None) else self.action)
+		return ("index" if (self.action is None) else self.action)
 	#
 
 	def get_compression_formats(self):
@@ -156,8 +156,8 @@ Returns the compression formats the client accepts.
 		_return = [ ]
 
 		formats = self.get_header("Accept-Encoding")
-		if (formats != None): formats = Header.get_field_list_dict(formats, field_separator = None)
-		if (formats == None): formats = [ ]
+		if (formats is not None): formats = Header.get_field_list_dict(formats, field_separator = None)
+		if (formats is None): formats = [ ]
 
 		for _format in formats: _return.append(_format.split(";")[0])
 
@@ -283,7 +283,7 @@ Returns the requested module.
 :since:  v0.1.00
 		"""
 
-		return ("services" if (self.module == None) else self.module)
+		return ("services" if (self.module is None) else self.module)
 	#
 
 	def _get_parent_request(self):
@@ -355,7 +355,7 @@ Returns the requested service.
 :since:  v0.1.00
 		"""
 
-		return ("index" if (self.service == None) else self.service)
+		return ("index" if (self.service is None) else self.service)
 	#
 
 	def get_session(self):
@@ -412,7 +412,7 @@ requested by the client. It will reset the response and its cached values.
 		if (isinstance(request, AbstractInnerRequest)):
 		#
 			parent_request = self._get_parent_request()
-			if (parent_request == None): parent_request = self
+			if (parent_request is None): parent_request = self
 
 			request.init(self)
 			if (not isinstance(response, AbstractResponse)): response = AbstractResponse.get_instance()
@@ -491,7 +491,7 @@ Sets the script path and name of the request.
 :since: v0.1.01
 		"""
 
-		if (script_path_name != None):
+		if (script_path_name is not None):
 		#
 			self.script_name = path.basename(script_path_name)
 			self.script_path_name = script_path_name
@@ -520,7 +520,7 @@ Returns false if accepted formats can not be identified.
 :since:  v0.1.01
 		"""
 
-		return (self._supports_headers() and self.get_header("Accept") != None)
+		return (self._supports_headers() and self.get_header("Accept") is not None)
 	#
 
 	def _supports_compression(self):
@@ -532,7 +532,7 @@ Returns false if supported compression formats can not be identified.
 :since:  v0.1.01
 		"""
 
-		return (self._supports_headers() and self.get_header("Accept-Encoding") != None)
+		return (self._supports_headers() and self.get_header("Accept-Encoding") is not None)
 	#
 
 	def _supports_headers(self):
@@ -544,7 +544,7 @@ Returns false if headers are not received.
 :since:  v0.1.00
 		"""
 
-		return (self.headers != None)
+		return (self.headers is not None)
 	#
 
 	def _supports_type(self):
@@ -556,7 +556,7 @@ Returns true if the request type is known.
 :since:  v0.1.00
 		"""
 
-		return (self.get_type() != None)
+		return (self.get_type() is not None)
 	#
 #
 

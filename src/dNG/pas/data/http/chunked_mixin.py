@@ -46,8 +46,10 @@ Returns the formats the client accepts.
 
 		data = Binary.bytes(data)
 
-		if (data == None): _return = Binary.bytes("0\r\n\r\n")
-		elif (type(data) == type(ChunkedReaderMixin.BINARY_NEWLINE) and len(data) > 0): _return = Binary.bytes("{0:x}\r\n".format(len(data))) + data + ChunkedReaderMixin.BINARY_NEWLINE
+		if (data is None): _return = Binary.bytes("0\r\n\r\n")
+		elif (type(data) is type(ChunkedReaderMixin.BINARY_NEWLINE)
+		      and len(data) > 0
+		     ): _return = Binary.bytes("{0:x}\r\n".format(len(data))) + data + ChunkedReaderMixin.BINARY_NEWLINE
 		else: _return = Binary.BYTES_TYPE()
 
 		return _return

@@ -51,12 +51,12 @@ Renders a date and time XHTML 5 tag based on the given presentation type.
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time_xhtml({1}, {2})- (#echo(__LINE__)#)", self, key, _type, context = "pas_tag_parser")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time_xhtml({1}, {2})- (#echo(__LINE__)#)", self, key, _type, context = "pas_tag_parser")
 		_return = L10n.get("core_unknown")
 
 		timestamp = self.get_source_value(source, key)
 
-		if (timestamp != None):
+		if (timestamp is not None):
 		#
 			link_attributes = { "tag": "time", "attributes": { "datetime": "{0}+00:00".format(RfcBasics.get_iso8601_datetime(timestamp)) } }
 

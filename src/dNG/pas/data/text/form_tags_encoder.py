@@ -36,10 +36,10 @@ Encodes data and validates FormTags.
              Mozilla Public License, v. 2.0
 	"""
 
-	def _change_match_center(self, data, tag_position, data_position, tag_end_position):
+	def _change_match_box(self, data, tag_position, data_position, tag_end_position):
 	#
 		"""
-Change data according to the "center" tag.
+Change data according to the "box" tag.
 
 :param tag_definition: Matched tag definition
 :param data: Data to be parsed
@@ -53,14 +53,25 @@ Change data according to the "center" tag.
 
 		_return = ""
 
-		re_object = re.match("^\\[center\\:box=(\\d+)\\]", data[tag_position:data_position])
+		tag_params = AbstractFormTags.parse_tag_parameters("box", data, tag_position, data_position)
 
-		if (re_object != None):
+		re_object = re.match("^(\\d+)$", tag_params.get("width", ""))
+
+		if (re_object is not None):
 		#
-			enclosed_data = data[data_position:tag_end_position]
 			value = int(re_object.group(1))
 
-			_return = ("[center:box={0:d}%]{1}[/center]".format(value, enclosed_data) if (value > 0 and value <= 100) else enclosed_data)
+			if (value > 0 and value <= 100): tag_params['width'] = "{0:d}%".format(re_object.group(1))
+			else: del(tag_params['width'])
+
+			enclosed_data = data[data_position:tag_end_position]
+
+			if (len(tag_params) > 0):
+			#
+				tag_params_encoded = ":".join([ "{0}={1}".format(key, value) for ( key, value ) in tag_params.items() ])
+				_return = "[box:{0}]{1}[/box]".format(tag_params_encoded, enclosed_data)
+			#
+			else: _return = enclosed_data
 		#
 
 		return _return
@@ -83,14 +94,19 @@ Change data according to the "highlight" tag.
 
 		_return = ""
 
-		re_object = re.match("^\\[highlight\\:box=(\\d+)\\]", data[tag_position:data_position])
+		tag_params = AbstractFormTags.parse_tag_parameters("highlight", data, tag_position, data_position)
 
-		if (re_object != None):
+		re_object = re.match("^(\\d+)$", tag_params.get("width", ""))
+
+		if (re_object is not None):
 		#
 			enclosed_data = data[data_position:tag_end_position]
 			value = int(re_object.group(1))
 
-			_return = ("[highlight:box={0:d}%]{1}[/highlight]".format(value, enclosed_data) if (value > 0 and value <= 100) else enclosed_data)
+			_return = ("[highlight:width={0:d}%]{1}[/highlight]".format(value, enclosed_data)
+			           if (value > 0 and value <= 100) else
+			           enclosed_data
+			          )
 		#
 
 		return _return
@@ -115,70 +131,10 @@ Change data according to the "hr" tag.
 
 		re_object = re.match("^\\[hr=(\\d+)\\]", data[tag_position:data_position])
 
-		if (re_object != None):
+		if (re_object is not None):
 		#
 			value = int(re_object.group(1))
 			if (value > 0 and value <= 100): _return = "[hr={0:d}%]".format(value)
-		#
-
-		return _return
-	#
-
-	def _change_match_justify(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
-Change data according to the "justify" tag.
-
-:param tag_definition: Matched tag definition
-:param data: Data to be parsed
-:param tag_position: Tag starting position
-:param data_position: Data starting position
-:param tag_end_position: Starting position of the closing tag
-
-:return: (str) Converted data
-:since:  v0.1.01
-		"""
-
-		_return = ""
-
-		re_object = re.match("^\\[justify\\:box=(\\d+)\\]", data[tag_position:data_position])
-
-		if (re_object != None):
-		#
-			enclosed_data = data[data_position:tag_end_position]
-			value = int(re_object.group(1))
-
-			_return = ("[justify:box={0:d}%]{1}[/justify]".format(value, enclosed_data) if (value > 0 and value <= 100) else enclosed_data)
-		#
-
-		return _return
-	#
-
-	def _change_match_left(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
-Change data according to the "left" tag.
-
-:param tag_definition: Matched tag definition
-:param data: Data to be parsed
-:param tag_position: Tag starting position
-:param data_position: Data starting position
-:param tag_end_position: Starting position of the closing tag
-
-:return: (str) Converted data
-:since:  v0.1.01
-		"""
-
-		_return = ""
-
-		re_object = re.match("^\\[left\\:box=(\\d+)\\]", data[tag_position:data_position])
-
-		if (re_object != None):
-		#
-			enclosed_data = data[data_position:tag_end_position]
-			value = int(re_object.group(1))
-
-			_return = ("[left:box={0:d}%]{1}[/left]".format(value, enclosed_data) if (value > 0 and value <= 100) else enclosed_data)
 		#
 
 		return _return
@@ -203,42 +159,12 @@ Change data according to the "margin" tag.
 
 		re_object = re.match("^\\[margin=(\\d+)\\]", data[tag_position:data_position])
 
-		if (re_object != None):
+		if (re_object is not None):
 		#
 			enclosed_data = data[data_position:tag_end_position]
 			value = int(re_object.group(1))
 
 			_return = ("[margin={0:d}%]{1}[/margin]".format(value, enclosed_data) if (value > 0 and value <= 100) else enclosed_data)
-		#
-
-		return _return
-	#
-
-	def _change_match_right(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
-Change data according to the "right" tag.
-
-:param tag_definition: Matched tag definition
-:param data: Data to be parsed
-:param tag_position: Tag starting position
-:param data_position: Data starting position
-:param tag_end_position: Starting position of the closing tag
-
-:return: (str) Converted data
-:since:  v0.1.01
-		"""
-
-		_return = ""
-
-		re_object = re.match("^\\[right\\:box=(\\d+)\\]", data[tag_position:data_position])
-
-		if (re_object != None):
-		#
-			enclosed_data = data[data_position:tag_end_position]
-			value = int(re_object.group(1))
-
-			_return = ("[right:box={0:d}%]{1}[/right]".format(value, enclosed_data) if (value > 0 and value <= 100) else enclosed_data)
 		#
 
 		return _return
@@ -263,7 +189,7 @@ Change data according to the "size" tag.
 
 		re_object = re.match("^\\[size=(\\d+)\\]", data[tag_position:data_position])
 
-		if (re_object != None):
+		if (re_object is not None):
 		#
 			enclosed_data = data[data_position:tag_end_position]
 			value = int(re_object.group(1))
@@ -290,6 +216,30 @@ Check if a possible tag match is a valid "b" tag that needs to be changed.
 		return False
 	#
 
+	def _check_match_box(self, data):
+	#
+		"""
+Check if a possible tag match is a valid "box" tag that needs to be changed.
+
+:param data: Data starting with the possible tag
+
+:return: (bool) True if change required
+:since:  v0.1.01
+		"""
+
+		_return = False
+
+		tag_element_end_position = self._find_tag_end_position(data, 4)
+
+		if (tag_element_end_position > 5):
+		#
+			tag_params = FormTagsEncoder.parse_tag_parameters("box", data, 0, tag_element_end_position)
+			_return = ("width" in tag_params and re.match("^\\d+$", tag_params['width']) is not None)
+		#
+
+		return _return
+	#
+
 	def _check_match_center(self, data):
 	#
 		"""
@@ -302,7 +252,7 @@ changed.
 :since:  v0.1.01
 		"""
 
-		return (re.match("^\\[center\\:box=(\\d+)\\]", data) != None)
+		return False
 	#
 
 	def _check_match_color(self, data):
@@ -376,7 +326,15 @@ changed.
 :since:  v0.1.01
 		"""
 
-		return (re.match("^\\[highlight\\:box=(\\d+)\\]", data) != None)
+		tag_element_end_position = self._find_tag_end_position(data, 10)
+
+		if (tag_element_end_position > 11):
+		#
+			tag_params = FormTagsEncoder.parse_tag_parameters("highlight", data, 0, tag_element_end_position)
+			_return = ("width" in tag_params and re.match("^\\d+$", tag_params['width']) is not None)
+		#
+
+		return (re.match("^\\[highlight\\:width=(\\d+)\\]", data) is not None)
 	#
 
 	def _check_match_hr(self, data):
@@ -390,7 +348,7 @@ Check if a possible tag match is a valid "hr" tag that needs to be changed.
 :since:  v0.1.01
 		"""
 
-		return (re.match("^\\[hr=(\\d+)\\]", data) != None)
+		return (re.match("^\\[hr=(\\d+)\\]", data) is not None)
 	#
 
 	def _check_match_i(self, data):
@@ -433,7 +391,7 @@ changed.
 :since:  v0.1.01
 		"""
 
-		return (re.match("^\\[justify\\:box=(\\d+)\\]", data) != None)
+		return False
 	#
 
 	def _check_match_left(self, data):
@@ -448,7 +406,7 @@ changed.
 :since:  v0.1.01
 		"""
 
-		return (re.match("^\\[left\\:box=(\\d+)\\]", data) != None)
+		return False
 	#
 
 	def _check_match_link(self, data):
@@ -492,7 +450,7 @@ changed.
 :since:  v0.1.01
 		"""
 
-		return (re.match("^\\[margin=(\\d+)\\]", data) != None)
+		return (re.match("^\\[margin=(\\d+)\\]", data) is not None)
 	#
 
 	def _check_match_quote(self, data):
@@ -522,7 +480,7 @@ changed.
 :since:  v0.1.01
 		"""
 
-		return (re.match("^\\[right\\:box=(\\d+)\\]", data) != None)
+		return False
 	#
 
 	def _check_match_s(self, data):
@@ -551,7 +509,7 @@ changed.
 :since:  v0.1.01
 		"""
 
-		return (re.match("^\\[size=(\\d+)\\]", data) != None)
+		return (re.match("^\\[size=(\\d+)\\]", data) is not None)
 	#
 
 	def _check_match_title(self, data):

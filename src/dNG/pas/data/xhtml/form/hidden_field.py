@@ -47,7 +47,7 @@ Checks if the field value is valid.
 :since:  v0.1.01
 		"""
 
-		if (self.valid == None or force): self.valid = (self.value != None)
+		if (self.valid is None or force): self.valid = (self.value is not None)
 		return AbstractField.check(self, force)
 	#
 

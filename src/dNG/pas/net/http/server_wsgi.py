@@ -60,7 +60,7 @@ Cache instance
 Timestamp of service initialisation
 		"""
 
-		if (self.cache_instance != None): self.cache_instance.disable()
+		if (self.cache_instance is not None): self.cache_instance.disable()
 
 		# Call super after we disabled the cache
 		ServerImplementation.__init__(self)
@@ -71,7 +71,7 @@ Timestamp of service initialisation
 		Hook.register_weakref("dNG.pas.Status.getTimeStarted", self.get_time_started)
 		Hook.register_weakref("dNG.pas.Status.getUptime", self.get_uptime)
 
-		if (self.log_handler != None):
+		if (self.log_handler is not None):
 		#
 			Hook.set_log_handler(self.log_handler)
 			NamedLoader.set_log_handler(self.log_handler)
@@ -95,7 +95,7 @@ mod_wsgi may already have removed globals at this stage.
 :since: v0.1.00
 		"""
 
-		if (Hook != None): Hook.free()
+		if (Hook is not None): Hook.free()
 	#
 
 	def __iter__(self):

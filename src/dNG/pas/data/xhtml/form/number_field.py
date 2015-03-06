@@ -46,7 +46,7 @@ Checks if the field value is valid.
 :since:  v0.1.01
 		"""
 
-		if (self.valid == None or force): self.valid = self._check_range()
+		if (self.valid is None or force): self.valid = self._check_range()
 		return AbstractField.check(self, force)
 	#
 

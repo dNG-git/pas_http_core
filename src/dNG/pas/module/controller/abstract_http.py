@@ -90,7 +90,7 @@ Execute the requested action.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("{0!r} identified action '{1}'", self, self.action, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("{0!r} identified action '{1}'", self, self.action, context = "pas_http_core")
 		method = "execute_{0}".format(re.sub("\\W", "_", self.action))
 
 		if (hasattr(self, method)):
@@ -104,7 +104,7 @@ Execute the requested action.
 			raise TranslatableException("core_unsupported_command", value = "Identified action '{0}' is not supported".format(self.action))
 		#
 
-		return ("" if (self.action_result == None) else self.action_result)
+		return ("" if (self.action_result is None) else self.action_result)
 	#
 
 	def set_action(self, action, context = None):
@@ -122,8 +122,8 @@ Sets an block action for execution.
 		self.context = context
 		self.primary_action = False
 
-		if (self.request == None): self.request = AbstractRequest.get_instance()
-		if (self.response == None): self.response = AbstractResponse.get_instance()
+		if (self.request is None): self.request = AbstractRequest.get_instance()
+		if (self.response is None): self.response = AbstractResponse.get_instance()
 	#
 
 	def set_action_result(self, result):

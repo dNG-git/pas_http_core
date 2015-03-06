@@ -70,11 +70,11 @@ Reads from the current streamer session.
 
 		_return = AbstractEncapsulated.read(self, _bytes)
 
-		is_data_uncompressed = (self.compressor != None)
+		is_data_uncompressed = (self.compressor is not None)
 
 		while (is_data_uncompressed):
 		#
-			if (_return == None):
+			if (_return is None):
 			#
 				_return = self.compressor.flush()
 				self.compressor = None

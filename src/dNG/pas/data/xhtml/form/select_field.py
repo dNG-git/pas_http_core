@@ -18,12 +18,13 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+from dNG.pas.data.binary import Binary
 from dNG.pas.data.xhtml.formatting import Formatting
 from dNG.pas.runtime.type_exception import TypeException
 from .abstract_field import AbstractField
 from .choices_mixin import ChoicesMixin
 
-class SelectField(AbstractField, ChoicesMixin):
+class SelectField(ChoicesMixin, AbstractField):
 #
 	"""
 "SelectField" provides a selectbox to select one option.
@@ -64,7 +65,7 @@ Checks if the field value is valid.
 :since:  v0.1.01
 		"""
 
-		if (self.valid == None or force):
+		if (self.valid is None or force):
 		#
 			if (len(self.choices) < 1): self.error_data = "internal_error"
 			elif (self.required and len(self.values_selected) < 1): self.error_data = "required_element"
@@ -85,35 +86,6 @@ Check if the given value has been selected.
 		"""
 
 		return (self.value == value)
-	#
-
-	def _get_content(self):
-	#
-		"""
-Returns the field content.
-
-:return: (str) Field content
-:since:  v0.1.01
-		"""
-
-		_return = [ ]
-
-		for choice in self.choices:
-		#
-			if ("value" in choice):
-			#
-				choice['value'] = Formatting.escape(choice['value'])
-
-				choice['title'] = (Formatting.escape(choice['title'])
-				                   if ("title" in choice) else
-				                   choice['value']
-				                  )
-
-				_return.append(choice)
-			#
-		#
-
-		return _return
 	#
 
 	def get_type(self):
@@ -169,12 +141,17 @@ Renders the given field.
 :since:  v0.1.01
 		"""
 
+		if (self.size == SelectField.SIZE_MEDIUM): rows = 4
+		elif (self.size == SelectField.SIZE_LARGE): rows = 8
+		else: rows = 1
+
 		context = { "id": "pas_{0}".format(Formatting.escape(self.get_id())),
 		            "name": Formatting.escape(self.name),
 		            "title": Formatting.escape(self.get_title()),
 		            "choices": self._get_content(),
+		            "rows": rows,
 		            "required": self.required,
-		            "error_message": ("" if (self.error_data == None) else Formatting.escape(self.get_error_message()))
+		            "error_message": ("" if (self.error_data is None) else Formatting.escape(self.get_error_message()))
 		          }
 
 		return self._render_oset_file("core/form/select", context)
@@ -203,6 +180,14 @@ Sets the field value.
 
 :since: v0.1.01
 		"""
+
+		value = Binary.str(value)
+
+		if (not isinstance(value, str)):
+		#
+			value = Binary.str(value)
+			if (type(value) is not str): value = str(value)
+		#
 
 		self.value = value
 

@@ -72,7 +72,9 @@ Returns a dict of parameters to be used with a Link instance.
 			if ("a" in data): _return['a'] = data['a']
 			if ("dsd" in data): _return['dsd'] = re.sub("\\_\\_\\w+\\\\_\\_", "", data['dsd'])
 		#
-		elif ("tag" in data and self.datalinker_main_id != None): _return = { "m": "datalinker", "a": "related", "dsd": { "otag": data['tag'], "omid": self.datalinker_main_id } }
+		elif ("tag" in data
+		      and self.datalinker_main_id is not None
+		     ): _return = { "m": "datalinker", "a": "related", "dsd": { "otag": data['tag'], "omid": self.datalinker_main_id } }
 
 		return _return
 	#
@@ -89,8 +91,8 @@ Renders a link ready for output.
 :since:  v0.1.01
 		"""
 
-		if ("type" in data): link_type = (data['type'] if (type(data['type']) == int) else Link.get_type(data['type']))
-		else: link_type = Link.TYPE_RELATIVE
+		if ("type" in data): link_type = (data['type'] if (type(data['type']) is int) else Link.get_type_int(data['type']))
+		else: link_type = Link.TYPE_RELATIVE_URL
 
 		link_parameters = self._get_link_parameters(data)
 
@@ -110,7 +112,7 @@ Renders a link with the parsed parameters ready for output.
 :since:  v0.1.01
 		"""
 
-		return "{0} ({1})".format(content, Link.get_preferred().build_url((Link.TYPE_ABSOLUTE & link_type), link_parameters))
+		return "{0} ({1})".format(content, Link.get_preferred().build_url((Link.TYPE_ABSOLUTE_URL & link_type), link_parameters))
 	#
 
 	def set_datalinker_main_id(self, id_main):

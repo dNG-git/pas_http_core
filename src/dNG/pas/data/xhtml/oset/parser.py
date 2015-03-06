@@ -34,7 +34,7 @@ from dNG.pas.data.xhtml.tag_parser.rewrite_safe_xhtml_mixin import RewriteSafeXh
 from dNG.pas.data.xhtml.tag_parser.rewrite_user_xhtml_mixin import RewriteUserXhtmlMixin
 from dNG.pas.module.named_loader import NamedLoader
 
-class Parser(AbstractTagParser, BlockMixin, EachMixin, IfConditionMixin, RewriteDateTimeXhtmlMixin, RewriteFormTagsXhtmlMixin, RewriteSafeXhtmlMixin, RewriteUserXhtmlMixin):
+class Parser(BlockMixin, EachMixin, IfConditionMixin, RewriteDateTimeXhtmlMixin, RewriteFormTagsXhtmlMixin, RewriteSafeXhtmlMixin, RewriteUserXhtmlMixin, AbstractTagParser):
 #
 	"""
 The OSet parser takes a template string to render the output.
@@ -99,16 +99,16 @@ Change data according to the matched tag.
 		#
 			re_result = re.match("^\\[block(:(\\w+):([\\w\\.]+)){0,1}\\]", data[tag_position:data_position])
 
-			if (re_result != None):
+			if (re_result is not None):
 			#
-				if (re_result.group(1) != None):
+				if (re_result.group(1) is not None):
 				#
 					source = re_result.group(2)
 					key = re_result.group(3)
 				#
 				else: source = None
 
-				if (source == None): _return += self.render_block(data[data_position:tag_end_position])
+				if (source is None): _return += self.render_block(data[data_position:tag_end_position])
 				elif (source == "content"): _return += self.render_block(data[data_position:tag_end_position], "content", self._update_mapped_element("content", self.content), key)
 				elif (source == "settings"): _return += self.render_block(data[data_position:tag_end_position], "settings", self._update_mapped_element("settings", Settings.get_dict()), key)
 			#
@@ -117,9 +117,9 @@ Change data according to the matched tag.
 		#
 			re_result = re.match("^\\[each:(\\w+):([\\w\\.]+):([\\w\\.]+)\\]", data[tag_position:data_position])
 
-			source = (None if (re_result == None) else re_result.group(1))
+			source = (None if (re_result is None) else re_result.group(1))
 
-			if (source != None):
+			if (source is not None):
 			#
 				key = re_result.group(2)
 				mapping_key = re_result.group(3)
@@ -132,9 +132,9 @@ Change data according to the matched tag.
 		#
 			re_result = re.match("^\\[if:(\\w+):([\\w\\.]+)(\\s*)(\\!=|==)(.*?)\\]", data[tag_position:data_position])
 
-			source = (None if (re_result == None) else re_result.group(1))
+			source = (None if (re_result is None) else re_result.group(1))
 
-			if (source != None):
+			if (source is not None):
 			#
 				key = re_result.group(2)
 				operator = re_result.group(4)
@@ -169,7 +169,7 @@ Change data according to the matched tag.
 			elif (source == "timestamp"):
 			#
 				re_result = re.match("^\\[rewrite:timestamp:([\\w]+)\\]", data[tag_position:data_position])
-				_return += self.render_rewrite_date_time_xhtml(self._update_mapped_element("content", self.content), key, ("date_time_short" if (re_result == None) else re_result.group(1)))
+				_return += self.render_rewrite_date_time_xhtml(self._update_mapped_element("content", self.content), key, ("date_time_short" if (re_result is None) else re_result.group(1)))
 			#
 			elif (source == "user_author_bar"): _return += self.render_rewrite_user_xhtml_author_bar(self._update_mapped_element("content", self.content), key)
 			elif (source == "user_linked"): _return += self.render_rewrite_user_xhtml_link(self._update_mapped_element("content", self.content), key)
@@ -199,7 +199,7 @@ Check if a possible tag match is a false positive.
 		tags = [ "block", "each", "if", "link", "rewrite" ]
 		tags_length = len(tags)
 
-		while (_return == None and i < tags_length):
+		while (_return is None and i < tags_length):
 		#
 			tag = tags[i]
 			data_match = data[1:1 + len(tag)]
@@ -207,28 +207,28 @@ Check if a possible tag match is a false positive.
 			if (data_match == "block"):
 			#
 				re_result = re.match("^\\[block(:\\w+:[\\w\\.]+){0,1}\\]", data)
-				if (re_result != None): _return = { "tag": "block", "tag_end": "[/block]", "type": "top_down" }
+				if (re_result is not None): _return = { "tag": "block", "tag_end": "[/block]", "type": "top_down" }
 			#
 			elif (data_match == "each"):
 			#
 				re_result = re.match("^\\[each:\\w+:[\\w\\.]+:[\\w\\.]+\\]", data)
-				if (re_result != None): _return = { "tag": "each", "tag_end": "[/each]", "type": "top_down" }
+				if (re_result is not None): _return = { "tag": "each", "tag_end": "[/each]", "type": "top_down" }
 			#
 			elif (data_match == "if"):
 			#
 				re_result = re.match("^\\[if:\\w+:[\\w\\.]+\\s*(\\!=|==).*?\\]", data)
-				if (re_result != None): _return = { "tag": "if", "tag_end": "[/if]", "type": "top_down" }
+				if (re_result is not None): _return = { "tag": "if", "tag_end": "[/if]", "type": "top_down" }
 			#
 			elif (data_match == "link"):
 			#
 				re_result = re.match("^\\[link:(.+)\\]", data)
-				if (re_result != None): _return = { "tag": "link", "tag_end": "[/link]" }
+				if (re_result is not None): _return = { "tag": "link", "tag_end": "[/link]" }
 			#
 			elif (data_match == "rewrite"):
 			#
 				re_result = re.match("^\\[rewrite:(\\w+)(:[\\w:]+)*\\]", data)
 
-				if (re_result != None
+				if (re_result is not None
 				    and re_result.group(1) in ( "content",
 				                                "formtags_content",
 				                                "l10n",
@@ -261,7 +261,7 @@ Renders content ready for output from the given OSet template.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render()- (#echo(__LINE__)#)", self, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 
 		self.content = content
 		return self._parse(template_data)

@@ -54,16 +54,16 @@ Uses the given streamer if all prerequisites are met.
 		if (not isinstance(response, AbstractHttpResponse)): raise TranslatableException("pas_http_core_500")
 
 		if (not streamer.is_resource_valid()
-		    or response.get_header("Content-Type") == None
+		    or response.get_header("Content-Type") is None
 		   ): raise TranslatableException("pas_http_core_500")
 
-		if (response.get_header("Accept-Ranges") == None): response.set_header("Accept-Ranges", "bytes")
-		if (response.get_header("X-Content-Type-Options") == None): response.set_header("X-Content-Type-Options", "nosniff")
+		if (response.get_header("Accept-Ranges") is None): response.set_header("Accept-Ranges", "bytes")
+		if (response.get_header("X-Content-Type-Options") is None): response.set_header("X-Content-Type-Options", "nosniff")
 
 		is_content_length_set = False
 		is_valid = True
 
-		if (is_valid and request.get_header('range') != None):
+		if (is_valid and request.get_header('range') is not None):
 		#
 			is_valid = False
 			streamer_size = streamer.get_size()
@@ -71,7 +71,7 @@ Uses the given streamer if all prerequisites are met.
 			range_end = 0
 			re_result = re.match("^bytes(.*)=(.*)\\-(.*)$", request.get_header('range'), re.I)
 
-			if (re_result != None):
+			if (re_result is not None):
 			#
 				range_start = re.sub("(\\D+)", "", re_result.group(2))
 				range_end = re.sub("(\\D+)", "", re_result.group(3))
@@ -119,14 +119,14 @@ Uses the given streamer and URL if all prerequisites are met.
 		if (not isinstance(streamer, AbstractStreamer)): raise TranslatableException("pas_http_core_400")
 		if (not isinstance(response, AbstractHttpResponse)): raise TranslatableException("pas_http_core_500")
 
-		if (streamer == None): response.set_header("HTTP/1.1", "HTTP/1.1 501 Not Implemented", True)
+		if (streamer is None): response.set_header("HTTP/1.1", "HTTP/1.1 501 Not Implemented", True)
 		elif (streamer.open_url(url)):
 		#
-			if (response.get_header("Content-Type") == None):
+			if (response.get_header("Content-Type") is None):
 			#
 				url_ext = path.splitext(url)[1]
 				mimetype_definition = MimeType.get_instance().get(url_ext[1:])
-				if (mimetype_definition != None): response.set_header("Content-Type", mimetype_definition['type'])
+				if (mimetype_definition is not None): response.set_header("Content-Type", mimetype_definition['type'])
 			#
 
 			Streaming.handle(request, streamer, response)

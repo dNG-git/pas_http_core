@@ -125,7 +125,7 @@ Set the config for the given virtual path.
 :since: v0.1.00
 		"""
 
-		if (setup_callback != None): config['setup_callback'] = setup_callback
+		if (setup_callback is not None): config['setup_callback'] = setup_callback
 		path_normalized = path.lower()
 
 		if ("_path_prefix" not in config): config['_path_prefix'] = path_normalized

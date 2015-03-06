@@ -53,23 +53,27 @@ class Link(Uri):
 
 	# pylint: disable=unused-argument
 
-	TYPE_ABSOLUTE = 1
+	TYPE_ABSOLUTE_URL = 1
 	"""
 Absolute URLs like "http://localhost/index.py?..."
 	"""
-	TYPE_BASE_PATH = 2
+	TYPE_BASE_PATH = 8
 	"""
 Generates URLs to the base path of this application.
 	"""
-	TYPE_OPTICAL = 4
+	TYPE_OPTICAL = 16
 	"""
 Optical URLs are used to show the target address.
 	"""
-	TYPE_RELATIVE = 8
+	TYPE_PREDEFINED_URL = 4
+	"""
+Predefined URL
+	"""
+	TYPE_RELATIVE_URL = 2
 	"""
 Relative URLs like "index.py?..."
 	"""
-	TYPE_VIRTUAL_PATH = 16
+	TYPE_VIRTUAL_PATH = 32
 	"""
 Generates absolute URLs based on the "__virtual__" path parameter.
 	"""
@@ -119,14 +123,14 @@ This method appends default parameters if not already set.
 		if ("lang" not in _return):
 		#
 			request = AbstractHttpRequest.get_instance()
-			if (request != None and request.get_lang() != request.get_lang_default()): _return['lang'] = request.get_lang()
+			if (request is not None and request.get_lang() != request.get_lang_default()): _return['lang'] = request.get_lang()
 		#
 
-		if ("uuid" not in _return and Session != None):
+		if ("uuid" not in _return and Session is not None):
 		#
-			if (request == None): request = AbstractHttpRequest.get_instance()
-			session = (None if (request == None) else request.get_session())
-			if (session != None and session.is_active() and (not session.is_persistent())): _return['uuid'] = Session.get_class().get_thread_uuid()
+			if (request is None): request = AbstractHttpRequest.get_instance()
+			session = (None if (request is None) else request.get_session())
+			if (session is not None and session.is_active() and (not session.is_persistent())): _return['uuid'] = Session.get_class().get_thread_uuid()
 		#
 
 		return _return
@@ -149,18 +153,18 @@ as a source for parameters.
 :since:  v0.1.00
 		"""
 
-		if (type(_type) != int): _type = self.__class__.get_type_int(_type)
+		if (type(_type) is not int): _type = self.__class__.get_type_int(_type)
 
 		_return = self.get_url_base(_type, parameters)
 
-		if (parameters == None
+		if (parameters is None
 		    or _type & Link.TYPE_BASE_PATH == Link.TYPE_BASE_PATH
 		   ): parameters = { }
 		else: parameters = self._filter_parameters(parameters)
 
 		if (_type & Link.TYPE_VIRTUAL_PATH == Link.TYPE_VIRTUAL_PATH):
 		#
-			if (parameters == None or "__virtual__" not in parameters): raise ValueException("Virtual path URL requested but base path not defined")
+			if (parameters is None or "__virtual__" not in parameters): raise ValueException("Virtual path URL requested but base path not defined")
 
 			virtual_parameters = parameters.copy()
 
@@ -172,15 +176,15 @@ as a source for parameters.
 			del(virtual_parameters['__virtual__'])
 
 			dsds = virtual_parameters.get("dsd")
-			if (dsds != None): del(virtual_parameters['dsd'])
+			if (dsds is not None): del(virtual_parameters['dsd'])
 
 			_return += virtual_base_path
-			if (len(virtual_parameters) > 0): _return += "/" + self._build_url_formatted("{0}%20{1}", "/", virtual_parameters)
-			if (dsds != None): _return += "/" + self._build_url_formatted("dsd%20{0}%20{1}", "/", dsds)
+			if (len(virtual_parameters) > 0): _return += "/" + self._build_url_formatted("{0}+{1}", "/", virtual_parameters)
+			if (dsds is not None): _return += "/" + self._build_url_formatted("dsd+{0}+{1}", "/", dsds)
 		#
 		else:
 		#
-			parameters = self._add_default_parameters(parameters)
+			if (_type & Link.TYPE_PREDEFINED_URL != Link.TYPE_PREDEFINED_URL): parameters = self._add_default_parameters(parameters)
 
 			if (len(parameters) > 0):
 			#
@@ -205,10 +209,17 @@ A filter is required for really long URLs. First we will have a look at the
 				url_elements = urlsplit(_return)
 
 				_return = "{0}://".format(url_elements.scheme)
-				if (url_elements.username != None or url_elements.password != None): _return += "{0}:{1}@".format(("" if (url_elements.username == None) else url_elements.username), ("" if (url_elements.password == None) else url_elements.password))
-				_return += ("" if (url_elements.hostname == None) else url_elements.hostname)
 
-				if (url_elements.port != None): _return += ":{0:d}".format(url_elements.port)
+				if (url_elements.username is not None or url_elements.password is not None):
+				#
+					_return += "{0}:{1}@".format(("" if (url_elements.username is None) else url_elements.username),
+					                             ("" if (url_elements.password is None) else url_elements.password)
+					                            )
+				#
+
+				_return += ("" if (url_elements.hostname is None) else url_elements.hostname)
+
+				if (url_elements.port is not None): _return += ":{0:d}".format(url_elements.port)
 				path_length = len(url_elements.path)
 				if (path_length > 0): basepath_position = (url_elements[:-1] if (url_elements[-1:] == "/") else url_elements).path.rfind("/")
 
@@ -311,12 +322,11 @@ Builds a template-defined string containing the given URL parameters.
 
 		_return = ""
 
-		if (_escape == None): _escape = Link.encode_query_value
+		if (_escape is None): _escape = Link.encode_query_value
 
 		for key in self.__class__._build_url_sorted_parameters(parameters.keys()):
 		#
 			escaped_key = _escape(key)
-			value_type = type(parameters[key])
 
 			if (key == "dsd"):
 			#
@@ -328,7 +338,7 @@ Builds a template-defined string containing the given URL parameters.
 					_return += link_template.format("dsd", dsd_value)
 				#
 			#
-			elif (value_type == dict):
+			elif (isinstance(parameters[key], dict)):
 			#
 				for value_key in parameters[key]:
 				#
@@ -339,7 +349,7 @@ Builds a template-defined string containing the given URL parameters.
 					_return += link_template.format(escaped_key, escaped_value)
 				#
 			#
-			elif (value_type == list):
+			elif (isinstance(parameters[key], list)):
 			#
 				for value in parameters[key]:
 				#
@@ -403,25 +413,43 @@ This method filters all parameters of the type "__<KEYWORD>__".
 :since:  v0.1.00
 		"""
 
-		_return = parameters.copy()
-
-		if ("__query__" in _return):
+		if ("__query__" in parameters):
 		#
-			if (len(_return) == 1 and len(_return['__query__']) > 0):
-			#
-				_return = AbstractHttpRequest.parse_iline(InputFilter.filter_control_chars(_return['__query__']))
-				if ("dsd" in _return): _return['dsd'] = AbstractHttpRequest.parse_dsd(_return['dsd'])
-			#
-			else: del(_return['__query__'])
-		#
+			_return = { }
 
-		if (_return.get("__request__", False)):
+			if (len(parameters) == 1 and len(parameters['__query__']) > 0):
+			#
+				parameters = AbstractHttpRequest.parse_iline(InputFilter.filter_control_chars(parameters['__query__']))
+
+				for parameter in parameters:
+				#
+					_return[parameter] = (AbstractHttpRequest.parse_dsd(parameters['dsd'])
+					                      if (parameter == "dsd") else
+					                      Link.decode_query_value(parameters[parameter])
+					                     )
+				#
+			#
+		#
+		else: _return = parameters.copy()
+
+		if (_return.get("__link__", False)): del(_return['__link__'])
+		elif (_return.get("__request__", False)):
 		#
 			request = AbstractHttpRequest.get_instance()
-			inner_request = request.get_inner_request()
-			if (inner_request != None): request = inner_request
 
-			if (request != None):
+			if (request.is_supported("executing_request")):
+			#
+				executing_request = request.get_executing_request()
+				if (executing_request is not None): request = executing_request
+			#
+
+			if (request.is_supported("inner_request")):
+			#
+				inner_request = request.get_inner_request()
+				if (inner_request is not None): request = inner_request
+			#
+
+			if (request is not None):
 			#
 				if ("ohandler" not in _return): _return['ohandler'] = request.get_output_handler()
 				if ("m" not in _return): _return['m'] = request.get_module()
@@ -458,7 +486,7 @@ This method removes all parameters marked as "__remove__" or special ones.
 
 		for key in parameters:
 		#
-			if (type(parameters[key]) == dict and len(parameters[key]) > 0): _return[key] = self._filter_remove_parameters(parameters[key])
+			if (isinstance(parameters[key], dict) and len(parameters[key]) > 0): _return[key] = self._filter_remove_parameters(parameters[key])
 			elif (parameters[key] == "__remove__"): del(_return[key])
 		#
 
@@ -484,33 +512,38 @@ Returns the base URL for the given type and parameters.
 
 		_return = ""
 
-		if (self.scheme != None and self.path != None):
+		if (_type & Link.TYPE_PREDEFINED_URL == Link.TYPE_PREDEFINED_URL):
+		#
+			if ("__link__" not in parameters): raise ValueException("Required parameter not defined for the predefined URL")
+			_return = parameters['__link__']
+		#
+		elif (self.scheme is not None and self.path is not None):
 		#
 			_return = "{0}://".format(Binary.str(self.scheme))
-			if (self.host != None): _return += Binary.str(self.host)
+			if (self.host is not None): _return += Binary.str(self.host)
 
-			if (self.port != None):
+			if (self.port is not None):
 			#
 				port = Link._filter_well_known_port(self.scheme, self.port)
 				if (port > 0): _return += ":{0:d}".format(port)
 			#
 
-			path = ("/" if (self.path == None) else Binary.str(self.path))
+			path = ("/" if (self.path is None) else Binary.str(self.path))
 			_return += ("/" if (path == "") else path)
 		#
 		else:
 		#
 			request = AbstractHttpRequest.get_instance()
-			if (request == None): raise ValueException("Can't construct an URL from a request instance if it is not provided")
+			if (request is None): raise ValueException("Can't construct an URL from a request instance if it is not provided")
 
-			if (_type & Link.TYPE_ABSOLUTE == Link.TYPE_ABSOLUTE):
+			if (_type & Link.TYPE_ABSOLUTE_URL == Link.TYPE_ABSOLUTE_URL):
 			#
 				scheme = request.get_server_scheme()
 
 				_return = "{0}://".format(Binary.str(scheme))
 
 				host = request.get_server_host()
-				if (host != None): _return += Binary.str(host)
+				if (host is not None): _return += Binary.str(host)
 
 				port = Link._filter_well_known_port(scheme, request.get_server_port())
 				if (port > 0): _return += ":{0:d}".format(port)
@@ -535,10 +568,10 @@ Returns the base URL path for the given URL or the current handled one.
 :since:  v0.1.01
 		"""
 
-		if (self.path == None):
+		if (self.path is None):
 		#
-			if (request == None): request = AbstractHttpRequest.get_instance()
-			if (request == None): raise ValueException("Can't construct an URL from a request instance if it is not provided")
+			if (request is None): request = AbstractHttpRequest.get_instance()
+			if (request is None): raise ValueException("Can't construct an URL from a request instance if it is not provided")
 
 			script_name = request.get_script_name()
 
@@ -621,7 +654,7 @@ Filter well known ports defined for the given scheme.
 
 		_return = 0
 
-		if (port != None):
+		if (port is not None):
 		#
 			port = int(port)
 
@@ -650,10 +683,10 @@ Returns a "Link" instance based on the defined preferred URL.
 
 		url = None
 
-		if (context != None): url = Settings.get("pas_http_site_preferred_url_base_{0}".format(re.sub("\\W+", "_", context)))
-		if (url == None): url = Settings.get("pas_http_site_preferred_url_base")
+		if (context is not None): url = Settings.get("pas_http_site_preferred_url_base_{0}".format(re.sub("\\W+", "_", context)))
+		if (url is None): url = Settings.get("pas_http_site_preferred_url_base")
 
-		if (url == None): raise ValueException("Preferred URL base setting is not defined")
+		if (url is None): raise ValueException("Preferred URL base setting is not defined")
 		url_elements = urlsplit(url)
 
 		return Link(url_elements.scheme, url_elements.hostname, url_elements.port, url_elements.path)
@@ -677,9 +710,10 @@ Parses the given type parameter given as a string value.
 
 		for _type in type_set:
 		#
-			if (_type == "elink"): _return |= Link.TYPE_ABSOLUTE
-			elif (_type == "ilink"): _return |= Link.TYPE_RELATIVE
+			if (_type == "elink"): _return |= Link.TYPE_ABSOLUTE_URL
+			elif (_type == "ilink"): _return |= Link.TYPE_RELATIVE_URL
 			elif (_type == "optical"): _return |= Link.TYPE_OPTICAL
+			elif (_type == "plink"): _return |= Link.TYPE_PREDEFINED_URL
 			elif (_type == "vlink"): _return |= Link.TYPE_VIRTUAL_PATH
 		#
 

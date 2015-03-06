@@ -50,12 +50,12 @@ Renders a date and time string based on the given presentation type.
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time({1}, {2})- (#echo(__LINE__)#)", self, key, _type, context = "pas_tag_parser")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time({1}, {2})- (#echo(__LINE__)#)", self, key, _type, context = "pas_tag_parser")
 		_return = L10n.get("core_unknown")
 
 		timestamp = self.get_source_value(source, key)
 
-		if (timestamp != None):
+		if (timestamp is not None):
 		#
 			# TODO: Timezone from session
 			_return = DateTime.format_l10n(_type, int(timestamp))

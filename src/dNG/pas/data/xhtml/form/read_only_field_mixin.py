@@ -33,12 +33,12 @@ pre-defined content.
              Mozilla Public License, v. 2.0
 	"""
 
-	def set_value(self, value):
+	def _set_form_value(self, form):
 	#
 		"""
-Sets the field value.
+Sets the field value based on the given form.
 
-:param value: Field value
+:param form: Form
 
 :since: v0.1.01
 		"""

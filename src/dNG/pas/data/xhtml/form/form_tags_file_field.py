@@ -25,7 +25,7 @@ from dNG.pas.data.xhtml.formatting import Formatting
 from .abstract_field import AbstractField
 from .read_only_field_mixin import ReadOnlyFieldMixin
 
-class FormTagsFileField(AbstractField, ReadOnlyFieldMixin):
+class FormTagsFileField(ReadOnlyFieldMixin, AbstractField):
 #
 	"""
 "FormTagsFileField" adds a pre-formatted text from an external file.
@@ -73,11 +73,11 @@ Returns the field content.
 :since:  v0.1.01
 		"""
 
-		if (self.formtags_content == None
-		    and self.formtags_filepath != None
+		if (self.formtags_content is None
+		    and self.formtags_filepath is not None
 		   ): self.formtags_content = FileContent.read(self.formtags_filepath)
 
-		return ("" if (self.formtags_content == None) else self.formtags_content)
+		return ("" if (self.formtags_content is None) else self.formtags_content)
 	#
 
 	def get_type(self):
@@ -110,10 +110,10 @@ Renders the given field.
 		            "name": Formatting.escape(self.name),
 		            "title": Formatting.escape(self.get_title()),
 		            "content": (L10n.get("pas_http_core_form_error_internal_error")
-		                        if (content == None) else
+		                        if (content is None) else
 		                        renderer.render(content)
 		                       ),
-		            "error_message": ("" if (self.error_data == None) else Formatting.escape(self.get_error_message()))
+		            "error_message": ("" if (self.error_data is None) else Formatting.escape(self.get_error_message()))
 		          }
 
 		if (self.size == FormTagsFileField.SIZE_MEDIUM): context['size_percentage'] = "55%"

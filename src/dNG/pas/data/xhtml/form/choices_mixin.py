@@ -18,6 +18,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+from dNG.pas.data.binary import Binary
+from dNG.pas.data.xhtml.formatting import Formatting
 from dNG.pas.runtime.not_implemented_exception import NotImplementedException
 from dNG.pas.runtime.type_exception import TypeException
 
@@ -67,6 +69,40 @@ Check if the given value has been selected.
 		raise NotImplementedException()
 	#
 
+	def _get_content(self):
+	#
+		"""
+Returns the field content.
+
+:return: (str) Field content
+:since:  v0.1.01
+		"""
+
+		_return = [ ]
+
+		for choice in self.choices:
+		#
+			value = ""
+
+			if ("value" in choice):
+			#
+				value = Binary.str(choice['value'])
+				value = Formatting.escape(value if (isinstance(value, str)) else str(value))
+
+				choice['value'] = value
+			#
+
+			choice['title'] = (Formatting.escape(choice['title'])
+			                   if ("title" in choice) else
+			                   value
+			                  )
+
+			_return.append(choice)
+		#
+
+		return _return
+	#
+
 	def _prepare_choices(self):
 	#
 		"""
@@ -105,7 +141,18 @@ Sets the available choices.
 		"""
 
 		if (not isinstance(choices, list)): raise TypeException("Given choices type is invalid")
-		self.choices = choices
+		self.choices = [ ]
+
+		for choice in choices:
+		#
+			if ("value" in choice):
+			#
+				choice['value'] = Binary.str(choice['value'])
+				if (not isinstance(choice['value'], str)): choice['value'] = str(choice['value'])
+			#
+
+			self.choices.append(choice)
+		#
 	#
 #
 

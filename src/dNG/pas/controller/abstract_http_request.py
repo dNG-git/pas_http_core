@@ -22,11 +22,12 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 from os import path
 from time import time, timezone
+from weakref import ref
 import os
 import re
 
-try: from urllib.parse import quote, unquote
-except ImportError: from urllib import quote, unquote
+try: from urllib.parse import quote_plus, unquote_plus
+except ImportError: from urllib import quote_plus, unquote_plus
 
 from dNG.data.rfc.header import Header
 from dNG.pas.data.settings import Settings
@@ -115,6 +116,10 @@ Constructor __init__(AbstractHttpRequest)
 		"""
 Request body pointer
 		"""
+		self.executing_request = None
+		"""
+A reference of the currently executing instance.
+		"""
 		self.inner_request = None
 		"""
 A inner request is used to support protocols based on other ones (e.g.
@@ -131,6 +136,7 @@ Associated session to request
 
 		self.log_handler = NamedLoader.get_singleton("dNG.pas.data.logging.LogHandler", False)
 
+		self.supported_features['executing_request'] = True
 		self.supported_features['inner_request'] = True
 		self.supported_features['query_string'] = True
 	#
@@ -145,10 +151,10 @@ Executes the incoming request.
 
 		# pylint: disable=broad-except
 
-		if (self.inner_request != None):
+		if (self.inner_request is not None):
 		#
 			request = self.inner_request
-			if (request.get_output_handler() != None): self.output_handler = request.get_output_handler()
+			if (request.get_output_handler() is not None): self.output_handler = request.get_output_handler()
 		#
 		else: request = self
 
@@ -180,7 +186,7 @@ Executes the incoming request.
 		#
 		except Exception as handled_exception:
 		#
-			if (self.log_handler != None): self.log_handler.error(handled_exception, context = "pas_http_core")
+			if (self.log_handler is not None): self.log_handler.error(handled_exception, context = "pas_http_core")
 			response.handle_exception(None, handled_exception)
 		#
 
@@ -196,10 +202,18 @@ Executes the given request and generate content for the given response.
 :since: v0.1.00
 		"""
 
-		requested_module = request.get_module()
-		requested_service = "".join([word.capitalize() for word in request.get_service().split("_")])
+		self.executing_request = ref(request)
 
-		if (self.log_handler != None): self.log_handler.debug("{0!r} has been called for 'dNG.pas.module.controller.{1}.{2}'", self, requested_module, requested_service, context = "pas_http_core")
+		requested_module = request.get_module()
+
+		requested_service_path_elements = request.get_service().rsplit(".", 1)
+
+		requested_service_class_name = requested_service_path_elements.pop()
+		requested_service_class_name = "".join([word.capitalize() for word in requested_service_class_name.split("_")])
+
+		requested_service = ".".join(requested_service_path_elements + [ requested_service_class_name ])
+
+		if (self.log_handler is not None): self.log_handler.debug("{0!r} has been called for 'dNG.pas.module.controller.{1}.{2}'", self, requested_module, requested_service, context = "pas_http_core")
 
 		if (NamedLoader.is_defined("dNG.pas.module.controller.{0}.{1}".format(requested_module, requested_service))):
 		#
@@ -221,6 +235,18 @@ Executes the given request and generate content for the given response.
 
 			self.handle_missing_service(response)
 		#
+	#
+
+	def get_executing_request(self):
+	#
+		"""
+Returns the currently executing request instance.
+
+:return: (object) Request instance; None if not available
+:since:  v0.1.00
+		"""
+
+		return (None if (self.executing_request is None) else self.executing_request())
 	#
 
 	def get_inner_request(self):
@@ -262,10 +288,10 @@ implementation.
 		"""
 
 		content_type = InputFilter.filter_control_chars(self.get_header("Content-Type"))
-		if (content_type != None): content_type = content_type.split(";", 1)[0].lower()
+		if (content_type is not None): content_type = content_type.split(";", 1)[0].lower()
 
 		_return = (self._init_request_body(content_type)
-		           if (request_body_instance == None) else
+		           if (request_body_instance is None) else
 		           request_body_instance
 		          )
 
@@ -273,18 +299,18 @@ implementation.
 		#
 			content_length = InputFilter.filter_int(self.get_header("Content-Length"))
 
-			if (self.body_fp != None
-			    and (content_type_expected == None or (content_type != None and content_type == content_type_expected))
-			    and ((content_length != None and content_length > 0)
+			if (self.body_fp is not None
+			    and (content_type_expected is None or (content_type is not None and content_type == content_type_expected))
+			    and ((content_length is not None and content_length > 0)
 			         or "chunked" in Header.get_field_list_dict(self.get_header("Transfer-Encoding"))
 			        )
 			   ):
 			#
-				if (content_length != None): _return.set_input_size(content_length)
+				if (content_length is not None): _return.set_input_size(content_length)
 				else: _return.define_input_chunk_encoded(True)
 
 				content_encoding = self.get_header("Content-Encoding")
-				if (content_encoding != None): _return.define_input_compression(content_encoding)
+				if (content_encoding is not None): _return.define_input_compression(content_encoding)
 
 				_return.set_headers(self.get_headers())
 				_return.set_input_ptr(self.body_fp)
@@ -356,8 +382,8 @@ matching the given content type.
 
 		if (content_type == "application/x-www-form-urlencoded"): _return = RequestBodyUrlencoded()
 		elif (content_type[:10] == "multipart/"): _return = RequestBodyMultipart()
-		elif (self.get_header("Content-Length") != None
-		      or self.get_header("Transfer-Encoding") != None
+		elif (self.get_header("Content-Length") is not None
+		      or self.get_header("Transfer-Encoding") is not None
 		     ): _return = RequestBody()
 
 		return _return
@@ -379,13 +405,13 @@ Initializes the matching response instance.
 		with ExceptionLogTrap("pas_http_core"):
 		#
 			session = self.get_session()
-			session_class = (None if (Session == None) else Session.get_class())
+			session_class = (None if (Session is None) else Session.get_class())
 
-			if (session_class != None):
+			if (session_class is not None):
 			#
 				session_class.set_adapter(HttpSessionAdapter)
 
-				if (session == None):
+				if (session is None):
 				#
 					session = Session.get_class().load(session_create = False)
 					self.set_session(session)
@@ -393,12 +419,15 @@ Initializes the matching response instance.
 				else: session.set_thread_default()
 			#
 
-			if (session != None):
+			if (session is not None):
 			#
 				response.set_content_dynamic(True)
 
-				user_profile = session.get_user_profile()
-				if (user_profile != None): self.lang_default = user_profile.get_lang()
+				if (self.lang == ""):
+				#
+					user_profile = session.get_user_profile()
+					if (user_profile is not None): self.lang = user_profile.get_lang()
+				#
 			#
 		#
 
@@ -409,7 +438,7 @@ Initializes the matching response instance.
 		L10n.init("pas_core")
 		L10n.init("pas_http_core")
 
-		if (self.log_handler != None): response.set_log_handler(self.log_handler)
+		if (self.log_handler is not None): response.set_log_handler(self.log_handler)
 		response.set_charset(L10n.get("lang_charset", "UTF-8"))
 		response.set_stream_response(self._init_stream_response())
 
@@ -441,7 +470,7 @@ Parses request parameters.
 		if (self.lang_default == ""):
 		#
 			lang = InputFilter.filter_control_chars(self.get_header("Accept-Language"))
-			if (lang != None): self.lang_default = lang.lower().split(",", 1)[0]
+			if (lang is not None): self.lang_default = lang.lower().split(",", 1)[0]
 		#
 
 		self.parameters = self._get_request_parameters()
@@ -490,7 +519,7 @@ instance.
 :since:  v0.1.01
 		"""
 
-		if (virtual_config == None): _return = None
+		if (virtual_config is None): _return = None
 		elif ("path_parameters" in virtual_config and virtual_config['path_parameters']):
 		#
 			_return = NamedLoader.get_instance("dNG.pas.controller.PredefinedHttpRequest")
@@ -502,10 +531,10 @@ instance.
 
 			for encoded_parameter in encoded_parameters:
 			#
-				parameter = encoded_parameter.split(" ", 2)
+				parameter = encoded_parameter.split("+", 2)
 
-				if (len(parameter) == 2): parameters[unquote(parameter[0])] = unquote(parameter[1])
-				elif (len(parameter) == 3 and parameter[0] == "dsd"): dsds[unquote(parameter[1])] = unquote(parameter[2])
+				if (len(parameter) == 2): parameters[parameter[0]] = unquote_plus(parameter[1])
+				elif (len(parameter) == 3 and parameter[0] == "dsd"): dsds[parameter[1]] = unquote_plus(parameter[2])
 			#
 
 			if ("m" in virtual_config): _return.set_module(virtual_config['m'])
@@ -574,11 +603,11 @@ Respond the request with the given response.
 
 		with ExceptionLogTrap("pas_http_core"):
 		#
-			if (self.session != None and self.session.is_active()):
+			if (self.session is not None and self.session.is_active()):
 			#
 				user_profile = self.session.get_user_profile()
 
-				if (user_profile != None):
+				if (user_profile is not None):
 				#
 					user_profile_data = { "lang": self.lang,
 					                      "lastvisit_time": time(),
@@ -611,7 +640,7 @@ Sets the inner request object.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_inner_request()- (#echo(__LINE__)#)", self, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_inner_request()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 		self.inner_request = request
 	#
 
@@ -640,7 +669,7 @@ Filters the given parameter value.
 :since:  v0.1.01
 		"""
 
-		if (" " in value): value = quote(value)
+		if (" " in value): value = quote_plus(value, "")
 		value = AbstractHttpRequest.RE_PARAMETER_NON_WORD_START.sub("", value)
 		value = AbstractHttpRequest.RE_PARAMETER_FILTERED_CHARS.sub("", value)
 		return AbstractHttpRequest.RE_PARAMETER_NON_WORD_END.sub("", value)
@@ -676,7 +705,7 @@ Filter word parameters used for module and action statements.
 		"""
 
 		value = AbstractHttpRequest.filter_parameter(value)
-		return AbstractHttpRequest.RE_PARAMETER_FILTERED_WORD_CHARS.sub("", unquote(value))
+		return AbstractHttpRequest.RE_PARAMETER_FILTERED_WORD_CHARS.sub("", unquote_plus(value))
 	#
 
 	@staticmethod
@@ -692,8 +721,8 @@ news, topics, ... Take care for injection attacks!
 :since:  v0.1.00
 		"""
 
-		if ("+" not in dsd and AbstractHttpRequest.RE_PARAMETER_PLUS_ENCODED_CHAR.search(dsd) != None): dsd = unquote(dsd)
-		elif (" " in dsd): dsd = quote(dsd)
+		if ("+" not in dsd and AbstractHttpRequest.RE_PARAMETER_PLUS_ENCODED_CHAR.search(dsd) is not None): dsd = unquote_plus(dsd)
+		elif (" " in dsd): dsd = quote_plus(dsd, "")
 
 		dsd = AbstractHttpRequest.RE_PARAMETER_DSD_PLUS_SPAM_CHAR.sub("++", dsd)
 
@@ -704,7 +733,7 @@ news, topics, ... Take care for injection attacks!
 		#
 			dsd_element = dsd.strip().split("+", 1)
 
-			if (len(dsd_element) > 1): _return[dsd_element[0]] = InputFilter.filter_control_chars(unquote(dsd_element[1]))
+			if (len(dsd_element) > 1): _return[dsd_element[0]] = InputFilter.filter_control_chars(unquote_plus(dsd_element[1]))
 			elif (len(dsd_element[0]) > 0): _return[dsd_element[0]] = ""
 		#
 
@@ -725,7 +754,7 @@ Parse the input variables given as an URI query string.
 
 		_return = { }
 
-		if (iline != None):
+		if (iline is not None):
 		#
 			iline_list = iline.split(";")
 

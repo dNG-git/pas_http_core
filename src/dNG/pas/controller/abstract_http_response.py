@@ -132,7 +132,7 @@ Returns the current HTTP Content-Type header.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.get_content_type()- (#echo(__LINE__)#)", self, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.get_content_type()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 		self.get_header("Content-Type")
 	#
 
@@ -148,7 +148,7 @@ Returns an already defined header.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.get_header({1})- (#echo(__LINE__)#)", self, name, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.get_header({1})- (#echo(__LINE__)#)", self, name, context = "pas_http_core")
 
 		if (not self.stream_response.is_supported("headers")): return None
 		else: return self.stream_response.get_header(name, name_as_key)
@@ -226,7 +226,7 @@ Return the title set for the response.
 
 		message = L10n.get("errors_{0}".format(message), message)
 
-		if (self.errors == None): self.errors = [ { "title": L10n.get("core_title_error_critical"), "message": message } ]
+		if (self.errors is None): self.errors = [ { "title": L10n.get("core_title_error_critical"), "message": message } ]
 		else: self.errors.append({ "title": L10n.get("core_title_error_critical"), "message": message })
 	#
 
@@ -242,7 +242,7 @@ Return the title set for the response.
 
 		message = L10n.get("errors_{0}".format(message), message)
 
-		if (self.errors == None): self.errors = [ { "title": L10n.get("core_title_error"), "message": message } ]
+		if (self.errors is None): self.errors = [ { "title": L10n.get("core_title_error"), "message": message } ]
 		else: self.errors.append({ "title": L10n.get("core_title_error"), "message": message })
 	#
 
@@ -261,7 +261,7 @@ send.
 
 		is_critical = True
 
-		if (self.get_header("HTTP/1.1", True) == None):
+		if (self.get_header("HTTP/1.1", True) is None):
 		#
 			self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
 
@@ -280,10 +280,10 @@ send.
 
 		title = (L10n.get("core_title_error_critical") if (is_critical) else L10n.get("core_title_error"))
 
-		if (message == None and isinstance(exception, TranslatableException)): message = "{0:l10n_message}".format(exception)
+		if (message is None and isinstance(exception, TranslatableException)): message = "{0:l10n_message}".format(exception)
 		if (not isinstance(exception, TracedException)): exception = TracedException(str(exception), exception)
 
-		if (message == None): message = L10n.get("errors_core_unknown_error")
+		if (message is None): message = L10n.get("errors_core_unknown_error")
 		else: message = L10n.get("errors_{0}".format(message), message)
 
 		if (isinstance(exception, TracedException)): details = Binary.str(exception.get_printable_trace().replace("\n", "<br />\n"))
@@ -293,7 +293,7 @@ send.
 			details = exception.get_printable_trace()
 		#
 
-		if (self.errors == None): self.errors = [ { "title": title, "message": message, "details": details } ]
+		if (self.errors is None): self.errors = [ { "title": title, "message": message, "details": details } ]
 		else: self.errors.append({ "title": title, "message": message, "details": details })
 	#
 
@@ -309,7 +309,7 @@ compression setting and information about P3P.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.init()- (#echo(__LINE__)#)", self, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.init()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 
 		expires = self.expires
 		last_modified = self.last_modified
@@ -390,8 +390,25 @@ Sends the prepared response.
 :since: v0.1.00
 		"""
 
-		if (self.data == None): self.stream_response.send()
+		if (self.data is None): self.stream_response.send()
 		else: self.stream_response.send_data(self.data)
+	#
+
+	def send_and_finish(self):
+	#
+		"""
+Sends the prepared response and finishes all related tasks.
+
+:since: v0.1.01
+		"""
+
+		if (self.stream_response.is_supported("headers")
+		    and self.data is not None
+		    and (not self.headers_sent)
+		   ): self.set_header("Content-Length", len(self.data))
+
+		AbstractResponse.send_and_finish(self)
+		self.reset()
 	#
 
 	def send_headers(self):
@@ -432,7 +449,7 @@ Sets the charset used for the response.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_charset({1})- (#echo(__LINE__)#)", self, charset, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_charset({1})- (#echo(__LINE__)#)", self, charset, context = "pas_http_core")
 		self.charset = charset
 	#
 
@@ -459,7 +476,7 @@ Sets the content for the response.
 :since: v0.1.00
 		"""
 
-		if (self.data != None): raise IOException("Can't combine content and raw data in one response.")
+		if (self.data is not None): raise IOException("Can't combine content and raw data in one response.")
 		if (self.stream_response.is_streamer_set()): raise IOException("Can't combine a streaming object with content.")
 
 		self.content = content
@@ -476,7 +493,7 @@ the last modified timestamp with the current time.
 :since: v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_content_dynamic()- (#echo(__LINE__)#)", self, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_content_dynamic()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 
 		if (mode and self.initialized):
 		#
@@ -499,7 +516,7 @@ Sets the HTTP Content-Type header.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_content_type({1})- (#echo(__LINE__)#)", self, content_type, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_content_type({1})- (#echo(__LINE__)#)", self, content_type, context = "pas_http_core")
 		self.set_header("Content-Type", content_type)
 	#
 
@@ -519,7 +536,7 @@ Sets a cookie.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_cookie({1}, {2:d})- (#echo(__LINE__)#)", self, name, timeout, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_cookie({1}, {2:d})- (#echo(__LINE__)#)", self, name, timeout, context = "pas_http_core")
 		if (self.stream_response.is_supported("headers")): self.stream_response.set_cookie(name, value, timeout, secure_only, http_only, domain, path)
 	#
 
@@ -546,7 +563,7 @@ Sets a expires value.
 :since: v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._set_expires({1:d})- (#echo(__LINE__)#)", self, timestamp, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._set_expires({1:d})- (#echo(__LINE__)#)", self, timestamp, context = "pas_http_core")
 
 		self.expires = timestamp
 		if (self.initialized and self.stream_response.is_supported("headers") and (not self.headers_sent)): self.stream_response.set_header("Expires", RfcBasics.get_rfc5322_datetime(self.expires))
@@ -579,7 +596,7 @@ Sets a header.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_header({1})- (#echo(__LINE__)#)", self, name, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_header({1})- (#echo(__LINE__)#)", self, name, context = "pas_http_core")
 		if (self.stream_response.is_supported("headers")): self.stream_response.set_header(name, value, name_as_key, value_append)
 	#
 
@@ -606,7 +623,7 @@ Sets a last modified value.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._set_last_modified({1:d})- (#echo(__LINE__)#)", self, timestamp, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._set_last_modified({1:d})- (#echo(__LINE__)#)", self, timestamp, context = "pas_http_core")
 
 		self.last_modified = timestamp
 		if (self.initialized and self.stream_response.is_supported("headers") and (not self.headers_sent)): self.stream_response.set_header("Last-Modified", RfcBasics.get_rfc5322_datetime(self.last_modified))
@@ -623,7 +640,7 @@ given.
 :since: v0.1.00
 		"""
 
-		if (self.content != None): raise IOException("Can't combine raw data and content in one response.")
+		if (self.content is not None): raise IOException("Can't combine raw data and content in one response.")
 		if (self.stream_response.is_streamer_set()): raise IOException("Can't combine a streaming object with raw data.")
 
 		self.data = data
@@ -639,7 +656,7 @@ Sets the called script name.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_script_name({1})- (#echo(__LINE__)#)", self, script_name, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_script_name({1})- (#echo(__LINE__)#)", self, script_name, context = "pas_http_core")
 		self.script_name = script_name
 	#
 
@@ -689,7 +706,7 @@ Sets the streamer to create response data when requested.
 :since: v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("{0!r} starts streaming with an IO chunk size of {1:d}", self, streamer.get_io_chunk_size(), context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("{0!r} starts streaming with an IO chunk size of {1:d}", self, streamer.get_io_chunk_size(), context = "pas_http_core")
 		self.stream_response.set_streamer(streamer)
 	#
 
@@ -703,7 +720,7 @@ Sets the title set for the response.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_title({1})- (#echo(__LINE__)#)", self, title, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_title({1})- (#echo(__LINE__)#)", self, title, context = "pas_http_core")
 		self.title = title
 	#
 
@@ -716,7 +733,7 @@ Returns false if responses can not be streamed.
 :since:  v0.1.00
 		"""
 
-		return (False if (self.stream_response == None) else self.stream_response.is_supported("streaming"))
+		return (False if (self.stream_response is None) else self.stream_response.is_supported("streaming"))
 	#
 #
 

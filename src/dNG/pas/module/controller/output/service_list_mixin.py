@@ -88,7 +88,7 @@ Renders the content of the given service list file.
 
 		json_data = JsonFileContent.read(file_path_name)
 
-		if (type(json_data) == list):
+		if (type(json_data) is list):
 		#
 			rendered_links = self._get_rendered_service_list_links(json_data)
 			if (len(rendered_links) > 0): _return = "<nav class='pageoptionsblock pageservicelist'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links))

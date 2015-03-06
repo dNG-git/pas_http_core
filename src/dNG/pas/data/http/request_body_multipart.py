@@ -68,7 +68,7 @@ python.org: Called to implement evaluation of self[key].
 :since:  v0.1.00
 		"""
 
-		if (self.parsed_data == None): self.parse()
+		if (self.parsed_data is None): self.parse()
 		return self.parsed_data[key].value
 	#
 
@@ -81,7 +81,7 @@ python.org: Return an iterator object.
 :since:  v0.1.00
 		"""
 
-		if (self.parsed_data == None): self.parse()
+		if (self.parsed_data is None): self.parse()
 		return iter(self.parsed_data)
 	#
 
@@ -94,7 +94,7 @@ python.org: Called to implement the built-in function len().
 :since:  v0.1.00
 		"""
 
-		if (self.parsed_data == None): self.parse()
+		if (self.parsed_data is None): self.parse()
 		return len(self.parsed_data)
 	#
 
@@ -106,10 +106,10 @@ Sets a given pointer for the streamed post instance.
 :since: v0.1.00
 		"""
 
-		if (self.headers == None): raise ValueException("Request body can't be read without HTTP headers")
+		if (self.headers is None): raise ValueException("Request body can't be read without HTTP headers")
 
 		byte_buffer = RequestBody.get(self)
-		if (byte_buffer != None): self.parsed_data = FieldStorage(byte_buffer, self.headers, environ = { }, keep_blank_values = True)
+		if (byte_buffer is not None): self.parsed_data = FieldStorage(byte_buffer, self.headers, environ = { }, keep_blank_values = True)
 	#
 #
 

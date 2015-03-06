@@ -48,7 +48,7 @@ Action for "index"
 
 		default_page_settings = Settings.get_lang_associated("pas_http_site_page_default", self.request.get_lang())
 
-		if (type(default_page_settings) != dict
+		if (type(default_page_settings) is not dict
 		    or ("module" not in default_page_settings
 		        and "service" not in default_page_settings
 		        and "action" not in default_page_settings
@@ -62,9 +62,12 @@ Action for "index"
 
 		if ("dsd" in default_page_settings):
 		#
-			dsd = (default_page_settings['dsd'] if (type(default_page_settings['dsd']) == dict) else AbstractHttpRequest.parse_dsd(default_page_settings['dsd']))
+			dsd = (default_page_settings['dsd']
+			       if (type(default_page_settings['dsd']) is dict) else
+			       AbstractHttpRequest.parse_dsd(default_page_settings['dsd'])
+			      )
 
-			if (type(dsd) == dict):
+			if (type(dsd) is dict):
 			#
 				for key in dsd: redirect_request.set_dsd(key, dsd[key])
 			#

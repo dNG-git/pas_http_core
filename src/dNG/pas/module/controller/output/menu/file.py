@@ -28,7 +28,7 @@ from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttp
 from dNG.pas.module.controller.output.filter_links_mixin import FilterLinksMixin
 from dNG.pas.module.controller.output.options_block_mixin import OptionsBlockMixin
 
-class File(AbstractHttpController, FilterLinksMixin, OptionsBlockMixin):
+class File(FilterLinksMixin, OptionsBlockMixin, AbstractHttpController):
 #
 	"""
 The "Main" class implements a main menu view.
@@ -50,7 +50,7 @@ Action for "render"
 :since: v0.1.00
 		"""
 
-		if (self.context != None and "file" in self.context): rendered_links = self._get_rendered_links(self.context['file'])
+		if (self.context is not None and "file" in self.context): rendered_links = self._get_rendered_links(self.context['file'])
 		else: rendered_links = self._get_rendered_links()
 
 		if (len(rendered_links) > 0): self.set_action_result("<nav class='pagemainmenu'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
@@ -67,7 +67,7 @@ Returns a list of rendered links for the service menu.
 
 		_return = [ ]
 
-		if (file_path_name == None): links = Link.get_store("mainmenu")
+		if (file_path_name is None): links = Link.get_store("mainmenu")
 		else:
 		#
 			links = None
@@ -86,10 +86,10 @@ Returns a list of rendered links for the service menu.
 			else: file_path_name = path.join(Settings.get("path_base"), file_path_name)
 
 			json_data = JsonFileContent.read(file_path_name)
-			if (type(json_data) == list): links = json_data
+			if (type(json_data) is list): links = json_data
 		#
 
-		if (links != None):
+		if (links is not None):
 		#
 			links = self._filter_links(links)
 			for link in links: _return.append(self.render_options_block_link(link, include_image))

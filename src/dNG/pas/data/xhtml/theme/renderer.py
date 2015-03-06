@@ -40,7 +40,7 @@ from dNG.pas.data.xhtml.tag_parser.block_mixin import BlockMixin
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.runtime.io_exception import IOException
 
-class Renderer(AbstractTagParser, BlockMixin, EachMixin, IfConditionMixin, RewriteMixin):
+class Renderer(BlockMixin, EachMixin, IfConditionMixin, RewriteMixin, AbstractTagParser):
 #
 	"""
 The theme renderer parses and renders a template file.
@@ -159,9 +159,9 @@ Checks if the given theme and subtype is supported.
 
 		_return = False
 
-		if (theme != None):
+		if (theme is not None):
 		#
-			file_path_name = path.join(self.path, theme.replace(".", "/"), "{0}.tsc".format("site" if (subtype == None) else subtype))
+			file_path_name = path.join(self.path, theme.replace(".", "/"), "{0}.tsc".format("site" if (subtype is None) else subtype))
 			_return = os.access(file_path_name, os.R_OK)
 		#
 
@@ -191,16 +191,16 @@ Change data according to the matched tag.
 		#
 			re_result = re.match("^\\[block(:(\\w+):([\\w\\.]+)){0,1}\\]", data[tag_position:data_position])
 
-			if (re_result != None):
+			if (re_result is not None):
 			#
-				if (re_result.group(1) != None):
+				if (re_result.group(1) is not None):
 				#
 					source = re_result.group(2)
 					key = re_result.group(3)
 				#
 				else: source = None
 
-				if (source == None): _return += self.render_block(data[data_position:tag_end_position])
+				if (source is None): _return += self.render_block(data[data_position:tag_end_position])
 				elif (source == "content"): _return += self.render_block(data[data_position:tag_end_position], "content", self._update_mapped_element("content", self.content), key)
 				elif (source == "settings"): _return += self.render_block(data[data_position:tag_end_position], "settings", self._update_mapped_element("settings", Settings.get_dict()), key)
 			#
@@ -209,9 +209,9 @@ Change data according to the matched tag.
 		#
 			re_result = re.match("^\\[each:(\\w+):([\\w\\.]+):([\\w\\.]+)\\]", data[tag_position:data_position])
 
-			source = (None if (re_result == None) else re_result.group(1))
+			source = (None if (re_result is None) else re_result.group(1))
 
-			if (source != None):
+			if (source is not None):
 			#
 				key = re_result.group(2)
 				mapping_key = re_result.group(3)
@@ -224,9 +224,9 @@ Change data according to the matched tag.
 		#
 			re_result = re.match("^\\[if:(\\w+):([\\w\\.]+)(\\s*)(\\!=|==)(.*?)\\]", data[tag_position:data_position])
 
-			source = (None if (re_result == None) else re_result.group(1))
+			source = (None if (re_result is None) else re_result.group(1))
 
-			if (source != None):
+			if (source is not None):
 			#
 				key = re_result.group(2)
 				operator = re_result.group(4)
@@ -280,7 +280,7 @@ Check if a possible tag match is a false positive.
 		tags = [ "block", "each", "if", "rewrite" ]
 		tags_length = len(tags)
 
-		while (_return == None and i < tags_length):
+		while (_return is None and i < tags_length):
 		#
 			tag = tags[i]
 			data_match = data[1:1 + len(tag)]
@@ -288,28 +288,28 @@ Check if a possible tag match is a false positive.
 			if (data_match == "block"):
 			#
 				re_result = re.match("^\\[block(:\\w+:[\\w\\.]+){0,1}\\]", data)
-				if (re_result != None): _return = { "tag": "block", "tag_end": "[/block]", "type": "top_down" }
+				if (re_result is not None): _return = { "tag": "block", "tag_end": "[/block]", "type": "top_down" }
 			#
 			elif (data_match == "each"):
 			#
 				re_result = re.match("^\\[each:\\w+:[\\w\\.]+:[\\w\\.]+\\]", data)
-				if (re_result != None): _return = { "tag": "each", "tag_end": "[/each]", "type": "top_down" }
+				if (re_result is not None): _return = { "tag": "each", "tag_end": "[/each]", "type": "top_down" }
 			#
 			elif (data_match == "if"):
 			#
 				re_result = re.match("^\\[if:\\w+:[\\w\\.]+\\s*(\\!=|==).*?\\]", data)
-				if (re_result != None): _return = { "tag": "if", "tag_end": "[/if]", "type": "top_down" }
+				if (re_result is not None): _return = { "tag": "if", "tag_end": "[/if]", "type": "top_down" }
 			#
 			elif (data_match == "link"):
 			#
 				re_result = re.match("^\\[link:(.+)\\]", data)
-				if (re_result != None): _return = { "tag": "link", "tag_end": "[/link]" }
+				if (re_result is not None): _return = { "tag": "link", "tag_end": "[/link]" }
 			#
 			elif (data_match == "rewrite"):
 			#
 				re_result = re.match("^\\[rewrite:(\\w+)(:.*|)\\]", data)
 
-				if (re_result != None
+				if (re_result is not None
 				    and re_result.group(1) in ( "content", "l10n", "settings" )
 				   ): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
 			#
@@ -333,7 +333,7 @@ Renders content ready for output from the given OSet template.
 
 		# pylint: disable=no-member
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render()- (#echo(__LINE__)#)", self, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 
 		theme = self.theme
 		theme_subtype = self.theme_subtype
@@ -346,9 +346,9 @@ Renders content ready for output from the given OSet template.
 			theme_subtype = "site"
 		#
 
-		theme_data = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_path_name))
+		theme_data = (None if (self.cache_instance is None) else self.cache_instance.get_file(file_path_name))
 
-		if (theme_data == None):
+		if (theme_data is None):
 		#
 			file_obj = File()
 			if (not file_obj.open(file_path_name, True, "r")): raise IOException("Failed to open theme file for '{0}'".format(self.theme))
@@ -357,7 +357,7 @@ Renders content ready for output from the given OSet template.
 			file_obj.close()
 
 			if (theme_data == False): raise IOException("Failed to read theme file for '{0}'".format(self.theme))
-			if (self.cache_instance != None): self.cache_instance.set_file(file_path_name, theme_data)
+			if (self.cache_instance is not None): self.cache_instance.set_file(file_path_name, theme_data)
 		#
 
 		"""
@@ -367,7 +367,7 @@ Read corresponding theme configuration
 		file_path_name = file_path_name[:-3] + "json"
 		Settings.read_file(file_path_name)
 
-		if (self.title == None): self.title = Settings.get("pas_html_title", "Unconfigured site")
+		if (self.title is None): self.title = Settings.get("pas_html_title", "Unconfigured site")
 
 		self.content = { "head_canonical_url": self.canonical_url,
 		                 "head_p3p_url": self.p3p_url,
@@ -381,7 +381,7 @@ Read corresponding theme configuration
 		css_files = (self.css_files.copy() if (hasattr(self.css_files, "copy")) else copy(self.css_files))
 		js_files = (self.js_files.copy() if (hasattr(self.js_files, "copy")) else copy(self.js_files))
 
-		if (theme_settings != None and theme_subtype in theme_settings):
+		if (theme_settings is not None and theme_subtype in theme_settings):
 		#
 			if ("css_files" in theme_settings[theme_subtype]): css_files += theme_settings[theme_subtype]['css_files']
 			if ("js_files" in theme_settings[theme_subtype]): js_files += theme_settings[theme_subtype]['js_files']
@@ -411,7 +411,7 @@ Sets the theme to use.
 		"""
 
 		theme = Binary.str(theme)
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set({1})- (#echo(__LINE__)#)", self, theme, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set({1})- (#echo(__LINE__)#)", self, theme, context = "pas_http_core")
 
 		theme = theme.replace(".", "/")
 		file_path_name = path.join(self.path, theme, "site.tsc")
@@ -459,9 +459,9 @@ given.
 :since: v0.1.00
 		"""
 
-		_type = (Link.TYPE_RELATIVE
+		_type = (Link.TYPE_RELATIVE_URL
 		         if (Settings.get("pas_http_site_canonical_url_type", "absolute") == "relative") else
-		         Link.TYPE_ABSOLUTE
+		         Link.TYPE_ABSOLUTE_URL
 		        )
 
 		self.set_canonical_url(Link().build_url(_type, parameters))
@@ -516,7 +516,7 @@ Sets the theme subtype to use.
 		"""
 
 		subtype = Binary.str(subtype)
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_subtype({1})- (#echo(__LINE__)#)", self, subtype, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_subtype({1})- (#echo(__LINE__)#)", self, subtype, context = "pas_http_core")
 
 		self.theme_subtype = subtype
 	#
@@ -531,9 +531,22 @@ Sets the title to use.
 		"""
 
 		title = Binary.str(title)
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_title({1})- (#echo(__LINE__)#)", self, title, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_title({1})- (#echo(__LINE__)#)", self, title, context = "pas_http_core")
 
 		self.title = title
+	#
+
+	@staticmethod
+	def get_default_theme():
+	#
+		"""
+Returns the default theme name.
+
+:return: (str) Theme name
+:since:  v0.1.03
+		"""
+
+		return Settings.get("pas_http_site_theme_default", "simple")
 	#
 #
 

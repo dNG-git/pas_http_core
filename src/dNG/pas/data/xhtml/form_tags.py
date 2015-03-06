@@ -70,7 +70,7 @@ Render FormTags as XHTML output and set given restrictions.
 		renderer = FormTagsRenderer()
 		renderer.set_xhtml_title_top_level(2)
 		if (not block_encoding_supported): renderer.set_blocks_supported(block_encoding_supported)
-		if (main_id != None): renderer.set_datalinker_main_id(main_id)
+		if (main_id is not None): renderer.set_datalinker_main_id(main_id)
 
 		return renderer.render(content)
 	#

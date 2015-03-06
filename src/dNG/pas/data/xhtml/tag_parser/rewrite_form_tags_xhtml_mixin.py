@@ -49,7 +49,7 @@ Renders the FormTags content for XHTML output.
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_formtags_xhtml({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_formtags_xhtml({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
 
 		content = None
 		data = self.get_source_value(source, key)
@@ -63,7 +63,7 @@ Renders the FormTags content for XHTML output.
 		#
 
 		_return = (FormTags.render(content, main_id = main_id)
-		           if (type(content) == str) else
+		           if (type(content) is str) else
 		           ""
 		          )
 

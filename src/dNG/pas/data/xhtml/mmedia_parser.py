@@ -29,7 +29,7 @@ from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.runtime.io_exception import IOException
 
-class MmediaParser(AbstractTagParser, RewriteMixin):
+class MmediaParser(RewriteMixin, AbstractTagParser):
 #
 	"""
 Parses files in the "mmedia" directory to set configured values and replace
@@ -108,7 +108,7 @@ Check if a possible tag match is a false positive.
 		tags = [ "rewrite" ]
 		tags_length = len(tags)
 
-		while (_return == None and i < tags_length):
+		while (_return is None and i < tags_length):
 		#
 			tag = tags[i]
 			data_match = data[1:1 + len(tag)]
@@ -116,7 +116,7 @@ Check if a possible tag match is a false positive.
 			if (data_match == tag and data_match == "rewrite"):
 			#
 				re_result = re.match("^\\[rewrite:(\\w+)\\]", data)
-				if (re_result != None and re_result.group(1) in ( "l10n", "settings" )): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
+				if (re_result is not None and re_result.group(1) in ( "l10n", "settings" )): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
 			#
 
 			i += 1
@@ -136,12 +136,12 @@ Renders content ready for output from the given "mmedia" file.
 :since:  v0.1.00
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, file_path_name, context = "pas_http_core")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, file_path_name, context = "pas_http_core")
 
 		file_path_name = path.normpath(file_path_name)
-		file_content = (None if (self.cache_instance == None) else self.cache_instance.get_file(file_path_name))
+		file_content = (None if (self.cache_instance is None) else self.cache_instance.get_file(file_path_name))
 
-		if (file_content == None):
+		if (file_content is None):
 		#
 			file_obj = File()
 			if (not file_obj.open(file_path_name, True, "r")): raise IOException("Failed to open mmedia file '{0}'".format(file_path_name))
@@ -150,7 +150,7 @@ Renders content ready for output from the given "mmedia" file.
 			file_obj.close()
 
 			if (file_content == False): raise IOException("Failed to read mmedia file '{0}'".format(file_path_name))
-			if (self.cache_instance != None): self.cache_instance.set_file(file_path_name, file_content)
+			if (self.cache_instance is not None): self.cache_instance.set_file(file_path_name, file_content)
 		#
 
 		return self._parse(file_content)

@@ -57,22 +57,29 @@ Filters links based on required permissions.
 
 			if ("required_permission" in link):
 			#
-				permissions = (link['required_permission'] if (type(link['required_permission']) == list) else [ link['required_permission'] ])
+				permissions = (link['required_permission']
+				               if (type(link['required_permission']) is list) else
+				               [ link['required_permission'] ]
+				              )
 
-				if (session != None): pass
+				if (session is not None): pass
 			#
-			elif ("required_permissions" in link and type(link['required_permissions']) == list):
+			elif ("required_permissions" in link and type(link['required_permissions']) is list):
 			#
 				permissions = link['required_permissions']
 
-				if (session != None): pass
+				if (session is not None): pass
 			#
 			elif ("required_user_type" in link):
 			#
-				user_profile = (None if (session == None) else session.get_user_profile())
-				user_types = (link['required_user_type'] if (type(link['required_user_type']) == list) else [ link['required_user_type'] ])
+				user_profile = (None if (session is None) else session.get_user_profile())
 
-				if (user_profile == None): is_allowed = ("gt" in user_types)
+				user_types = (link['required_user_type']
+				              if (type(link['required_user_type']) is list) else
+				              [ link['required_user_type'] ]
+				             )
+
+				if (user_profile is None): is_allowed = ("gt" in user_types)
 				else:
 				#
 					for user_type in user_types:
@@ -87,10 +94,14 @@ Filters links based on required permissions.
 			#
 			elif ("forbidden_user_type" in link):
 			#
-				user_profile = (None if (session == None) else session.get_user_profile())
-				user_types = (link['forbidden_user_type'] if (type(link['forbidden_user_type']) == list) else [ link['forbidden_user_type'] ])
+				user_profile = (None if (session is None) else session.get_user_profile())
 
-				if (user_profile == None): is_allowed = ("gt" not in user_types)
+				user_types = (link['forbidden_user_type']
+				              if (type(link['forbidden_user_type']) is list) else
+				              [ link['forbidden_user_type'] ]
+				             )
+
+				if (user_profile is None): is_allowed = ("gt" not in user_types)
 				else:
 				#
 					is_allowed = True

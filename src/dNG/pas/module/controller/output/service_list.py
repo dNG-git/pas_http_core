@@ -22,7 +22,7 @@ from dNG.pas.data.http.translatable_exception import TranslatableException
 from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 from .service_list_mixin import ServiceListMixin
 
-class ServiceList(AbstractHttpController, ServiceListMixin):
+class ServiceList(ServiceListMixin, AbstractHttpController):
 #
 	"""
 "ServiceList" is a navigation element providing links to other services.

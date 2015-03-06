@@ -72,14 +72,14 @@ Action for "view"
 		Settings.read_file("{0}/settings/pas_http_contentfiles.json".format(Settings.get("path_data")))
 
 		contentfiles = Settings.get("pas_http_contentfiles_list", { })
-		if (type(contentfiles) != dict): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
+		if (type(contentfiles) is not dict): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
 
 		if (source_iline != ""):
 		#
 			if (self.response.is_supported("html_css_files")): self.response.add_theme_css_file("mini_default_sprite.min.css")
 
 			Link.set_store("servicemenu",
-			               Link.TYPE_RELATIVE,
+			               Link.TYPE_RELATIVE_URL,
 			               L10n.get("core_back"),
 			               { "__query__": re.sub("\\_\\_\\w+\\_\\_", "", source_iline) },
 			               icon = "mini-default-back",
@@ -93,7 +93,7 @@ Action for "view"
 		   ): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
 
 		file_content = FileContent.read(contentfiles[cid]['filepath'])
-		if (file_content == None): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
+		if (file_content is None): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
 
 		if (path.splitext(contentfiles[cid]['filepath'])[1].lower() == ".ftg"): file_content = FormTags.render(file_content)
 

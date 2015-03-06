@@ -159,8 +159,9 @@ corresponding method to get valid XHTML for output.
 		_return = ""
 
 		position = -1
+		section_type = type(section)
 
-		if (type(section) == str):
+		if (section_type is str):
 		#
 			section_position = 0
 
@@ -175,7 +176,7 @@ corresponding method to get valid XHTML for output.
 				section_position += 1
 			#
 		#
-		elif (type(section) == int): position = section
+		elif (section_type is int): position = section
 
 		if (position < 0 or len(self.fields) < position): raise ValueException("Given section not found")
 
@@ -190,7 +191,7 @@ corresponding method to get valid XHTML for output.
 
 			if (_return != ""): _return += "\n"
 
-			if (type(output) == str): _return += output
+			if (type(output) is str): _return += output
 			else: _return += self._render_oset_file("core/form/error", { "error_message": L10n.get("pas_http_core_form_error_internal_error") })
 		#
 
@@ -235,7 +236,7 @@ Sets the form ID currently defined with "set_data()".
 :param form_id: Unique form ID
 		"""
 
-		self.form_id = ("pas_form_{0}".format(Binary.str(hexlify(urandom(10)))) if (form_id == None) else form_id)
+		self.form_id = ("pas_form_{0}".format(Binary.str(hexlify(urandom(10)))) if (form_id is None) else form_id)
 	#
 
 	def set_oset(self, oset):

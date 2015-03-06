@@ -22,7 +22,7 @@ from dNG.pas.data.xhtml.link import Link
 from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 from dNG.pas.module.controller.output.options_block_mixin import OptionsBlockMixin
 
-class Service(AbstractHttpController, OptionsBlockMixin):
+class Service(OptionsBlockMixin, AbstractHttpController):
 #
 	"""
 The "Service" class implements a service menu view.

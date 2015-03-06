@@ -20,8 +20,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 # pylint: disable=import-error,no-name-in-module
 
-try: from urllib.parse import quote, unquote
-except ImportError: from urllib import quote, unquote
+try: from urllib.parse import quote_plus, unquote_plus
+except ImportError: from urllib import quote_plus, unquote_plus
 
 from dNG.pas.data.text.input_filter import InputFilter
 
@@ -51,7 +51,7 @@ Decode special characters from a RFC 2396 compliant URI.
 :since:  v0.1.00
 		"""
 
-		data = unquote(data)
+		data = unquote_plus(data)
 		return InputFilter.filter_control_chars(data).strip()
 	#
 
@@ -67,9 +67,9 @@ Encode special characters for a RFC 2396 compliant URI.
 :since:  v0.1.00
 		"""
 
-		if (type(data) != str): data = str(data)
+		if (not isinstance(data, str)): data = str(data)
 		data = InputFilter.filter_control_chars(data).strip()
-		return quote(data, "")
+		return quote_plus(data, "")
 	#
 #
 

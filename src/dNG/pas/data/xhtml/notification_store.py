@@ -129,7 +129,7 @@ Get the NotificationStore singleton.
 
 		store = AbstractResponse.get_instance_store()
 
-		if (store == None): raise IOException("Response store not available")
+		if (store is None): raise IOException("Response store not available")
 		if ("dNG.pas.data.xhtml.NotificationStore" not in store): store['dNG.pas.data.xhtml.NotificationStore'] = { }
 		if (context not in store['dNG.pas.data.xhtml.NotificationStore']): store['dNG.pas.data.xhtml.NotificationStore'][context] = [ ]
 
@@ -137,7 +137,7 @@ Get the NotificationStore singleton.
 	#
 
 	@staticmethod
-	def get_type(_type):
+	def get_type_int(_type):
 	#
 		"""
 Parses the given type parameter given as a string value.
@@ -166,7 +166,7 @@ Returns a string representing the given type.
 :since:  v0.1.00
 		"""
 
-		if (type(_type) != int): _type = NotificationStore.get_type(_type)
+		if (type(_type) is not int): _type = NotificationStore.get_type_int(_type)
 
 		if (_type & NotificationStore.TYPE_COMPLETED_INFO == NotificationStore.TYPE_COMPLETED_INFO): _return = "completed_info"
 		elif (_type & NotificationStore.TYPE_INFO == NotificationStore.TYPE_INFO): _return = "info"

@@ -59,7 +59,7 @@ Action for "index"
 
 		self.response.set_header("X-Robots-Tag", "noindex")
 
-		if (dfile != None and dfile != ""):
+		if (dfile is not None and dfile != ""):
 		#
 			file_path_name = path.abspath("{0}/mmedia/{1}".format(Settings.get("path_data"), dfile))
 
@@ -68,8 +68,8 @@ Action for "index"
 				if (file_path_name.endswith(".paslink.url")):
 				#
 					file_content = FileContent.read(file_path_name)
-					if (file_content != None): file_content = path.normpath(file_content)
-					file_path_name = ("" if (file_content == None or (not path.exists(file_content)) or (not os.access(file_content, os.R_OK))) else file_content)
+					if (file_content is not None): file_content = path.normpath(file_content)
+					file_path_name = ("" if (file_content is None or (not path.exists(file_content)) or (not os.access(file_content, os.R_OK))) else file_content)
 				#
 			#
 			else: file_path_name = ""
@@ -84,7 +84,7 @@ Action for "index"
 		#
 			is_valid = True
 
-			if (is_last_modified_supported and self.request.get_header("If-Modified-Since") != None):
+			if (is_last_modified_supported and self.request.get_header("If-Modified-Since") is not None):
 			#
 				last_modified_on_client = RfcBasics.get_rfc7231_timestamp(self.request.get_header("If-Modified-Since").split(";")[0])
 
@@ -112,7 +112,7 @@ Action for "index"
 		#
 			re_tsc_result = re.search("\\.tsc\\.(css|js|min\\.css|min\\.js|min\\.svg|svg)$", file_path_name, re.I)
 
-			self.response.set_content_dynamic(re_tsc_result != None)
+			self.response.set_content_dynamic(re_tsc_result is not None)
 			self.response.init(True)
 
 			if (is_last_modified_supported):
@@ -121,7 +121,7 @@ Action for "index"
 				self.response.set_last_modified(last_modified_on_server)
 			#
 
-			if (re_tsc_result != None):
+			if (re_tsc_result is not None):
 			#
 				file_extension = re_tsc_result.group(1)
 
@@ -138,13 +138,13 @@ Action for "index"
 
 				streamer = NamedLoader.get_instance("dNG.pas.data.streamer.File", False)
 
-				if (streamer == None): self.response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+				if (streamer is None): self.response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
 				else: Streaming.handle_url(self.request, streamer, "file:///{0}".format(file_path_name), self.response)
 			#
 		#
 		elif (not is_valid):
 		#
-			if (self.log_handler != None): self.log_handler.warning("#echo(__FILEPATH__)# -Cache.execute_index()- reporting: Failed opening {0} - file not readable", dfile, context = "pas_http_core")
+			if (self.log_handler is not None): self.log_handler.warning("#echo(__FILEPATH__)# -Cache.execute_index()- reporting: Failed opening {0} - file not readable", dfile, context = "pas_http_core")
 			self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
 		#
 	#

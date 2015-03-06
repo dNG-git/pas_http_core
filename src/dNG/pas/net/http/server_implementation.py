@@ -124,7 +124,7 @@ Returns the configured server host.
 :since:  v0.1.00
 		"""
 
-		return (self.host if (last_return == None) else last_return)
+		return (self.host if (last_return is None) else last_return)
 	#
 
 	def get_port(self, params = None, last_return = None):
@@ -139,7 +139,7 @@ Returns the configured server port.
 :since:  v0.1.00
 		"""
 
-		return (self.port if (last_return == None) else last_return)
+		return (self.port if (last_return is None) else last_return)
 	#
 
 	def start(self, params = None, last_return = None):

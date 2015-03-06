@@ -55,7 +55,7 @@ Returns the placeholder.
 :since:  v0.1.01
 		"""
 
-		return ("" if (self.placeholder == None) else self.placeholder)
+		return ("" if (self.placeholder is None) else self.placeholder)
 	#
 
 	def set_placeholder(self, placeholder):

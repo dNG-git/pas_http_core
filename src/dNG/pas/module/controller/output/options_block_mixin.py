@@ -56,7 +56,7 @@ Adds the requested CSS sprites to the output.
 			css_sprites = [ ]
 
 			if (isinstance(css_sprite_data, list)): css_sprites = css_sprite_data
-			elif (type(css_sprite_data) == str): css_sprites.append(css_sprite_data)
+			elif (type(css_sprite_data) is str): css_sprites.append(css_sprite_data)
 
 			if (len(css_sprites) > 0):
 			#
@@ -122,20 +122,31 @@ Renders a link.
 
 		if ("title" in data and "type" in data and "parameters" in data):
 		#
-			_type = (data['type'] if (type(data['type']) == int) else Link.get_type_int(data['type']))
+			_type = (data['type'] if (type(data['type']) is int) else Link.get_type_int(data['type']))
 
 			url = Link().build_url(_type, data['parameters'])
 			xml_parser = XmlParser()
 
 			is_js_required = (_type & Link.TYPE_JS_REQUIRED == Link.TYPE_JS_REQUIRED)
-			link_id = None
+			link_id = data.get("id")
 
 			if (is_js_required):
 			#
-				link_id = "pas_id_{0}".format(Md5.hash("pas_http_core_url_{0}_{1:d}_{2:d}".format(url, id(data), id(self))))
+				if (link_id is None):
+				#
+					link_id = Md5.hash("pas_http_core_url_{0}_{1:d}_{2:d}".format(url, id(data), id(self)))
+					link_id = "pas_id_{0}".format(link_id)
+				#
+
 				_return = xml_parser.dict_to_xml_item_encoder({ "tag": "span", "attributes": { "data-href": url, "id": link_id, "title": L10n.get("pas_http_core_js_required"), "class": "pageurl_requirements_unsupported" } }, False)
 			#
-			else: _return = xml_parser.dict_to_xml_item_encoder({ "tag": "a", "attributes": { "href": url } }, False)
+			else:
+			#
+				link_attributes = { "href": url }
+				if (link_id is not None): link_attributes['id'] = link_id
+
+				_return = xml_parser.dict_to_xml_item_encoder({ "tag": "a", "attributes": link_attributes }, False)
+			#
 
 			l10n_title_id = "title_{0}".format(self.request.get_lang())
 			title = (data[l10n_title_id] if (l10n_title_id in data) else data['title'])
@@ -150,8 +161,8 @@ Renders a link.
 
 			l10n_description_id = "description_{0}".format(self.request.get_lang())
 			description = (data[l10n_description_id] if (l10n_description_id in data) else None)
-			if (description == None and "description" in data): description = data['description']
-			if (description != None): _return += "<br />\n{0}".format(FormTags.render(description))
+			if (description is None and "description" in data): description = data['description']
+			if (description is not None): _return += "<br />\n{0}".format(FormTags.render(description))
 
 			if (is_js_required):
 			#

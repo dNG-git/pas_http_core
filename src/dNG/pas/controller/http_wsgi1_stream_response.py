@@ -24,7 +24,7 @@ from dNG.pas.data.streamer.http_wsgi1 import HttpWsgi1 as HttpWsgi1Streamer
 from dNG.pas.runtime.iterator import Iterator
 from .abstract_http_stream_response import AbstractHttpStreamResponse
 
-class HttpWsgi1StreamResponse(AbstractHttpStreamResponse, Iterator):
+class HttpWsgi1StreamResponse(Iterator, AbstractHttpStreamResponse):
 #
 	"""
 This stream response instance will write all data to the underlying WSGI 1.0
@@ -79,9 +79,9 @@ python.org: Return an iterator object.
 
 		_return = self
 
-		if (self.streamer != None and self.wsgi_file_wrapper != None):
+		if (self.streamer is not None and self.wsgi_file_wrapper is not None):
 		#
-			if (self.compressor != None):
+			if (self.compressor is not None):
 			#
 				streamer = HttpCompressedStreamer(self.streamer, self.compressor)
 				self.compressor = None
@@ -112,19 +112,19 @@ python.org: Return the next item from the container.
 This iterator is only called for uncompressed data.
 			"""
 
-			if (self.streamer != None):
+			if (self.streamer is not None):
 			#
 				_return = (None if (self.streamer.is_eof()) else self.streamer.read())
-				if (_return != None): _return = self._prepare_output_data(_return)
+				if (_return is not None): _return = self._prepare_output_data(_return)
 			#
-			elif (self.data != None):
+			elif (self.data is not None):
 			#
 				_return = self.data
 				self.data = None
 			#
 		#
 
-		if (_return == None):
+		if (_return is None):
 		#
 			self.finish()
 			raise StopIteration()
@@ -178,7 +178,7 @@ Sends the prepared response headers.
 
 		for header_name in filtered_headers:
 		#
-			if (type(header_name) == int):
+			if (type(header_name) is int):
 			#
 				header_value = str(filtered_headers[header_name])
 				header_name = headers_indexed[header_name]
@@ -186,7 +186,7 @@ Sends the prepared response headers.
 				if (header_name == "HTTP/1.1"): http_status_line = header_value[9:]
 				else: headers.append(( header_name, header_value ))
 			#
-			elif (type(filtered_headers[header_name]) == list):
+			elif (type(filtered_headers[header_name]) is list):
 			#
 				for header_list_value in filtered_headers[header_name]:
 				#
@@ -220,7 +220,7 @@ Writes the given data.
 
 		try:
 		#
-			if (self.active and (not self.headers_only) and self.wsgi_write != None):
+			if (self.active and (not self.headers_only) and self.wsgi_write is not None):
 			#
 				data = Binary.bytes(data)
 				self.wsgi_write(data)

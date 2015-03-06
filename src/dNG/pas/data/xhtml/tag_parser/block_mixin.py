@@ -51,12 +51,13 @@ Checks and renders the block statement.
 :since:  v0.1.01
 		"""
 
-		if (self.log_handler != None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_block()- (#echo(__LINE__)#)", self, context = "pas_tag_parser")
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_block()- (#echo(__LINE__)#)", self, context = "pas_tag_parser")
 		_return = ""
 
 		with ExceptionLogTrap("pas_tag_parser"):
 		#
-			content = (self.content if (source_key == None) else self.get_source_value(source, key))
+			content = (None if (source_key is None) else self.get_source_value(source, key))
+			if (not isinstance(content, dict)): content = self.content
 
 			action_definition = action.split(".")
 			action = action_definition.pop()

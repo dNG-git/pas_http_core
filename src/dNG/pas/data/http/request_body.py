@@ -110,9 +110,9 @@ Handles data received.
 :since: v0.1.01
 		"""
 
-		if (data == None): data = self.decompress(None)
+		if (data is None): data = self.decompress(None)
 
-		if (data != None):
+		if (data is not None):
 		#
 			self.received_data_size += len(data)
 			if (self.received_size_max > 0 and self.received_data_size > self.received_size_max): raise ValueException("Input size exceeds allowed limit")
@@ -130,12 +130,12 @@ Reads "chunked" encoded content if set to true.
 :since: v0.1.00
 		"""
 
-		_return = (data if (self.decompressors == None) else None)
+		_return = (data if (self.decompressors is None) else None)
 		raw_data = data
 
-		if (self.decompressors != None):
+		if (self.decompressors is not None):
 		#
-			for decompressor in self.decompressors: raw_data = (decompressor.flush() if (data == None) else decompressor.decompress(raw_data))
+			for decompressor in self.decompressors: raw_data = (decompressor.flush() if (data is None) else decompressor.decompress(raw_data))
 			_return = raw_data
 		#
 
@@ -155,24 +155,24 @@ Reads "chunked" encoded content if set to true.
 		self.input_chunk_encoded = chunk_encoded
 	#
 
-	def define_input_compression(self, method):
+	def define_input_compression(self, algorithms):
 	#
 		"""
-Reads "chunked" encoded content if set to true.
+Defines the input compression algorithms used.
 
-:param chunk_encoded: True to active the "chunked" encoded mode
+:param algorithms: Input compression algorithms used
 
 :since: v0.1.00
 		"""
 
-		methods = (method if (type(method) == list) else [ method ])
+		algorithms = (algorithms if (type(algorithms) is list) else [ algorithms ])
 		self.decompressors = [ ]
 
-		for method in methods:
+		for algorithm in algorithms:
 		#
-			if (method == "deflate"): self.decompressors.append(decompressobj(MAX_WBITS))
-			elif (method == "gzip"): self.decompressors.append(decompressobj(16 + MAX_WBITS))
-			else: raise ValueException("Unsupported compression definition '{0}' given".format(method))
+			if (algorithm == "deflate"): self.decompressors.append(decompressobj(MAX_WBITS))
+			elif (algorithm == "gzip"): self.decompressors.append(decompressobj(16 + MAX_WBITS))
+			else: raise ValueException("Unsupported compression definition '{0}' given".format(algorithm))
 		#
 	#
 
@@ -189,9 +189,9 @@ Returns the request body.
 
 		# pylint: disable=arguments-differ,raising-bad-type
 
-		if (timeout == None): timeout = self.socket_data_timeout
+		if (timeout is None): timeout = self.socket_data_timeout
 
-		if (self.input_ptr != None):
+		if (self.input_ptr is not None):
 		#
 			if (hasattr(self.input_ptr, "settimeout")): self.input_ptr.settimeout(self.socket_data_timeout)
 
@@ -212,7 +212,7 @@ Sets a given pointer for the streamed post instance.
 
 		# pylint: disable=broad-except
 
-		if (timeout == None): timeout = self.timeout
+		if (timeout is None): timeout = self.timeout
 
 		self.received_data = ByteBuffer()
 		self.received_data_size = 0

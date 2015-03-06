@@ -90,7 +90,7 @@ Returns the associated session.
 		"""
 
 		return (None
-		        if (self.parent_request == None) else
+		        if (self.parent_request is None) else
 		        self.parent_request.get_session()
 		       )
 	#
@@ -108,7 +108,7 @@ Initializes default values from the original request.
 		AbstractInnerRequest.init(self, request)
 
 		self.parent_request = request._get_parent_request()
-		if (self.parent_request == None): self.parent_request = request
+		if (self.parent_request is None): self.parent_request = request
 
 		if (request.is_supported("accepted_formats")): self.accepted_formats = request.get_accepted_formats()
 		if (request.is_supported("compression")): self.compression_formats = request.get_compression_formats()
@@ -130,7 +130,7 @@ Sets the associated session.
 :since: v0.1.00
 		"""
 
-		if (self.parent_request != None): self.parent_request.set_session(session)
+		if (self.parent_request is not None): self.parent_request.set_session(session)
 	#
 
 	def _supports_accepted_formats(self):
@@ -142,7 +142,7 @@ Returns false if accepted formats can not be identified.
 :since:  v0.1.01
 		"""
 
-		return (self.accepted_formats != None)
+		return (self.accepted_formats is not None)
 	#
 
 	def _supports_compression(self):
@@ -154,7 +154,7 @@ Returns false if supported compression formats can not be identified.
 :since:  v0.1.01
 		"""
 
-		return (self.compression_formats != None)
+		return (self.compression_formats is not None)
 	#
 #
 

@@ -23,7 +23,7 @@ from dNG.pas.data.xhtml.formatting import Formatting
 from .abstract_field import AbstractField
 from .read_only_field_mixin import ReadOnlyFieldMixin
 
-class InfoField(AbstractField, ReadOnlyFieldMixin):
+class InfoField(ReadOnlyFieldMixin, AbstractField):
 #
 	"""
 "InfoField" provides a read-only visible text.
@@ -68,7 +68,7 @@ Returns the field content.
 		content = AbstractField._get_content(self)
 
 		_return = (Formatting.escape(content)
-		           if (self.link == None) else
+		           if (self.link is None) else
 		           XmlParser().dict_to_xml_item_encoder({ "tag": "a",
 		                                                  "attributes": { "href": self.link },
 		                                                  "value": content
@@ -104,7 +104,7 @@ Renders the given field.
 		context = { "title": Formatting.escape(self.get_title()),
 		            "value": self._get_content(),
 		            "required": self.required,
-		            "error_message": ("" if (self.error_data == None) else Formatting.escape(self.get_error_message()))
+		            "error_message": ("" if (self.error_data is None) else Formatting.escape(self.get_error_message()))
 		          }
 
 		return self._render_oset_file("core/form/info", context)

@@ -30,7 +30,7 @@ from dNG.pas.runtime.not_implemented_exception import NotImplementedException
 from .abstract_http_request import AbstractHttpRequest
 from .abstract_stream_response import AbstractStreamResponse
 
-class AbstractHttpStreamResponse(AbstractStreamResponse, ChunkedMixin):
+class AbstractHttpStreamResponse(ChunkedMixin, AbstractStreamResponse):
 #
 	"""
 A HTTP aware stream response.
@@ -139,7 +139,7 @@ Filter response headers to remove conflicting ones.
 
 		_return = self.headers.copy()
 
-		if ((self.compressor != None
+		if ((self.compressor is not None
 		     or self.stream_mode & AbstractHttpStreamResponse.STREAM_CHUNKED == AbstractHttpStreamResponse.STREAM_CHUNKED
 		    )
 		    and "CONTENT-LENGTH" in _return
@@ -148,7 +148,7 @@ Filter response headers to remove conflicting ones.
 		if (len(self.cookies) > 0):
 		#
 			if ("SET-COOKIE" not in _return): _return['SET-COOKIE'] = [ ]
-			elif (type(_return['SET-COOKIE']) != list): _return['SET-COOKIE'] = [ _return['SET-COOKIE'] ]
+			elif (type(_return['SET-COOKIE']) is not list): _return['SET-COOKIE'] = [ _return['SET-COOKIE'] ]
 
 			for cookie_name in self.cookies: _return['SET-COOKIE'].append(self.cookies[cookie_name])
 		#
@@ -174,7 +174,7 @@ Finish transmission and cleanup resources.
 				self.send()
 			#
 
-			if (is_chunked_response or self.compressor != None): self.send_data(None)
+			if (is_chunked_response or self.compressor is not None): self.send_data(None)
 
 			AbstractStreamResponse.finish(self)
 			self.compressor = None
@@ -235,7 +235,7 @@ Returns the HTTP response code.
 :since:  v0.1.00
 		"""
 
-		return (200 if (self.http_code == None) else self.http_code)
+		return (200 if (self.http_code is None) else self.http_code)
 	#
 
 	def is_compressing(self):
@@ -247,7 +247,7 @@ Returns true if the response will be compressed.
 :since:  v0.1.01
 		"""
 
-		return (self.compressor != None)
+		return (self.compressor is not None)
 	#
 
 	def _prepare_output_data(self, data):
@@ -263,9 +263,9 @@ Prepare data for output. Compress and transform it if required.
 
 		is_chunked_response = (self.stream_mode & AbstractHttpStreamResponse.STREAM_CHUNKED == AbstractHttpStreamResponse.STREAM_CHUNKED)
 
-		if (self.compressor != None):
+		if (self.compressor is not None):
 		#
-			if (data == None): data = self.compressor.flush()
+			if (data is None): data = self.compressor.flush()
 			elif (len(data) > 0): data = self.compressor.compress(Binary.bytes(data))
 		#
 
@@ -288,7 +288,7 @@ Sends response data.
 		#
 			if (not self.headers_sent):
 			#
-				if (self.http_code == None): self.set_http_code(200)
+				if (self.http_code is None): self.set_http_code(200)
 				self.send_headers()
 			#
 
@@ -335,7 +335,7 @@ Sets the compression formats the client accepts.
 			self.compressor = None
 			self.set_header("Content-Encoding", None)
 		#
-		elif (self.compression_formats != None):
+		elif (self.compression_formats is not None):
 		#
 			if ("gzip" in self.compression_formats):
 			#
@@ -391,14 +391,14 @@ Sets a cookie.
 		if (secure_only): cookie += ";Secure="
 		if (http_only): cookie += ";HttpOnly="
 
-		if (domain == None):
+		if (domain is None):
 		#
 			request = AbstractHttpRequest.get_instance()
-			if (request != None): cookie += ";Domain={0}".format(request.get_server_host())
+			if (request is not None): cookie += ";Domain={0}".format(request.get_server_host())
 		#
 		else: cookie += ";Domain={0}".format(domain)
 
-		if (path == None): path = "/"
+		if (path is None): path = "/"
 		cookie += ";Path={0}".format(path)
 
 		self.cookies[name] = cookie
@@ -440,29 +440,29 @@ Sets a header.
 		#
 			if (name in self.headers_indexed):
 			#
-				if (value == None): del(self.headers[self.headers_indexed[name]])
+				if (value is None): del(self.headers[self.headers_indexed[name]])
 				elif (value_append):
 				#
-					if (type(self.headers[self.headers_indexed[name]]) == list): self.headers[self.headers_indexed[name]].append(value)
+					if (type(self.headers[self.headers_indexed[name]]) is list): self.headers[self.headers_indexed[name]].append(value)
 					else: self.headers[self.headers_indexed[name]] = [ self.headers[self.headers_indexed[name]], value ]
 				#
 				else: self.headers[self.headers_indexed[name]] = value
 			#
-			elif (value != None):
+			elif (value is not None):
 			#
 				self.headers[self.headers_index] = value
 				self.headers_indexed[name] = self.headers_index
 				self.headers_index += 1
 			#
 		#
-		elif (value == None):
+		elif (value is None):
 		#
 			if (name in self.headers): del(self.headers[name])
 		#
-		elif (type(value) == list): self.headers[name] = (value if (len(value) > 1) else value.pop())
+		elif (type(value) is list): self.headers[name] = (value if (len(value) > 1) else value.pop())
 		elif (value_append and name in self.headers):
 		#
-			if (type(self.headers[name]) == list): self.headers[name].append(value)
+			if (type(self.headers[name]) is list): self.headers[name].append(value)
 			else: self.headers[name] = [ self.headers[name], value ]
 		#
 		else: self.headers[name] = value
@@ -516,12 +516,46 @@ it.
 :since: v0.1.00
 		"""
 
-		if (self.stream_mode_supported & AbstractHttpStreamResponse.STREAM_CHUNKED == AbstractHttpStreamResponse.STREAM_CHUNKED and self.http_version > 1):
+		self.update_stream_mode()
+	#
+
+	def update_stream_mode(self):
+	#
+		"""
+Sets the stream mode or updates the stream mode algorithm selected to send
+output as soon as available instead of caching it.
+
+:since: v0.1.03
+		"""
+
+		is_chunked_mode_required = (self.get_header("Content-Length") is None)
+
+		is_chunked_mode_supported = (self.stream_mode_supported & AbstractHttpStreamResponse.STREAM_CHUNKED == AbstractHttpStreamResponse.STREAM_CHUNKED
+		                             and self.http_version > 1
+		                            )
+
+		if (is_chunked_mode_supported
+		    and (not is_chunked_mode_required)
+		    and self.stream_mode & AbstractHttpStreamResponse.STREAM_CHUNKED == AbstractHttpStreamResponse.STREAM_CHUNKED
+		   ):
+		#
+			if (self.get_header("Transfer-Encoding") == "chunked"): self.set_header("Transfer-Encoding", None)
+			self.stream_mode ^= AbstractHttpStreamResponse.STREAM_CHUNKED
+		#
+
+		is_direct_mode_supported = (self.stream_mode_supported & AbstractHttpStreamResponse.STREAM_DIRECT == AbstractHttpStreamResponse.STREAM_DIRECT)
+
+		if (not is_direct_mode_supported
+		    and self.stream_mode & AbstractHttpStreamResponse.STREAM_DIRECT == AbstractHttpStreamResponse.STREAM_DIRECT
+		   ): self.stream_mode ^= AbstractHttpStreamResponse.STREAM_DIRECT
+
+
+		if (is_chunked_mode_supported and is_chunked_mode_required):
 		#
 			self.set_header("Transfer-Encoding", "chunked")
 			self.stream_mode |= AbstractHttpStreamResponse.STREAM_CHUNKED
 		#
-		elif (self.stream_mode_supported & AbstractHttpStreamResponse.STREAM_DIRECT == AbstractHttpStreamResponse.STREAM_DIRECT): self.stream_mode |= AbstractHttpStreamResponse.STREAM_DIRECT
+		elif (is_direct_mode_supported): self.stream_mode |= AbstractHttpStreamResponse.STREAM_DIRECT
 	#
 #
 

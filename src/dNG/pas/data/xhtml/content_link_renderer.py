@@ -66,7 +66,7 @@ Returns a dict of parameters to be used with a Link instance.
 				_return['dsd'] = re.sub("\\_\\_\\w+\\\\_\\_", "", _return['dsd'])
 			#
 		#
-		elif ("tag" in data and self.datalinker_main_id != None): _ContentLinkRenderer._get_link_parameters(self, data)
+		elif ("tag" in data and self.datalinker_main_id is not None): _return = _ContentLinkRenderer._get_link_parameters(self, data)
 
 		return _return
 	#

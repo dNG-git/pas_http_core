@@ -78,7 +78,7 @@ python.org: Called to implement evaluation of self[key].
 :since:  v0.1.00
 		"""
 
-		if (self.parsed_data == None): self.parse()
+		if (self.parsed_data is None): self.parse()
 		return self.parsed_data[key]
 	#
 
@@ -91,7 +91,7 @@ python.org: Return an iterator object.
 :since:  v0.1.00
 		"""
 
-		if (self.parsed_data == None): self.parse()
+		if (self.parsed_data is None): self.parse()
 		return iter(self.parsed_data)
 	#
 
@@ -104,7 +104,7 @@ python.org: Called to implement the built-in function len().
 :since:  v0.1.00
 		"""
 
-		if (self.parsed_data == None): self.parse()
+		if (self.parsed_data is None): self.parse()
 		return len(self.parsed_data)
 	#
 
@@ -119,17 +119,17 @@ Sets a given pointer for the streamed post instance.
 		byte_buffer = RequestBody.get(self)
 
 		field_arrays = { }
-		parsed_data = ({ } if (byte_buffer == None) else parse_qsl(Binary.str(byte_buffer.read()), True, True))
+		parsed_data = ({ } if (byte_buffer is None) else parse_qsl(Binary.str(byte_buffer.read()), True, True))
 		self.parsed_data = { }
 
 		for parsed_field in parsed_data:
 		#
 			re_result = RequestBodyUrlencoded.RE_ARRAY.search(parsed_field[0])
 
-			if (re_result == None):
+			if (re_result is None):
 			#
 				if (parsed_field[0] not in self.parsed_data): self.parsed_data[parsed_field[0]] = parsed_field[1]
-				elif (type(self.parsed_data[parsed_field[0]]) == list): self.parsed_data[parsed_field[0]].append(parsed_field[1])
+				elif (type(self.parsed_data[parsed_field[0]]) is list): self.parsed_data[parsed_field[0]].append(parsed_field[1])
 				else: self.parsed_data[parsed_field[0]] = [ self.parsed_data[parsed_field[0]], parsed_field[1] ]
 			#
 			elif (re_result.group(1) in field_arrays): field_arrays[re_result.group(1)].append({ "key": re_result.group(2), "value": parsed_field[1] })

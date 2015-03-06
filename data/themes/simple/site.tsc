@@ -19,7 +19,7 @@ a:link, a:visited, a:focus { text-decoration: underline }
 a:active, a:hover, a:focus { color: #000000; text-decoration: none }
 
 body {
-	margin: 0; padding: 0 10%; background-color: #eaeaea; border-top: 3em solid #375a9d;
+	margin: 0; padding: 0 10%; background-color: #eaeaea; border-top: 28px solid #375a9d;
 	font-family: "Nimbus Sans L", "Lucida Grande", "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet MS", Helvetica, Verdana, Arial, sans-serif; font-size: 90%; font-style: normal; line-height: normal; font-weight: normal; color: #202020
 }
 
@@ -75,23 +75,23 @@ td:last-child, th:last-child { border-right: none }
 .designtitle { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 1.2em; font-weight: bold; color: #fafafa }
 
 @media only screen and (max-width: 46em) {
-	body { padding: 0 0.5em; border-top-width: 1em }
+	body { padding: 0 0.5em; border-top-width: 7px }
 
 	header {
-		margin: -1px -1px 0 -1px; padding: 0.1em;
+		margin: -1px -1px 0 -1px; padding: 1px;
 		text-align: center
 	}
 
-	.designcopyright { margin: 0 -1px -1px -1px; padding: 1px 0.1em 0 0.1em }
+	.designcopyright { margin: 0 -1px -1px -1px; padding: 1px 1px 0 1px }
 	.designmainblock { margin: -0.5em 0; padding: 2px }
 }
 
 @media only screen and (min-width: 46em) and (max-width: 62em) {
-	body { padding: 0 5%; border-top-width: 2em }
-	header { margin: -1px -1px 0 -1px; padding: 0.2em }
+	body { padding: 0 5%; border-top-width: 14px }
+	header { margin: -1px -1px 0 -1px; padding: 3px }
 
-	.designcopyright { margin: 0 -1px -1px -1px; padding: 1px 0.2em 0 0.2em }
-	.designmainblock { margin: -1em 0; padding: 2px }
+	.designcopyright { margin: 0 -1px -1px -1px; padding: 1px 3px 0 3px }
+	.designmainblock { margin: -14px 0; padding: 2px }
 }
 ]]></style>
 [each:content:css_files:file]
