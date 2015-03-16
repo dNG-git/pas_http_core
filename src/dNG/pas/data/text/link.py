@@ -579,7 +579,7 @@ Returns the base URL path for the given URL or the current handled one.
 			else:
 			#
 				script_name = Binary.str(script_name)
-				path = (script_name if (script_name[:1] == "/") else "/{0}?".format(script_name))
+				path = (script_name if (script_name[:1] == "/") else "/{0}".format(script_name))
 			#
 		#
 		else: path = Binary.str(self.path)
