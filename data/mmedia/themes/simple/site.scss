@@ -19,7 +19,7 @@ small { font-size: 0.75em }
 	white-space: nowrap;
 
 	div {
-		display: inline-block; padding: 6px; border: 1px solid $dark_grey;
+		display: inline-block; padding: 6px; border: 1px solid $dark_grey; border-radius: 3px;
 		background-image: -moz-linear-gradient(rgba(#{$white_rgba}, 0) 0%, $light_steel 100%);
 		background-image: -ms-linear-gradient(rgba(#{$white_rgba}, 0) 0%, $light_steel 100%);
 		background-image: -o-linear-gradient(rgba(#{$white_rgba}, 0) 0%, $light_steel 100%);
@@ -148,7 +148,7 @@ small { font-size: 0.75em }
 .pagecontent_user_bar {
 	clear: left; margin: 14px 0;
 
-	& > div { display: inline-block; min-width: 25%; padding: 6px; background-color: $light_grey; border: 1px solid $dark_grey }
+	& > div { display: inline-block; min-width: 25%; padding: 6px; background-color: $light_grey; border: 1px solid $dark_grey; border-radius: 3px }
 }
 
 .pagecontent_user_quote {
@@ -210,7 +210,7 @@ small { font-size: 0.75em }
 }
 
 .pagemainmenu {
-	margin: 0 -2px; padding: 7px; background-color: $blue; border-top: 1px solid $light_blue; border-bottom-color: $light_grey; box-shadow: 0 11px 14px -14px $dark_blue;
+	margin: 7px -2px 0 -2px; padding: 7px 7px 0 7px; border-top: 1px solid $light_blue;
 	font-size: 1.2em; font-weight: bold; color: $light_grey;
 
 	a {

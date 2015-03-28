@@ -34,14 +34,13 @@ h5 { font-size: 1.55em }
 h6, summary { font-size: 1.50em }
 
 header {
-	margin: -2px -2px 0 -2px; padding: 0.5em; background-color: #193879; border-radius: 0.5em 0.5em 0 0;
+	margin: -32px -12px 0 -12px; padding: 0.5em; background-color: #193879; border-width: 0 1px 1px 1px; border-style: solid; border-color: #ffffff; border-bottom-left-radius: 0.5em; border-bottom-right-radius: 0.5em; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 	background-image: -moz-linear-gradient(#193879 0%, #375a9d 100%);
 	background-image: -ms-linear-gradient(#193879 0%, #375a9d 100%);
 	background-image: -o-linear-gradient(#193879 0%, #375a9d 100%);
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #193879), color-stop(1, #375a9d));
 	background-image: -webkit-linear-gradient(#193879 0%, #375a9d 100%);
-	background-image: linear-gradient(#193879 0%, #375a9d 100%);
-	text-align: right
+	background-image: linear-gradient(#193879 0%, #375a9d 100%)
 }
 
 img { border: none }
@@ -65,14 +64,14 @@ td:last-child, th:last-child { border-right: none }
 .designcopyright a, .designcopyright a:link, .designcopyright a:active, .designcopyright a:visited, .designcopyright a:hover, .designcopyright a:focus { color: #202020 }
 
 .designmainblock {
-	margin: -1.5em 0; padding: 4px; background-color: #fdfdfd; border: 1px solid #193879; border-radius: 0.5em; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+	padding: 4px; background-color: #fdfdfd; border-width: 0 1px 1px 1px; border-style: solid; border-color: #193879; border-bottom-left-radius: 0.5em; border-bottom-right-radius: 0.5em; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 	text-align: left; vertical-align: middle
 }
 
 .designpage > :first-child { margin-top: 0.5% }
 .designpage > :last-child { margin-bottom: 0.5% }
 
-.designtitle { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 1.2em; font-weight: bold; color: #fafafa }
+.designtitle { text-align: right; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 1.2em; font-weight: bold; color: #fafafa }
 
 @media only screen and (max-width: 46em) {
 	body { padding: 0 0.5em; border-top-width: 7px }
@@ -104,12 +103,12 @@ td:last-child, th:last-child { border-right: none }
 <body><div class='designmainblock'>
 	<header>
 [if:settings:pas_http_site_title_xhtml != ]
-		<span class='designtitle'>[rewrite:settings]pas_http_site_title_xhtml[/rewrite]</span>
+		<div class='designtitle'>[rewrite:settings]pas_http_site_title_xhtml[/rewrite]</div>
 [/if][if:settings:pas_http_site_title_xhtml == ]
-		<span class='designtitle'><i>direct</i> Netware Group</span>
+		<div class='designtitle'><i>direct</i> Netware Group</div>
 [/if]
-	</header>
 [block:settings:pas_http_site_menu_main]output.menu.File.render[/block]
+	</header>
 	<div class='designpage'>
 [block]output.menu.Service.render_primary[/block]
 [block]output.NotificationBox.render[/block]
