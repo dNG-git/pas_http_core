@@ -524,7 +524,7 @@ Returns the base URL for the given type and parameters.
 
 			if (self.port is not None):
 			#
-				port = Link._filter_well_known_port(self.scheme, self.port)
+				port = Link.filter_well_known_port(self.scheme, self.port)
 				if (port > 0): _return += ":{0:d}".format(port)
 			#
 
@@ -545,7 +545,7 @@ Returns the base URL for the given type and parameters.
 				host = request.get_server_host()
 				if (host is not None): _return += Binary.str(host)
 
-				port = Link._filter_well_known_port(scheme, request.get_server_port())
+				port = Link.filter_well_known_port(scheme, request.get_server_port())
 				if (port > 0): _return += ":{0:d}".format(port)
 
 				if (_type & Link.TYPE_BASE_PATH == Link.TYPE_BASE_PATH
@@ -640,7 +640,7 @@ Builds a sorted list for the parameter key list given.
 	#
 
 	@staticmethod
-	def _filter_well_known_port(scheme, port):
+	def filter_well_known_port(scheme, port):
 	#
 		"""
 Filter well known ports defined for the given scheme.
@@ -658,8 +658,8 @@ Filter well known ports defined for the given scheme.
 		#
 			port = int(port)
 
-			if ((scheme == "http" and port == 80)
-			    or (scheme == "https" and port == 443)
+			if ((scheme in ( "http", "ws" ) and port == 80)
+			    or (scheme in ( "https", "wss" ) and port == 443)
 			   ): _return = 0
 			else: _return = port
 		#
