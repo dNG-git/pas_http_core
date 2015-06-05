@@ -42,19 +42,19 @@ TODO: Code incomplete
 
 	# pylint: disable=arguments-differ
 
-	TYPE_FORM_FIELDS = 128
+	TYPE_FORM_FIELDS = 256
 	"""
 Hidden input fields
 	"""
-	TYPE_FORM_URL = 64
+	TYPE_FORM_URL = 128
 	"""
 Form action URL
 	"""
-	TYPE_JS_REQUIRED = 512
+	TYPE_JS_REQUIRED = 1024
 	"""
 JavaScript is required
 	"""
-	TYPE_QUERY_STRING = 256
+	TYPE_QUERY_STRING = 512
 	"""
 Generate the query string
 	"""
@@ -98,26 +98,18 @@ value='de' />". Automatically add language, theme and uuid fields.
 			parameters = self._filter_parameters(parameters)
 			parameters = self._add_default_parameters(parameters)
 
-			#if (/*#ifndef(PHP4) */stripos/* #*//*#ifdef(PHP4):stristr:#*/($f_data,"lang=") === false) { $f_return .= "<input type='hidden' name='lang' value='$direct_settings[lang]' />"; }
-			#if (/*#ifndef(PHP4) */stripos/* #*//*#ifdef(PHP4):stristr:#*/($f_data,"theme=") === false) { $f_return .= "<input type='hidden' name='theme' value='$direct_settings[theme]' />"; }
-
-			#if ((isset ($direct_globals['input']))&&($f_withuuid))
-			#{
-			#	$f_uuid = $direct_globals['input']->uuidGet ();
-			#	if (($f_uuid)&&(!$direct_globals['kernel']->vUuidIsCookied ())&&($direct_globals['kernel']->vUuidCheckUsage ())) { $f_return .= "<input type='hidden' name='uuid' value='$f_uuid' />"; }
-			#}
-
 			_return = self._build_url_formatted("<input type='hidden' name=\"{0}\" value=\"{1}\" />", "", parameters, Link.escape)
 			xhtml_escape = False
 		#
 		elif (_type & Link.TYPE_FORM_URL == Link.TYPE_FORM_URL):
 		#
-			if (_type == Link.TYPE_FORM_URL): _type |= Link.TYPE_RELATIVE_URL
+			_type |= Link.TYPE_RELATIVE_URL
+			_type |= Link.TYPE_PARAMETER_LESS
+
 			_return = _Link.build_url(self, _type)
 		#
 		elif (_type & Link.TYPE_QUERY_STRING == Link.TYPE_QUERY_STRING):
 		#
-			if (_type == Link.TYPE_FORM_URL): _type = Link.TYPE_RELATIVE_URL
 			parameters = self._filter_parameters(parameters)
 			parameters = self._add_default_parameters(parameters)
 

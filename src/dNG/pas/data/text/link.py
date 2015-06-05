@@ -65,6 +65,10 @@ Generates URLs to the base path of this application.
 	"""
 Optical URLs are used to show the target address.
 	"""
+	TYPE_PARAMETER_LESS = 64
+	"""
+Generated URL will not handle parameters
+	"""
 	TYPE_PREDEFINED_URL = 4
 	"""
 Predefined URL
@@ -158,9 +162,15 @@ as a source for parameters.
 		_return = self.get_url_base(_type, parameters)
 
 		if (parameters is None
-		    or _type & Link.TYPE_BASE_PATH == Link.TYPE_BASE_PATH
-		   ): parameters = { }
-		else: parameters = self._filter_parameters(parameters)
+		    or _type & Link.TYPE_BASE_PATH in ( Link.TYPE_BASE_PATH,
+		                                        Link.TYPE_PREDEFINED_URL
+		                                      )
+		   ): _type |= Link.TYPE_PARAMETER_LESS
+
+		parameters = ({ }
+		              if (_type & Link.TYPE_PARAMETER_LESS == Link.TYPE_PARAMETER_LESS) else
+		              self._filter_parameters(parameters)
+		             )
 
 		if (_type & Link.TYPE_VIRTUAL_PATH == Link.TYPE_VIRTUAL_PATH):
 		#
@@ -184,7 +194,10 @@ as a source for parameters.
 		#
 		else:
 		#
-			if (_type & Link.TYPE_PREDEFINED_URL != Link.TYPE_PREDEFINED_URL): parameters = self._add_default_parameters(parameters)
+			if (_type & Link.TYPE_PARAMETER_LESS != Link.TYPE_PARAMETER_LESS):
+			#
+				parameters = self._add_default_parameters(parameters)
+			#
 
 			if (len(parameters) > 0):
 			#
@@ -405,7 +418,7 @@ Builds a URL DSD string.
 	def _filter_parameters(self, parameters):
 	#
 		"""
-This method filters all parameters of the type "__<KEYWORD>__".
+This method filters parameters like "__<KEYWORD>__".
 
 :param parameters: Parameters dict
 
