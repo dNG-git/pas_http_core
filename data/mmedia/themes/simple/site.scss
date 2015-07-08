@@ -122,7 +122,7 @@ small { font-size: 0.75em }
 	position: relative; padding: 6px; background-color: $light_grey; border: 1px solid $dark_grey;
 
 	&::before, &::after {
-		position: absolute; top: 0; left: 0.4em; margin-left: 9px; border: 9px solid transparent;
+		position: absolute; top: 0; left: 6px; margin-left: 9px; border: 9px solid transparent;
 		content: " "
 	}
 
@@ -134,7 +134,7 @@ small { font-size: 0.75em }
 	padding: 6px; background-color: $white; border: 1px solid $dark_grey;
 
 	&::before, &::after {
-		position: absolute; top: 0; left: 0.4em; margin-left: 9px; border: 9px solid transparent;
+		position: absolute; top: 0; left: 6px; margin-left: 9px; border: 9px solid transparent;
 		content: " "
 	}
 
@@ -200,12 +200,12 @@ small { font-size: 0.75em }
 .pageform_radio_label { vertical-align: middle }
 
 .pageform_textnpassword {
-	padding: 0.4em; border: 1px solid $light_blue; border-bottom-color: $dark_grey; border-radius: 3px;
+	padding: 6px; border: 1px solid $light_blue; border-bottom-color: $dark_grey; border-radius: 3px;
 	font-size: 1em
 }
 
 .pageform_select {
-	margin: 3px; padding: 0.2em; background-color: $white; border: 1px solid $light_blue; border-radius: 3px;
+	margin: 3px; padding: 3px; background-color: $white; border: 1px solid $light_blue; border-radius: 3px;
 	font-size: 1em
 }
 
@@ -290,8 +290,6 @@ small { font-size: 0.75em }
 	clear: both; margin: 10px 0; border: 1px solid $light_blue; border-radius: 3px;
 
 	a {
-		display: inline-block;
-
 		&:link, &:visited { color: $blue; text-decoration: none }
 		&:active, &:hover, &:focus { color: $black; text-decoration: none }
 	}
@@ -302,7 +300,7 @@ small { font-size: 0.75em }
 	}
 
 	li {
-		display: inline-block;
+		display: inline;
 		vertical-align: top
 	}
 
@@ -353,7 +351,7 @@ small { font-size: 0.75em }
 
 .pageurl_requirements_unsupported { color: $dark_grey }
 
-@media only screen and (max-width: 46em) {
+@media only screen and (max-width: 352px) {
 	.pagecontent_box_infoblock {
 		display: block; clear: both; float: initial; margin: 3px 0; padding: 3px; border: 1px solid $dark_grey; border-radius: 3px;
 		background-image: -moz-linear-gradient(rgba(#{$white_rgba}, 0) 0%, $light_steel 100%);
@@ -432,7 +430,7 @@ small { font-size: 0.75em }
 	}
 }
 
-@media only screen and (min-width: 46em) and (max-width: 62em) {
+@media only screen and (min-width: 352px) and (max-width: 672px) {
 	.pageform_element { padding: 3px 0 }
 
 	.pageform_field {
@@ -445,12 +443,10 @@ small { font-size: 0.75em }
 		text-align: left
 	}
 
-	.pagemainmenu { margin: 0 -1px; padding: 3px 6px }
-	.pageoptionsblock li { width: 50%; margin: 0; padding: 0 }
 	.pageservicemenu_p { padding: 1px 1px 0 1px }
 	.pageservicemenu_s { padding: 1px }
 }
 
-@media only screen and (min-width: 62em) and (max-width: 126em) {
-	.pageoptionsblock li { width: 50% }
+@media only screen and (min-width: 352px) and (max-width: 992px) {
+	.pageoptionsblock li { width: 50%; margin: 0; padding: 0 }
 }

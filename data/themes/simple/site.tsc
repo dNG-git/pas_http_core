@@ -34,7 +34,7 @@ h5 { font-size: 1.55em }
 h6, summary { font-size: 1.50em }
 
 header {
-	margin: -32px -12px 0 -12px; padding: 0.5em; background-color: #193879; border-width: 0 1px 1px 1px; border-style: solid; border-color: #ffffff; border-bottom-left-radius: 0.5em; border-bottom-right-radius: 0.5em; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+	margin: -32px -12px 0 -12px; padding: 8px; background-color: #193879; border-width: 0 1px 1px 1px; border-style: solid; border-color: #ffffff; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 	background-image: -moz-linear-gradient(#193879 0%, #375a9d 100%);
 	background-image: -ms-linear-gradient(#193879 0%, #375a9d 100%);
 	background-image: -o-linear-gradient(#193879 0%, #375a9d 100%);
@@ -51,7 +51,7 @@ td:first-child, th:first-child { border-left: none }
 td:last-child, th:last-child { border-right: none }
 
 .designcopyright {
-	clear: both; margin: 0 -2px -2px -2px; padding: 2px 0.5em 0 0.5em; border-top: 1px solid #375a9d; border-radius: 0 0 0.5em 0.5em;
+	clear: both; margin: 0 -2px -2px -2px; padding: 2px 8px 0 8px; border-top: 1px solid #375a9d; border-radius: 0 0 8px 8px;
 	background-image: -moz-linear-gradient(rgba(90, 90, 90, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
 	background-image: -ms-linear-gradient(rgba(90, 90, 90, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
 	background-image: -o-linear-gradient(rgba(90, 90, 90, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
@@ -64,33 +64,34 @@ td:last-child, th:last-child { border-right: none }
 .designcopyright a, .designcopyright a:link, .designcopyright a:active, .designcopyright a:visited, .designcopyright a:hover, .designcopyright a:focus { color: #202020 }
 
 .designmainblock {
-	padding: 4px; background-color: #fdfdfd; border-width: 0 1px 1px 1px; border-style: solid; border-color: #193879; border-bottom-left-radius: 0.5em; border-bottom-right-radius: 0.5em; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+	padding: 4px; background-color: #fdfdfd; border-width: 0 1px 1px 1px; border-style: solid; border-color: #193879; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 	text-align: left; vertical-align: middle
 }
 
 .designpage > :first-child { margin-top: 0.5% }
 .designpage > :last-child { margin-bottom: 0.5% }
 
-.designtitle { text-align: right; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 1.2em; font-weight: bold; color: #fafafa }
+.designtitle { text-align: right; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 1.4em; font-weight: bold; color: #fafafa }
 
-@media only screen and (max-width: 46em) {
-	body { padding: 0 0.5em; border-top-width: 7px }
-
-	header {
-		margin: -1px -1px 0 -1px; padding: 1px;
-		text-align: center
-	}
+@media only screen and (max-width: 352px) {
+	body { padding: 0 8px; border-top-width: 7px }
+	header { margin: -1px -1px 0 -1px; padding: 1px }
 
 	.designcopyright { margin: 0 -1px -1px -1px; padding: 1px 1px 0 1px }
-	.designmainblock { margin: -0.5em 0; padding: 2px }
+	.designmainblock { margin: -8px 0; padding: 2px }
 }
 
-@media only screen and (min-width: 46em) and (max-width: 62em) {
-	body { padding: 0 5%; border-top-width: 14px }
-	header { margin: -1px -1px 0 -1px; padding: 3px }
+@media only screen and (max-width: 672px) {
+	header { text-align: center }
+
+	.designtitle { text-align: center }
+}
+
+@media only screen and (min-width: 352px) and (max-width: 992px) {
+	body { padding: 0 5% }
 
 	.designcopyright { margin: 0 -1px -1px -1px; padding: 1px 3px 0 3px }
-	.designmainblock { margin: -14px 0; padding: 2px }
+	.designmainblock { padding: 2px }
 }
 ]]></style>
 [each:content:css_files:file]
