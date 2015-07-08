@@ -21,6 +21,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from binascii import hexlify
 from os import urandom
 
+from dNG.data.xml_parser import XmlParser
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting
@@ -86,34 +87,60 @@ valid XHTML for output.
 
 		if (sections_count > 1):
 		#
-			section_position = 0
+			xml_parser = XmlParser()
 
-			"""
-		if (isset ($f_data['']))
-		{
-			if (count ($f_data) > 1)
-			{
-				if (!isset ($f_form_id)) { $f_form_id = uniqid ('swg_form_'); }
-				$f_return = "<div id='{$f_form_id}_sections'>".($this->formGetSection ($f_data[''],(direct_local_get ("formbuilder_section_general"))));
-			}
-			else { $f_return = $this->formGetSection ($f_data['']); }
+			for section_position in range(0, sections_count):
+			#
+				fields = self.fields[section_position]['fields']
+				is_visible = False
 
-			unset ($f_data['']);
-		}
-		else { $f_return = ""; }
+				for field in fields:
+				#
+					if (isinstance(field, AbstractField)):
+					#
+						if (field.get_type() != "hidden"):
+						#
+							is_visible = True
+							break
+						#
+					#
+				#
 
-		if (!empty ($f_data))
-		{
-			if (!isset ($f_form_id)) { $f_form_id = uniqid ('swg_form_'); }
+				if (is_visible):
+				#
+					section_id = "pas_form_section_{0}".format(Binary.str(hexlify(urandom(10))))
 
-			if (!$f_return) { $f_return .= "<div id='{$f_form_id}_sections'>"; }
-			foreach ($f_data as $f_section => $f_elements_array) { $f_return .= $this->formGetSection ($f_elements_array,$f_section); }
-			$f_return .= "</div><script type='text/javascript'><![CDATA[\njQuery (function () { {$direct_settings['theme_form_js_init']} ({ id:'{$f_form_id}_sections',type:'form_sections' }); });\n]]></script>";
-		}
-$f_return = ((isset ($f_section) ? "<p class='pagecontenttitle ui-accordion-header'><a href='#swg_form_".(md5 ($f_section))."'>".(direct_html_encode_special ($f_section))."</a></p><div>" : "")."
-<table class='pagetable' style='width:100%;table-layout:auto'>
-<tbody>");
-			"""
+					section_attributes = { "class": "pasform_section",
+					                       "id": section_id,
+					                       "data-form-id": self.form_id
+					                     }
+
+					if (self.fields[section_position]['name'] != ""):
+					#
+						section_attributes['data-form-section-title'] = self.fields[section_position]['name']
+					#
+
+					_return += "{0}".format(xml_parser.dict_to_xml_item_encoder({ "tag": "div",
+					                                                              "attributes": section_attributes
+					                                                            },
+					                                                            False
+					                                                           )
+					                       )
+				#
+
+				_return += self.render_section(section_position)
+
+				if (is_visible):
+				#
+					_return += """
+</div><script type="text/javascript"><![CDATA[
+require([ "djs/XHtml5FormElement.min" ], function(XHtml5FormElement) {{
+	new XHtml5FormElement({{ id: "{0}", type: "form_section" }});
+}});
+]]></script>
+					""".format(section_id).strip()
+				#
+			#
 		#
 		elif (sections_count > 0): _return = self.render_section(0)
 
