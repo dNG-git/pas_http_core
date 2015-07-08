@@ -154,7 +154,8 @@ Executes the incoming request.
 		if (self.inner_request is not None):
 		#
 			request = self.inner_request
-			if (request.get_output_handler() is not None): self.output_handler = request.get_output_handler()
+			request_output_handler = request.get_output_handler()
+			if (request_output_handler is not None): self.output_handler = request_output_handler
 		#
 		else: request = self
 
@@ -361,6 +362,19 @@ Do preparations for request handling.
 Set source variables. The server timezone will be changed if a user is
 logged in and/or its timezone is identified.
 		"""
+
+		content_type = self.get_header("Content-Type")
+
+		if (content_type is not None):
+		#
+			content_type = content_type.lower()
+
+			if (content_type not in ( "text/html", "application/xhtml+xml" )):
+			#
+				content_type_output_handler = Hook.call("dNG.pas.http.Request.getOutputHandlerForContentType", request = self)
+				if (content_type_output_handler is not None): self.output_handler = content_type_output_handler
+			#
+		#
 
 		self._parse_parameters()
 		self.timezone = float(Settings.get("core_timezone", (timezone / 3600)))
@@ -761,9 +775,7 @@ Parse the input variables given as an URI query string.
 			for iline in iline_list:
 			#
 				value_element = iline.split("=", 1)
-
 				if (len(value_element) > 1): _return[value_element[0]] = value_element[1]
-				elif ("ohandler" not in _return): _return['ohandler'] = re.sub("\\W+", "", iline)
 			#
 		#
 
