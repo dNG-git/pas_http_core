@@ -58,10 +58,6 @@ Constructor __init__(AbstractHttpResponse)
 		"""
 Charset used for response
 		"""
-		self.content = None
-		"""
-Content to be shown
-		"""
 		self.content_is_dynamic = False
 		"""
 True if the content is dynamic
@@ -286,7 +282,7 @@ send.
 		if (message is None): message = L10n.get("errors_core_unknown_error")
 		else: message = L10n.get("errors_{0}".format(message), message)
 
-		if (isinstance(exception, TracedException)): details = Binary.str(exception.get_printable_trace().replace("\n", "<br />\n"))
+		if (isinstance(exception, TracedException)): details = Binary.str(exception.get_printable_trace())
 		else:
 		#
 			exception = TracedException(str(exception), exception)
@@ -300,8 +296,8 @@ send.
 	def init(self, cache = False, compress = True):
 	#
 		"""
-Important headers will be created here. This includes caching, cookies, the
-compression setting and information about P3P.
+Important headers will be created here. This includes caching, cookies and
+compression setting used.
 
 :param cache: Allow caching at client
 :param compress: Send page GZip encoded (if supported)
@@ -373,7 +369,6 @@ Resets all cached values.
 :since: v0.1.00
 		"""
 
-		self.content = None
 		self.data = None
 		self.errors = None
 		self.expires = 0
@@ -464,22 +459,6 @@ Sets the compression formats the client accepts.
 		"""
 
 		if (self.stream_response.is_supported("compression")): self.stream_response.set_compression_formats(compression_formats)
-	#
-
-	def set_content(self, content):
-	#
-		"""
-Sets the content for the response.
-
-:param content: Content to be send
-
-:since: v0.1.00
-		"""
-
-		if (self.data is not None): raise IOException("Can't combine content and raw data in one response.")
-		if (self.stream_response.is_streamer_set()): raise IOException("Can't combine a streaming object with content.")
-
-		self.content = content
 	#
 
 	def set_content_dynamic(self, mode):
@@ -640,9 +619,7 @@ given.
 :since: v0.1.00
 		"""
 
-		if (self.content is not None): raise IOException("Can't combine raw data and content in one response.")
 		if (self.stream_response.is_streamer_set()): raise IOException("Can't combine a streaming object with raw data.")
-
 		self.data = data
 	#
 

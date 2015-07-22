@@ -119,9 +119,10 @@ session.
 
 		passcode_timeout = self.session.get("uuids.passcode_timeout")
 
-		if (passcode_timeout is not None):
+		if (passcode_timeout is None): self.session.set_timeout()
+		else:
 		#
-			self.session.set_session_time(int(Settings.get("pas_session_uuids_passcode_session_time", 604800)))
+			self.session.set_timeout(int(Settings.get("pas_session_uuids_passcode_session_time", 604800)))
 			if (passcode_timeout < time()): self._renew_passcode()
 		#
 	#
@@ -169,7 +170,7 @@ Saves changes of the uuIDs instance.
 
 		if (passcode_timeout is not None):
 		#
-			self.session.set_session_time(int(Settings.get("pas_session_uuids_passcode_session_time", 604800)))
+			self.session.set_timeout(int(Settings.get("pas_session_uuids_passcode_session_time", 604800)))
 			if (passcode_timeout < time()): self._renew_passcode()
 
 			is_passcode_changed = False

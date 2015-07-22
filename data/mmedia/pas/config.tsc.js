@@ -1,6 +1,6 @@
 //j// BOF
 
-/* -------------------------------------------------------------------------
+/*
 direct PAS
 Python Application Services
 ----------------------------------------------------------------------------
@@ -15,16 +15,21 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 ----------------------------------------------------------------------------
 #echo(pasHttpCoreVersion)#
 #echo(__FILEPATH__)#
-------------------------------------------------------------------------- */
+*/
 
 var djs_config = {
 	FixableBlock_fixed_class: 'pagecontent_box_fixed',
 	ResponsiveTable_class: 'pagetable_responsive',
-	XHtml5FormElement_focused_class: 'pageform_input_focused',
+	XHtml5FormElement_focused_class: 'pageform_input_focused'
+};
+
+var pas_config = {
+	HttpJsonApiRequest_base_url: '[rewrite:settings]x_pas_http_base_url[/rewrite]',
+	HttpJsonApiRequest_session_uuid: '[rewrite:settings]x_pas_http_session_uuid[/rewrite]'
 };
 
 var require = {
-	baseUrl: '[rewrite:settings]http_path_mmedia_versioned[/rewrite]',
+	baseUrl: '[rewrite:settings]x_pas_http_path_mmedia_versioned[/rewrite]',
 	paths: {
 		'Hammer': 'input/hammer.min',
 		'jquery': 'jquery/jquery-2.1.4.min',

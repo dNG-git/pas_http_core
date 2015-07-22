@@ -47,7 +47,7 @@ Constructor __init__(TranslatableException)
 :since: v0.1.01
 		"""
 
-		TranslatableError.__init__(self, l10n_id, http_code = 500, value = None, _exception = None)
+		TranslatableError.__init__(self, l10n_id, http_code, value, _exception)
 	#
 #
 

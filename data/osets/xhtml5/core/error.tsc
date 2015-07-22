@@ -4,7 +4,7 @@
 [if:settings:pas_core_dev_mode == 1][if:content:details != ]
 <details>
 	<summary>[rewrite:l10n]core_title_error_details[/rewrite]</summary>
-	<pre>[rewrite:content]details[/rewrite]</pre>
+	<pre class='pagecontent_box'>[rewrite:safe_content]details[/rewrite]</pre>
 </details><script type="text/javascript"><![CDATA[
 require([ "djs/uiX" ], function(uiX) {
 	uiX.details();

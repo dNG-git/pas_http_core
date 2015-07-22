@@ -20,8 +20,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 import re
 
-from dNG.pas.controller.abstract_http_request import AbstractHttpRequest
-from dNG.pas.data.settings import Settings
+from dNG.pas.controller.abstract_request import AbstractRequest
+from dNG.pas.controller.abstract_response import AbstractResponse
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.text.tag_parser.abstract import Abstract as AbstractTagParser
 from dNG.pas.data.text.tag_parser.each_mixin import EachMixin
@@ -110,7 +110,11 @@ Change data according to the matched tag.
 
 				if (source is None): _return += self.render_block(data[data_position:tag_end_position])
 				elif (source == "content"): _return += self.render_block(data[data_position:tag_end_position], "content", self._update_mapped_element("content", self.content), key)
-				elif (source == "settings"): _return += self.render_block(data[data_position:tag_end_position], "settings", self._update_mapped_element("settings", Settings.get_dict()), key)
+				elif (source == "settings"):
+				#
+					runtime_settings_dict = AbstractResponse.get_instance().get_runtime_settings()
+					_return += self.render_block(data[data_position:tag_end_position], "settings", self._update_mapped_element("settings", runtime_settings_dict), key)
+				#
 			#
 		#
 		elif (tag_definition['tag'] == "each"):
@@ -125,7 +129,11 @@ Change data according to the matched tag.
 				mapping_key = re_result.group(3)
 
 				if (source == "content"): _return += self.render_each(data[data_position:tag_end_position], "content", self._update_mapped_element("content", self.content), key, mapping_key)
-				elif (source == "settings"): _return += self.render_each(data[data_position:tag_end_position], "settings", self._update_mapped_element("settings", Settings.get_dict()), key, mapping_key)
+				elif (source == "settings"):
+				#
+					runtime_settings_dict = AbstractResponse.get_instance().get_runtime_settings()
+					_return += self.render_each(data[data_position:tag_end_position], "settings", self._update_mapped_element("settings", runtime_settings_dict), key, mapping_key)
+				#
 			#
 		#
 		elif (tag_definition['tag'] == "if"):
@@ -143,10 +151,14 @@ Change data according to the matched tag.
 				if (source == "content"): _return += self.render_if_condition(self._update_mapped_element("content", self.content), key, operator, value, data[data_position:tag_end_position])
 				elif (source == "request"):
 				#
-					request = AbstractHttpRequest.get_instance()
+					request = AbstractRequest.get_instance()
 					_return += self.render_if_condition({ 'lang': request.get_lang() } , key, operator, value, data[data_position:tag_end_position])
 				#
-				elif (source == "settings"): _return += self.render_if_condition(self._update_mapped_element("settings", Settings.get_dict()), key, operator, value, data[data_position:tag_end_position])
+				elif (source == "settings"):
+				#
+					runtime_settings_dict = AbstractResponse.get_instance().get_runtime_settings()
+					_return += self.render_if_condition(self._update_mapped_element("settings", runtime_settings_dict), key, operator, value, data[data_position:tag_end_position])
+				#
 			#
 		#
 		elif (tag_definition['tag'] == "link"):
@@ -165,7 +177,11 @@ Change data according to the matched tag.
 			elif (source == "formtags_content"): _return += self.render_rewrite_form_tags_xhtml(self._update_mapped_element("content", self.content), key)
 			elif (source == "l10n"): _return += self.render_rewrite(self._update_mapped_element("l10n", L10n.get_dict()), key)
 			elif (source == "safe_content"): _return += self.render_rewrite_safe_xhtml(self._update_mapped_element("content", self.content), key)
-			elif (source == "settings"): _return += self.render_rewrite(self._update_mapped_element("settings", Settings.get_dict()), key)
+			elif (source == "settings"):
+			#
+				runtime_settings_dict = AbstractResponse.get_instance().get_runtime_settings()
+				_return += self.render_rewrite(self._update_mapped_element("settings", runtime_settings_dict), key)
+			#
 			elif (source == "timestamp"):
 			#
 				re_result = re.match("^\\[rewrite:timestamp:([\\w]+)\\]", data[tag_position:data_position])

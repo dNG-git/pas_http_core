@@ -5,7 +5,6 @@
     { "name": "themes/simple/site.min.css" }
    ],
    "js_files": [
-    { "name": "requirejs/pas.config.tsc.min.js" },
     { "name": "requirejs/require-2.1.17.min.js" }
    ]
   }

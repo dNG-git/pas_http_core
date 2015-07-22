@@ -43,6 +43,7 @@ from dNG.pas.runtime.exception_log_trap import ExceptionLogTrap
 from .abstract_http_mixin import AbstractHttpMixin
 from .abstract_inner_request import AbstractInnerRequest
 from .abstract_request import AbstractRequest
+from .abstract_response import AbstractResponse
 from .stdout_stream_response import StdoutStreamResponse
 
 try:
@@ -427,7 +428,7 @@ Initializes the matching response instance.
 
 				if (session is None):
 				#
-					session = Session.get_class().load(session_create = False)
+					session = session_class.load(session_create = False)
 					self.set_session(session)
 				#
 				else: session.set_thread_default()
@@ -435,6 +436,7 @@ Initializes the matching response instance.
 
 			if (session is not None):
 			#
+				if (not session.is_persistent()): response.get_runtime_settings()['x_pas_http_session_uuid'] = session.get_uuid()
 				response.set_content_dynamic(True)
 
 				if (self.lang == ""):
@@ -534,7 +536,7 @@ instance.
 		"""
 
 		if (virtual_config is None): _return = None
-		elif ("path_parameters" in virtual_config and virtual_config['path_parameters']):
+		elif (virtual_config.get("path_parameters", False)):
 		#
 			_return = NamedLoader.get_instance("dNG.pas.controller.PredefinedHttpRequest")
 
@@ -550,6 +552,8 @@ instance.
 				if (len(parameter) == 2): parameters[parameter[0]] = unquote_plus(parameter[1])
 				elif (len(parameter) == 3 and parameter[0] == "dsd"): dsds[parameter[1]] = unquote_plus(parameter[2])
 			#
+
+			if ("ohandler" in virtual_config): _return.set_output_handler(virtual_config['ohandler'])
 
 			if ("m" in virtual_config): _return.set_module(virtual_config['m'])
 			elif ("m" in parameters): _return.set_module(parameters['m'])
@@ -579,6 +583,8 @@ instance.
 		elif ("m" in virtual_config or "s" in virtual_config or "a" in virtual_config or "path" in virtual_config):
 		#
 			_return = NamedLoader.get_instance("dNG.pas.controller.PredefinedHttpRequest")
+
+			if ("ohandler" in virtual_config): _return.set_output_handler(virtual_config['ohandler'])
 
 			if ("m" in virtual_config): _return.set_module(virtual_config['m'])
 			if ("s" in virtual_config): _return.set_service(virtual_config['s'])
@@ -669,6 +675,13 @@ Sets the associated session.
 		"""
 
 		self.session = session
+
+		response = AbstractResponse.get_instance()
+
+		if (response is not None
+		    and session is not None
+		    and (not session.is_persistent())
+		   ): response.get_runtime_settings()['x_pas_http_session_uuid'] = session.get_uuid()
 	#
 
 	@staticmethod

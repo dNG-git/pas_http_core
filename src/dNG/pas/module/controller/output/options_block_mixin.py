@@ -77,7 +77,7 @@ Renders an "OptionsBlock" CSS sprite icon.
 		"""
 
 		img_attributes = { "tag": "img",
-		                   "attributes": { "src": "{0}/spacer.png".format(Settings.get("http_path_mmedia_versioned")),
+		                   "attributes": { "src": "{0}/spacer.png".format(Settings.get("x_pas_http_path_mmedia_versioned")),
 		                                   "class": "{0}-icon".format(icon)
 		                                 },
 		                   "alt": title
@@ -98,7 +98,7 @@ Renders an "OptionsBlock" image.
 		"""
 
 		img_attributes = { "tag": "img",
-		                   "attributes": { "src": "{0}/themes/{1}/{2}.png".format(Settings.get("http_path_mmedia_versioned"),
+		                   "attributes": { "src": "{0}/themes/{1}/{2}.png".format(Settings.get("x_pas_http_path_mmedia_versioned"),
 		                                                                          self.response.get_theme_active(),
 		                                                                          image
 		                                                                         )

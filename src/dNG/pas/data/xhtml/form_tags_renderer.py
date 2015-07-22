@@ -175,7 +175,7 @@ Change data according to the "code" tag.
 		#
 			_return = _return.replace("[", "&#91;")
 			_return = _return.replace("]", "&#93;")
-			_return = "<code>{0}</code>".format(_return)
+			_return = "<code class='pagecontent_box'>{0}</code>".format(_return)
 		#
 
 		return _return

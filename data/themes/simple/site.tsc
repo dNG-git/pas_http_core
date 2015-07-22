@@ -95,9 +95,11 @@ td:last-child, th:last-child { border-right: none }
 }
 ]]></style>
 [each:content:css_files:file]
-<link href="[rewrite:settings]http_path_mmedia_versioned[/rewrite]/[rewrite:content]css_files.file.name[/rewrite]" rel="stylesheet" type="text/css" />
-[/each][each:content:js_files:file]
-<script src="[rewrite:settings]http_path_mmedia_versioned[/rewrite]/[rewrite:content]js_files.file.name[/rewrite]" type="text/javascript"></script>
+<link href="[rewrite:settings]x_pas_http_path_mmedia_versioned[/rewrite]/[rewrite:content]css_files.file.name[/rewrite]" rel="stylesheet" type="text/css" />
+[/each]
+<script src="[rewrite:settings]x_pas_http_path_mmedia_versioned[/rewrite]/pas/config.tsc.min.js?uuid=[rewrite:settings]x_pas_http_session_uuid[/rewrite]" type="text/javascript"></script>
+[each:content:js_files:file]
+<script src="[rewrite:settings]x_pas_http_path_mmedia_versioned[/rewrite]/[rewrite:content]js_files.file.name[/rewrite]" type="text/javascript"></script>
 [/each]
 </head>
 
@@ -119,6 +121,15 @@ td:last-child, th:last-child { border-right: none }
 [block]output.menu.Service.render_secondary[/block]
 	</div>
 	<footer class='designcopyright'>&#169; <i>direct</i> Netware Group - All rights reserved</footer>
-</div></body>
+</div>
+[if:settings:x_pas_http_session_uuid != ]
+<script type="text/javascript"><![CDATA[
+require([ "pas/HttpJsonApiRequest.min" ], function(HttpJsonApiRequest) {
+	var hjapi_request = new HttpJsonApiRequest();
+	hjapi_request.init_ping({ id: "pas.Session.ping", endpoint: "pas/session/ping/1.0/", delay: 10 });
+});
+]]></script>
+[/if]
+</body>
 
 </html>

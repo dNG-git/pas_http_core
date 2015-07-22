@@ -18,11 +18,10 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from os import path
 import re
 
 from dNG.data.file import File
-from dNG.pas.data.settings import Settings
+from dNG.pas.controller.abstract_response import AbstractResponse
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.text.tag_parser.abstract import Abstract as AbstractTagParser
 from dNG.pas.data.text.tag_parser.rewrite_mixin import RewriteMixin
@@ -83,7 +82,11 @@ Change data according to the matched tag.
 			key = data[data_position:tag_end_position]
 
 			if (source == "l10n"): _return += self.render_rewrite(L10n.get_dict(), key)
-			else: _return += self.render_rewrite(Settings.get_dict(), key)
+			else:
+			#
+				runtime_settings_dict = AbstractResponse.get_instance().get_runtime_settings()
+				_return += self.render_rewrite(runtime_settings_dict, key)
+			#
 		#
 
 		_return += data_closed
@@ -138,20 +141,13 @@ Renders content ready for output from the given "mmedia" file.
 
 		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, file_path_name, context = "pas_http_core")
 
-		file_path_name = path.normpath(file_path_name)
-		file_content = (None if (self.cache_instance is None) else self.cache_instance.get_file(file_path_name))
+		file_obj = File()
+		if (not file_obj.open(file_path_name, True, "r")): raise IOException("Failed to open mmedia file '{0}'".format(file_path_name))
 
-		if (file_content is None):
-		#
-			file_obj = File()
-			if (not file_obj.open(file_path_name, True, "r")): raise IOException("Failed to open mmedia file '{0}'".format(file_path_name))
+		file_content = file_obj.read()
+		file_obj.close()
 
-			file_content = file_obj.read()
-			file_obj.close()
-
-			if (file_content == False): raise IOException("Failed to read mmedia file '{0}'".format(file_path_name))
-			if (self.cache_instance is not None): self.cache_instance.set_file(file_path_name, file_content)
-		#
+		if (file_content == False): raise IOException("Failed to read mmedia file '{0}'".format(file_path_name))
 
 		return self._parse(file_content)
 	#

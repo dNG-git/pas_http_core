@@ -365,8 +365,33 @@ small { font-size: 0.75em }
 		div { background-color: $white; background-image: none }
 	}
 
-	.pageform_element { padding: 6px 0 }
+	.pageform_element { padding: 3px 0 }
 
+	.pagemainmenu {
+		margin: 0 -1px; padding: 1px 3px;
+		text-align: center
+	}
+
+	.pageservicemenu img { margin-bottom: 0 }
+
+	.pageservicemenu_p {
+		padding: 0;
+		text-align: center
+	}
+
+	.pageservicemenu_s {
+		padding: 0;
+		text-align: center
+	}
+}
+
+@media only screen and (min-width: 352px) and (max-width: 672px) {
+	.pageform_element { padding: 6px 0 }
+	.pageservicemenu_p { padding: 1px 1px 0 1px }
+	.pageservicemenu_s { padding: 1px }
+}
+
+@media only screen and (max-width: 672px) {
 	.pageform_field {
 		display: block; float: initial; width: inherit;
 		text-align: left
@@ -382,24 +407,7 @@ small { font-size: 0.75em }
 		-moz-box-sizing: border-box; -ms-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box
 	}
 
-	.pagemainmenu {
-		margin: 0 -1px; padding: 1px 3px;
-		text-align: center
-	}
-
 	.pageoptionsblock li { width: 100%; margin: 0; padding: 0 }
-
-	.pageservicemenu img { margin-bottom: 0 }
-
-	.pageservicemenu_p {
-		padding: 0;
-		text-align: center
-	}
-
-	.pageservicemenu_s {
-		padding: 0;
-		text-align: center
-	}
 
 	.pagetable_responsive {
 		margin: 6px 0;
@@ -430,23 +438,6 @@ small { font-size: 0.75em }
 	}
 }
 
-@media only screen and (min-width: 352px) and (max-width: 672px) {
-	.pageform_element { padding: 3px 0 }
-
-	.pageform_field {
-		display: block; float: initial; width: inherit;
-		text-align: left
-	}
-
-	.pageform_label {
-		display: block; width: inherit;
-		text-align: left
-	}
-
-	.pageservicemenu_p { padding: 1px 1px 0 1px }
-	.pageservicemenu_s { padding: 1px }
-}
-
 @media only screen and (min-width: 352px) and (max-width: 1632px) {
-	.pageoptionsblock li { width: 50%; margin: 0; padding: 0 }
+	.pageoptionsblock li { width: 50% }
 }

@@ -24,6 +24,7 @@ from socket import getaddrinfo, gethostname, getfqdn
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.http.virtual_config import VirtualConfig
 from dNG.pas.data.logging.log_line import LogLine
+from dNG.pas.data.text.link import Link
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.plugins.hook import Hook
 from dNG.pas.runtime.not_implemented_exception import NotImplementedException
@@ -104,7 +105,9 @@ Configures the server
 			Settings.set("pas_http_site_version", site_version)
 		#
 
-		Settings.set("http_path_mmedia_versioned", "/data/mmedia/{0}".format(site_version))
+		Settings.set("x_pas_http_base_url", Link.get_preferred().build_url(Link.TYPE_BASE_PATH))
+		Settings.set("x_pas_http_session_uuid", "")
+		Settings.set("x_pas_http_path_mmedia_versioned", "/data/mmedia/{0}".format(site_version))
 
 		VirtualConfig.set_virtual_path("/data/mmedia/{0}/".format(site_version), { "s": "cache", "path": "dfile" })
 		VirtualConfig.set_virtual_path("/data/mmedia/", { "s": "cache", "path": "dfile" })

@@ -26,6 +26,7 @@ from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.plugins.hook import Hook
+from dNG.pas.runtime.io_exception import IOException
 from .abstract_http_request import AbstractHttpRequest
 from .abstract_http_response import AbstractHttpResponse
 
@@ -53,6 +54,10 @@ Constructor __init__(HttpXhtmlResponse)
 
 		AbstractHttpResponse.__init__(self)
 
+		self.content = None
+		"""
+Content to be shown
+		"""
 		self.css_files_cache = [ ]
 		"""
 CSS files to be added.
@@ -226,8 +231,8 @@ theme if plugins changed the selected theme renderer.
 	def init(self, cache = False, compress = True):
 	#
 		"""
-Important headers will be created here. This includes caching, cookies, the
-compression setting and information about P3P.
+Important headers will be created here. This includes caching, cookies and
+compression setting used.
 
 :param cache: Allow caching at client
 :param compress: Send page GZip encoded (if supported)
@@ -318,6 +323,18 @@ Get the corresponding OSet name
 		#
 	#
 
+	def reset(self):
+	#
+		"""
+Resets all cached values.
+
+:since: v0.1.00
+		"""
+
+		AbstractHttpResponse.reset(self)
+		self.content = None
+	#
+
 	def send(self):
 	#
 		"""
@@ -390,6 +407,22 @@ occurred if they are not sent and all buffers are "None".
 		#
 	#
 
+	def set_content(self, content):
+	#
+		"""
+Sets the content for the response.
+
+:param content: Content to be send
+
+:since: v0.1.00
+		"""
+
+		if (self.data is not None): raise IOException("Can't combine content and raw data in one response.")
+		if (self.stream_response.is_streamer_set()): raise IOException("Can't combine a streaming object with content.")
+
+		self.content = content
+	#
+
 	def set_html_canonical_url(self, url):
 	#
 		"""
@@ -444,6 +477,21 @@ Sets the OSet to use.
 		"""
 
 		self.oset = oset
+	#
+
+	def set_raw_data(self, data):
+	#
+		"""
+"set_raw_data()" ignores any protocol specification and buffer the data as
+given.
+
+:param data: Data to be send
+
+:since: v0.1.00
+		"""
+
+		if (self.content is not None): raise IOException("Can't combine raw data and content in one response.")
+		AbstractHttpResponse.set_raw_data(self, data)
 	#
 
 	def set_theme(self, theme):
