@@ -364,6 +364,12 @@ Set source variables. The server timezone will be changed if a user is
 logged in and/or its timezone is identified.
 		"""
 
+		if (Settings.get("x_pas_http_base_url") is None):
+		#
+			link_class = NamedLoader.get_class("dNG.pas.data.text.Link")
+			Settings.set("x_pas_http_base_url", link_class().build_url(link_class.TYPE_ABSOLUTE_URL | link_class.TYPE_BASE_PATH))
+		#
+
 		content_type = self.get_header("Content-Type")
 
 		if (content_type is not None):

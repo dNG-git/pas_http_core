@@ -732,6 +732,26 @@ Parses the given type parameter given as a string value.
 
 		return _return
 	#
+
+	@staticmethod
+	def is_preferred_defined(context = None):
+	#
+		"""
+Returns true if a defined preferred URL exists for the given context.
+
+:param context: Context for the preferred link
+
+:return: (bool) True if defined
+:since:  v0.1.03
+		"""
+
+		url = None
+
+		if (context is not None): url = Settings.get("pas_http_site_preferred_url_base_{0}".format(re.sub("\\W+", "_", context)))
+		if (url is None): url = Settings.get("pas_http_site_preferred_url_base")
+
+		return (url is not None)
+	#
 #
 
 ##j## EOF

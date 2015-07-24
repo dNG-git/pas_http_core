@@ -105,7 +105,9 @@ Configures the server
 			Settings.set("pas_http_site_version", site_version)
 		#
 
-		Settings.set("x_pas_http_base_url", Link.get_preferred().build_url(Link.TYPE_BASE_PATH))
+		if (Link.is_preferred_defined()): Settings.set("x_pas_http_base_url", Link.get_preferred().build_url(Link.TYPE_ABSOLUTE_URL | Link.TYPE_BASE_PATH))
+		else: Settings.set("x_pas_http_base_url", None)
+
 		Settings.set("x_pas_http_session_uuid", "")
 		Settings.set("x_pas_http_path_mmedia_versioned", "/data/mmedia/{0}".format(site_version))
 
