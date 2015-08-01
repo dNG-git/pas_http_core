@@ -530,7 +530,10 @@ Returns the base URL for the given type and parameters.
 			if ("__link__" not in parameters): raise ValueException("Required parameter not defined for the predefined URL")
 			_return = parameters['__link__']
 		#
-		elif (self.scheme is not None and self.path is not None):
+		elif (_type & Link.TYPE_RELATIVE_URL != Link.TYPE_RELATIVE_URL
+		      and self.scheme is not None
+		      and self.path is not None
+		     ):
 		#
 			_return = "{0}://".format(Binary.str(self.scheme))
 			if (self.host is not None): _return += Binary.str(self.host)
