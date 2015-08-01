@@ -530,18 +530,21 @@ Returns the base URL for the given type and parameters.
 			if ("__link__" not in parameters): raise ValueException("Required parameter not defined for the predefined URL")
 			_return = parameters['__link__']
 		#
-		elif (_type & Link.TYPE_RELATIVE_URL != Link.TYPE_RELATIVE_URL
-		      and self.scheme is not None
-		      and self.path is not None
-		     ):
+		elif (self.path is not None):
 		#
-			_return = "{0}://".format(Binary.str(self.scheme))
-			if (self.host is not None): _return += Binary.str(self.host)
-
-			if (self.port is not None):
+			if (_type & Link.TYPE_RELATIVE_URL != Link.TYPE_RELATIVE_URL):
 			#
-				port = Link.filter_well_known_port(self.scheme, self.port)
-				if (port > 0): _return += ":{0:d}".format(port)
+				if (self.scheme is None): raise ValueException("Can't construct an absolute URL without an URI scheme")
+				_return = "{0}://".format(Binary.str(self.scheme))
+
+				if (self.host is None): raise ValueException("Can't construct an absolute URL without a host")
+				_return += Binary.str(self.host)
+
+				if (self.port is not None):
+				#
+					port = Link.filter_well_known_port(self.scheme, self.port)
+					if (port > 0): _return += ":{0:d}".format(port)
+				#
 			#
 
 			path = ("/" if (self.path is None) else Binary.str(self.path))
