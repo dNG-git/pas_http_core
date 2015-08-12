@@ -34,6 +34,7 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 		}
 
 		this.base_url = null;
+		this.endpoint = null;
 		this.final_error_codes = [ 400, 402, 410, 411, 413, 414, 500, 501, 505 ];
 		this.reload_error_codes = [ 401, 403 ];
 		this.timeout = 30;
@@ -45,6 +46,10 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 			} else if ('pas_config' in self && 'HttpJsonApiRequest_base_url' in self.pas_config) {
 				this.base_url = self.pas_config.HttpJsonApiRequest_base_url;
 			}
+		}
+
+		if ('endpoint' in args) {
+			this.endpoint = args.endpoint;
 		}
 
 		if ('timeout' in args) {
@@ -97,6 +102,10 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 			args = { };
 		}
 
+		if (this.base_url != null && this.endpoint == null && (!('endpoint' in args))) {
+			throw new Error('Missing required argument');
+		}
+
 		if ('delay' in args) {
 			var _this = this;
 			self.setTimeout(function () { _this._ping(args); }, 1000 * args.delay);
@@ -116,12 +125,37 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 		var _return = _super.prototype._prepare_request_args.call(this, args);
 
 		if (this.base_url != null) {
-			_return['url'] = this.base_url + "apis/" + args.endpoint;
+			var endpoint = this.endpoint;
+
+			if (endpoint == null) {
+				if (!('endpoint' in args)) {
+					throw new Error('Missing required arguments');
+				}
+
+				endpoint = args.endpoint;
+			}
+
+			_return['url'] = this.base_url + "apis/" + endpoint;
 		}
 
 		if (this.uuid != '' && 'url' in _return) {
-			_return.url += ((_return.url.indexOf('?') < 0) ? '?' : ';');
-			_return.url += 'uuid=' + this.uuid;
+			var is_uuid_defined = false;
+
+			if (_return.url.indexOf('?') < 0) {
+				_return.url += '?';
+			} else {
+				is_uuid_defined = (_return.url.search(/(\?|;)uuid=/) < 0);
+
+				if (!(is_uuid_defined)) {
+					_return.url += ';';
+				}
+			}
+
+			if (is_uuid_defined) {
+				_return.url = _return.url.replace(/(\?|;)uuid=(;|$)/, "$1uuid=" + this.uuid + "$2");
+			} else {
+				_return.url += "uuid=" + this.uuid;
+			}
 		}
 
 		_return['timeout'] = 1000 * this.timeout;
