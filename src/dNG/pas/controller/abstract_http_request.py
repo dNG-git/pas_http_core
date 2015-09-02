@@ -561,16 +561,33 @@ instance.
 
 			if ("ohandler" in virtual_config): _return.set_output_handler(virtual_config['ohandler'])
 
+			is_module_set = True
+			is_service_set = True
+			is_action_set = True
+
 			if ("m" in virtual_config): _return.set_module(virtual_config['m'])
 			elif ("m" in parameters): _return.set_module(parameters['m'])
+			else: is_module_set = False
 
 			if ("s" in virtual_config): _return.set_service(virtual_config['s'])
 			elif ("s" in parameters): _return.set_service(parameters['s'])
+			else: is_service_set = False
 
 			if ("a" in virtual_config): _return.set_action(virtual_config['a'])
 			elif ("a" in parameters): _return.set_action(parameters['a'])
+			else: is_action_set = False
 
-			for key in dsds: _return.set_dsd(key, dsds[key])
+			if (is_module_set or is_service_set or is_action_set):
+			#
+				for key in dsds: _return.set_dsd(key, dsds[key])
+			#
+			else:
+			#
+				_return.set_module(self.get_module())
+				_return.set_service(self.get_service())
+				_return.set_action(self.get_action())
+				_return.set_dsd_dict(self.get_dsd_dict())
+			#
 		#
 		elif ("setup_callback" in virtual_config):
 		#

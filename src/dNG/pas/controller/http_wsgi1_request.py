@@ -165,12 +165,7 @@ Request path after the script
 			else: virtual_pathname = self.virtual_pathname
 
 			inner_request = self._parse_virtual_config(virtual_config, virtual_pathname)
-
-			if (isinstance(inner_request, AbstractInnerRequest)):
-			#
-				self.query_string = ""
-				self.set_inner_request(inner_request)
-			#
+			if (isinstance(inner_request, AbstractInnerRequest)): self.set_inner_request(inner_request)
 
 			self.execute()
 		#
