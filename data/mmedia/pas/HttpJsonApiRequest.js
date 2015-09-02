@@ -115,6 +115,37 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 	}
 
 	/**
+	 * Prepares the query string.
+	 *
+	 * @method
+	 * @param {Object} args Query string arguments
+	 * @return {String} Prepared query string
+	 */
+	HttpJsonApiRequest.prototype._prepare_query_string = function(args) {
+		var _return = _super.prototype._prepare_query_string.call(this, args);
+
+		if (this.uuid != '') {
+			var is_uuid_defined = false;
+
+			if (_return.length > 0) {
+				is_uuid_defined = (_return.search(/(;|^)uuid=/) < 0);
+
+				if (!(is_uuid_defined)) {
+					_return += ';';
+				}
+			}
+
+			if (is_uuid_defined) {
+				_return = _return.replace(/(;|^)uuid=\w+(;|$)/, "$1uuid=" + this.uuid + "$2");
+			} else {
+				_return += "uuid=" + this.uuid;
+			}
+		}
+
+		return _return;
+	}
+
+	/**
 	 * Prepares and extends the given request arguments.
 	 *
 	 * @method
@@ -136,26 +167,6 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 			}
 
 			_return['url'] = this.base_url + "apis/" + endpoint;
-		}
-
-		if (this.uuid != '' && 'url' in _return) {
-			var is_uuid_defined = false;
-
-			if (_return.url.indexOf('?') < 0) {
-				_return.url += '?';
-			} else {
-				is_uuid_defined = (_return.url.search(/(\?|;)uuid=/) < 0);
-
-				if (!(is_uuid_defined)) {
-					_return.url += ';';
-				}
-			}
-
-			if (is_uuid_defined) {
-				_return.url = _return.url.replace(/(\?|;)uuid=(;|$)/, "$1uuid=" + this.uuid + "$2");
-			} else {
-				_return.url += "uuid=" + this.uuid;
-			}
 		}
 
 		_return['timeout'] = 1000 * this.timeout;
