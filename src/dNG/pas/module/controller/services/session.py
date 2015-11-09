@@ -23,8 +23,8 @@ from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 from dNG.pas.runtime.io_exception import IOException
 
-try: from dNG.pas.data.session.implementation import Implementation as SessionImplementation
-except ImportError: SessionImplementation = None
+try: from dNG.pas.data.session.implementation import Implementation as _Session
+except ImportError: _Session = None
 
 class Session(AbstractHttpController):
 #
@@ -54,14 +54,10 @@ Action for "api_ping"
 
 		session = (self.request.get_session() if (self.request.is_supported("session")) else None)
 
-		if (session == None):
+		if (session is None):
 		#
-			if (uuid is None): raise TranslatableException("core_unsupported_command", 400)
-
-			session_class = (None if (SessionImplementation is None) else SessionImplementation.get_class())
-			if (session_class is None): raise TranslatableException("core_unsupported_command", 400)
-
-			session = session_class.load(uuid, False)
+			if (uuid is None or _Session is None): raise TranslatableException("core_unsupported_command", 400)
+			session = _Session.load(uuid, False)
 		#
 
 		if (session is None): raise TranslatableException("core_access_denied", 403)
