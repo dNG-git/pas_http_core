@@ -27,13 +27,14 @@ try: from urllib.parse import parse_qsl
 except ImportError: from urlparse import parse_qsl
 
 from dNG.pas.data.binary import Binary
-from .request_body import RequestBody
+from .data import Data
 
-class RequestBodyUrlencoded(Mapping, RequestBody):
+class Urlencoded(Mapping, Data):
 #
 	"""
-"RequestBodyUrlencoded" parses an incoming request body as
-"application/x-www-form-urlencoded".
+"Urlencoded" parses an incoming request body as
+"application/x-www-form-urlencoded". Multi-dimensional arrays are not
+supported.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -48,16 +49,20 @@ class RequestBodyUrlencoded(Mapping, RequestBody):
 	"""
 RegEx for keys with array indices
 	"""
+	TYPE_ID = "urlencoded_form"
+	"""
+Body type ID
+	"""
 
 	def __init__(self):
 	#
 		"""
-Constructor __init__(RequestBodyUrlencoded)
+Constructor __init__(Urlencoded)
 
 :since: v0.1.00
 		"""
 
-		RequestBody.__init__(self)
+		Data.__init__(self)
 
 		self.parsed_data = None
 		"""
@@ -108,29 +113,45 @@ python.org: Called to implement the built-in function len().
 		return len(self.parsed_data)
 	#
 
+	def _init_read(self):
+	#
+		"""
+Initializes internal variables for reading from input.
+
+:since: v0.1.03
+		"""
+
+		Data._init_read(self)
+
+		self.parsed_data = { }
+	#
+
 	def parse(self):
 	#
 		"""
-Sets a given pointer for the streamed post instance.
+Parses the content of the request body.
 
 :since: v0.1.00
 		"""
 
-		byte_buffer = RequestBody.get(self)
+		byte_buffer = Data.get(self)
 
 		field_arrays = { }
-		parsed_data = ({ } if (byte_buffer is None) else parse_qsl(Binary.str(byte_buffer.read()), True, True))
-		self.parsed_data = { }
 
-		for parsed_field in parsed_data:
+		parsed_fields = ([ ]
+		                 if (byte_buffer is None or byte_buffer.get_size() < 1) else
+		                 parse_qsl(Binary.str(byte_buffer.read()), True, True)
+		                )
+
+		for parsed_field in parsed_fields:
 		#
-			re_result = RequestBodyUrlencoded.RE_ARRAY.search(parsed_field[0])
+			re_result = Urlencoded.RE_ARRAY.match(parsed_field[0])
 
 			if (re_result is None):
 			#
 				if (parsed_field[0] not in self.parsed_data): self.parsed_data[parsed_field[0]] = parsed_field[1]
-				elif (type(self.parsed_data[parsed_field[0]]) is list): self.parsed_data[parsed_field[0]].append(parsed_field[1])
-				else: self.parsed_data[parsed_field[0]] = [ self.parsed_data[parsed_field[0]], parsed_field[1] ]
+				elif (parsed_field[0] in field_arrays): field_arrays[parsed_field[0]].append({ "key": "", "value": parsed_field[1] })
+				else: field_arrays[parsed_field[0]] = [ { "key": "", "value": parsed_field[1] } ]
 			#
 			elif (re_result.group(1) in field_arrays): field_arrays[re_result.group(1)].append({ "key": re_result.group(2), "value": parsed_field[1] })
 			else: field_arrays[re_result.group(1)] = [ { "key": re_result.group(2), "value": parsed_field[1] } ]
@@ -139,7 +160,7 @@ Sets a given pointer for the streamed post instance.
 		for field in field_arrays:
 		#
 			element_position = 0
-			if (field in self.parsed_data): field_arrays[field].append(self.parsed_data[field])
+			if (field in self.parsed_data): field_arrays[field].insert(0, self.parsed_data[field])
 			self.parsed_data[field] = { }
 
 			for element in field_arrays[field]:

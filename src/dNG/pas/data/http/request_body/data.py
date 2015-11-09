@@ -28,28 +28,33 @@ from dNG.pas.data.supports_mixin import SupportsMixin
 from dNG.pas.runtime.io_exception import IOException
 from dNG.pas.runtime.value_exception import ValueException
 
-class RequestBody(ChunkedReaderMixin, SupportsMixin):
+class Data(ChunkedReaderMixin, SupportsMixin):
 #
 	"""
-The class "RequestBody" implements method to read the request body.
+The class "Data" implements method to read the request body.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.1.00
+:since:      v0.1.03
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
 
 	# pylint: disable=arguments-differ
 
+	TYPE_ID = None
+	"""
+Body type ID
+	"""
+
 	def __init__(self):
 	#
 		"""
-Constructor __init__(RequestBody)
+Constructor __init__(Data)
 
-:since: v0.1.00
+:since: v0.1.03
 		"""
 
 		ChunkedReaderMixin.__init__(self)
@@ -73,7 +78,7 @@ Input pointer
 		"""
 		self.input_size = -1
 		"""
-Input size in bytes if known.
+Input size in bytes if known
 		"""
 		self.received_data = None
 		"""
@@ -83,51 +88,38 @@ Received file-like data object
 		"""
 Size of the file-like data object
 		"""
-		self.received_size_max = int(Settings.get("pas_http_site_request_body_size_max", 10485760))
+		self.received_size_max = 0
 		"""
-Timeout for each network read.
+Allowed size in bytes of the request body
 		"""
-		self.socket_data_timeout = int(Settings.get("pas_http_core_request_body_socket_data_timeout", 0))
+		self.socket_data_timeout = int(Settings.get("pas_http_site_request_body_socket_data_timeout", 0))
 		"""
-Timeout for each network read.
+Timeout for each network read
 		"""
-		self.timeout = int(Settings.get("pas_http_request_body_timeout", 7200))
+		self.timeout = int(Settings.get("pas_http_site_request_body_timeout", 7200))
 		"""
-Absolute timeout to receive the request body.
+Absolute timeout to receive the request body
 		"""
+
+		if (self.__class__.TYPE_ID is not None):
+		#
+			self.received_size_max = int(Settings.get("pas_http_site_request_body_{0}_size_max".format(self.__class__.TYPE_ID), 0))
+		#
+
+		if (self.received_size_max < 1): self.received_size_max = int(Settings.get("pas_http_site_request_body_size_max", 2097152))
 
 		if (self.socket_data_timeout < 1): self.socket_data_timeout = int(Settings.get("pas_global_client_socket_data_timeout", 0))
 		if (self.socket_data_timeout < 1): self.socket_data_timeout = int(Settings.get("pas_global_socket_data_timeout", 30))
 	#
 
-	def _append_received_data(self, data):
+	def _decompress(self, data):
 	#
 		"""
-Handles data received.
+Decompresses incoming data.
 
 :param data: Data read from input
 
-:since: v0.1.01
-		"""
-
-		if (data is None): data = self.decompress(None)
-
-		if (data is not None):
-		#
-			self.received_data_size += len(data)
-			if (self.received_size_max > 0 and self.received_data_size > self.received_size_max): raise ValueException("Input size exceeds allowed limit")
-			self.received_data.write(data)
-		#
-	#
-
-	def decompress(self, data):
-	#
-		"""
-Reads "chunked" encoded content if set to true.
-
-:param chunk_encoded: True to active the "chunked" encoded mode
-
-:since: v0.1.00
+:since: v0.1.03
 		"""
 
 		_return = (data if (self.decompressors is None) else None)
@@ -149,7 +141,7 @@ Reads "chunked" encoded content if set to true.
 
 :param chunk_encoded: True to active the "chunked" encoded mode
 
-:since: v0.1.00
+:since: v0.1.03
 		"""
 
 		self.input_chunk_encoded = chunk_encoded
@@ -162,7 +154,7 @@ Defines the input compression algorithms used.
 
 :param algorithms: Input compression algorithms used
 
-:since: v0.1.00
+:since: v0.1.03
 		"""
 
 		algorithms = (algorithms if (type(algorithms) is list) else [ algorithms ])
@@ -179,47 +171,89 @@ Defines the input compression algorithms used.
 	def get(self, timeout = None):
 	#
 		"""
-Returns the request body.
+Returns the raw request body data.
 
-:param timeout: Attribute name
+:param timeout: Read timeout in seconds
 
 :return: (str) Request body data
-:since:  v0.1.00
+:since:  v0.1.03
 		"""
 
-		# pylint: disable=arguments-differ,raising-bad-type
+		self.read(timeout)
+		return self.received_data
+	#
 
-		if (timeout is None): timeout = self.socket_data_timeout
+	def _handle_data(self, data):
+	#
+		"""
+Handles data received.
+
+:param data: Data read from input
+
+:since: v0.1.03
+		"""
+
+		data = self._decompress(data)
+
+		if (data is not None):
+		#
+			self.received_data_size += len(data)
+			if (self.received_size_max > 0 and self.received_data_size > self.received_size_max): raise ValueException("Input size exceeds allowed limit")
+			self.received_data.write(data)
+		#
+	#
+
+	def _init_read(self):
+	#
+		"""
+Initializes internal variables for reading from input.
+
+:since: v0.1.03
+		"""
+
+		self.received_data = ByteBuffer()
+		self.received_data_size = 0
+	#
+
+	def read(self, timeout = None):
+	#
+		"""
+Reads the request body data and fills the buffer.
+
+:param timeout: Read timeout in seconds
+
+:since: v0.1.03
+		"""
+
+		# pylint: disable=raising-bad-type
 
 		if (self.input_ptr is not None):
 		#
 			if (hasattr(self.input_ptr, "settimeout")): self.input_ptr.settimeout(self.socket_data_timeout)
 
-			try: self.run(timeout)
+			self._init_read()
+
+			try: self._read(self._handle_data, timeout)
 			finally: self.input_ptr = None
 		#
-
-		return self.received_data
 	#
 
-	def run(self, timeout = None):
+	def _read(self, read_callback, timeout = None):
 	#
 		"""
-Sets a given pointer for the streamed post instance.
+Reads data until the body has been received or timeout occurs.
 
-:since: v0.1.00
+:param read_callback: Callback used to handle data read
+:param timeout: Read timeout in seconds
+
+:since: v0.1.03
 		"""
-
-		# pylint: disable=broad-except
 
 		if (timeout is None): timeout = self.timeout
 
-		self.received_data = ByteBuffer()
-		self.received_data_size = 0
-
 		if (self.input_size < 0 and (not self.input_chunk_encoded)): raise IOException("Input size and expected first chunk size are unknown")
 
-		if (self.input_chunk_encoded): self._read_chunked_data(self.input_ptr.read, self._append_received_data,timeout = timeout)
+		if (self.input_chunk_encoded): self._read_chunked_data(self.input_ptr.read, read_callback, timeout = timeout)
 		else:
 		#
 			timeout_time = time() + timeout
@@ -227,32 +261,33 @@ Sets a given pointer for the streamed post instance.
 
 			while (size_unread > 0 and time() < timeout_time):
 			#
-				part_size = (4096 if (size_unread > 4096) else size_unread)
+				part_size = (16384 if (size_unread > 16384) else size_unread)
 				part_data = self.input_ptr.read(part_size)
-				part_size = len(part_data)
+				part_size = (0 if (part_data is None) else len(part_data))
 
 				if (part_size < 1): raise IOException("Input pointer could not be read before socket timeout occurred")
 
 				if (part_size > 0):
 				#
 					size_unread -= part_size
-					self._append_received_data(part_data)
+					read_callback(part_data)
 				#
 			#
+
+			if (size_unread > 0): raise IOException("Timeout occured before EOF")
 		#
 
-		self._append_received_data(None)
-		self.received_data.seek(0)
+		if (self.decompressors is not None): read_callback(None)
 	#
 
 	def set_headers(self, headers):
 	#
 		"""
-Sets a given pointer for the RequestBody instance.
+Sets the relevant request headers.
 
-:param instance: File-like instance
+:param headers: Header dict
 
-:since: v0.1.00
+:since: v0.1.03
 		"""
 
 		self.headers = headers
@@ -261,11 +296,11 @@ Sets a given pointer for the RequestBody instance.
 	def set_input_ptr(self, input_ptr):
 	#
 		"""
-Sets a given pointer for the RequestBody instance.
+Sets the file-like input pointer used to read the request body from.
 
 :param instance: File-like instance
 
-:since: v0.1.00
+:since: v0.1.03
 		"""
 
 		self.input_ptr = input_ptr
@@ -278,7 +313,7 @@ Sets the expected input size.
 
 :param _bytes: Size in bytes
 
-:since: v0.1.00
+:since: v0.1.03
 		"""
 
 		self.input_size = _bytes
@@ -291,7 +326,7 @@ Sets the absolute timeout to receive the request body.
 
 :param timeout: Timeout in seconds
 
-:since: v0.1.00
+:since: v0.1.03
 		"""
 
 		self.timeout = timeout

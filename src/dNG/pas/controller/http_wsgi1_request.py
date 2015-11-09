@@ -207,7 +207,8 @@ Returns the unparsed request parameters.
 
 		_return = AbstractHttpRequest.parse_iline(self.query_string)
 
-		request_body = self.get_request_body(content_type_expected = "application/x-www-form-urlencoded")
+		request_body = self.prepare_body_instance(content_type_expected = "application/x-www-form-urlencoded")
+		if (request_body is None): request_body = self.prepare_body_instance(content_type_expected = "multipart/form-data")
 
 		if (isinstance(request_body, Mapping)):
 		#
