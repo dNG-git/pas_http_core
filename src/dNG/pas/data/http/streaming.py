@@ -126,7 +126,13 @@ Uses the given streamer and URL if all prerequisites are met.
 			#
 				url_ext = path.splitext(url)[1]
 				mimetype_definition = MimeType.get_instance().get(url_ext[1:])
-				if (mimetype_definition is not None): response.set_header("Content-Type", mimetype_definition['type'])
+
+				mimetype = (mimetype_definition['type']
+				            if (mimetype_definition is not None) else
+				            "application/octet-stream"
+				           )
+
+				response.set_header("Content-Type", mimetype)
 			#
 
 			Streaming.handle(request, streamer, response)
