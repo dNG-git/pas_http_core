@@ -5,7 +5,7 @@
     { "name": "themes/simple/site.min.css" }
    ],
    "js_files": [
-    { "name": "requirejs/require-2.1.17.min.js" }
+    { "name": "requirejs/require.min.js" }
    ]
   }
  }
