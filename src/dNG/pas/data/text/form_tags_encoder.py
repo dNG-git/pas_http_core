@@ -55,13 +55,13 @@ Change data according to the "box" tag.
 
 		tag_params = AbstractFormTags.parse_tag_parameters("box", data, tag_position, data_position)
 
-		re_object = re.match("^(\\d+)$", tag_params.get("width", ""))
+		re_result = re.match("^(\\d+)$", tag_params.get("width", ""))
 
-		if (re_object is not None):
+		if (re_result is not None):
 		#
-			value = int(re_object.group(1))
+			value = int(re_result.group(1))
 
-			if (value > 0 and value <= 100): tag_params['width'] = "{0:d}%".format(re_object.group(1))
+			if (value > 0 and value <= 100): tag_params['width'] = "{0:d}%".format(re_result.group(1))
 			else: del(tag_params['width'])
 
 			enclosed_data = data[data_position:tag_end_position]
@@ -96,12 +96,12 @@ Change data according to the "highlight" tag.
 
 		tag_params = AbstractFormTags.parse_tag_parameters("highlight", data, tag_position, data_position)
 
-		re_object = re.match("^(\\d+)$", tag_params.get("width", ""))
+		re_result = re.match("^(\\d+)$", tag_params.get("width", ""))
 
-		if (re_object is not None):
+		if (re_result is not None):
 		#
 			enclosed_data = data[data_position:tag_end_position]
-			value = int(re_object.group(1))
+			value = int(re_result.group(1))
 
 			_return = ("[highlight:width={0:d}%]{1}[/highlight]".format(value, enclosed_data)
 			           if (value > 0 and value <= 100) else
@@ -129,11 +129,11 @@ Change data according to the "hr" tag.
 
 		_return = ""
 
-		re_object = re.match("^\\[hr=(\\d+)\\]", data[tag_position:data_position])
+		re_result = re.match("^\\[hr=(\\d+)\\]", data[tag_position:data_position])
 
-		if (re_object is not None):
+		if (re_result is not None):
 		#
-			value = int(re_object.group(1))
+			value = int(re_result.group(1))
 			if (value > 0 and value <= 100): _return = "[hr={0:d}%]".format(value)
 		#
 
@@ -157,12 +157,12 @@ Change data according to the "margin" tag.
 
 		_return = ""
 
-		re_object = re.match("^\\[margin=(\\d+)\\]", data[tag_position:data_position])
+		re_result = re.match("^\\[margin=(\\d+)\\]", data[tag_position:data_position])
 
-		if (re_object is not None):
+		if (re_result is not None):
 		#
 			enclosed_data = data[data_position:tag_end_position]
-			value = int(re_object.group(1))
+			value = int(re_result.group(1))
 
 			_return = ("[margin={0:d}%]{1}[/margin]".format(value, enclosed_data) if (value > 0 and value <= 100) else enclosed_data)
 		#
@@ -187,12 +187,12 @@ Change data according to the "size" tag.
 
 		_return = ""
 
-		re_object = re.match("^\\[size=(\\d+)\\]", data[tag_position:data_position])
+		re_result = re.match("^\\[size=(\\d+)\\]", data[tag_position:data_position])
 
-		if (re_object is not None):
+		if (re_result is not None):
 		#
 			enclosed_data = data[data_position:tag_end_position]
-			value = int(re_object.group(1))
+			value = int(re_result.group(1))
 
 			if (value >= 8 and value <= 80): _return = "[size={0:d}px]{1}[/size]".format(value, enclosed_data)
 			elif (value > 0 and value <= 100): _return = "[size={0:d}%]{1}[/size]".format(value, enclosed_data)

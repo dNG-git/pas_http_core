@@ -411,7 +411,7 @@ Change data according to the "url" tag.
 
 		_return = ""
 
-		re_result = re.match("^\\[url=(\\w+:.*|)\\]", data[tag_position:data_position])
+		re_result = re.match("^\\[url=(\\w+:.*)?\\]", data[tag_position:data_position])
 		enclosed_data = ""
 		url = None
 

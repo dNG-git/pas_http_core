@@ -203,17 +203,17 @@ Change data according to the "color" tag.
 		"""
 
 		_return = ""
-		re_object = re.match("^\\[color=(.+?)\\]", data[tag_position:data_position])
+		re_result = re.match("^\\[color=(.+?)\\]", data[tag_position:data_position])
 
-		if (re_object is not None):
+		if (re_result is not None):
 		#
-			color = re_object.group(1)
+			color = re_result.group(1)
 			enclosed_data = data[data_position:tag_end_position]
 
 			if (color[:1] == "#"):
 			#
-				re_color_object = re.match("^\\[color=#([0-9a-f])([0-9a-f])([0-9a-f])\\]", data[tag_position:data_position])
-				_return = (enclosed_data if (re_color_object is None) else "[color=#{0}{1}{2}]{3}[/color]".format(re_color_object.group(1) * 2, re_color_object.group(2) * 2, re_color_object.group(3) * 2, enclosed_data))
+				re_color_result = re.match("^\\[color=#([0-9a-f])([0-9a-f])([0-9a-f])\\]", data[tag_position:data_position])
+				_return = (enclosed_data if (re_color_result is None) else "[color=#{0}{1}{2}]{3}[/color]".format(re_color_result.group(1) * 2, re_color_result.group(2) * 2, re_color_result.group(3) * 2, enclosed_data))
 			#
 			else: _return = ("[color=#{0}]{1}[/color]".format(FormTagsEncoder.CSS_COLOR_NAMES[color.lower()], enclosed_data) if (color.lower() in FormTagsEncoder.CSS_COLOR_NAMES) else enclosed_data)
 		#
@@ -233,16 +233,16 @@ Check if a possible tag match is a valid "color" tag that needs to be changed.
 		"""
 
 		_return = False
-		re_object = re.match("^\\[color=(.+?)\\]", data)
+		re_result = re.match("^\\[color=(.+?)\\]", data)
 
-		if (re_object is not None):
+		if (re_result is not None):
 		#
-			color = re_object.group(1)
+			color = re_result.group(1)
 
 			if (color[:1] == "#"):
 			#
-				re_color_object = re.match("^\\[color=#([0-9a-f]{6})\\]", data)
-				if (re_color_object is None): _return = True
+				re_color_result = re.match("^\\[color=#([0-9a-f]{6})\\]", data)
+				if (re_color_result is None): _return = True
 			#
 			else: _return = True
 		#
