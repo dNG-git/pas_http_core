@@ -31,11 +31,12 @@ except ImportError: from urllib import quote_plus, unquote_plus
 
 from dNG.data.rfc.header import Header
 from dNG.pas.data.settings import Settings
-from dNG.pas.data.http.request_body import RequestBody
-from dNG.pas.data.http.request_body_multipart import RequestBodyMultipart
-from dNG.pas.data.http.request_body_urlencoded import RequestBodyUrlencoded
+from dNG.pas.data.http.request_body.data import Data as RequestBodyData
+from dNG.pas.data.http.request_body.multipart_form_data import MultipartFormData as RequestBodyMultipartFormData
+from dNG.pas.data.http.request_body.urlencoded import Urlencoded as RequestBodyUrlencoded
 from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.text.l10n import L10n
+from dNG.pas.database.connection import Connection
 from dNG.pas.database.transaction_context import TransactionContext
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.plugins.hook import Hook
@@ -275,55 +276,6 @@ Returns the raw request query string.
 		return self.query_string
 	#
 
-	def get_request_body(self, request_body_instance = None, content_type_expected = None):
-	#
-		"""
-Returns a configured RequestBody instance to be read by the Request
-implementation.
-
-:param request_body_instance: RequestBody instance to be configured
-:param content_type_expected: Expected Content-Type header if any to use the
-                              RequestBody instance.
-
-:return: (object) Configured RequestBody instance
-:since:  v0.1.00
-		"""
-
-		content_type = InputFilter.filter_control_chars(self.get_header("Content-Type"))
-		if (content_type is not None): content_type = content_type.split(";", 1)[0].lower()
-
-		_return = (self._init_request_body(content_type)
-		           if (request_body_instance is None) else
-		           request_body_instance
-		          )
-
-		if (isinstance(_return, RequestBody)):
-		#
-			content_length = InputFilter.filter_int(self.get_header("Content-Length"))
-
-			if (self.body_fp is not None
-			    and (content_type_expected is None or (content_type is not None and content_type == content_type_expected))
-			    and ((content_length is not None and content_length > 0)
-			         or "chunked" in Header.get_field_list_dict(self.get_header("Transfer-Encoding"))
-			        )
-			   ):
-			#
-				if (content_length is not None): _return.set_input_size(content_length)
-				else: _return.define_input_chunk_encoded(True)
-
-				content_encoding = self.get_header("Content-Encoding")
-				if (content_encoding is not None): _return.define_input_compression(content_encoding)
-
-				_return.set_headers(self.get_headers())
-				_return.set_input_ptr(self.body_fp)
-
-				self.body_fp = None
-			#
-		#
-
-		return _return
-	#
-
 	def get_session(self):
 	#
 		"""
@@ -402,10 +354,10 @@ matching the given content type.
 		_return = None
 
 		if (content_type == "application/x-www-form-urlencoded"): _return = RequestBodyUrlencoded()
-		elif (content_type[:10] == "multipart/"): _return = RequestBodyMultipart()
+		elif (content_type[:19] == "multipart/form-data"): _return = RequestBodyMultipartFormData()
 		elif (self.get_header("Content-Length") is not None
 		      or self.get_header("Transfer-Encoding") is not None
-		     ): _return = RequestBody()
+		     ): _return = RequestBodyData()
 
 		return _return
 	#
@@ -423,18 +375,17 @@ Initializes the matching response instance.
 
 		response = NamedLoader.get_instance("dNG.pas.controller.{0}Response".format("".join([word.capitalize() for word in self.output_handler.split("_")])))
 
-		with ExceptionLogTrap("pas_http_core"):
+		with Connection.get_instance(), ExceptionLogTrap("pas_http_core"):
 		#
 			session = self.get_session()
-			session_class = (None if (Session is None) else Session.get_class())
 
-			if (session_class is not None):
+			if (Session is not None):
 			#
-				session_class.set_adapter(HttpSessionAdapter)
+				Session.get_class().set_adapter(HttpSessionAdapter)
 
 				if (session is None):
 				#
-					session = session_class.load(session_create = False)
+					session = Session.load(session_create = False)
 					self.set_session(session)
 				#
 				else: session.set_thread_default()
@@ -634,6 +585,57 @@ instance.
 		return _return
 	#
 
+	def prepare_body_instance(self, request_body_instance = None, content_type_expected = None):
+	#
+		"""
+Returns a configured RequestBody instance to be read by the Request
+implementation.
+
+:param request_body_instance: RequestBody instance to be configured
+:param content_type_expected: Expected Content-Type header if any to use the
+                              RequestBody instance.
+
+:return: (object) Configured RequestBody instance
+:since:  v0.1.00
+		"""
+
+		content_type = InputFilter.filter_control_chars(self.get_header("Content-Type"))
+		if (content_type is not None): content_type = content_type.split(";", 1)[0].lower()
+
+		_return = (self._init_request_body(content_type)
+		           if (request_body_instance is None) else
+		           request_body_instance
+		          )
+
+		if (isinstance(_return, RequestBodyData)):
+		#
+			content_length = InputFilter.filter_int(self.get_header("Content-Length"))
+
+			if (self.body_fp is None
+			    or (content_type is not None and content_type != content_type_expected)
+			    or (content_length is None
+			        and "chunked" not in Header.get_field_list_dict(self.get_header("Transfer-Encoding"))
+			       )
+			    or (content_length is not None and content_length < 1)
+			   ): _return = None
+			else:
+			#
+				if (content_length is not None): _return.set_input_size(content_length)
+				else: _return.define_input_chunk_encoded(True)
+
+				content_encoding = self.get_header("Content-Encoding")
+				if (content_encoding is not None): _return.define_input_compression(content_encoding)
+
+				_return.set_headers(self.get_headers())
+				_return.set_input_ptr(self.body_fp)
+
+				self.body_fp = None
+			#
+		#
+
+		return _return
+	#
+
 	def _respond(self, response):
 	#
 		"""
@@ -644,7 +646,7 @@ Respond the request with the given response.
 
 		# pylint: disable=broad-except,star-args
 
-		with ExceptionLogTrap("pas_http_core"):
+		with Connection.get_instance(), ExceptionLogTrap("pas_http_core"):
 		#
 			if (self.session is not None and self.session.is_active()):
 			#
@@ -719,9 +721,12 @@ Filters the given parameter value.
 :since:  v0.1.01
 		"""
 
+		value = InputFilter.filter_control_chars(value)
+
 		if (" " in value): value = quote_plus(value, "")
 		value = AbstractHttpRequest.RE_PARAMETER_NON_WORD_START.sub("", value)
 		value = AbstractHttpRequest.RE_PARAMETER_FILTERED_CHARS.sub("", value)
+
 		return AbstractHttpRequest.RE_PARAMETER_NON_WORD_END.sub("", value)
 	#
 
@@ -770,6 +775,8 @@ news, topics, ... Take care for injection attacks!
 :return: (dict) Parsed DSD
 :since:  v0.1.00
 		"""
+
+		dsd = InputFilter.filter_control_chars(dsd)
 
 		if ("+" not in dsd and AbstractHttpRequest.RE_PARAMETER_PLUS_ENCODED_CHAR.search(dsd) is not None): dsd = unquote_plus(dsd)
 		elif (" " in dsd): dsd = quote_plus(dsd, "")
