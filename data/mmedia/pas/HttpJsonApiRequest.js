@@ -20,13 +20,14 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 /**
  * @module HttpJsonApiRequest
  */
-define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
+define([ 'jquery', 'djt/HttpJsonRequest.min' ], function($, _super) {
 	/**
 	 * "HttpJsonApiRequest" instances provide easier access to the "direct PAS"
 	 * API endpoints.
 	 *
 	 * @class HttpJsonApiRequest
-	 * @param {Object} args Arguments to initialize a given HttpJsonApiRequest
+	 *
+	 * @param {object} args Arguments to initialize a given HttpJsonApiRequest
 	 */
 	function HttpJsonApiRequest(args) {
 		if (args === undefined) {
@@ -64,7 +65,7 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 			this.uuid = self.pas_config.HttpJsonApiRequest_session_uuid;
 		}
 
-		_super.call(args);
+		_super.call(this, args);
 	}
 
 	$.extend(HttpJsonApiRequest.prototype, _super.prototype);
@@ -73,7 +74,8 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 	 * Returns the error codes a call should not be retried.
 	 *
 	 * @method
-	 * @return {Array} List of HTTP codes
+	 *
+	 * @return {array} List of HTTP codes
 	 */
 	HttpJsonApiRequest.prototype.get_final_error_codes = function() {
 		return this.final_error_codes;
@@ -83,7 +85,8 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 	 * Returns the error codes the page should be reloaded.
 	 *
 	 * @method
-	 * @return {Array} List of HTTP codes
+	 *
+	 * @return {array} List of HTTP codes
 	 */
 	HttpJsonApiRequest.prototype.get_reload_error_codes = function() {
 		return this.reload_error_codes;
@@ -93,7 +96,8 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 	 * Initializes a repetitive API ping call.
 	 *
 	 * @method
-	 * @param {Object} args Arguments to override default call parameter
+	 *
+	 * @param {object} args Arguments to override default call parameter
 	 */
 	HttpJsonApiRequest.prototype.init_ping = function(args) {
 		var _return = null;
@@ -118,8 +122,10 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 	 * Prepares the query string.
 	 *
 	 * @method
-	 * @param {Object} args Query string arguments
-	 * @return {String} Prepared query string
+	 *
+	 * @param {object} args Query string arguments
+	 *
+	 * @return {string} Prepared query string
 	 */
 	HttpJsonApiRequest.prototype._prepare_query_string = function(args) {
 		var _return = _super.prototype._prepare_query_string.call(this, args);
@@ -149,8 +155,10 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 	 * Prepares and extends the given request arguments.
 	 *
 	 * @method
-	 * @param {Object} args Base arguments
-	 * @return {Object} Prepared and extended arguments
+	 *
+	 * @param {object} args Base arguments
+	 *
+	 * @return {object} Prepared and extended arguments
 	 */
 	HttpJsonApiRequest.prototype._prepare_request_args = function(args) {
 		var _return = _super.prototype._prepare_request_args.call(this, args);
@@ -178,7 +186,8 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 	 * Executes an API ping call.
 	 *
 	 * @method
-	 * @param {Object} args Arguments to override default call parameter
+	 *
+	 * @param {object} args Arguments to override default call parameter
 	 */
 	HttpJsonApiRequest.prototype._ping = function(args) {
 		var promise = this.call(args);
@@ -193,7 +202,7 @@ define([ 'jquery', 'djs/HttpJsonRequest.min' ], function($, _super) {
 		});
 
 		promise.fail(function(jQxhr, status, error) {
-			if ($.inArray(jQxhr.status, _this.get_reload_error_codes())) {
+			if ($.inArray(jQxhr.status, _this.get_reload_error_codes()) > -1) {
 				self.location.reload(true);
 			} else if ($.inArray(jQxhr.status, _this.get_final_error_codes()) < 0) {
 				self.setTimeout(function () { _this._ping(args); }, 1000);
