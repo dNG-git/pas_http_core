@@ -68,7 +68,7 @@ Returns a dict of parameters to be used with a Link instance.
 		elif ("link" in data and data['link'] == "params"):
 		#
 			if ("m" in data): _return['m'] = data['m']
-			if ("s" in data): _return['s'] = data['s']
+			if ("s" in data): _return['s'] = data['s'].replace("+", " ")
 			if ("a" in data): _return['a'] = data['a']
 			if ("dsd" in data): _return['dsd'] = re.sub("\\_\\_\\w+\\\\_\\_", "", data['dsd'])
 		#
