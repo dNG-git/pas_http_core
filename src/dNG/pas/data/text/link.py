@@ -134,7 +134,7 @@ This method appends default parameters if not already set.
 		#
 			if (request is None): request = AbstractHttpRequest.get_instance()
 			session = (None if (request is None) else request.get_session())
-			if (session is not None and session.is_active() and (not session.is_persistent())): _return['uuid'] = Session.get_class().get_thread_uuid()
+			if (session is not None and session.is_active() and (not session.is_persistent())): _return['uuid'] = Session.get_thread_uuid()
 		#
 
 		return _return
@@ -466,7 +466,7 @@ This method filters parameters like "__<KEYWORD>__".
 			#
 				if ("ohandler" not in _return): _return['ohandler'] = request.get_output_handler()
 				if ("m" not in _return): _return['m'] = request.get_module()
-				if ("s" not in _return): _return['s'] = request.get_service().replace(".", " ")
+				if ("s" not in _return): _return['s'] = request.get_service()
 				if ("a" not in _return): _return['a'] = request.get_action()
 
 				dsd_dict = request.get_dsd_dict()
@@ -480,6 +480,8 @@ This method filters parameters like "__<KEYWORD>__".
 
 			del(_return['__request__'])
 		#
+
+		if ("s" in _return): _return['s'] = _return['s'].replace(".", " ")
 
 		return self._filter_remove_parameters(_return)
 	#
