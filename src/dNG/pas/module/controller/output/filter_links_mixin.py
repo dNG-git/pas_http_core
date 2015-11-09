@@ -47,15 +47,13 @@ Filters links based on required permissions.
 
 		_return = [ ]
 
-		links_count = len(links)
 		session = self.request.get_session()
 
-		for position in range(0, links_count):
+		for link in links:
 		#
-			link = links[position]
 			is_allowed = False
 
-			if ("required_permission" in link):
+			if (link.get("required_permission") is not None):
 			#
 				permissions = (link['required_permission']
 				               if (type(link['required_permission']) is list) else
@@ -64,13 +62,13 @@ Filters links based on required permissions.
 
 				if (session is not None): pass
 			#
-			elif ("required_permissions" in link and type(link['required_permissions']) is list):
+			elif (type(link.get("required_permissions")) is list):
 			#
 				permissions = link['required_permissions']
 
 				if (session is not None): pass
 			#
-			elif ("required_user_type" in link):
+			elif (link.get("required_user_type") is not None):
 			#
 				user_profile = (None if (session is None) else session.get_user_profile())
 
@@ -92,7 +90,7 @@ Filters links based on required permissions.
 					#
 				#
 			#
-			elif ("forbidden_user_type" in link):
+			elif (link.get("forbidden_user_type") is not None):
 			#
 				user_profile = (None if (session is None) else session.get_user_profile())
 
@@ -118,9 +116,9 @@ Filters links based on required permissions.
 			#
 			else: is_allowed = True
 
-			if (is_allowed and "required_lang" in link): is_allowed = (self.request.get_lang() == link['required_lang'])
+			if (is_allowed and link.get("required_lang") is not None): is_allowed = (self.request.get_lang() == link['required_lang'])
 
-			if (is_allowed and "required_setting" in link):
+			if (is_allowed and link.get("required_setting") is not None):
 			#
 				setting = InputFilter.filter_control_chars(link['required_setting'])
 				if (Settings.get(setting, False) == False): is_allowed = False
