@@ -69,7 +69,11 @@ Action for "index"
 				#
 					file_content = FileContent.read(file_path_name)
 					if (file_content is not None): file_content = path.normpath(file_content)
-					file_path_name = ("" if (file_content is None or (not path.exists(file_content)) or (not os.access(file_content, os.R_OK))) else file_content)
+
+					file_path_name = (""
+					                  if (file_content is None or (not path.exists(file_content)) or (not os.access(file_content, os.R_OK))) else
+					                  file_content
+					                 )
 				#
 			#
 			else: file_path_name = ""
@@ -110,7 +114,7 @@ Action for "index"
 
 		if (is_valid and is_modified):
 		#
-			re_tsc_result = re.search("\\.tsc\\.(css|js|min\\.css|min\\.js|min\\.svg|svg)$", file_path_name, re.I)
+			re_tsc_result = re.search("\\.tsc\\.(min\\.)?(css|js|svg)$", file_path_name, re.I)
 
 			self.response.set_content_dynamic(re_tsc_result is not None)
 			self.response.init(True)
@@ -123,7 +127,7 @@ Action for "index"
 
 			if (re_tsc_result is not None):
 			#
-				file_extension = re_tsc_result.group(1)
+				file_extension = re_tsc_result.group(2)
 
 				if (file_extension == "css"): self.response.set_header("Content-Type", "text/css")
 				elif (file_extension == "js"): self.response.set_header("Content-Type", "text/javascript")
