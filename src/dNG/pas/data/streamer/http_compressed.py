@@ -56,19 +56,19 @@ Compression function
 		self.set_io_chunk_size(1048576)
 	#
 
-	def read(self, _bytes = None):
+	def read(self, n = None):
 	#
 		"""
 Reads from the current streamer session.
 
-:param _bytes: How many bytes to read from the current position (0 means
-               until EOF)
+:param n: How many bytes to read from the current position (0 means until
+          EOF)
 
 :return: (bytes) Data; None if EOF
 :since:  v0.1.00
 		"""
 
-		_return = AbstractEncapsulated.read(self, _bytes)
+		_return = AbstractEncapsulated.read(self, n)
 
 		is_data_uncompressed = (self.compressor is not None)
 
@@ -86,7 +86,7 @@ Reads from the current streamer session.
 				_return = self.compressor.compress(Binary.bytes(_return))
 
 				# Feed compressor object with data until it returns at least one byte
-				if (len(_return) < 1): _return = AbstractEncapsulated.read(self, _bytes)
+				if (len(_return) < 1): _return = AbstractEncapsulated.read(self, n)
 				else: is_data_uncompressed = False
 			#
 		#

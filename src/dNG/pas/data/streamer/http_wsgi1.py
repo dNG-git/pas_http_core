@@ -35,19 +35,19 @@ WSGI 1.0 compliant streamer.
              Mozilla Public License, v. 2.0
 	"""
 
-	def read(self, _bytes = None):
+	def read(self, n = None):
 	#
 		"""
 Reads from the current streamer session.
 
-:param _bytes: How many bytes to read from the current position (0 means
-               until EOF)
+:param n: How many bytes to read from the current position (0 means until
+          EOF)
 
 :return: (bytes) Data; Empty byte string if EOF
 :since:  v0.1.00
 		"""
 
-		_return = AbstractEncapsulated.read(self, _bytes)
+		_return = AbstractEncapsulated.read(self, n)
 		if (_return is None): _return = Binary.BYTES_TYPE()
 		return _return
 	#
