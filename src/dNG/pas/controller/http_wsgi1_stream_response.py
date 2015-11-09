@@ -144,7 +144,7 @@ to an error.
 :since: v0.1.00
 		"""
 
-		self.active = False
+		self.finish()
 	#
 
 	def finish(self):
