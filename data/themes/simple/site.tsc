@@ -97,7 +97,7 @@ td:last-child, th:last-child { border-right: none }
 [each:content:css_files:file]
 <link href="[rewrite:settings]x_pas_http_path_mmedia_versioned[/rewrite]/[rewrite:content]css_files.file.name[/rewrite]" rel="stylesheet" type="text/css" />
 [/each]
-<script src="[rewrite:settings]x_pas_http_path_mmedia_versioned[/rewrite]/pas/config.tsc.min.js?uuid=[rewrite:settings]x_pas_http_session_uuid[/rewrite]" type="text/javascript"></script>
+<script src="[rewrite:settings]x_pas_http_path_mmedia_versioned[/rewrite]/pas/config.tsc.min.js?lang=[rewrite:l10n]lang_code[/rewrite];theme=[rewrite:settings]x_pas_http_theme[/rewrite];uuid=[rewrite:settings]x_pas_http_session_uuid[/rewrite]" type="text/javascript"></script>
 [each:content:js_files:file]
 <script src="[rewrite:settings]x_pas_http_path_mmedia_versioned[/rewrite]/[rewrite:content]js_files.file.name[/rewrite]" type="text/javascript"></script>
 [/each]
