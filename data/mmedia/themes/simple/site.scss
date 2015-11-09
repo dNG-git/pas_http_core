@@ -12,7 +12,15 @@ hr {
 
 small { font-size: 0.75em }
 
-.pagecontent_box { overflow: auto; border-radius: 3px }
+.pagecontent_box { overflow: auto; overflow-y: hidden; border-radius: 3px }
+.pagecontent_box_bordered { margin: 6px 0px; padding: 6px; border: 1px solid $light_blue }
+.pagecontent_box_both_cleared { clear: both }
+.pagecontent_box_left { float: left }
+.pagecontent_box_left_cleared { clear: left }
+.pagecontent_box_left_padded { margin-left: 6px }
+.pagecontent_box_right { float: right }
+.pagecontent_box_right_cleared { clear: right }
+.pagecontent_box_right_padded { margin-right: 6px }
 
 .pagecontent_box_infoblock {
 	display: inline-block; clear: right; float: right; margin: 0 0 3px 3px;
@@ -99,7 +107,7 @@ small { font-size: 0.75em }
 }
 
 .pagecontent_monospace_box {
-	overflow: auto;
+	overflow: auto; overflow-y: hidden;
 	font-family: "Nimbus Mono L", Monaco, "Lucida Sans Typewriter", "Lucida Console", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace
 }
 
@@ -167,7 +175,7 @@ small { font-size: 0.75em }
 	font-size: 1.2em
 }
 
-.pageform_element { overflow: auto; border-bottom: 1px solid $grey; box-shadow: 0 2px 5px -5px rgba(#{$black_rgba}, 0.2) }
+.pageform_element { overflow: auto; overflow-y: hidden; border-bottom: 1px solid $grey; box-shadow: 0 2px 5px -5px rgba(#{$black_rgba}, 0.2) }
 .pageform_element .pageform_error { display: inline-block; margin-top: 10px }
 
 .pageform_error { clear: both; padding: 3px; background-color: $light_red; border: 1px solid $red; border-radius: 3px }
@@ -280,7 +288,7 @@ small { font-size: 0.75em }
 
 	li > a, li > span {
 		display: block; margin: 4px; padding: 6px; border: 1px solid $grey; border-radius: 7px;
-		overflow: auto; text-decoration: none
+		overflow: auto; overflow-y: hidden; text-decoration: none
 	}
 
 	ul { position: relative; margin: 0; padding: 0; list-style: none inside none }
@@ -392,6 +400,13 @@ small { font-size: 0.75em }
 }
 
 @media only screen and (max-width: 672px) {
+	.pagecontent_box_left, .pagecontent_box_right {
+		float: inherit;
+		text-align: center
+	}
+
+	.pagecontent_box_right.pagecontent_box_left_padded, .pagecontent_box_left.pagecontent_box_right_padded { margin-left: inherit, margin-right: inherit }
+
 	.pageform_field {
 		display: block; float: initial; width: inherit;
 		text-align: left

@@ -113,14 +113,17 @@ Change data according to the "box" tag.
 		#
 			tag_params = FormTagsRenderer.parse_tag_parameters("box", data, tag_position, data_position)
 
+			css_classes_list = [ ]
 			css_styles = [ ]
-			if ("align" in tag_params): css_styles.append("float: {0}".format(tag_params['align']))
+
+			if ("align" in tag_params): css_classes_list.append("pagecontent_box_{0}".format(tag_params['align']))
 			if ("clear" in tag_params): css_styles.append("clear: {0}".format(tag_params['clear']))
 			if ("width" in tag_params): css_styles.append("width: {0}".format(tag_params['width']))
 
+			css_classes = (" {0}".format(" ".join(css_classes_list)) if (len(css_classes_list) > 0) else "")
 			css_style = (' style="{0}"'.format("; ".join(css_styles)) if (len(css_styles) > 0) else "")
 
-			_return = '<div class="pagecontent_box"{0}>{1}</div>[nobr]'.format(css_style, _return)
+			_return = '<div class="pagecontent_box{0}"{1}>{2}</div>[nobr]'.format(css_classes, css_style, _return)
 		#
 
 		return _return
@@ -302,11 +305,11 @@ Change data according to the "img" tag.
 
 			if ("align" in tag_params):
 			#
-				if (tag_params['align'] == "left"): element_code = " class='pagecontent_box pagecontent_box_left' style='clear: left; float: left'"
-				elif (tag_params['align'] == "right"): element_code = " class='pagecontent_box pagecontent_box_right' style='clear: right; float: right'"
+				if (tag_params['align'] == "left"): element_code = " class='pagecontent_box pagecontent_box_left' style='clear: left'"
+				elif (tag_params['align'] == "right"): element_code = " class='pagecontent_box pagecontent_box_right' style='clear: right'"
 			#
 
-			_return = '<img src="{0}" title="{1}"{2} />'.format(Formatting.escape(url), title, element_code)
+			_return = '<img src="{0}" alt="{1}"{2} />'.format(Formatting.escape(url), title, element_code)
 		#
 
 		return _return
@@ -332,9 +335,17 @@ Change data according to the "justify" tag.
 		if (self.is_block_encoding_supported and len(_return) > 0):
 		#
 			tag_params = FormTagsRenderer.parse_tag_parameters("justify", data, tag_position, data_position)
-			css_style = ("float: left; width: {0}; ".format(tag_params['box']) if ("box" in tag_params) else "")
 
-			_return = '<div class="pagecontent_box" style="{0}text-align: justify">{1}</div>[nobr]'.format(css_style, _return)
+			css_classes = ""
+			css_style = ""
+
+			if ("box" in tag_params):
+			#
+				css_classes = ' class="pagecontent_box pagecontent_box_left"'
+				css_style = "width: {0}; ".format(tag_params['box'])
+			#
+
+			_return = '<div{0} style="{1}text-align: justify">{2}</div>[nobr]'.format(css_classes, css_style, _return)
 		#
 
 		return _return
@@ -363,7 +374,7 @@ Change data according to the "left" tag.
 
 			element_code = ""
 
-			if ("box" in tag_params): element_code = "class='pagecontent_box pagecontent_box_left' style='clear: left; float: left; width: {0}'".format(tag_params['box'])
+			if ("box" in tag_params): element_code = "class='pagecontent_box pagecontent_box_left' style='clear: left; width: {0}'".format(tag_params['box'])
 			else: element_code = "style='text-align: left'"
 
 			_return = '<div {0}>{1}</div>[nobr]'.format(element_code, _return)
@@ -527,7 +538,7 @@ Change data according to the "right" tag.
 
 			element_code = ""
 
-			if ("box" in tag_params): element_code = "class='pagecontent_box pagecontent_box_right' style='clear: right; float: right; width: {0}'".format(tag_params['box'])
+			if ("box" in tag_params): element_code = "class='pagecontent_box pagecontent_box_right' style='clear: right; width: {0}'".format(tag_params['box'])
 			else: element_code = "style='text-align: right'"
 
 			_return = '<div {0}>{1}</div>[nobr]'.format(element_code, _return)
@@ -664,7 +675,7 @@ Change data according to the "url" tag.
 :since:  v0.1.01
 		"""
 
-		re_result = re.match("^\\[url=(\\w+:.*|)\\]", data[tag_position:data_position])
+		re_result = re.match("^\\[url=(\\w+:.*)?\\]", data[tag_position:data_position])
 		enclosed_data = ""
 		url = None
 
