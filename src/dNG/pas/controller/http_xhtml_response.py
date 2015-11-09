@@ -18,6 +18,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+from os import path
+import os
 import re
 
 from dNG.pas.data.binary import Binary
@@ -89,6 +91,10 @@ Output theme (requested or configured)
 		self.theme_active = None
 		"""
 Selected output theme
+		"""
+		self.theme_active_base_path = None
+		"""
+Selected output theme file base path
 		"""
 		self.theme_css_files_cache = [ ]
 		"""
@@ -173,7 +179,7 @@ Add output content from an OSet template.
 	def add_theme_css_file(self, css_file):
 	#
 		"""
-Adds the requested CSS sprites to the output.
+Adds the requested theme CSS sprites to the output.
 
 :param css_file: Theme CSS file
 
@@ -183,9 +189,16 @@ Adds the requested CSS sprites to the output.
 		if (self.theme_renderer is None): self.theme_css_files_cache.append(css_file)
 		else:
 		#
-			theme_css_file = "themes/{0}/{1}".format(self.get_theme_active(),
-			                                         css_file
-			                                        )
+			css_file_path = path.join(self.get_theme_active_mmedia_base_path(),
+			                          css_file
+			                         )
+
+			theme_name = (self.get_theme_active()
+			              if (os.access(css_file_path, os.R_OK)) else
+			              "default"
+			             )
+
+			theme_css_file = "themes/{0}/{1}".format(theme_name, css_file)
 
 			self.add_css_file(theme_css_file)
 		#
@@ -226,6 +239,18 @@ theme if plugins changed the selected theme renderer.
 		"""
 
 		return self.theme_active
+	#
+
+	def get_theme_active_mmedia_base_path(self):
+	#
+		"""
+Returns the active output theme file base path.
+
+:return: (str) Output theme file base path
+:since:  v0.1.03
+		"""
+
+		return self.theme_active_base_path
 	#
 
 	def init(self, cache = False, compress = True):
@@ -280,7 +305,7 @@ Set up theme framework
 			if (self.theme is None):
 			#
 				theme = AbstractHttpRequest.get_instance().get_parameter("theme")
-				if (theme is not None): self.set_theme(theme)
+				if (theme is not None): self._set_theme(theme)
 			#
 
 			theme = (Hook.call("dNG.pas.http.Theme.checkCandidates", theme = self.theme) if (Settings.get("pas_http_theme_plugins_supported", True)) else None)
@@ -296,6 +321,14 @@ Set up theme framework
 
 			if (theme is None and (not self.theme_renderer.is_supported(self.theme))): self.theme = self.theme_renderer.__class__.get_default_theme()
 			if (self.theme_active is None): self.theme_active = (self.theme if (self.theme_renderer.is_supported(self.theme)) else "simple")
+
+			Settings.set("x_pas_http_theme", self.theme)
+
+			self.theme_active_base_path = path.join(Settings.get("path_data"),
+			                                        "mmedia",
+			                                        "themes",
+			                                        self.theme_active
+			                                       )
 
 			self.theme_renderer.set(self.theme_active)
 			self.theme_renderer.set_log_handler(self.log_handler)
@@ -320,6 +353,8 @@ Get the corresponding OSet name
 
 			self.oset = Settings.get("pas_http_theme_{0}_oset".format(self.theme_active))
 			if (self.oset is None): self.oset = Settings.get("pas_http_theme_oset_default", "xhtml5")
+
+			Settings.set("x_pas_http_oset", self.oset)
 		#
 	#
 
@@ -477,6 +512,7 @@ Sets the OSet to use.
 		"""
 
 		self.oset = oset
+		Settings.set("x_pas_http_oset", self.oset)
 	#
 
 	def set_raw_data(self, data):
@@ -494,18 +530,30 @@ given.
 		AbstractHttpResponse.set_raw_data(self, data)
 	#
 
-	def set_theme(self, theme):
+	def _set_theme(self, theme):
 	#
 		"""
-Sets the theme to use.
+Sets the theme to use. This function does not change CSS and JavaScript
+files already set. Use with care.
 
 :param theme: Output theme
 
-:since: v0.1.00
+:since: v0.1.03
 		"""
 
 		self.theme = re.sub("\\W", "", theme)
-		if (self.theme_renderer is not None and self.theme_renderer.is_supported(theme)): self.theme_renderer.set(theme)
+
+		if (self.theme_renderer is not None and self.theme_renderer.is_supported(theme)):
+		#
+			self.theme_active_base_path = path.join(Settings.get("path_data"),
+			                                        "mmedia",
+			                                        "themes",
+			                                        theme
+			                                       )
+
+			self.theme_renderer.set(theme)
+			Settings.set("x_pas_http_theme", theme)
+		#
 	#
 
 	def set_title(self, title):
