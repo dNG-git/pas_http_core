@@ -1,5 +1,5 @@
 // Icon names from left to right
-$mini-icon-names: mini-default-back, mini-default-option;
+$mini-icon-names: mini-default-back, mini-default-option, mini-default-locked;
 
 // Generate corresponding class names
 $mini-icon-class-names: null;
@@ -18,7 +18,7 @@ $mini-icon-position: 0;
 	$mini-icon-position: 1 + $mini-icon-position;
 }
 
-@media only screen and (max-width: 46em) {
+@media only screen and (max-width: 352px) {
 	// Small sprite size is 16px
 	$mini-icon-size: 16px;
 
@@ -32,7 +32,7 @@ $mini-icon-position: 0;
 	}
 }
 
-@media only screen and (min-width: 46em) and (max-width: 62em) {
+@media only screen and (min-width: 352px) and (max-width: 672px) {
 	// Medium sprite size is 24px
 	$mini-icon-size: 24px;
 
