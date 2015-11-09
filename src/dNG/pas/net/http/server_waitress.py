@@ -26,9 +26,9 @@ from socket import error as socket_error
 from dNG.pas.data.settings import Settings
 from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
 from dNG.pas.runtime.exception_log_trap import ExceptionLogTrap
-from .server_implementation import ServerImplementation
+from .abstract_server import AbstractServer
 
-class ServerWaitress(ServerImplementation):
+class ServerWaitress(AbstractServer):
 #
 	"""
 "ServerWaitress" is responsible to start an HTTP aware server.
@@ -50,7 +50,7 @@ Constructor __init__(ServerWaitress)
 :since: v0.1.00
 		"""
 
-		ServerImplementation.__init__(self)
+		AbstractServer.__init__(self)
 
 		self.server = None
 		"""
@@ -83,7 +83,7 @@ Configures the server
 Configure common paths and settings
 		"""
 
-		ServerImplementation._configure(self)
+		AbstractServer._configure(self)
 	#
 
 	def run(self):
@@ -131,7 +131,7 @@ Stop the server
 			self.sockets = { }
 		#
 
-		return ServerImplementation.stop(self, params, last_return)
+		return AbstractServer.stop(self, params, last_return)
 	#
 #
 

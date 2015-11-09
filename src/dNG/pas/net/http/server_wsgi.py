@@ -25,9 +25,9 @@ from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
 from dNG.pas.data.settings import Settings
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.plugins.hook import Hook
-from .server_implementation import ServerImplementation
+from .abstract_server import AbstractServer
 
-class ServerWsgi(ServerImplementation):
+class ServerWsgi(AbstractServer):
 #
 	"""
 "ServerWsgi" takes requests from WSGI aware servers.
@@ -63,7 +63,7 @@ Timestamp of service initialisation
 		if (self.cache_instance is not None): self.cache_instance.disable()
 
 		# Call super after we disabled the cache
-		ServerImplementation.__init__(self)
+		AbstractServer.__init__(self)
 
 		self._configure()
 
@@ -128,7 +128,7 @@ Configures the server
 		Settings.read_file("{0}/settings/pas_core.json".format(Settings.get("path_data")), True)
 		Settings.read_file("{0}/settings/pas_http.json".format(Settings.get("path_data")))
 
-		ServerImplementation._configure(self)
+		AbstractServer._configure(self)
 	#
 
 	def get_time_started(self, params = None, last_return = None):

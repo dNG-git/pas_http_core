@@ -28,9 +28,9 @@ from dNG.pas.data.settings import Settings
 from dNG.pas.controller.http_wsgi1_request import HttpWsgi1Request
 from dNG.pas.module.named_loader import NamedLoader
 from dNG.pas.runtime.exception_log_trap import ExceptionLogTrap
-from .server_implementation import ServerImplementation
+from .abstract_server import AbstractServer
 
-class ServerCherryPy(ServerImplementation):
+class ServerCherryPy(AbstractServer):
 #
 	"""
 "ServerCherryPy" is responsible to start the HTTP CherryPy server.
@@ -52,7 +52,7 @@ Constructor __init__(ServerCherryPy)
 :since: v0.1.01
 		"""
 
-		ServerImplementation.__init__(self)
+		AbstractServer.__init__(self)
 
 		self.server = None
 		"""
@@ -82,18 +82,23 @@ Configures the server
 		else: self.host = listener_host
 
 		config.update({ "response.stream": True })
-		numthreads = Settings.get("pas_http_cherrypy_server_numthreads", 10)
 
 		if (self.log_handler is not None): self.log_handler.info("pas.http.core cherrypy server starts at '{0}:{1:d}'", listener_host, self.port, context = "pas_http_core")
 
 		listener_data = ( listener_host, self.port )
-		self.server = CherryPyWSGIServer(listener_data, HttpWsgi1Request, numthreads = numthreads, server_name = self.host)
+		threads = Settings.get("pas_http_cherrypy_server_threads", 10)
+
+		self.server = CherryPyWSGIServer(listener_data,
+		                                 HttpWsgi1Request,
+		                                 numthreads = threads,
+		                                 server_name = self.host
+		                                )
 
 		"""
 Configure common paths and settings
 		"""
 
-		ServerImplementation._configure(self)
+		AbstractServer._configure(self)
 	#
 
 	def run(self):
@@ -120,7 +125,7 @@ Stop the server
 		"""
 
 		if (self.server is not None): self.server.stop()
-		return ServerImplementation.stop(self, params, last_return)
+		return AbstractServer.stop(self, params, last_return)
 	#
 #
 
