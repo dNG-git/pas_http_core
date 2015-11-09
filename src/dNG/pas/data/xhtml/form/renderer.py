@@ -134,7 +134,7 @@ valid XHTML for output.
 				#
 					_return += """
 </div><script type="text/javascript"><![CDATA[
-require([ "djs/XHtml5FormElement.min" ], function(XHtml5FormElement) {{
+require([ "djt/XHtml5FormElement.min" ], function(XHtml5FormElement) {{
 	new XHtml5FormElement({{ id: "{0}", type: "form_section" }});
 }});
 ]]></script>

@@ -168,7 +168,7 @@ Renders a link.
 			#
 				_return += """
 </span><script type="text/javascript"><![CDATA[
-require([ "djs/JsLink.min" ], function(JsLink) {{
+require([ "djt/JsLink.min" ], function(JsLink) {{
 	new JsLink({{ id: "{0}" }});
 }});
 ]]></script>

@@ -49,7 +49,7 @@ Renders the options button.
 
 		rendered_content = """
 {0}<script type="text/javascript"><![CDATA[
-require([ "djs/OverlayButton.min" ], function(OverlayButton) {{
+require([ "djt/OverlayButton.min" ], function(OverlayButton) {{
 	new OverlayButton({{
 		id: "{1}",
 		button_content: "{2}",
