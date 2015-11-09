@@ -25,7 +25,8 @@ from dNG.pas.module.controller.output.options_block_mixin import OptionsBlockMix
 class Service(OptionsBlockMixin, AbstractHttpController):
 #
 	"""
-The "Service" class implements a service menu view.
+The "Service" menu class implements a service menu based on the
+"servicemenu" link store.
 
 :author:     direct Netware Group
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -72,7 +73,11 @@ Returns a list of rendered links for the service menu.
 		_return = [ ]
 
 		links = Link.get_store("servicemenu")
-		for link in links: _return.append(self.render_options_block_link(link, include_image))
+
+		if (links is not None):
+		#
+			for link in links: _return.append(self.render_options_block_link(link, include_image))
+		#
 
 		return _return
 	#
