@@ -43,7 +43,7 @@ with TemporaryDirectory(dir = ".") as build_directory:
 	css_js_copyright = "pas.http.core #echo(pasHttpCoreVersion)# - (C) direct Netware Group - All rights reserved"
 	versions = get_versions()
 
-	parameters = { "install_data_plain_copy_extensions": "crt,jpg,json,png,tsc,wsgi,xml",
+	parameters = { "install_data_plain_copy_extensions": "crt,jpg,json,map,png,swf,tsc,wsgi,xml",
 	               "pasHttpCoreVersion": versions[0], "pasHttpCoreIVersion": versions[1],
 	               "css_header": css_js_copyright, "css_min_filenames": True,
 	               "js_header": css_js_copyright, "js_min_filenames": True
