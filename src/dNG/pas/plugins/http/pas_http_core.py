@@ -49,6 +49,7 @@ Called for "dNG.pas.http.Server.onStartup" and "dNG.pas.http.Wsgi.onStartup"
 
 	VirtualConfig.set_virtual_path("/apis/pas/dynamic/", { "ohandler": "http_json", "path_parameters": True })
 	VirtualConfig.set_virtual_path("/apis/pas/form/ping/1.0/", { "ohandler": "http_json", "m": "output", "s": "form", "a": "api_ping", "path": "form_id" })
+	VirtualConfig.set_virtual_path("/apis/pas/lang/get/1.0/", { "ohandler": "http_json", "m": "output", "s": "lang", "a": "api_get", "path": "lang_request" })
 	VirtualConfig.set_virtual_path("/apis/pas/session/ping/1.0/", { "ohandler": "http_json", "m": "services", "s": "session", "a": "api_ping", "path": "uuid" })
 
 	VirtualConfig.set_virtual_path("/contentfile/", { "path": "cid" })
