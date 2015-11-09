@@ -263,7 +263,7 @@ Change data according to the matched tag.
 		#
 		elif (tag_definition['tag'] == "rewrite"):
 		#
-			source = re.match("^\\[rewrite:(\\w+)(:.*|)\\]", data[tag_position:data_position]).group(1)
+			source = re.match("^\\[rewrite:(\\w+)(:.*)?\\]", data[tag_position:data_position]).group(1)
 			key = data[data_position:tag_end_position]
 
 			if (source == "content"): _return += self.render_rewrite(self._update_mapped_element("content", self.content), key)
@@ -324,7 +324,7 @@ Check if a possible tag match is a false positive.
 			#
 			elif (data_match == "rewrite"):
 			#
-				re_result = re.match("^\\[rewrite:(\\w+)(:.*|)\\]", data)
+				re_result = re.match("^\\[rewrite:(\\w+)(:.*)?\\]", data)
 
 				if (re_result is not None
 				    and re_result.group(1) in ( "content", "l10n", "settings" )
@@ -373,7 +373,7 @@ Renders content ready for output from the given OSet template.
 			theme_data = file_obj.read()
 			file_obj.close()
 
-			if (theme_data == False): raise IOException("Failed to read theme file for '{0}'".format(self.theme))
+			if (theme_data is None): raise IOException("Failed to read theme file for '{0}'".format(self.theme))
 			if (self.cache_instance is not None): self.cache_instance.set_file(file_path_name, theme_data)
 		#
 

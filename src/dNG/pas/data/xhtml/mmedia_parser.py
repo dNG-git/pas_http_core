@@ -147,7 +147,7 @@ Renders content ready for output from the given "mmedia" file.
 		file_content = file_obj.read()
 		file_obj.close()
 
-		if (file_content == False): raise IOException("Failed to read mmedia file '{0}'".format(file_path_name))
+		if (file_content is None): raise IOException("Failed to read mmedia file '{0}'".format(file_path_name))
 
 		return self._parse(file_content)
 	#
