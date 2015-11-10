@@ -26,6 +26,7 @@ from dNG.pas.data.text.key_store import KeyStore
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.data.xhtml.link import Link
 from dNG.pas.data.xhtml.form.renderer import Renderer
+from dNG.pas.database.connection import Connection
 from dNG.pas.database.nothing_matched_exception import NothingMatchedException
 from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 from dNG.pas.runtime.io_exception import IOException
@@ -44,6 +45,7 @@ The "Form" class implements the form view.
              Mozilla Public License, v. 2.0
 	"""
 
+	@Connection.wrap_callable
 	def execute_api_ping(self):
 	#
 		"""
@@ -64,7 +66,7 @@ Action for "api_ping"
 			form_store.set_data_attributes(validity_end_time = time() + validity_time)
 			form_store.save()
 		#
-		except NothingMatchedException: raise TranslatableException("core_access_denied", 403)
+		except NothingMatchedException as handled_exception: raise TranslatableException("core_access_denied", 403, _exception = handled_exception)
 
 		self.response.set_result({ "expires_in": validity_time })
 	#
@@ -85,24 +87,51 @@ Action for "render"
 			if ("url_parameters" in self.context):
 			#
 				link = Link()
+
 				form_parameters = link.build_url(Link.TYPE_FORM_FIELDS, self.context['url_parameters'])
+
+				form_post_encoding = (self.context['post_encoding']
+				                      if ("post_encoding" in self.context) else
+				                      "application/x-www-form-urlencoded"
+				                     )
+
 				form_url = link.build_url(Link.TYPE_FORM_URL, self.context['url_parameters'])
 
-				form = "<form id=\"pas_{0}\" action=\"{1}\" method='post' enctype='application/x-www-form-urlencoded' target='_self'>{2}{3}</form>"
-				form = form.format(form_id, form_url, form_parameters, form_content)
+				form = "<form id=\"pas_{0}\" action=\"{1}\" method='post' enctype=\"{2}\" target='_self'>{3}{4}</form>"
+				form = form.format(form_id, form_url, form_post_encoding, form_parameters, form_content)
 			#
 			else: form = "<form id=\"pas_{0}\">{1}</form>".format(form_id, form_content)
 
-			form += """
+			if (self.context['object'].is_supported("form_store")):
+			#
+				form += """
 <script type="text/javascript"><![CDATA[
 require([ "pas/HttpJsonApiRequest.min" ], function(HttpJsonApiRequest) {{
 	var hjapi_request = new HttpJsonApiRequest();
 	hjapi_request.init_ping({{ id: "pas.Form.ping.{0}", endpoint: "pas/form/ping/1.0/{0}", delay: 60 }});
 }});
 ]]></script>
-			""".format(form_id).strip()
+				""".format(form_id).strip()
+			#
 
 			self.set_action_result(form)
+		#
+	#
+
+	def execute_render_view(self):
+	#
+		"""
+Action for "render_view"
+
+:since: v0.1.00
+		"""
+
+		if ("object" in self.context):
+		#
+			form_content = self._parse()
+			form_id = XHtmlFormatting.escape(self.context['object'].get_form_id())
+
+			self.set_action_result("<div id=\"pas_{0}\">{1}</div>".format(form_id, form_content))
 		#
 	#
 
