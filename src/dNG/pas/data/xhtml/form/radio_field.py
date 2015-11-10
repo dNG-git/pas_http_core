@@ -152,17 +152,17 @@ Renders the given field.
 		return self._render_oset_file("core/form/radio", context)
 	#
 
-	def _set_form_value(self, form):
+	def _set_form(self, form):
 	#
 		"""
-Sets the field value based on the given form.
+Sets the form this field is part of.
 
 :param form: Form
 
-:since: v0.1.01
+:since: v0.1.03
 		"""
 
-		AbstractField._set_form_value(self, form)
+		AbstractField._set_form(self, form)
 		self._prepare_choices()
 	#
 

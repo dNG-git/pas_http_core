@@ -66,6 +66,10 @@ Constructor __init__(AbstractField)
 		"""
 Form context
 		"""
+		self.form_id = None
+		"""
+Form ID
+		"""
 		self.error_data = None
 		"""
 Field error data
@@ -460,17 +464,47 @@ Render the form field using the given OSet template.
 		return parser.render(file_path_name, content)
 	#
 
-	def _set_form_context(self, context):
+	def _set_form(self, form):
+	#
+		"""
+Sets the form this field is part of.
+
+:param form: Form
+
+:since: v0.1.03
+		"""
+
+		self._set_form_id(form)
+
+		self._set_form_context(form)
+
+		self._set_form_value(form)
+	#
+
+	def _set_form_id(self, form):
+	#
+		"""
+Sets the form ID.
+
+:param form: Form
+
+:since: v0.1.03
+		"""
+
+		self.form_id = form.get_form_id()
+	#
+
+	def _set_form_context(self, form):
 	#
 		"""
 Sets the form context.
 
-:param context: Form context dict
+:param form: Form
 
 :since: v0.1.01
 		"""
 
-		self.form_context = context
+		self.form_context = form.get_context()
 	#
 
 	def _set_form_value(self, form):
