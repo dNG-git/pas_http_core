@@ -6,8 +6,8 @@
 	<summary>[rewrite:l10n]core_title_error_details[/rewrite]</summary>
 	<pre class='pagecontent_box'>[rewrite:safe_content]details[/rewrite]</pre>
 </details><script type="text/javascript"><![CDATA[
-require([ "djs/uiX" ], function(uiX) {
-	uiX.details();
+require([ "djt/XHtml5UIElement" ], function(XHtml5UIElement) {
+	new XHtml5UIElement({ type: "details" });
 });
 ]]></script>
 [/if][/if]

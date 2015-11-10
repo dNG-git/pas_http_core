@@ -4,7 +4,7 @@
 		<p><ul class="pageform_radio">
 [each:content:choices:choice]
 			<li><label for="[rewrite:content]choices.choice.id[/rewrite]" class="pageform_radio_label"><input id="[rewrite:content]choices.choice.id[/rewrite]" type="radio" name="[rewrite:content]name[/rewrite]" value="[rewrite:content]choices.choice.value[/rewrite]"[if:content:choices.choice.selected == 1] checked="checked"[/if] /> [rewrite:content]choices.choice.title[/rewrite]</label><script type="text/javascript"><![CDATA[
-			require([ "djs/XHtml5FormElement.min" ], function(XHtml5FormElement) {
+			require([ "djt/XHtml5FormElement.min" ], function(XHtml5FormElement) {
 				new XHtml5FormElement({ id: "[rewrite:content]choices.choice.id[/rewrite]", type: "radio" });
 			});
 			]]></script></li>
