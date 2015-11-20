@@ -22,9 +22,9 @@ from time import time
 
 from dNG.pas.data.http.translatable_exception import TranslatableException
 from dNG.pas.data.text.input_filter import InputFilter
-from dNG.pas.data.text.key_store import KeyStore
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.data.xhtml.link import Link
+from dNG.pas.data.xhtml.form.processor import Processor
 from dNG.pas.data.xhtml.form.renderer import Renderer
 from dNG.pas.database.connection import Connection
 from dNG.pas.database.nothing_matched_exception import NothingMatchedException
@@ -62,7 +62,7 @@ Action for "api_ping"
 
 		try:
 		#
-			form_store = KeyStore.load_key(form_id)
+			form_store = Processor.load_form_store_id(form_id)
 			form_store.set_data_attributes(validity_end_time = time() + validity_time)
 			form_store.save()
 		#
