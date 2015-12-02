@@ -29,8 +29,6 @@ class Link(_Link):
 	"""
 "Link" provides (X)HTML centric methods to build them from parameters.
 
-TODO: Code incomplete
-
 :author:     direct Netware Group
 :copyright:  direct Netware Group - All rights reserved
 :package:    pas.http
@@ -81,13 +79,6 @@ as a source for parameters.
 		if (parameters is None): parameters = { }
 		xhtml_escape = escape
 
-		#if (_type == "asis"): _return = self.build_url(data)
-		#elif ($f__type == "asisuuid"):
-		#
-		#	uuid = (((isset ($direct_globals['input']))&&($f_withuuid)) ? $direct_globals['input']->uuidGet () : "");
-		#	_return = str_replace ("[uuid]",((($f_uuid)&&(!$direct_globals['kernel']->vUuidIsCookied ())&&($direct_globals['kernel']->vUuidCheckUsage ())) ? $f_uuid : ""),$f_data);
-		#
-
 		if (_type & Link.TYPE_FORM_FIELDS == Link.TYPE_FORM_FIELDS):
 		#
 			"""
@@ -98,7 +89,12 @@ value='de' />". Automatically add language, theme and uuid fields.
 			parameters = self._filter_parameters(parameters)
 			parameters = self._add_default_parameters(parameters)
 
-			_return = self._build_url_formatted("<input type='hidden' name=\"{0}\" value=\"{1}\" />", "", parameters, Link.escape)
+			_return = self._build_url_formatted("<input type='hidden' name=\"{0}\" value=\"{1}\" />",
+			                                    "",
+			                                    parameters,
+			                                    Link.escape
+			                                   )
+
 			xhtml_escape = False
 		#
 		elif (_type & Link.TYPE_FORM_URL == Link.TYPE_FORM_URL):
@@ -198,9 +194,9 @@ Removes all links defined for the given set name.
 		"""
 Escape the given data for embedding into (X)HTML.
 
-:param parameters: Parameters dict
+:param data: Input string
 
-:return: (dict) Filtered parameters dict
+:return: (str) Output string
 :since:  v0.1.01
 		"""
 
@@ -309,9 +305,9 @@ Adds a link to the given set name.
 		"""
 Unescape the given data.
 
-:param parameters: Parameters dict
+:param data: Input string
 
-:return: (dict) Filtered parameters dict
+:return: (str) Output string
 :since:  v0.1.01
 		"""
 

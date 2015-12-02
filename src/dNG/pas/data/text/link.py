@@ -87,6 +87,11 @@ Generates absolute URLs based on the "__virtual__" path parameter.
 		"""
 Constructor __init__(Link)
 
+:param scheme: URL scheme
+:param host: URL host
+:param port: URL port
+:param path: URL path
+
 :since: v0.1.01
 		"""
 
