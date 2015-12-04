@@ -136,6 +136,9 @@ Renders the given field.
 			context['size_percentage'] = "55%"
 		#
 
+		if (self.limit_max is not None): context['max_file_size'] = self.limit_max
+		if (self.limit_min is not None): context['min_file_size'] = self.limit_min
+
 		return self._render_oset_file("core/form/file", context)
 	#
 #
