@@ -5,6 +5,7 @@
  "pas_http_core_form_case_sensitive_placeholder": "Field is case-sensitive",
  "pas_http_core_form_password_repetition": "Please re-enter your password in the following field.",
 
+ "pas_http_core_form_done_data_saved_temporarily": "The form content has been temporarily saved successfully.",
  "pas_http_core_form_done_message": "The form content has been processed successfully.",
 
  "pas_http_core_form_error_format_invalid": "The content of this field does not match the required format.",
