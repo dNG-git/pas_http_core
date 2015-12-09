@@ -221,6 +221,30 @@ untranslated as well as the translated error message.
 		return _return
 	#
 
+	def get_field_list(self, section = None):
+	#
+		"""
+Returns a list of all input field defined.
+
+:param section: Form section
+
+:return: (list) List of dictionaries with the field name and section
+:since:  v0.1.00
+		"""
+
+		_return = [ ]
+
+		if (section is None): sections = self.cache
+		else: sections = ([ self.cache[self.cache_sections[section]] ] if (section in self.cache_sections) else [ ])
+
+		for section in sections:
+		#
+			for field_name in section['positions']: _return.append({ "name": field_name, "section": section['name'] })
+		#
+
+		return _return
+	#
+
 	def get_form_id(self):
 	#
 		"""
