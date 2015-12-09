@@ -61,6 +61,10 @@ Constructor __init__(Processor)
 		"""
 Can be set to true using "set_input_available()"
 		"""
+		self.input_data = None
+		"""
+Dictionary containing form data
+		"""
 		self.form_id_value = None
 		"""
 Value for the given form ID
@@ -168,7 +172,8 @@ source (e.g. from a HTTP POST request parameter).
 :since:  v0.1.00
 		"""
 
-		return (AbstractRequest.get_instance().get_parameter(name) if (self.input_available) else None)
+		if (self.input_data is None and self.input_available): self.input_data = AbstractRequest.get_instance().get_parameters()
+		return (self.input_data.get(name) if (self.input_data is not None) else None)
 	#
 
 	def set_input_available(self):
@@ -181,6 +186,18 @@ Sets the flag for available input. Input values can be read with
 		"""
 
 		self.input_available = True
+	#
+
+	def set_input_data(self, data):
+	#
+		"""
+Sets the dictionary of available input data.
+
+:since: v0.1.03
+		"""
+
+		self.input_available = True
+		self.input_data = data
 	#
 
 	@staticmethod
