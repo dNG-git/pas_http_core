@@ -66,7 +66,10 @@ Check if the given value has been selected.
 :since:  v0.1.01
 		"""
 
-		raise NotImplementedException()
+		parent = super(ChoicesMixin, self)
+		if (not hasattr(parent, "_check_selected_value")): raise NotImplementedException()
+
+		return parent._check_selected_value(value)
 	#
 
 	def _get_content(self):
