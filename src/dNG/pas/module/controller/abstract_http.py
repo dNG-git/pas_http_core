@@ -90,21 +90,42 @@ Execute the requested action.
 :since: v0.1.00
 		"""
 
-		if (self.log_handler is not None): self.log_handler.debug("{0!r} identified action '{1}'", self, self.action, context = "pas_http_core")
-		method = "execute_{0}".format(re.sub("\\W", "_", self.action))
+		method_name = "execute_{0}".format(re.sub("\\W", "_", self.action))
+		return self._execute(method_name)
+	#
 
-		if (hasattr(self, method)):
+	def _execute(self, method_name):
+	#
+		"""
+Execute the given action method.
+
+:param method_name: Method to be executed
+
+:since: v0.1.03
+		"""
+
+		if (self.log_handler is not None): self.log_handler.debug("{0!r} identified action '{1}'", self, self.action, context = "pas_http_core")
+
+		if (hasattr(self, method_name)):
 		#
-			method = getattr(self, method)
+			method = getattr(self, method_name)
 			method()
 		#
-		else:
-		#
-			if (self.primary_action and self.response.is_supported("headers")): self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
-			raise TranslatableException("core_unsupported_command", value = "Identified action '{0}' is not supported".format(self.action))
-		#
+		else: self._raise_executable_not_found()
 
 		return ("" if (self.action_result is None) else self.action_result)
+	#
+
+	def _raise_executable_not_found(self):
+	#
+		"""
+Raises the executable method not found error.
+
+:since: v0.1.03
+		"""
+
+		if (self.primary_action and self.response.is_supported("headers")): self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+		raise TranslatableException("core_unsupported_command", value = "Identified action '{0}' is not supported".format(self.action))
 	#
 
 	def set_action(self, action, context = None):
