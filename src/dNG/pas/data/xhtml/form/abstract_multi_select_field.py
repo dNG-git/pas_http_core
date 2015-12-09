@@ -83,7 +83,7 @@ Check if the given value has been selected.
 :since:  v0.1.03
 		"""
 
-		return (value in self.value)
+		return (self.value is not None and value in self.value)
 	#
 
 	def _get_render_context(self):
