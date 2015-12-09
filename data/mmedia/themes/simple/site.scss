@@ -207,13 +207,20 @@ small { font-size: 0.75em }
 
 .pageform_radio_label { vertical-align: middle }
 
-.pageform_textnpassword {
-	padding: 6px; border: 1px solid $light_blue; border-bottom-color: $dark_grey; border-radius: 3px;
-	font-size: 1em
+.pageform_section { margin: 11px 0; border-radius: 3px; box-shadow: 2px 2px 5px 1px $dark_grey }
+
+.pageform_section_title {
+	padding: 6px;
+	font-size: 1.25em; font-weight: bold
 }
 
 .pageform_select {
 	margin: 3px; padding: 3px; background-color: $white; border: 1px solid $light_blue; border-radius: 3px;
+	font-size: 1em
+}
+
+.pageform_textnpassword {
+	padding: 6px; border: 1px solid $light_blue; border-bottom-color: $dark_grey; border-radius: 3px;
 	font-size: 1em
 }
 

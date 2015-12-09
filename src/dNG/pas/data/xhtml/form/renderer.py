@@ -108,24 +108,41 @@ valid XHTML for output.
 
 				if (is_visible):
 				#
+					rendered_section_title = ""
 					section_id = "pas_form_section_{0}".format(Binary.str(hexlify(urandom(10))))
-
-					section_attributes = { "class": "pasform_section",
-					                       "id": section_id,
-					                       "data-form-id": self.form_id
-					                     }
+					section_title_id = None
 
 					if (self.fields[section_position]['name'] != ""):
 					#
-						section_attributes['data-form-section-title'] = self.fields[section_position]['name']
+						section_title_id = "pas_form_section_title_{0}".format(Binary.str(hexlify(urandom(10))))
+
+						section_title_attributes = { "class": "pageform_section_title",
+						                             "id": section_title_id
+						                           }
+
+						rendered_section_title = xml_parser.dict_to_xml_item_encoder({ "tag": "div",
+						                                                               "value": self.fields[section_position]['name'],
+						                                                               "attributes": section_title_attributes
+						                                                             })
 					#
 
-					_return += "{0}".format(xml_parser.dict_to_xml_item_encoder({ "tag": "div",
-					                                                              "attributes": section_attributes
-					                                                            },
-					                                                            False
-					                                                           )
-					                       )
+					section_attributes = { "id": section_id,
+					                       "data-form-id": self.form_id
+					                     }
+
+					if (section_title_id is not None):
+					#
+						section_attributes['class'] = "pageform_section"
+						section_attributes['data-form-section-title-id'] = section_title_id
+					#
+
+					_return += "{0}{1}".format(xml_parser.dict_to_xml_item_encoder({ "tag": "div",
+					                                                                 "attributes": section_attributes
+					                                                               },
+					                                                               False
+					                                                              ),
+					                           rendered_section_title
+					                          )
 				#
 
 				_return += self.render_section(section_position)
