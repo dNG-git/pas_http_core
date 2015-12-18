@@ -388,7 +388,7 @@ Returns if this field is required.
 :since:  v0.1.01
 		"""
 
-		return self.valid
+		return self.required
 	#
 
 	def is_valid(self):
