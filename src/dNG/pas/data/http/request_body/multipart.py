@@ -181,6 +181,7 @@ Handles data received.
 					self._handle_mime_part_headers(mime_part_id, mime_part_trailing_data.strip())
 
 					last_boundary_end_position = re_result.end()
+					last_boundary_end_position += 2 # Ignore CR LF of look-ahead match end
 
 					self.pending_received_data = ByteBuffer()
 				#
