@@ -147,12 +147,7 @@ Parses the content of the request body.
 		#
 			re_result = Urlencoded.RE_ARRAY.match(parsed_field[0])
 
-			if (re_result is None):
-			#
-				if (parsed_field[0] not in self.parsed_data): self.parsed_data[parsed_field[0]] = parsed_field[1]
-				elif (parsed_field[0] in field_arrays): field_arrays[parsed_field[0]].append({ "key": "", "value": parsed_field[1] })
-				else: field_arrays[parsed_field[0]] = [ { "key": "", "value": parsed_field[1] } ]
-			#
+			if (re_result is None): self.parsed_data[parsed_field[0]] = parsed_field[1]
 			elif (re_result.group(1) in field_arrays): field_arrays[re_result.group(1)].append({ "key": re_result.group(2), "value": parsed_field[1] })
 			else: field_arrays[re_result.group(1)] = [ { "key": re_result.group(2), "value": parsed_field[1] } ]
 		#

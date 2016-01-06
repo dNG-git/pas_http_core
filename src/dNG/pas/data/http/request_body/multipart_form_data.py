@@ -156,12 +156,7 @@ Parses the content of the request body.
 			re_result = MultipartFormData.RE_ARRAY.match(key)
 			parsed_part_value = self.parsed_parts[key]
 
-			if (re_result is None):
-			#
-				if (key not in self.parsed_data): self.parsed_data[key] = parsed_part_value
-				elif (key in field_arrays): field_arrays[key].append({ "key": "", "value": parsed_part_value })
-				else: field_arrays[key] = [ { "key": "", "value": parsed_part_value } ]
-			#
+			if (re_result is None): self.parsed_data[key] = parsed_part_value
 			elif (re_result.group(1) in field_arrays): field_arrays[re_result.group(1)].append({ "key": re_result.group(2), "value": parsed_part_value })
 			else: field_arrays[re_result.group(1)] = [ { "key": re_result.group(2), "value": parsed_part_value } ]
 		#
