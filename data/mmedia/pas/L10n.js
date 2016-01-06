@@ -121,8 +121,8 @@ define([ 'jquery', 'pas/HttpJsonApiRequest.min' ], function($, HttpJsonApiReques
 			throw new Error('Language is not specified in PAS configuration');
 		}
 
-		var hjs_request = new HttpJsonApiRequest({ endpoint: 'pas/lang/get/1.0/' + encodeURIComponent(files) });
-		var hjs_promise = hjs_request.call({ data: { lang: self.pas_config.lang }, cache: true });
+		var hjapi_request = new HttpJsonApiRequest({ endpoint: 'pas/lang/get/1.0/' + encodeURIComponent(files) });
+		var hjapi_promise = hjapi_request.call({ data: { lang: self.pas_config.lang }, cache: true });
 
 		for (var i = 0; i < files_pending.length; i++) {
 			var file = files_pending[i];
