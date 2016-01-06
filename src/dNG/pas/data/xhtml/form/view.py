@@ -75,6 +75,10 @@ Nameless form field counter
 		"""
 Form ID
 		"""
+		self.form_render_id = None
+		"""
+Form render ID
+		"""
 
 		L10n.init("pas_http_core_form")
 
@@ -257,6 +261,18 @@ Returns the form ID.
 		return self.form_id
 	#
 
+	def get_form_render_id(self):
+	#
+		"""
+Returns the form render ID.
+
+:return: (str) Form render ID
+:since:  v0.1.03
+		"""
+
+		return (self.get_form_id() if (self.form_render_id is None) else self.form_render_id)
+	#
+
 	def get_value(self, name, section = None, _raw_input = False):
 	#
 		"""
@@ -320,6 +336,19 @@ Sets the validator context used for defined callbacks.
 		"""
 
 		self.context = context
+	#
+
+	def set_form_render_id(self, form_render_id):
+	#
+		"""
+Sets a form render ID.
+
+:param form_render_id: Form render ID
+
+:since: v0.1.03
+		"""
+
+		self.form_render_id = form_render_id
 	#
 #
 
