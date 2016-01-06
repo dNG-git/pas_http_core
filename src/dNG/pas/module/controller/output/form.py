@@ -25,13 +25,13 @@ from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.data.xhtml.link import Link
 from dNG.pas.data.xhtml.form.processor import Processor
-from dNG.pas.data.xhtml.form.renderer import Renderer
 from dNG.pas.database.connection import Connection
 from dNG.pas.database.nothing_matched_exception import NothingMatchedException
 from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 from dNG.pas.runtime.io_exception import IOException
+from .form_parse_mixin import FormParseMixin
 
-class Form(AbstractHttpController):
+class Form(FormParseMixin, AbstractHttpController):
 #
 	"""
 The "Form" class implements the form view.
@@ -79,43 +79,40 @@ Action for "render"
 :since: v0.1.00
 		"""
 
-		if ("object" in self.context):
+		form_content = self._parse_context_form()
+		form_id = XHtmlFormatting.escape(self.context['object'].get_form_render_id())
+
+		if ("url_parameters" in self.context):
 		#
-			form_content = self._parse()
-			form_id = XHtmlFormatting.escape(self.context['object'].get_form_id())
+			link = Link()
 
-			if ("url_parameters" in self.context):
-			#
-				link = Link()
+			form_parameters = link.build_url(Link.TYPE_FORM_FIELDS, self.context['url_parameters'])
 
-				form_parameters = link.build_url(Link.TYPE_FORM_FIELDS, self.context['url_parameters'])
+			form_post_encoding = (self.context['post_encoding']
+			                      if ("post_encoding" in self.context) else
+			                      "application/x-www-form-urlencoded"
+			                     )
 
-				form_post_encoding = (self.context['post_encoding']
-				                      if ("post_encoding" in self.context) else
-				                      "application/x-www-form-urlencoded"
-				                     )
+			form_url = link.build_url(Link.TYPE_FORM_URL, self.context['url_parameters'])
 
-				form_url = link.build_url(Link.TYPE_FORM_URL, self.context['url_parameters'])
+			form = "<form id=\"pas_{0}\" action=\"{1}\" method='post' enctype=\"{2}\" target='_self'>{3}{4}</form>"
+			form = form.format(form_id, form_url, form_post_encoding, form_parameters, form_content)
+		#
+		else: form = "<form id=\"pas_{0}\">{1}</form>".format(form_id, form_content)
 
-				form = "<form id=\"pas_{0}\" action=\"{1}\" method='post' enctype=\"{2}\" target='_self'>{3}{4}</form>"
-				form = form.format(form_id, form_url, form_post_encoding, form_parameters, form_content)
-			#
-			else: form = "<form id=\"pas_{0}\">{1}</form>".format(form_id, form_content)
-
-			if (self.context['object'].is_supported("form_store")):
-			#
-				form += """
+		if (self.context['object'].is_supported("form_store")):
+		#
+			form += """
 <script type="text/javascript"><![CDATA[
 require([ "pas/HttpJsonApiRequest.min" ], function(HttpJsonApiRequest) {{
-	var hjapi_request = new HttpJsonApiRequest();
-	hjapi_request.init_ping({{ id: "pas.Form.ping.{0}", endpoint: "pas/form/ping/1.0/{0}", delay: 60 }});
+var hjapi_request = new HttpJsonApiRequest();
+hjapi_request.init_ping({{ id: "pas.Form.ping.{0}", endpoint: "pas/form/ping/1.0/{0}", delay: 60 }});
 }});
 ]]></script>
-				""".format(form_id).strip()
-			#
-
-			self.set_action_result(form)
+			""".format(form_id).strip()
 		#
+
+		self.set_action_result(form)
 	#
 
 	def execute_render_view(self):
@@ -126,37 +123,10 @@ Action for "render_view"
 :since: v0.1.00
 		"""
 
-		if ("object" in self.context):
-		#
-			form_content = self._parse()
-			form_id = XHtmlFormatting.escape(self.context['object'].get_form_id())
+		form_content = self._parse_context_form()
+		form_id = XHtmlFormatting.escape(self.context['object'].get_form_id())
 
-			self.set_action_result("<div id=\"pas_{0}\">{1}</div>".format(form_id, form_content))
-		#
-	#
-
-	def _parse(self):
-	#
-		"""
-Parses, renders and returns the given form.
-
-:return: (str) Valid XHTML form
-:since:  v0.1.00
-		"""
-
-		renderer = Renderer()
-		renderer.set_data(self.context['object'].get_data())
-		renderer.set_oset(self.response.get_oset())
-
-		_return = renderer.render()
-
-		if ("url_parameters" in self.context):
-		#
-			button_title = self.context.get("button_title", "core_continue")
-			_return += (renderer.render_submit_button(button_title) if (_return == "") else "\n{0}".format(renderer.render_submit_button(button_title)))
-		#
-
-		return _return
+		self.set_action_result("<div id=\"pas_{0}\">{1}</div>".format(form_id, form_content))
 	#
 #
 
