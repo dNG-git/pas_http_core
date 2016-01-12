@@ -52,26 +52,6 @@ Constructor __init__(AbstractMultiSelectField)
 		self.size = AbstractMultiSelectField.SIZE_SMALL
 	#
 
-	def check(self, force = False):
-	#
-		"""
-Checks if the field value is valid.
-
-:param force: True to force revalidation
-
-:return: (bool) True if all checks are passed
-:since:  v0.1.03
-		"""
-
-		if (self.valid is None or force):
-		#
-			if (len(self.choices) < 1): self.error_data = "internal_error"
-			elif (self.required and len(self.values_selected) < 1): self.error_data = "required_element"
-		#
-
-		return AbstractField.check(self, force)
-	#
-
 	def _check_selected_value(self, value):
 	#
 		"""

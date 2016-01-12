@@ -54,24 +54,19 @@ Constructor __init__(RadioField)
 		self.size = RadioField.SIZE_SMALL
 	#
 
-	def check(self, force = False):
+	def _check(self):
 	#
 		"""
-Checks if the field value is valid.
-
-:param force: True to force revalidation
+Executes checks if the field value is valid.
 
 :return: (bool) True if all checks are passed
-:since:  v0.1.01
+:since:  v0.1.03
 		"""
 
-		if (self.valid is None or force):
-		#
-			if (len(self.choices) < 1): self.error_data = "internal_error"
-			elif (self.required and len(self.values_selected) < 1): self.error_data = "required_element"
-		#
+		_return = AbstractField._check(self)
+		if (_return): _return = self._check_values_selected_size()
 
-		return AbstractField.check(self, force)
+		return _return
 	#
 
 	def _check_selected_value(self, value):

@@ -90,24 +90,19 @@ Value based Python "time_struct"
 		"""
 	#
 
-	def check(self, force = False):
+	def _check(self):
 	#
 		"""
-Checks if the field value is valid.
-
-:param force: True to force revalidation
+Executes checks if the field value is valid.
 
 :return: (bool) True if all checks are passed
 :since:  v0.1.03
 		"""
 
-		if (self.valid is None or force):
-		#
-			if (self.input_type_flags < 1): self.error_data = "internal_error"
-			else: self.valid = self._check_format()
-		#
+		_return = AbstractField._check(self)
+		if (_return): _return = self._check_format()
 
-		return AbstractField.check(self, force)
+		return _return
 	#
 
 	def _check_format(self):
@@ -289,6 +284,8 @@ Parses the raw value.
 
 :since: v0.1.00
 		"""
+
+		if (self.input_type_flags < 1): raise ValueException("Input type flags are not set")
 
 		data_length = (0 if (self.value is None) else len(self.value))
 		if (data_length < 1): raise ValueException("No data has been provided")

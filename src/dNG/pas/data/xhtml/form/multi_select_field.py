@@ -52,6 +52,21 @@ Constructor __init__(MultiSelectField)
 		self.size = MultiSelectField.SIZE_SMALL
 	#
 
+	def _check(self):
+	#
+		"""
+Executes checks if the field value is valid.
+
+:return: (bool) True if all checks are passed
+:since:  v0.1.03
+		"""
+
+		_return = AbstractMultiSelectField._check(self)
+		if (_return): _return = self._check_values_selected_size()
+
+		return _return
+	#
+
 	def load_definition(self, field_definition):
 	#
 		"""

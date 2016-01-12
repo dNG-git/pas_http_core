@@ -50,19 +50,19 @@ Constructor __init__(TextareaField)
 		PlaceholderMixin.__init__(self)
 	#
 
-	def check(self, force = False):
+	def _check(self):
 	#
 		"""
-Checks if the field value is valid.
-
-:param force: True to force revalidation
+Executes checks if the field value is valid.
 
 :return: (bool) True if all checks are passed
-:since:  v0.1.01
+:since:  v0.1.03
 		"""
 
-		if (self.valid is None or force): self.valid = self._check_length()
-		return AbstractField.check(self, force)
+		_return = AbstractField._check(self)
+		if (_return): _return = self._check_length()
+
+		return _return
 	#
 
 	def _get_content(self):

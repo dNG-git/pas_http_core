@@ -131,10 +131,25 @@ Checks if the field value is valid.
 :since:  v0.1.01
 		"""
 
-		self.valid = (self.valid if (self.valid is not None) else (self.error_data is None))
-		if (self.valid): self.valid = self._check_validators()
+		if (self.valid is None or force):
+		#
+			self.valid = self._check()
+			if (self.valid): self.valid = self._check_validators()
+		#
 
 		return self.valid
+	#
+
+	def _check(self):
+	#
+		"""
+Executes checks if the field value is valid.
+
+:return: (bool) True if all checks are passed
+:since:  v0.1.03
+		"""
+
+		return (self.error_data is None)
 	#
 
 	def _check_length(self):
@@ -146,18 +161,7 @@ Checks the length of value.
 :since:  v0.1.00
 		"""
 
-		data_length = (0 if (self.value is None) else len(self.value))
-		error_data = None
-
-		if (self.required and data_length < 1): error_data = "required_element"
-		elif (self.limit_min is not None
-		      and (self.required or data_length > 0)
-		      and self.limit_min > data_length
-		     ): error_data = ( "string_min", str(self.limit_min) )
-		elif (self.limit_max is not None and self.limit_max < data_length): error_data = ( "string_max", str(self.limit_max) )
-
-		if (error_data is not None): self.error_data = error_data
-		return (error_data is None)
+		return self._check_string_length(self.value)
 	#
 
 	def _check_range(self):
@@ -183,6 +187,29 @@ Checks the range of value.
 			else: error_data = "format_invalid"
 		#
 		elif (self.required): error_data = "required_element"
+
+		if (error_data is not None): self.error_data = error_data
+		return (error_data is None)
+	#
+
+	def _check_string_length(self, data):
+	#
+		"""
+Checks the length of the given string.
+
+:return: (bool) True if all checks are passed
+:since:  v0.1.03
+		"""
+
+		data_length = (0 if (data is None) else len(data))
+		error_data = None
+
+		if (self.required and data_length < 1): error_data = "required_element"
+		elif (self.limit_min is not None
+		      and (self.required or data_length > 0)
+		      and self.limit_min > data_length
+		     ): error_data = ( "string_min", str(self.limit_min) )
+		elif (self.limit_max is not None and self.limit_max < data_length): error_data = ( "string_max", str(self.limit_max) )
 
 		if (error_data is not None): self.error_data = error_data
 		return (error_data is None)
@@ -259,7 +286,21 @@ Returns the error message.
 
 		error_type = (self.error_data[0] if (type(self.error_data) is tuple) else self.error_data)
 
-		if (error_type == "number_max"):
+		if (error_type == "limit_max"):
+		#
+			_return = "{0}{1}{2}".format(L10n.get("pas_http_core_form_error_limit_max_1"),
+			                             self.error_data[1],
+			                             L10n.get("pas_http_core_form_error_limit_max_2")
+			                            )
+		#
+		elif (error_type == "limit_min"):
+		#
+			_return = "{0}{1}{2}".format(L10n.get("pas_http_core_form_error_limit_min_1"),
+			                             self.error_data[1],
+			                             L10n.get("pas_http_core_form_error_limit_min_2")
+			                            )
+		#
+		elif (error_type == "number_max"):
 		#
 			_return = "{0}{1}{2}".format(L10n.get("pas_http_core_form_error_number_max_1"),
 			                             self.error_data[1],

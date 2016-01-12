@@ -50,6 +50,21 @@ Constructor __init__(SelectField)
 		ChoicesMixin.__init__(self)
 	#
 
+	def _check(self):
+	#
+		"""
+Executes checks if the field value is valid.
+
+:return: (bool) True if all checks are passed
+:since:  v0.1.03
+		"""
+
+		_return = AbstractSelectField._check(self)
+		if (_return): _return = self._check_values_selected_size(1)
+
+		return _return
+	#
+
 	def load_definition(self, field_definition):
 	#
 		"""

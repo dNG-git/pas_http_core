@@ -78,29 +78,17 @@ Encrypted repetition field value
 		"""
 	#
 
-	def check(self, force = False):
+	def _check(self):
 	#
 		"""
-Checks if the field value is valid.
-
-:param force: True to force revalidation
+Executes checks if the field value is valid.
 
 :return: (bool) True if all checks are passed
-:since:  v0.1.01
+:since:  v0.1.03
 		"""
 
-		_return = TextField.check(self, force)
-
-		if (_return
-		    and self.mode & PasswordField.PASSWORD_WITH_REPETITION == PasswordField.PASSWORD_WITH_REPETITION
-		    and self.value != self.repetition_value
-		   ):
-		#
-			_return = False
-
-			self.error_data = "password_repetition"
-			self.valid = False
-		#
+		_return = TextField._check(self)
+		if (_return): _return = self._check_password_requirements()
 
 		return _return
 	#
@@ -114,15 +102,25 @@ Checks the length of value.
 :since:  v0.1.00
 		"""
 
-		data_length = (0 if (self.raw_value is None) else len(self.raw_value))
+		return self._check_string_length(self.raw_value)
+	#
+
+	def _check_password_requirements(self):
+	#
+		"""
+Checks if the field value fulfills the requirements.
+
+:param force: True to force revalidation
+
+:return: (bool) True if all checks are passed
+:since:  v0.1.01
+		"""
+
 		error_data = None
 
-		if (self.required and data_length < 1): error_data = "required_element"
-		elif (self.limit_min is not None
-		      and (self.required or data_length > 0)
-		      and self.limit_min > data_length
-		     ): error_data = ( "string_min", str(self.limit_min) )
-		elif (self.limit_max is not None and self.limit_max < data_length): error_data = ( "string_max", str(self.limit_max) )
+		if (self.mode & PasswordField.PASSWORD_WITH_REPETITION == PasswordField.PASSWORD_WITH_REPETITION
+		    and self.value != self.repetition_value
+		   ): error_data = "password_repetition"
 
 		if (error_data is not None): self.error_data = error_data
 		return (error_data is None)

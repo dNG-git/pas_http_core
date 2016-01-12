@@ -72,6 +72,35 @@ Check if the given value has been selected.
 		return parent._check_selected_value(value)
 	#
 
+	def _check_values_selected_size(self, limit_max_supported = -1):
+	#
+		"""
+Checks if the field value has the expected number of entries.
+
+:param limit_max_supported: Maximum number of entries supported
+
+:return: (bool) True if all checks are passed
+:since:  v0.1.03
+		"""
+
+		error_data = None
+		limit_max = self.limit_max
+		values_selected_size = len(self.values_selected)
+
+		if (limit_max is not None and limit_max > limit_max_supported): limit_max = limit_max_supported
+
+		if (len(self.choices) < 1): error_data = "internal_error"
+		elif (self.required and values_selected_size < 1): error_data = "required_element"
+		elif (self.limit_min is not None
+		      and (self.required or values_selected_size > 0)
+		      and self.limit_min > values_selected_size
+		     ): error_data = ( "limit_min", str(self.limit_min) )
+		elif (limit_max is not None and limit_max < values_selected_size): error_data = ( "limit_max", str(limit_max) )
+
+		if (error_data is not None): self.error_data = error_data
+		return (error_data is None)
+	#
+
 	def _get_content(self):
 	#
 		"""

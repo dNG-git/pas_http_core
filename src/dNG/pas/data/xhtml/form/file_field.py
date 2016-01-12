@@ -32,7 +32,7 @@ class FileField(PlaceholderMixin, AbstractField):
 :copyright:  direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.1.01
+:since:      v0.1.03
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -40,39 +40,39 @@ class FileField(PlaceholderMixin, AbstractField):
 	def __init__(self, name = None):
 	#
 		"""
-Constructor __init__(TextField)
+Constructor __init__(FileField)
 
 :param name: Form field name
 
-:since: v0.1.01
+:since: v0.1.03
 		"""
 
 		AbstractField.__init__(self, name)
 		PlaceholderMixin.__init__(self)
 	#
 
-	def check(self, force = False):
+	def _check(self):
 	#
 		"""
-Checks if the field value is valid.
-
-:param force: True to force revalidation
+Executes checks if the field value is valid.
 
 :return: (bool) True if all checks are passed
-:since:  v0.1.01
+:since:  v0.1.03
 		"""
 
-		if (self.valid is None or force): self.valid = self._check_size()
-		return AbstractField.check(self, force)
+		_return = AbstractField._check(self)
+		if (_return): _return = self._check_file_size()
+
+		return _return
 	#
 
-	def _check_size(self):
+	def _check_file_size(self):
 	#
 		"""
-Checks the size of value.
+Checks the file size of value.
 
 :return: (bool) True if all checks are passed
-:since:  v0.1.00
+:since:  v0.1.03
 		"""
 
 		data_size = (self.value.get_size() if (isinstance(self.value, UploadedFile)) else -1)
@@ -96,7 +96,7 @@ Checks the size of value.
 Returns the field type.
 
 :return: (str) Field type
-:since:  v0.1.01
+:since:  v0.1.03
 		"""
 
 		return "file"
@@ -108,7 +108,7 @@ Returns the field type.
 Renders the given field.
 
 :return: (str) Valid XHTML form field definition
-:since:  v0.1.01
+:since:  v0.1.03
 		"""
 
 		context = { "type": Formatting.escape(self.get_type()),

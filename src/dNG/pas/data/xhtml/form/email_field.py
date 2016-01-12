@@ -35,31 +35,39 @@ class EMailField(TextField):
              Mozilla Public License, v. 2.0
 	"""
 
-	def check(self, force = False):
+	def _check(self):
 	#
 		"""
-Checks if the field value is valid.
+Executes checks if the field value is valid.
 
-:param force: True to force revalidation
+:return: (bool) True if all checks are passed
+:since:  v0.1.03
+		"""
+
+		_return = TextField._check(self)
+		if (_return): _return = self._check_format()
+
+		return _return
+	#
+
+	def _check_format(self):
+	#
+		"""
+Checks if the field value has the expected format.
 
 :return: (bool) True if all checks are passed
 :since:  v0.1.01
 		"""
 
-		_return = TextField.check(self, force)
+		error_data = None
 
-		if (_return
-		    and len(self.value) > 0
-		    and InputFilter.filter_email_address(self.value) == ""
-		   ):
+		if (len(self.value) > 0 and InputFilter.filter_email_address(self.value) == ""):
 		#
-			_return = False
-
-			self.error_data = "format_invalid"
-			self.valid = False
+			error_data = "format_invalid"
 		#
 
-		return _return
+		if (error_data is not None): self.error_data = error_data
+		return (error_data is None)
 	#
 
 	def get_type(self):
