@@ -364,7 +364,11 @@ Sets and saves the given form input data temporarily.
 		for field in field_list:
 		#
 			value = form.get_value(field['name'])
-			if (type(value) not in ( bool, float, int )): value = InputFilter.filter_control_chars(value)
+
+			if (type(value) not in ( bool, float, int )
+			    and (not isinstance(value, list))
+			    and (not isinstance(value, dict))
+			   ): value = InputFilter.filter_control_chars(value)
 
 			form_data['multi_form_data'][field['name']] = value
 		#
