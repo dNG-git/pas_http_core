@@ -145,12 +145,10 @@ Checks the format of value.
 :since: v0.1.03
 		"""
 
-		_return = ""
-
-		if (self.input_type_flags & AbstractDateTimeField.TYPE_YEAR == AbstractDateTimeField.TYPE_YEAR):
-		#
-			_return = "%Y"
-		#
+		_return = ("%Y"
+		           if (self.input_type_flags & AbstractDateTimeField.TYPE_YEAR == AbstractDateTimeField.TYPE_YEAR) else
+		           ""
+		          )
 
 		if (self.input_type_flags & AbstractDateTimeField.TYPE_MONTH == AbstractDateTimeField.TYPE_MONTH):
 		#
@@ -289,36 +287,6 @@ Parses the raw value.
 
 		data_length = (0 if (self.value is None) else len(self.value))
 		if (data_length < 1): raise ValueException("No data has been provided")
-
-		value_format = self.get_format()
-
-		if (self.input_type_flags & AbstractDateTimeField.TYPE_YEAR == AbstractDateTimeField.TYPE_YEAR):
-		#
-			value_format = "%Y"
-		#
-
-		if (self.input_type_flags & AbstractDateTimeField.TYPE_MONTH == AbstractDateTimeField.TYPE_MONTH):
-		#
-			if (value_format != ""): value_format += "-"
-			value_format += "%m"
-		#
-
-		if (self.input_type_flags & AbstractDateTimeField.TYPE_DAY == AbstractDateTimeField.TYPE_DAY):
-		#
-			value_format += "-%d"
-		#
-
-		if (self.input_type_flags & AbstractDateTimeField.TYPE_WEEK == AbstractDateTimeField.TYPE_WEEK):
-		#
-			if (value_format != ""): value_format += "-"
-			value_format += "W%W"
-		#
-
-		if (self.input_type_flags & AbstractDateTimeField.TYPE_TIME == AbstractDateTimeField.TYPE_TIME):
-		#
-			if (value_format != ""): value_format += "T"
-			value_format += "%H:%M:%S"
-		#
 
 		try: self.parsed_time_struct = strptime(self.value, self.get_format())
 		except ValueError as handled_exception: raise ValueException("Value given does not contain the format specified", _exception = handled_exception)
