@@ -197,11 +197,11 @@ untranslated as well as the translated error message.
 
 		_return =  [ ]
 
-		if (section is None): sections = self.cache_sections
-		else: sections = ([ self.cache_sections[section] ] if (section in self.cache_sections) else None)
+		if (section is None): sections = self.cache
+		else: sections = ([ self.cache[self.cache_sections[section]] ] if (section in self.cache_sections) else None)
 
-		if (type(types_hidden) is list): types_hidden = [ "hidden", "info", "subtitle" ]
-		else: types_hidden += [ "hidden", "info", "subtitle" ]
+		if (type(types_hidden) is list): types_hidden += [ "hidden", "info", "subtitle" ]
+		else: types_hidden = [ "hidden", "info", "subtitle" ]
 
 		if (sections is not None):
 		#
