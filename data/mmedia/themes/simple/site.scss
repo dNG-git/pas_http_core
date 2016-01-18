@@ -111,6 +111,8 @@ small { font-size: 0.75em }
 	font-family: "Nimbus Mono L", Monaco, "Lucida Sans Typewriter", "Lucida Console", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace
 }
 
+.pagecontent_overlayed_box { opacity: 0.4 }
+
 .pagecontent_page_navigation {
 	clear: both; padding: 6px; background-color: $light_grey; border: 1px solid $light_blue;
 
@@ -181,8 +183,8 @@ small { font-size: 0.75em }
 .pageform_error { clear: both; padding: 3px; background-color: $light_red; border: 1px solid $red; border-radius: 3px }
 
 .pageform_field {
-	display: inline-block; float: right; width: 74%; margin: 0; padding: 11px 0;
-	text-align: center;
+	display: inline-block; float: right; width: 64%; margin: 0; padding: 11px 0;
+	text-align: left;
 
 	& > :first-child { margin-top: 0 }
 	& > :last-child { margin-bottom: 0 }
@@ -201,11 +203,13 @@ small { font-size: 0.75em }
 }
 
 .pageform_radio {
-	margin: 0; padding: 0; display: inline-block; list-style-type: none;
-	text-align: left
+	margin: 0; padding: 0; list-style-type: none;
+	text-align: left;
+
+	li { width: 80%; padding: 7px; border-bottom: 1px solid $grey }
 }
 
-.pageform_radio_label { vertical-align: middle }
+.pageform_radio_label { display: block }
 
 .pageform_section { margin: 11px 0; border-radius: 3px; box-shadow: 2px 2px 5px 1px $dark_grey }
 
