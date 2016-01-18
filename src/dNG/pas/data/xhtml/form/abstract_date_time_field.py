@@ -18,14 +18,15 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from time import localtime, mktime, strftime, strptime
+from calendar import timegm
+from time import gmtime, strftime, strptime
 
 from dNG.pas.data.binary import Binary
+from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting
 from dNG.pas.runtime.value_exception import ValueException
 from .abstract_field import AbstractField
 from .placeholder_mixin import PlaceholderMixin
-from dNG.pas.data.text.l10n import L10n
 
 class AbstractDateTimeField(PlaceholderMixin, AbstractField):
 #
@@ -248,14 +249,14 @@ Returns the context used for rendering the given field.
 	def get_timestamp(self):
 	#
 		"""
-Returns the field value as an UNIX timestamp.
+Returns the field value as an UNIX timestamp without timezone offset.
 
 :return: (int) UNIX timestamp
 :since:  v0.1.03
 		"""
 
 		if (self.parsed_time_struct is None): self._parse_value()
-		return mktime(self.parsed_time_struct)
+		return timegm(self.parsed_time_struct)
 	#
 
 	def get_value(self, _raw_input = False):
@@ -314,7 +315,7 @@ Sets the field value.
 :since: v0.1.03
 		"""
 
-		value = (strftime(self.get_format(), localtime(value))
+		value = (strftime(self.get_format(), gmtime(value))
 		         if (type(value) in ( float, int )) else
 		         Binary.str(value)
 		        )
