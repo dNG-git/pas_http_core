@@ -196,8 +196,8 @@ Sets the dictionary of available input data.
 :since: v0.1.03
 		"""
 
-		self.input_available = True
 		self.input_data = data
+		self.set_input_available()
 	#
 
 	@staticmethod
