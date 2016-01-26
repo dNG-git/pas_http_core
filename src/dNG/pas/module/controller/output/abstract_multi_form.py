@@ -98,29 +98,6 @@ class tree for self).
 		return _return
 	#
 
-	def _check_multi_form(self):
-	#
-		"""
-Returns true if all fields of the wizard-like context report to be valid.
-
-:return: (bool) True if valid
-:since:  v0.1.03
-		"""
-
-		form_id = self._get_multi_form_id()
-		form = FormProcessor(form_id)
-
-		form.set_input_data(self._get_multi_form_input_values(form))
-
-		for action_definition in self.multi_form_actions:
-		#
-			method = getattr(self, "apply_multi_form_action_{0}".format(action_definition['id']))
-			method(form)
-		#
-
-		return form.check()
-	#
-
 	def _execute_init(self, source = None, target = None):
 	#
 		"""
@@ -187,23 +164,32 @@ Action to show and handle a form action.
 		method = getattr(self, "apply_multi_form_action_{0}".format(form_action))
 		method(form)
 
+		is_last_save = ((len(self.multi_form_actions) - 1) == form_action_position)
+
 		if (is_save_mode and form.check()):
 		#
 			self._set_multi_form_input_values(form)
 
-			NotificationStore.get_instance().add_completed_info(L10n.get("pas_http_core_form_done_data_saved_temporarily"))
-
-			Link.clear_store("servicemenu")
-
-			next_form_action = ("save"
-			                    if (len(self.multi_form_actions) <= form_action_position) else
-			                    self.multi_form_actions[1 + form_action_position]['id']
-			                   )
-
 			redirect_request = PredefinedHttpRequest()
 			redirect_request.set_module(self.request.get_module())
 			redirect_request.set_service(self.request.get_service())
-			redirect_request.set_action(next_form_action)
+
+			if (is_last_save):
+			#
+				Link.clear_store("servicemenu")
+
+				redirect_request.set_action("save")
+			#
+			else:
+			#
+				NotificationStore.get_instance().add_completed_info(L10n.get("pas_http_core_form_done_data_saved_temporarily"))
+
+				Link.clear_store("servicemenu")
+
+				next_form_action = self.multi_form_actions[1 + form_action_position]['id']
+
+				redirect_request.set_action(next_form_action)
+			#
 
 			redirect_request.set_parameter_chained("form_id", form_id)
 			redirect_request.set_dsd_dict(self.request.get_dsd_dict())
@@ -214,10 +200,7 @@ Action to show and handle a form action.
 		#
 			content = { "title": self.multi_form_actions[form_action_position]['title'] }
 
-			button_title = ("pas_core_save"
-			                if (len(self.multi_form_actions) <= form_action_position) else
-			                "core_continue"
-			               )
+			button_title = ("pas_core_save" if (is_last_save) else "core_continue")
 
 			content['form'] = { "object": form,
 			                    "post_encoding": "multipart/form-data",
@@ -252,7 +235,84 @@ Saves all data of the form.
 :since: v0.1.03
 		"""
 
-		raise NotImplementedException()
+		L10n.init("pas_http_core_form")
+
+		first_form_action = self.multi_form_actions[0]['id']
+		form_id = self._get_multi_form_id()
+		back_link_params = { "__request__": True, "a": first_form_action, "form_id": form_id }
+
+		Link.set_store("servicemenu",
+		               Link.TYPE_RELATIVE_URL,
+		               L10n.get("core_back"),
+		               back_link_params,
+		               icon = "mini-default-back",
+		               priority = 7
+		              )
+
+		form = self._get_multi_form()
+
+		redirect_request = PredefinedHttpRequest()
+
+		if (form.check()):
+		#
+			self._save_multi_form_input_values(form)
+
+			target_iline = self._get_multi_form_saved_target_iline(form_id)
+
+			if (target_iline == ""):
+			#
+				redirect_request.set_module("output")
+				redirect_request.set_service("http")
+				redirect_request.set_action("done")
+
+				redirect_request.set_parameter_chained("title", L10n.get("pas_http_core_form_input_requested"))
+				redirect_request.set_parameter_chained("message", L10n.get("pas_http_core_form_done_message"))
+			#
+			else:
+			#
+				redirect_request.set_iline(target_iline)
+			#
+		#
+		else:
+		#
+			NotificationStore.get_instance().add_error(L10n.get("pas_http_core_form_multi_form_error_retry"))
+
+			redirect_request.set_module(self.request.get_module())
+			redirect_request.set_service(self.request.get_service())
+			redirect_request.set_action(first_form_action)
+
+			redirect_request.set_parameter_chained("form_id", form_id)
+			redirect_request.set_dsd_dict(self.request.get_dsd_dict())
+		#
+
+		self.request.redirect(redirect_request)
+	#
+
+	def _get_multi_form(self):
+	#
+		"""
+Returns the form for all fields defined in this wizard-like context.
+
+:return: (object) Form instance with all fields
+:since:  v0.1.03
+		"""
+
+		form_action = self._get_multi_form_action()
+		form_id = self._get_multi_form_id()
+
+		_return = FormProcessor(form_id)
+		_return.set_input_data(self._get_multi_form_input_values(_return))
+
+		for action_definition in self.multi_form_actions:
+		#
+			if (action_definition['id'] != form_action):
+			#
+				method = getattr(self, "apply_multi_form_action_{0}".format(action_definition['id']))
+				method(_return)
+			#
+		#
+
+		return _return
 	#
 
 	def _get_multi_form_action(self):
@@ -304,7 +364,8 @@ Returns the position of the given form action in a wizard-like context.
 		"""
 Returns the form ID used in a wizard-like context.
 
-:since: v0.1.03
+:return: (str) Form ID
+:since:  v0.1.03
 		"""
 
 		return (self.request.get_parameter_chained("form_id")
@@ -319,6 +380,8 @@ Returns the form ID used in a wizard-like context.
 		"""
 Returns temporarily saved form input data.
 
+:param form: Form instance
+
 :return: (dict) Form input data
 :since:  v0.1.03
 		"""
@@ -327,11 +390,30 @@ Returns temporarily saved form input data.
 		return form_data.get("multi_form_data", { })
 	#
 
+	def _get_multi_form_saved_target_iline(self, form_id):
+	#
+		"""
+Returns the target iline used to redirect to after the data has been saved.
+
+:param form_id: Form ID
+
+:return: (str) Form target iline
+:since:  v0.1.03
+		"""
+
+		source_iline = InputFilter.filter_control_chars(self.request.get_dsd("source", "")).strip()
+		target_iline = InputFilter.filter_control_chars(self.request.get_dsd("target", "")).strip()
+
+		return (source_iline if (target_iline == "") else target_iline)
+	#
+
 	def _is_multi_form_action_defined(self, form_action):
 	#
 		"""
 Returns true if the given form action is defined for the wizard-like
 context.
+
+:param form_action: Form action to be checked
 
 :return: (bool) True if defined
 :since:  v0.1.03
@@ -375,6 +457,20 @@ Sets and saves the given form input data temporarily.
 
 		form_store.set_value_dict(form_data)
 		form_store.save()
+	#
+
+	@Connection.wrap_callable
+	def _save_multi_form_input_values(self, form):
+	#
+		"""
+Saves the data of the wizard-like context form.
+
+:param form: Form instance
+
+:since: v0.1.03
+		"""
+
+		raise NotImplementedException()
 	#
 #
 
