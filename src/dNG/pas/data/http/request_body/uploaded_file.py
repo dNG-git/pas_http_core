@@ -118,12 +118,9 @@ Checks if the uploaded file has reached EOF.
 :since:  v0.1.03
 		"""
 
-		with self._lock:
-		#
-			if (self._wrapped_resource is None): _return = True
-			elif (hasattr(self._wrapped_resource, "is_eof")): _return = self._wrapped_resource.is_eof()
-			else: _return = (self.tell() == self.get_size())
-		#
+		if (self._wrapped_resource is None): _return = True
+		elif (hasattr(self._wrapped_resource, "is_eof")): _return = self._wrapped_resource.is_eof()
+		else: _return = (self.tell() == self.get_size())
 
 		return _return
 	#
