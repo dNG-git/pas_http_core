@@ -18,6 +18,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+from copy import copy
+
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.xhtml.formatting import Formatting
 from dNG.pas.runtime.not_implemented_exception import NotImplementedException
@@ -173,10 +175,13 @@ Sets the available choices.
 		"""
 
 		if (not isinstance(choices, list)): raise TypeException("Given choices type is invalid")
+
 		self.choices = [ ]
 
 		for choice in choices:
 		#
+			choice = choice.copy()
+
 			if ("value" in choice):
 			#
 				choice['value'] = Binary.str(choice['value'])
@@ -197,6 +202,10 @@ Sets the form this field is part of.
 :since: v0.1.03
 		"""
 
+		parent = super(ChoicesMixin, self)
+		if (not hasattr(parent, "_set_form")): raise NotImplementedException()
+
+		parent._set_form(form)
 		self._prepare_choices()
 	#
 #
