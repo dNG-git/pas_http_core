@@ -106,9 +106,15 @@ Adds a custom form field.
 
 		if (not isinstance(field, AbstractField)): raise TypeException("Given field type is invalid")
 
-		if (self.form_id is not None
-		    and (not field.is_id_set())
-		   ): field.set_id("{0}_{1:d}".format(self.get_form_id(), self.field_counter))
+		if (not field.is_id_set()):
+		#
+			field_id = (Binary.str(hexlify(urandom(16)))
+			            if (self.form_id is None) else
+			            "{0}_{1:d}".format(self.get_form_id(), self.field_counter)
+			           )
+
+			field.set_id(field_id)
+		#
 
 		self.field_counter += 1
 
