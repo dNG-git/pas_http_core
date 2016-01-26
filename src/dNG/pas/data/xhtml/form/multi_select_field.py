@@ -82,20 +82,6 @@ Loads the field configuration from the given definition.
 		self.set_choices(field_definition['choices'])
 	#
 
-	def _set_form(self, form):
-	#
-		"""
-Sets the form this field is part of.
-
-:param form: Form
-
-:since: v0.1.03
-		"""
-
-		AbstractMultiSelectField._set_form(self, form)
-		ChoicesMixin._set_form(self, form)
-	#
-
 	def _validate_definition(self, field_definition):
 	#
 		"""
