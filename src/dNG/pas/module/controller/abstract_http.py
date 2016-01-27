@@ -67,21 +67,6 @@ True if action is the primary requested one
 		"""
 	#
 
-	def init(self, request, response):
-	#
-		"""
-Initializes the controller from the given request and response.
-
-:param request: Request object
-:param response: Response object
-
-:since: v0.1.00
-		"""
-
-		AbstractController.init(self, request, response)
-		self.action = request.get_action()
-	#
-
 	def execute(self):
 	#
 		"""
@@ -114,6 +99,33 @@ Execute the given action method.
 		else: self._raise_executable_not_found()
 
 		return ("" if (self.action_result is None) else self.action_result)
+	#
+
+	def init(self, request, response):
+	#
+		"""
+Initializes the controller from the given request and response.
+
+:param request: Request object
+:param response: Response object
+
+:since: v0.1.00
+		"""
+
+		AbstractController.init(self, request, response)
+		self.action = request.get_action()
+	#
+
+	def _is_primary_action(self):
+	#
+		"""
+Returns true if the action is the primary requested one.
+
+:return: (bool) True if primary action
+:since:  v0.1.03
+		"""
+
+		return self.primary_action
 	#
 
 	def _raise_executable_not_found(self):
