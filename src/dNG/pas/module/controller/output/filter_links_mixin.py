@@ -47,7 +47,7 @@ Filters links based on required permissions.
 
 		_return = [ ]
 
-		session = self.request.get_session()
+		session = (self.request.get_session() if (self.request.is_supported("session")) else None)
 
 		for link in links:
 		#
