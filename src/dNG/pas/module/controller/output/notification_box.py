@@ -18,10 +18,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from binascii import hexlify
-from os import urandom
-
-from dNG.pas.data.binary import Binary
+from dNG.pas.data.http.translatable_error import TranslatableError
 from dNG.pas.data.xhtml.form_tags import FormTags
 from dNG.pas.data.xhtml.notification_store import NotificationStore
 from dNG.pas.data.xhtml.oset.file_parser import FileParser
@@ -59,7 +56,7 @@ Renders a notification.
 			elif (data['type'] == NotificationStore.TYPE_INFO): css_class = "pagenotification_info"
 
 			content = { "css_class": css_class,
-			            "id": "pas_notification_{0}".format(Binary.str(hexlify(urandom(10)))),
+			            "id": "pas_http_core_{0:d}_{1:d}".format(id(self), id(data)),
 			            "type": NotificationStore.get_type_string(data['type']),
 			            "message": FormTags.render(data['message'], block_encoding_supported = False),
 			          }
@@ -81,6 +78,8 @@ Action for "render"
 
 :since: v0.1.00
 		"""
+
+		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
 		messages = NotificationStore.get_instance().export()
 		rendered_messages = ""

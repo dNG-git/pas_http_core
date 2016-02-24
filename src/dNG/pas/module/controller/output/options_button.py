@@ -18,8 +18,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+from dNG.pas.data.http.translatable_error import TranslatableError
 from dNG.pas.data.text.l10n import L10n
-from dNG.pas.data.text.md5 import Md5
 from .options_bar import OptionsBar
 
 class OptionsButton(OptionsBar):
@@ -45,7 +45,9 @@ Renders the options button.
 :since: v0.1.01
 		"""
 
-		_id = "pas_id_{0}".format(Md5.hash("pas_http_core_options_button_{0:d}_{1:d}".format(id(self.context), id(self))))
+		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
+
+		_id = "pas_http_core_{0:d}_{1:d}".format(id(self.context), id(self))
 
 		rendered_content = """
 {0}<script type="text/javascript"><![CDATA[
