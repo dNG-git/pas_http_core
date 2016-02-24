@@ -18,8 +18,9 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.data.http.translatable_exception import TranslatableException
+from dNG.pas.data.http.translatable_error import TranslatableError
 from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
+from dNG.pas.runtime.value_exception import ValueException
 from .service_list_mixin import ServiceListMixin
 
 class ServiceList(ServiceListMixin, AbstractHttpController):
@@ -44,11 +45,13 @@ Action for "render"
 :since: v0.1.00
 		"""
 
+		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
+
 		if ("css_sprite" in self.context): self._add_options_block_css_sprite(self.context['css_sprite'])
 
 		if ("file" in self.context): self.set_action_result(self.render_service_list_file(self.context['file']))
 		elif (isinstance(self.context.get("entries"), list)): self.set_action_result(self.render_service_list_entries(self.context['entries']))
-		else: raise TranslatableException("core_unknown_error", value = "Missing service list to render")
+		else: raise ValueException("Missing service list to render")
 	#
 #
 

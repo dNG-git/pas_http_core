@@ -18,6 +18,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+from dNG.pas.data.http.translatable_error import TranslatableError
 from dNG.data.xml_parser import XmlParser
 from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 from .options_block_mixin import OptionsBlockMixin
@@ -44,6 +45,8 @@ Renders an options bar.
 
 :since: v0.1.01
 		"""
+
+		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
 		self.set_action_result(self._render_options_bar_links())
 	#

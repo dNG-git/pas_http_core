@@ -20,7 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 from time import time
 
-from dNG.pas.data.http.translatable_exception import TranslatableException
+from dNG.pas.data.http.translatable_error import TranslatableError
 from dNG.pas.data.text.input_filter import InputFilter
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.data.xhtml.link import Link
@@ -28,7 +28,6 @@ from dNG.pas.data.xhtml.form.processor import Processor
 from dNG.pas.database.connection import Connection
 from dNG.pas.database.nothing_matched_exception import NothingMatchedException
 from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
-from dNG.pas.runtime.io_exception import IOException
 from .form_parse_mixin import FormParseMixin
 
 class Form(FormParseMixin, AbstractHttpController):
@@ -54,19 +53,17 @@ Action for "api_ping"
 :since: v0.1.03
 		"""
 
-		if (not self.response.is_supported("dict_result_renderer")): raise IOException("Unsupported response object for action")
+		if (not self.response.is_supported("dict_result_renderer")): raise TranslatableError("core_access_denied", 403)
 		form_id = InputFilter.filter_control_chars(self.request.get_dsd("form_id"))
 
 		# TODO: Check if constant or setting makes more sense
 		validity_time = 300
 
-		try:
-		#
-			form_store = Processor.load_form_store_id(form_id)
-			form_store.set_data_attributes(validity_end_time = time() + validity_time)
-			form_store.save()
-		#
-		except NothingMatchedException as handled_exception: raise TranslatableException("core_access_denied", 403, _exception = handled_exception)
+		try: form_store = Processor.load_form_store_id(form_id)
+		except NothingMatchedException as handled_exception: raise TranslatableError("core_access_denied", 403, _exception = handled_exception)
+
+		form_store.set_data_attributes(validity_end_time = time() + validity_time)
+		form_store.save()
 
 		self.response.set_result({ "expires_in": validity_time })
 	#
@@ -78,6 +75,8 @@ Action for "render"
 
 :since: v0.1.00
 		"""
+
+		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
 		form_content = self._parse_context_form()
 		form_id = XHtmlFormatting.escape(self.context['object'].get_form_render_id())
@@ -122,6 +121,8 @@ Action for "render_view"
 
 :since: v0.1.00
 		"""
+
+		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
 		form_content = self._parse_context_form()
 		form_id = XHtmlFormatting.escape(self.context['object'].get_form_id())
