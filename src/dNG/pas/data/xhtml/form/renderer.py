@@ -18,11 +18,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from binascii import hexlify
-from os import urandom
-
 from dNG.data.xml_parser import XmlParser
-from dNG.pas.data.binary import Binary
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting
 from dNG.pas.data.xhtml.form.abstract_field import AbstractField
@@ -34,8 +30,6 @@ class Renderer(object):
 #
 	"""
 "Renderer" renders forms for output as XHTML 5.
-
-TODO: Code incomplete
 
 :author:     direct Netware Group
 :copyright:  direct Netware Group - All rights reserved
@@ -109,12 +103,12 @@ valid XHTML for output.
 				if (is_visible):
 				#
 					rendered_section_title = ""
-					section_id = "pas_form_section_{0}".format(Binary.str(hexlify(urandom(10))))
+					section_id = "pas_http_core_{0:d}_{1:d}".format(id(self), id(self.fields[section_position]))
 					section_title_id = None
 
 					if (self.fields[section_position]['name'] != ""):
 					#
-						section_title_id = "pas_form_section_title_{0}".format(Binary.str(hexlify(urandom(10))))
+						section_title_id = "pas_http_core_{0:d}_{1:d}_title".format(id(self), id(self.fields[section_position]))
 
 						section_title_attributes = { "class": "pageform_section_title",
 						                             "id": section_title_id
@@ -280,7 +274,7 @@ Sets the form ID currently defined with "set_data()".
 :param form_id: Unique form ID
 		"""
 
-		self.form_id = ("pas_form_{0}".format(Binary.str(hexlify(urandom(10)))) if (form_id is None) else form_id)
+		self.form_id = ("pas_http_core_{0:d}".format(id(self)) if (form_id is None) else form_id)
 	#
 
 	def set_oset(self, oset):

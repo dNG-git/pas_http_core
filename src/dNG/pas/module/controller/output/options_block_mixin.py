@@ -132,13 +132,17 @@ Renders a link.
 
 			if (is_js_required):
 			#
-				if (link_id is None):
-				#
-					link_id = Md5.hash("pas_http_core_url_{0}_{1:d}_{2:d}".format(url, id(data), id(self)))
-					link_id = "pas_id_{0}".format(link_id)
-				#
+				if (link_id is None): link_id = "pas_http_core_{0}_{1:d}_{2:d}".format(Md5.hash(url), id(data), id(self))
 
-				_return = xml_parser.dict_to_xml_item_encoder({ "tag": "span", "attributes": { "data-href": url, "id": link_id, "title": L10n.get("pas_http_core_js_required"), "class": "pageurl_requirements_unsupported" } }, False)
+				_return = xml_parser.dict_to_xml_item_encoder({ "tag": "span",
+				                                                "attributes": { "data-href": url,
+				                                                                "id": link_id,
+				                                                                "title": L10n.get("pas_http_core_js_required"),
+				                                                                "class": "pageurl_requirements_unsupported"
+				                                                              }
+				                                              },
+				                                              False
+				                                             )
 			#
 			else:
 			#
