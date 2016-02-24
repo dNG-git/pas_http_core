@@ -23,9 +23,11 @@ import os
 
 from dNG.pas.data.settings import Settings
 from dNG.pas.data.cache.json_file_content import JsonFileContent
+from dNG.pas.data.http.translatable_error import TranslatableError
 from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 from dNG.pas.module.controller.output.filter_links_mixin import FilterLinksMixin
 from dNG.pas.module.controller.output.options_block_mixin import OptionsBlockMixin
+from dNG.pas.runtime.value_exception import ValueException
 
 class File(FilterLinksMixin, OptionsBlockMixin, AbstractHttpController):
 #
@@ -49,11 +51,12 @@ Action for "render"
 :since: v0.1.00
 		"""
 
-		if (self.context is not None and "file" in self.context):
-		#
-			rendered_links = self._get_rendered_links(self.context['file'])
-			if (len(rendered_links) > 0): self.set_action_result("<nav class='pagemainmenu'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
-		#
+		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
+
+		if ("file" not in self.context): raise ValueException("Menu file required is not defined")
+
+		rendered_links = self._get_rendered_links(self.context['file'])
+		if (len(rendered_links) > 0): self.set_action_result("<nav class='pagemainmenu'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
 	#
 
 	def _get_rendered_links(self, file_path_name, include_image = True):
