@@ -469,7 +469,10 @@ This method filters parameters like "__<KEYWORD>__".
 
 			if (request is not None):
 			#
-				if ("ohandler" not in _return): _return['ohandler'] = request.get_output_handler()
+				if ("ohandler" not in _return
+				    and request.get_parameter("ohandler") is not None
+				   ): _return['ohandler'] = request.get_output_handler()
+
 				if ("m" not in _return): _return['m'] = request.get_module()
 				if ("s" not in _return): _return['s'] = request.get_service()
 				if ("a" not in _return): _return['a'] = request.get_action()
