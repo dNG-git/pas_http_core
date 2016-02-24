@@ -18,6 +18,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+from dNG.pas.data.http.translatable_error import TranslatableError
 from dNG.pas.data.xhtml.link import Link
 from dNG.pas.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 from dNG.pas.module.controller.output.filter_links_mixin import FilterLinksMixin
@@ -45,6 +46,8 @@ Action for "render"
 
 :since: v0.1.03
 		"""
+
+		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
 		rendered_links = self._get_rendered_links()
 		if (len(rendered_links) > 0): self.set_action_result("<nav class='pagemainmenu'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
