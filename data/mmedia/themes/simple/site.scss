@@ -111,6 +111,7 @@ small { font-size: 0.75em }
 	font-family: "Nimbus Mono L", Monaco, "Lucida Sans Typewriter", "Lucida Console", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace
 }
 
+.pagecontent_overlay_box { z-index: 228; padding: 9px; background-color: $white; border: 1px solid $dark_grey }
 .pagecontent_overlayed_box { opacity: 0.4 }
 
 .pagecontent_page_navigation {
@@ -176,6 +177,8 @@ small { font-size: 0.75em }
 	margin: 11px;
 	font-size: 1.2em
 }
+
+.pageform_button_field { text-align: center }
 
 .pageform_element { overflow: auto; overflow-y: hidden; border-bottom: 1px solid $grey; box-shadow: 0 2px 5px -5px rgba(#{$black_rgba}, 0.2) }
 .pageform_element .pageform_error { display: inline-block; margin-top: 10px }
