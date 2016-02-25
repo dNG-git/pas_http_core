@@ -1,4 +1,4 @@
-<div class="pageform_element" style="text-align: center">
+<div class="pageform_element pageform_button_field">
 	<input id="[rewrite:content]id[/rewrite]" type="[rewrite:content]type[/rewrite]" value="[rewrite:content]title[/rewrite]" class="pageform_button" />
 </div><script type="text/javascript"><![CDATA[
 require([ "djt/XHtml5FormElement.min" ], function(XHtml5FormElement) {
