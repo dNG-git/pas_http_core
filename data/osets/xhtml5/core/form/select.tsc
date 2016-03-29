@@ -11,7 +11,7 @@
 		});
 		]]></script>
 [if:content:error_message != ]
-		<span class="pageform_error">[rewrite:content]error_message[/rewrite]</span>
+		<p class="pageform_error">[rewrite:content]error_message[/rewrite]</p>
 [/if]
 	</div>
 </div>
