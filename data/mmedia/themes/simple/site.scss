@@ -180,8 +180,11 @@ small { font-size: 0.75em }
 
 .pageform_button_field { text-align: center }
 
-.pageform_element { overflow: auto; overflow-y: hidden; border-bottom: 1px solid $grey; box-shadow: 0 2px 5px -5px rgba(#{$black_rgba}, 0.2) }
-.pageform_element .pageform_error { display: inline-block; margin-top: 10px }
+.pageform_element {
+	overflow: auto; overflow-y: hidden; border-bottom: 1px solid $grey; box-shadow: 0 2px 5px -5px rgba(#{$black_rgba}, 0.2);
+
+	span.pageform_error { display: inline-block }
+}
 
 .pageform_error { clear: both; padding: 3px; background-color: $light_red; border: 1px solid $red; border-radius: 3px }
 
