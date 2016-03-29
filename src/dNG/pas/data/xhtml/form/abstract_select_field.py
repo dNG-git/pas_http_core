@@ -51,6 +51,36 @@ Constructor __init__(AbstractSelectField)
 		self.size = AbstractSelectField.SIZE_SMALL
 	#
 
+	def _check(self):
+	#
+		"""
+Executes checks if the field value is valid.
+
+:return: (bool) True if all checks are passed
+:since:  v0.1.03
+		"""
+
+		_return = AbstractField._check(self)
+
+		if (_return):
+		#
+			_return = False
+
+			for choice in self.choices:
+			#
+				if ("value" in choice and choice['value'] == self.value):
+				#
+					_return = True
+					break
+				#
+			#
+
+			if (not _return): self.error_data = "format_invalid"
+		#
+
+		return _return
+	#
+
 	def _check_selected_value(self, value):
 	#
 		"""

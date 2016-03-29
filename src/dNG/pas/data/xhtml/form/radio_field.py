@@ -66,6 +66,22 @@ Executes checks if the field value is valid.
 		_return = AbstractField._check(self)
 		if (_return): _return = self._check_values_selected_size()
 
+		if (_return):
+		#
+			_return = False
+
+			for choice in self.choices:
+			#
+				if ("value" in choice and choice['value'] == self.value):
+				#
+					_return = True
+					break
+				#
+			#
+
+			if (not _return): self.error_data = "format_invalid"
+		#
+
 		return _return
 	#
 
