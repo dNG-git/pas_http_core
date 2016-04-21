@@ -34,7 +34,7 @@ h5 { font-size: 1.55em }
 h6, summary { font-size: 1.50em }
 
 header {
-	margin: -32px -12px 0 -12px; padding: 8px; background-color: #193879; border-width: 0 1px 1px 1px; border-style: solid; border-color: #ffffff; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+	margin: -32px -12px 0 -12px; padding: 10px; background-color: #193879; border-width: 0 1px 1px 1px; border-style: solid; border-color: #ffffff; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 	background-image: -moz-linear-gradient(#193879 0%, #375a9d 100%);
 	background-image: -ms-linear-gradient(#193879 0%, #375a9d 100%);
 	background-image: -o-linear-gradient(#193879 0%, #375a9d 100%);
@@ -44,6 +44,9 @@ header {
 }
 
 img { border: none }
+
+main > :first-child { margin-top: 0.5% }
+main > :last-child { margin-bottom: 0.5% }
 
 table { margin: 0; table-layout: fixed; border: none; border-collapse: collapse; border-spacing: 0 }
 td, th { padding: 0 }
@@ -68,10 +71,12 @@ td:last-child, th:last-child { border-right: none }
 	text-align: left; vertical-align: middle
 }
 
-.designpage > :first-child { margin-top: 0.5% }
-.designpage > :last-child { margin-bottom: 0.5% }
+.designpage { margin: 4px }
 
-.designtitle { text-align: right; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 1.4em; font-weight: bold; color: #fafafa }
+.designtitle {
+	display: inline-block; float: right; padding: 4px 2px 2px 10px;
+	text-align: right; font-size: 1.8em; font-weight: bold; color: #fafafa
+}
 
 @media only screen and (max-width: 352px) {
 	body { padding: 0 8px; border-top-width: 7px }
@@ -84,7 +89,10 @@ td:last-child, th:last-child { border-right: none }
 @media only screen and (max-width: 672px) {
 	header { text-align: center }
 
-	.designtitle { text-align: center }
+	.designtitle {
+		display: block; float: initial; padding: 2px 0 2px 0;
+		text-align: center; font-size: 1.4em
+	}
 }
 
 @media only screen and (min-width: 352px) and (max-width: 992px) {
@@ -92,6 +100,13 @@ td:last-child, th:last-child { border-right: none }
 
 	.designcopyright { margin: 0 -1px -1px -1px; padding: 1px 3px 0 3px }
 	.designmainblock { padding: 2px }
+}
+
+@media only screen and (min-width: 672px) and (max-width: 992px) {
+	.designtitle {
+		padding-top: 6px;
+		font-size: 1.6em
+	}
 }
 ]]></style>
 [each:content:css_files:file]

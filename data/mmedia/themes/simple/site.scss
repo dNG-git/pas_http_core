@@ -234,15 +234,28 @@ small { font-size: 0.75em }
 	font-size: 1em
 }
 
-.pagemainmenu {
-	margin: 7px -2px 0 -2px; padding: 7px 7px 0 7px; border-top: 1px solid $light_blue;
-	font-size: 1.2em; font-weight: bold; color: $light_grey;
+.pagemainmenu, .pagemainmenu_sub_menu {
+	font-size: 1.2em; color: $light_grey;
 
 	a {
-		display: inline-block;
+		padding: 7px; border-bottom: 1px solid $light_blue;
 
 		&:link, &:visited { color: $light_grey; text-decoration: none }
-		&:active, &:hover, &:focus { color: $light_steel; text-decoration: underline }
+		&:active, &:hover, &:focus { color: $white; text-decoration: none }
+	}
+
+	li { margin: 0 }
+}
+
+.pagemainmenu {
+	margin: 0 -2px 0 -2px;
+	font-weight: bold;
+
+	a {
+		display: inline-block; margin: 2px 0 0 2px; background-color: rgba(#{$light_blue_rgba}, 0.1);
+
+		&:link, &:visited { color: $light_grey; text-decoration: none }
+		&:active, &:hover, &:focus { background-color: rgba(#{$light_blue_rgba}, 0.4) }
 	}
 
 	li {
@@ -250,9 +263,19 @@ small { font-size: 0.75em }
 		vertical-align: middle; white-space: nowrap
 	}
 
-	li:not(:last-child)::after { margin: 0 4px; content: "•" }
-
 	ul { margin: 0; padding: 0; list-style: none }
+}
+
+.pagemainmenu_sub_menu {
+	z-index: 196; margin: 0; padding: 0; list-style: none;
+
+	a {
+		display: block; background-color: rgba(#{$blue_rgba}, 0.95);
+
+		&:active, &:hover, &:focus { background-color: $dark_blue }
+	}
+
+	li { display: block }
 }
 
 .pagenavbox { padding: 5px; border: 1px solid $light_steel }
