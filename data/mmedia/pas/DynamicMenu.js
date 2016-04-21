@@ -37,6 +37,8 @@ function($, Hammer, NodePosition, L10n) {
 	 * "DynamicMenu" is used to show sub-menus placed next to an parent on hovering
 	 * over the parent or tapping on it.
 	 *
+	 * @TODO: Support multi-level sub-menus
+	 *
 	 * @class DynamicMenu
 	 *
 	 * @param {object} args Arguments to initialize a given DynamicMenu
@@ -120,10 +122,9 @@ function($, Hammer, NodePosition, L10n) {
 
 				$link.data('pas-dynamic-menu-sub-menu', $sub_menu);
 
-				var link_listener = new Hammer($link.get(0));
 				var _this = this;
 
-				link_listener.on('tap', function(event) {
+				Hammer($link.get(0)).on('tap', function(event) {
 					_this._on_tap(event);
 				});
 
@@ -172,7 +173,9 @@ function($, Hammer, NodePosition, L10n) {
 			$sub_menu = $node;
 		}
 
-		this._show_sub_menu($link, $sub_menu);
+		if ($sub_menu.data('pas-dynamic-menu-sub-menu-pending') != '1') {
+			this._show_sub_menu($link, $sub_menu);
+		}
 	}
 
 	/**
@@ -217,6 +220,7 @@ function($, Hammer, NodePosition, L10n) {
 			}
 		} else {
 			var _this = this;
+			$sub_menu.data('pas-dynamic-menu-sub-menu-pending', '1');
 
 			L10n.when_loaded('core', function() {
 				var $tap_close_menu_item = $("<li><a href='javascript:'><small>" + L10n.get('core_close') + "</small></a></li>");
@@ -224,12 +228,11 @@ function($, Hammer, NodePosition, L10n) {
 				$sub_menu.append($tap_close_menu_item);
 				$sub_menu.data('pas-dynamic-menu-sub-menu-close-item', $tap_close_menu_item);
 
-				var link_listener = new Hammer($tap_close_menu_item.get(0));
-
-				link_listener.on('tap', function(event) {
+				Hammer($tap_close_menu_item.get(0)).on('tap', function(event) {
 					_this._hide_sub_menu($link, $sub_menu);
 				});
 
+				$sub_menu.removeData('pas-dynamic-menu-sub-menu-pending');
 				_this._show_sub_menu($link, $sub_menu);
 			});
 		}
