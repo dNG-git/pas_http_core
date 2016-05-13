@@ -61,10 +61,12 @@ with TemporaryDirectory(dir = ".") as build_directory:
 	      version = versions[0],
 	      description = "Python Application Services",
 	      long_description = """"pas_http_core" provides the core infrastructure to handle HTTP requests.""",
-	      author = "direct Netware Group",
+	      author = "direct Netware Group et al.",
 	      author_email = "web@direct-netware.de",
 	      license = "MPL2",
 	      url = "https://www.direct-netware.de/redirect?pas;http;core",
+
+	      platforms = [ "any" ],
 
 	      package_dir = { "": _build_path },
 	      packages = [ "dNG" ],
