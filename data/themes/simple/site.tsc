@@ -34,7 +34,7 @@ h5 { font-size: 1.55em }
 h6, summary { font-size: 1.50em }
 
 header {
-	margin: -32px -12px 0 -12px; padding: 10px; background-color: #193879; border-width: 0 1px 1px 1px; border-style: solid; border-color: #ffffff; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+	overflow: auto; overflow-y: hidden; margin: -32px -12px 0 -12px; padding: 10px; background-color: #193879; border-width: 0 1px 1px 1px; border-style: solid; border-color: #ffffff; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 	background-image: -moz-linear-gradient(#193879 0%, #375a9d 100%);
 	background-image: -ms-linear-gradient(#193879 0%, #375a9d 100%);
 	background-image: -o-linear-gradient(#193879 0%, #375a9d 100%);
