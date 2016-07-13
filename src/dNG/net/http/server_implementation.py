@@ -38,12 +38,12 @@ aware instance.
 	"""
 
 	@staticmethod
-	def get_instance():
+	def get_class():
 	#
 		"""
-Returns an HTTP server instance based on the configuration set.
+Returns an HTTP server class based on the configuration set.
 
-:return: (object) HTTP server implementation
+:return: (object) HTTP server class
 :since:  v0.2.00
 		"""
 
@@ -52,19 +52,31 @@ Returns an HTTP server instance based on the configuration set.
 		_return = None
 
 		Settings.read_file("{0}/settings/pas_http.json".format(Settings.get("path_data")))
-		server_implementation = Settings.get("pas_http_server_implementation", "Standalone")
+		implementation_class_name = Settings.get("pas_http_server_implementation", "Standalone")
 
-		try: _return = NamedLoader.get_instance("dNG.net.http.Server{0}".format(server_implementation))
+		try: _return = NamedLoader.get_class("dNG.net.http.Server{0}".format(implementation_class_name))
 		except Exception as handled_exception:
 		#
 			LogLine.error(handled_exception, context = "pas_http_site")
 			LogLine.warning("pas.http.core use fallback after an exception occurred while instantiating the HTTP implementation", context = "pas_http_site")
-
-			server_implementation = "Standalone"
 		#
 
-		if (server_implementation == "Standalone"): _return = NamedLoader.get_instance("dNG.net.http.ServerStandalone")
+		if (_return == None): _return = NamedLoader.get_class("dNG.net.http.ServerStandalone")
 		return _return
+	#
+
+	@staticmethod
+	def get_instance(*args, **kwargs):
+	#
+		"""
+Returns an HTTP server instance based on the configuration set.
+
+:return: (object) HTTP server implementation
+:since:  v0.2.00
+		"""
+
+		implementation_class = ServerImplementation.get_class()
+		return implementation_class(*args, **kwargs)
 	#
 #
 
