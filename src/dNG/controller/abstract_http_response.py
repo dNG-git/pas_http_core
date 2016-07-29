@@ -24,6 +24,7 @@ from dNG.data.binary import Binary
 from dNG.data.http.translatable_error import TranslatableError as HttpTranslatableError
 from dNG.data.http.translatable_exception import TranslatableException as HttpTranslatableException
 from dNG.data.rfc.basics import Basics as RfcBasics
+from dNG.data.settings import Settings
 from dNG.data.text.l10n import L10n
 from dNG.data.traced_exception import TracedException
 from dNG.data.translatable_exception import TranslatableException
@@ -333,6 +334,9 @@ compression setting used.
 		#
 			output_headers = ({ "Cache-Control": "public" } if (cache) else { "Cache-Control": "no-cache, no-store, must-revalidate" })
 			if (not cache): output_headers['X-Robots-Tag'] = "noindex"
+
+			csp = Settings.get("pas_http_core_csp_header", "")
+			if (csp != ""): output_headers['Content-Security-Policy'] = csp
 
 			for header in output_headers:
 			#
