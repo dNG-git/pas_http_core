@@ -270,36 +270,28 @@ compression setting used.
 
 		AbstractHttpResponse.init(self, cache, compress)
 
-		p3p_url = ""
+		self._init_theme_renderer()
 
-		if (self.stream_response.is_supported("headers")):
+		if (self.oset is None):
 		#
-			"""
-Send P3P header if defined
-			"""
+			oset = Settings.get("pas_http_theme_{0}_oset".format(self.theme_active))
+			if (oset is None): oset = Settings.get("pas_http_theme_oset_default", "xhtml5")
 
-			p3p_cp = Settings.get("pas_http_core_p3p_cp", "")
-			p3p_url = Settings.get("pas_http_core_p3p_url", "").replace("&", "&amp;")
-
-			if (p3p_cp + p3p_url != ""):
-			#
-				p3p_data = ("" if (p3p_url == "") else "policyref=\"{0}\"".format(p3p_url))
-
-				if (p3p_cp != ""):
-				#
-					if (p3p_data != ""): p3p_data += ","
-					p3p_data += "CP=\"{0}\"".format(p3p_cp)
-				#
-
-				self.stream_response.set_header("P3P", p3p_data)
-			#
+			self.set_oset(oset)
 		#
+	#
+
+	def _init_theme_renderer(self):
+	#
+		"""
+Set up theme framework if renderer has not already been initialized.
+
+:since: v0.2.00
+		"""
 
 		if (self.theme_renderer is None):
 		#
-			"""
-Set up theme framework
-			"""
+			if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._init_theme_renderer()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 
 			Settings.read_file("{0}/settings/pas_http_theme.json".format(Settings.get("path_data")))
 
@@ -352,23 +344,15 @@ Set up theme framework
 			elif (self.html_canonical_url != ""): self.theme_renderer.set_canonical_url(self.html_canonical_url)
 
 			if (self.html_page_description != ""): self.theme_renderer.set_page_description(self.html_page_description)
-			if (p3p_url != ""): self.theme_renderer.set_p3p_url(p3p_url)
 
 			for css_file in self.css_files_cache: self.add_css_file(css_file)
+			self.css_files_cache = [ ]
+
 			for js_file in self.js_files_cache: self.add_js_file(js_file)
+			self.js_files_cache = [ ]
+
 			for theme_css_file in self.theme_css_files_cache: self.add_theme_css_file(theme_css_file)
-		#
-
-		if (self.oset is None):
-		#
-			"""
-Get the corresponding OSet name
-			"""
-
-			self.oset = Settings.get("pas_http_theme_{0}_oset".format(self.theme_active))
-			if (self.oset is None): self.oset = Settings.get("pas_http_theme_oset_default", "xhtml5")
-
-			Settings.set("x_pas_http_oset", self.oset)
+			self.theme_css_files_cache = [ ]
 		#
 	#
 
@@ -401,6 +385,7 @@ Sends the prepared response.
 		#
 		elif (self.content is not None):
 		#
+			self._init_theme_renderer()
 			if (self.title is not None): self.theme_renderer.set_title(self.title)
 
 			is_xhtml_supported = ("application/xhtml+xml" in self.stream_response.get_accepted_formats())
@@ -430,7 +415,7 @@ If raw data are send using "send_raw_data()" headers will be sent. An error
 occurred if they are not sent and all buffers are "None".
 			"""
 
-			self.init(False, True)
+			self.init()
 			self.content = ""
 
 			if (self.errors is None):
@@ -527,6 +512,8 @@ Sets the OSet to use.
 :since: v0.2.00
 		"""
 
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_oset({1})- (#echo(__LINE__)#)", self, oset, context = "pas_http_core")
+
 		self.oset = oset
 		Settings.set("x_pas_http_oset", self.oset)
 	#
@@ -557,6 +544,7 @@ files already set. Use with care.
 :since: v0.2.00
 		"""
 
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._set_theme({1})- (#echo(__LINE__)#)", self, theme, context = "pas_http_core")
 		self.theme = re.sub("\\W", "", theme)
 
 		if (self.theme_renderer is not None and self.theme_renderer.is_supported(theme)):
@@ -572,6 +560,22 @@ files already set. Use with care.
 		#
 	#
 
+	def set_theme_subtype(self, subtype):
+	#
+		"""
+Sets the theme subtype to use.
+
+:param subtype: Output theme subtype
+
+:since: v0.2.00
+		"""
+
+		subtype = Binary.str(subtype)
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_theme_subtype({1})- (#echo(__LINE__)#)", self, subtype, context = "pas_http_core")
+
+		self.theme_subtype = subtype
+	#
+
 	def set_title(self, title):
 	#
 		"""
@@ -581,6 +585,8 @@ Sets the response page title.
 
 :since: v0.2.00
 		"""
+
+		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.set_title({1})- (#echo(__LINE__)#)", self, title, context = "pas_http_core")
 
 		self.title = title
 	#

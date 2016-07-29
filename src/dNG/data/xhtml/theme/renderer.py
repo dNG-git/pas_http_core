@@ -94,10 +94,6 @@ JavaScript files to be added.
 The LogHandler is called whenever debug messages should be logged or errors
 happened.
 		"""
-		self.p3p_url = ""
-		"""
-P3P URL
-		"""
 		self.page_description = ""
 		"""
 (X)HTML head description
@@ -387,7 +383,6 @@ Read corresponding theme configuration
 		if (self.title is None): self.title = Settings.get("pas_html_title", "Unconfigured site")
 
 		self.content = { "head_canonical_url": self.canonical_url,
-		                 "head_p3p_url": self.p3p_url,
 		                 "head_page_description": self.page_description,
 		                 "page_title": self.title,
 		                 "page_content": content
@@ -424,6 +419,7 @@ Read corresponding theme configuration
 Sets the theme to use.
 
 :param theme: Output theme
+
 :since: v0.2.00
 		"""
 
@@ -497,19 +493,6 @@ Sets the LogHandler.
 		self.log_handler = log_handler
 	#
 
-	def set_p3p_url(self, url):
-	#
-		"""
-Sets the P3P URL.
-
-:param url: P3P URL
-
-:since: v0.2.00
-		"""
-
-		self.p3p_url = Formatting.escape(url)
-	#
-
 	def set_page_description(self, description):
 	#
 		"""
@@ -529,6 +512,7 @@ Sets the (X)HTML head description of the response.
 Sets the theme subtype to use.
 
 :param subtype: Output theme subtype
+
 :since: v0.2.00
 		"""
 
@@ -544,6 +528,7 @@ Sets the theme subtype to use.
 Sets the title to use.
 
 :param title: Page title
+
 :since: v0.2.00
 		"""
 
