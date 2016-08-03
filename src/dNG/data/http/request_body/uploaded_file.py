@@ -18,12 +18,10 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from time import time
-
-from dNG.runtime.io_exception import IOException
+from dNG.data.file_like_copy_mixin import FileLikeCopyMixin
 from dNG.vfs.file_like_wrapper_mixin import FileLikeWrapperMixin
 
-class UploadedFile(FileLikeWrapperMixin):
+class UploadedFile(FileLikeCopyMixin, FileLikeWrapperMixin):
 #
 	"""
 "UploadedFile" provides a file-like access for temporary, uploaded files.
@@ -52,6 +50,7 @@ Constructor __init__(UploadedFile)
 :since: v0.2.00
 		"""
 
+		FileLikeCopyMixin.__init__(self)
 		FileLikeWrapperMixin.__init__(self)
 
 		self.client_content_type = None
@@ -62,27 +61,6 @@ The client supplied content type.
 		"""
 The client supplied file name.
 		"""
-	#
-
-	def copy_data(self, target, timeout = None):
-	#
-		"""
-Copy data to the target.
-
-:param target: Any object providing a "write()" method
-:param timeout: Timeout for copying data
-
-:since: v0.2.00
-		"""
-
-		timeout_time = (0 if (timeout is None) else time() + timeout)
-		self.seek(0)
-
-		while ((not self.is_eof())
-		       and (timeout_time < 1 or time() < timeout_time)
-		      ): target.write(self.read(16384))
-
-		if (not self.is_eof()): raise IOException("Timeout occurred before EOF")
 	#
 
 	def get_client_content_type(self):
