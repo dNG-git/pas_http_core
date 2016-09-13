@@ -205,7 +205,12 @@ Sets the dictionary of available input data.
 	def load_form_store_id(form_id):
 	#
 		"""
-@TODO
+Loads the KeyStore instance based form store by ID.
+
+:param form_id: Form store ID
+
+:return: (object) KeyStore instance based form store
+:since:  v0.2.00
 		"""
 
 		_return = KeyStore.load_key(form_id)
