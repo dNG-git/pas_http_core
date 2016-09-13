@@ -27,7 +27,8 @@ from dNG.module.controller.abstract_http import AbstractHttp as AbstractHttpCont
 class NotificationBox(AbstractHttpController):
 #
 	"""
-"NotificationBox" is a navigation element providing links to other services.
+"NotificationBox" is an interactive element showing server as well as client
+side notifications.
 
 :author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
@@ -42,6 +43,8 @@ class NotificationBox(AbstractHttpController):
 	#
 		"""
 Renders a notification.
+
+:param data: Notification data to render
 
 :return: (str) XHTML notification
 :since:  v0.2.00
@@ -81,12 +84,14 @@ Action for "render"
 
 		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
-		messages = NotificationStore.get_instance().export()
-		rendered_messages = ""
+		notifications = NotificationStore.get_instance().export()
+		rendered_notification_box = "<div class='pagenotification_box pagenotification_site_box' id='pas_http_site_notification_box'>"
 
-		for message_data in messages: rendered_messages += self._render_notification(message_data)
+		for notification_data in notifications: rendered_notification_box += self._render_notification(notification_data)
 
-		if (len(rendered_messages) > 0): self.set_action_result(rendered_messages)
+		rendered_notification_box += "</div>"
+
+		self.set_action_result(rendered_notification_box)
 	#
 #
 
