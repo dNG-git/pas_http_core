@@ -58,9 +58,9 @@ Renders a date and time XHTML 5 tag based on the given presentation type.
 
 		if (timestamp is not None):
 		#
-			link_attributes = { "tag": "time", "attributes": { "datetime": "{0}+00:00".format(RfcBasics.get_iso8601_datetime(timestamp)) } }
+			time_attributes = { "tag": "time", "attributes": { "datetime": "{0}+00:00".format(RfcBasics.get_iso8601_datetime(timestamp)) } }
 
-			_return = "{0}{1}</time>".format(XmlParser().dict_to_xml_item_encoder(link_attributes, False),
+			_return = "{0}{1}</time>".format(XmlParser().dict_to_xml_item_encoder(time_attributes, False),
 			                                 self.render_rewrite_date_time(source, key, _type)
 			                                )
 		#
