@@ -1,5 +1,6 @@
 {
  "pas_http_core_additional_options": "Additional options",
+ "pas_http_core_content_is_locked": "The content has been locked by an authorized account and can not be shown therefore.",
  "pas_http_core_edit": "Edit",
  "pas_http_core_js_required": "JavaScript required",
  "pas_http_core_level_up": "Go to the parent entry",

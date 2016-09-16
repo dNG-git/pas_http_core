@@ -1,5 +1,6 @@
 {
  "pas_http_core_additional_options": "Weitere Optionen",
+ "pas_http_core_content_is_locked": "Der Inhalt wurde durch einen dazu berechtigten Account gesperrt und kann nicht angezeigt werden.",
  "pas_http_core_edit": "Bearbeiten",
  "pas_http_core_js_required": "JavaScript wird benötigt",
  "pas_http_core_level_up": "Zum übergeordneten Eintrag wechseln",
