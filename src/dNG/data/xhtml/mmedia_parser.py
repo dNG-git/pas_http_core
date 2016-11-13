@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -29,8 +28,7 @@ from dNG.module.named_loader import NamedLoader
 from dNG.runtime.io_exception import IOException
 
 class MmediaParser(RewriteMixin, AbstractTagParser):
-#
-	"""
+    """
 Parses files in the "mmedia" directory to set configured values and replace
 language placeholders.
 
@@ -41,25 +39,23 @@ language placeholders.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self):
-	#
-		"""
+    def __init__(self):
+        """
 Constructor __init__(MmediaParser)
 
 :since: v0.2.00
-		"""
+        """
 
-		AbstractTagParser.__init__(self)
+        AbstractTagParser.__init__(self)
 
-		self.cache_instance = NamedLoader.get_singleton("dNG.data.cache.Content", False)
-		self.log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
-	#
+        self.cache_instance = NamedLoader.get_singleton("dNG.data.cache.Content", False)
+        self.log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
+    #
 
-	def _change_match(self, tag_definition, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match(self, tag_definition, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the matched tag.
 
 :param tag_definition: Matched tag definition
@@ -70,87 +66,79 @@ Change data according to the matched tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		_return = data[:tag_position]
+        _return = data[:tag_position]
 
-		data_closed = data[self._find_tag_end_position(data, tag_end_position):]
+        data_closed = data[self._find_tag_end_position(data, tag_end_position):]
 
-		if (tag_definition['tag'] == "rewrite"):
-		#
-			source = re.match("^\\[rewrite:(\\w+)\\]", data[tag_position:data_position]).group(1)
-			key = data[data_position:tag_end_position]
+        if (tag_definition['tag'] == "rewrite"):
+            source = re.match("^\\[rewrite:(\\w+)\\]", data[tag_position:data_position]).group(1)
+            key = data[data_position:tag_end_position]
 
-			if (source == "l10n"): _return += self.render_rewrite(L10n.get_dict(), key)
-			else:
-			#
-				runtime_settings_dict = AbstractResponse.get_instance().get_runtime_settings()
-				_return += self.render_rewrite(runtime_settings_dict, key)
-			#
-		#
+            if (source == "l10n"): _return += self.render_rewrite(L10n.get_dict(), key)
+            else:
+                runtime_settings_dict = AbstractResponse.get_instance().get_runtime_settings()
+                _return += self.render_rewrite(runtime_settings_dict, key)
+            #
+        #
 
-		_return += data_closed
+        _return += data_closed
 
-		return _return
-	#
+        return _return
+    #
 
-	def _check_match(self, data):
-	#
-		"""
+    def _check_match(self, data):
+        """
 Check if a possible tag match is a false positive.
 
 :param data: Data starting with the possible tag
 
 :return: (dict) Matched tag definition; None if false positive
 :since:  v0.2.00
-		"""
+        """
 
-		_return = None
+        _return = None
 
-		i = 0
-		tags = [ "rewrite" ]
-		tags_length = len(tags)
+        i = 0
+        tags = [ "rewrite" ]
+        tags_length = len(tags)
 
-		while (_return is None and i < tags_length):
-		#
-			tag = tags[i]
-			data_match = data[1:1 + len(tag)]
+        while (_return is None and i < tags_length):
+            tag = tags[i]
+            data_match = data[1:1 + len(tag)]
 
-			if (data_match == tag and data_match == "rewrite"):
-			#
-				re_result = re.match("^\\[rewrite:(\\w+)\\]", data)
-				if (re_result is not None and re_result.group(1) in ( "l10n", "settings" )): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
-			#
+            if (data_match == tag and data_match == "rewrite"):
+                re_result = re.match("^\\[rewrite:(\\w+)\\]", data)
+                if (re_result is not None and re_result.group(1) in ( "l10n", "settings" )): _return = { "tag": "rewrite", "tag_end": "[/rewrite]" }
+            #
 
-			i += 1
-		#
+            i += 1
+        #
 
-		return _return
-	#
+        return _return
+    #
 
-	def render(self, file_path_name):
-	#
-		"""
+    def render(self, file_path_name):
+        """
 Renders content ready for output from the given "mmedia" file.
 
 :param file_path_name: mmedia file path and name
 
 :return: (str) Rendered "mmedia" file
 :since:  v0.2.00
-		"""
+        """
 
-		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, file_path_name, context = "pas_http_core")
+        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, file_path_name, context = "pas_http_core")
 
-		file_obj = File()
-		if (not file_obj.open(file_path_name, True, "r")): raise IOException("Failed to open mmedia file '{0}'".format(file_path_name))
+        file_obj = File()
+        if (not file_obj.open(file_path_name, True, "r")): raise IOException("Failed to open mmedia file '{0}'".format(file_path_name))
 
-		file_content = file_obj.read()
-		file_obj.close()
+        file_content = file_obj.read()
+        file_obj.close()
 
-		if (file_content is None): raise IOException("Failed to read mmedia file '{0}'".format(file_path_name))
+        if (file_content is None): raise IOException("Failed to read mmedia file '{0}'".format(file_path_name))
 
-		return self._parse(file_content)
-	#
+        return self._parse(file_content)
+    #
 #
-
-##j## EOF

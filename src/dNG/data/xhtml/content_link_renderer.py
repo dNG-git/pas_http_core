@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -25,8 +24,7 @@ from dNG.data.xhtml.link import Link
 from dNG.data.xml_parser import XmlParser
 
 class ContentLinkRenderer(_ContentLinkRenderer):
-#
-	"""
+    """
 The link renderer parses and renders internal links to DataLinker and other
 sources.
 
@@ -37,43 +35,38 @@ sources.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def _get_link_parameters(self, data):
-	#
-		"""
+    def _get_link_parameters(self, data):
+        """
 Returns a dict of parameters to be used with a Link instance.
 
 :param data: Link definition
 
 :return: (dict) Link parameters
 :since:  v0.2.00
-		"""
+        """
 
-		_return = { }
+        _return = { }
 
-		if ("id" in data): _return = _ContentLinkRenderer._get_link_parameters(self, data)
-		elif ("link" in data and data['link'] == "params"):
-		#
-			if ("m" in data): _return['m'] = data['m']
-			if ("s" in data): _return['s'] = data['s'].replace("+", " ")
-			if ("a" in data): _return['a'] = data['a']
+        if ("id" in data): _return = _ContentLinkRenderer._get_link_parameters(self, data)
+        elif ("link" in data and data['link'] == "params"):
+            if ("m" in data): _return['m'] = data['m']
+            if ("s" in data): _return['s'] = data['s'].replace("+", " ")
+            if ("a" in data): _return['a'] = data['a']
 
-			if ("dsd" in data):
-			#
-				_return['dsd'] = data['dsd']
-				if ("__source__" in data['dsd']): _return['dsd'] = re.sub("\\_\\_source\\_\\_", Link.encode_query_value(Link().build_url(Link.TYPE_QUERY_STRING, { "__request__": True })), _return['dsd'])
-				_return['dsd'] = re.sub("\\_\\_\\w+\\\\_\\_", "", _return['dsd'])
-			#
-		#
-		elif ("tag" in data and self.datalinker_main_id is not None): _return = _ContentLinkRenderer._get_link_parameters(self, data)
+            if ("dsd" in data):
+                _return['dsd'] = data['dsd']
+                if ("__source__" in data['dsd']): _return['dsd'] = re.sub("\\_\\_source\\_\\_", Link.encode_query_value(Link().build_url(Link.TYPE_QUERY_STRING, { "__request__": True })), _return['dsd'])
+                _return['dsd'] = re.sub("\\_\\_\\w+\\\\_\\_", "", _return['dsd'])
+            #
+        elif ("tag" in data and self.datalinker_main_id is not None): _return = _ContentLinkRenderer._get_link_parameters(self, data)
 
-		return _return
-	#
+        return _return
+    #
 
-	def _render(self, content, link_type, link_parameters):
-	#
-		"""
+    def _render(self, content, link_type, link_parameters):
+        """
 Renders a link with the parsed parameters ready for output.
 
 :param content: Content data
@@ -82,14 +75,12 @@ Renders a link with the parsed parameters ready for output.
 
 :return: (str) Rendered content
 :since:  v0.2.00
-		"""
+        """
 
-		link_arguments = { "tag": "a",
-		                   "attributes": { "href": Link().build_url(link_type, link_parameters) }
-		                 }
+        link_arguments = { "tag": "a",
+                           "attributes": { "href": Link().build_url(link_type, link_parameters) }
+                         }
 
-		return "{0}{1}</a>".format(XmlParser().dict_to_xml_item_encoder(link_arguments, False), content)
-	#
+        return "{0}{1}</a>".format(XmlParser().dict_to_xml_item_encoder(link_arguments, False), content)
+    #
 #
-
-##j## EOF

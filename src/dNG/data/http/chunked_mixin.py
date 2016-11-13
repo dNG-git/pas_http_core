@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -22,8 +21,7 @@ from dNG.data.binary import Binary
 from dNG.net.http.chunked_reader_mixin import ChunkedReaderMixin
 
 class ChunkedMixin(object):
-#
-	"""
+    """
 This response mixin provides the "chunkify()" method.
 
 :author:     direct Netware Group et al.
@@ -33,27 +31,24 @@ This response mixin provides the "chunkify()" method.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def chunkify(self, data):
-	#
-		"""
+    def chunkify(self, data):
+        """
 Returns the formats the client accepts.
 
 :return: (list) Accepted formats
 :since:  v0.2.00
-		"""
+        """
 
-		data = Binary.bytes(data)
+        data = Binary.bytes(data)
 
-		if (data is None): _return = Binary.bytes("0\r\n\r\n")
-		elif (type(data) is type(ChunkedReaderMixin.BINARY_NEWLINE)
-		      and len(data) > 0
-		     ): _return = Binary.bytes("{0:x}\r\n".format(len(data))) + data + ChunkedReaderMixin.BINARY_NEWLINE
-		else: _return = Binary.BYTES_TYPE()
+        if (data is None): _return = Binary.bytes("0\r\n\r\n")
+        elif (type(data) is type(ChunkedReaderMixin.BINARY_NEWLINE)
+              and len(data) > 0
+             ): _return = Binary.bytes("{0:x}\r\n".format(len(data))) + data + ChunkedReaderMixin.BINARY_NEWLINE
+        else: _return = Binary.BYTES_TYPE()
 
-		return _return
-	#
+        return _return
+    #
 #
-
-##j## EOF

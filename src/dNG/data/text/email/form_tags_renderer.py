@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -21,8 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from dNG.data.text.form_tags_renderer import FormTagsRenderer as _FormTagsRenderer
 
 class FormTagsRenderer(_FormTagsRenderer):
-#
-	"""
+    """
 The OSet parser takes a template string to render the output.
 
 :author:     direct Netware Group et al.
@@ -32,13 +30,12 @@ The OSet parser takes a template string to render the output.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	# pylint: disable=unused-argument
+    # pylint: disable=unused-argument
 
-	def _change_match_b(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match_b(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the "b" tag.
 
 :param tag_definition: Matched tag definition
@@ -49,14 +46,13 @@ Change data according to the "b" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		return "*{0}*".format(data[data_position:tag_end_position])
-	#
+        return "*{0}*".format(data[data_position:tag_end_position])
+    #
 
-	def _change_match_i(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match_i(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the "i" tag.
 
 :param tag_definition: Matched tag definition
@@ -67,14 +63,13 @@ Change data according to the "i" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		return "/{0}/".format(data[data_position:tag_end_position])
-	#
+        return "/{0}/".format(data[data_position:tag_end_position])
+    #
 
-	def _change_match_s(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match_s(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the "s" tag.
 
 :param tag_definition: Matched tag definition
@@ -85,14 +80,13 @@ Change data according to the "s" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		return "-{0}-".format(data[data_position:tag_end_position])
-	#
+        return "-{0}-".format(data[data_position:tag_end_position])
+    #
 
-	def _change_match_u(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match_u(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the "u" tag.
 
 :param tag_definition: Matched tag definition
@@ -103,10 +97,8 @@ Change data according to the "u" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		return "_{0}_".format(data[data_position:tag_end_position])
-	#
+        return "_{0}_".format(data[data_position:tag_end_position])
+    #
 #
-
-##j## EOF

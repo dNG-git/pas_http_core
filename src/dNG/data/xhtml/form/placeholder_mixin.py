@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -19,8 +18,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 """
 
 class PlaceholderMixin(object):
-#
-	"""
+    """
 "PlaceholderMixin" provides methods to support placeholder texts.
 
 :author:     direct Netware Group et al.
@@ -30,46 +28,41 @@ class PlaceholderMixin(object):
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self):
-	#
-		"""
+    def __init__(self):
+        """
 Constructor __init__(PlaceholderMixin)
 
 :since: v0.2.00
-		"""
+        """
 
-		self.placeholder = None
-		"""
+        self.placeholder = None
+        """
 Form field placeholder value
-		"""
-	#
+        """
+    #
 
-	def get_placeholder(self):
-	#
-		"""
+    def get_placeholder(self):
+        """
 Returns the placeholder.
 
 :return: (str) Placeholder content
 :since:  v0.2.00
-		"""
+        """
 
-		return ("" if (self.placeholder is None) else self.placeholder)
-	#
+        return ("" if (self.placeholder is None) else self.placeholder)
+    #
 
-	def set_placeholder(self, placeholder):
-	#
-		"""
+    def set_placeholder(self, placeholder):
+        """
 Sets the placeholder.
 
 :param placeholder: Placeholder content
 
 :since: v0.2.00
-		"""
+        """
 
-		self.placeholder = placeholder
-	#
+        self.placeholder = placeholder
+    #
 #
-
-##j## EOF

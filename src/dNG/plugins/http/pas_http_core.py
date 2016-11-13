@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -24,20 +23,18 @@ from dNG.data.http.virtual_config import VirtualConfig
 from dNG.plugins.hook import Hook
 
 def register_plugin():
-#
-	"""
+    """
 Register plugin hooks.
 
 :since: v0.2.00
-	"""
+    """
 
-	Hook.register("dNG.pas.http.Server.onStartup", on_startup)
-	Hook.register("dNG.pas.http.Wsgi.onStartup", on_startup)
+    Hook.register("dNG.pas.http.Server.onStartup", on_startup)
+    Hook.register("dNG.pas.http.Wsgi.onStartup", on_startup)
 #
 
 def on_startup(params, last_return = None):
-#
-	"""
+    """
 Called for "dNG.pas.http.Server.onStartup" and "dNG.pas.http.Wsgi.onStartup"
 
 :param params: Parameter specified
@@ -45,30 +42,27 @@ Called for "dNG.pas.http.Server.onStartup" and "dNG.pas.http.Wsgi.onStartup"
 
 :return: (mixed) Return value
 :since:  v0.2.00
-	"""
+    """
 
-	VirtualConfig.set_virtual_path("/apis/pas/dynamic/", { "ohandler": "http_json", "path_parameters": True })
-	VirtualConfig.set_virtual_path("/apis/pas/form/ping/1.0/", { "ohandler": "http_json", "m": "output", "s": "form", "a": "api_ping", "path": "form_id" })
-	VirtualConfig.set_virtual_path("/apis/pas/lang/get/1.0/", { "ohandler": "http_json", "m": "output", "s": "lang", "a": "api_get", "path": "lang_request" })
-	VirtualConfig.set_virtual_path("/apis/pas/session/ping/1.0/", { "ohandler": "http_json", "m": "services", "s": "session", "a": "api_ping", "path": "uuid" })
+    VirtualConfig.set_virtual_path("/apis/pas/dynamic/", { "ohandler": "http_json", "path_parameters": True })
+    VirtualConfig.set_virtual_path("/apis/pas/form/ping/1.0/", { "ohandler": "http_json", "m": "output", "s": "form", "a": "api_ping", "path": "form_id" })
+    VirtualConfig.set_virtual_path("/apis/pas/lang/get/1.0/", { "ohandler": "http_json", "m": "output", "s": "lang", "a": "api_get", "path": "lang_request" })
+    VirtualConfig.set_virtual_path("/apis/pas/session/ping/1.0/", { "ohandler": "http_json", "m": "services", "s": "session", "a": "api_ping", "path": "uuid" })
 
-	VirtualConfig.set_virtual_path("/contentfile/", { "path": "cid" })
-	if (not VirtualConfig.isset_virtual_path("/favicon.ico")): VirtualConfig.set_virtual_path("/favicon.ico", { "s": "cache", "dsd": { "dfile": "favicon.ico" } })
-	VirtualConfig.set_virtual_path("/robots.txt", { "m": "output", "s": "http", "a": "error", "dsd": { "code": "404" } })
+    VirtualConfig.set_virtual_path("/contentfile/", { "path": "cid" })
+    if (not VirtualConfig.isset_virtual_path("/favicon.ico")): VirtualConfig.set_virtual_path("/favicon.ico", { "s": "cache", "dsd": { "dfile": "favicon.ico" } })
+    VirtualConfig.set_virtual_path("/robots.txt", { "m": "output", "s": "http", "a": "error", "dsd": { "code": "404" } })
 
-	return last_return
+    return last_return
 #
 
 def unregister_plugin():
-#
-	"""
+    """
 Unregister plugin hooks.
 
 :since: v0.2.00
-	"""
+    """
 
-	Hook.unregister("dNG.pas.http.Server.onStartup", on_startup)
-	Hook.unregister("dNG.pas.http.Wsgi.onStartup", on_startup)
+    Hook.unregister("dNG.pas.http.Server.onStartup", on_startup)
+    Hook.unregister("dNG.pas.http.Wsgi.onStartup", on_startup)
 #
-
-##j## EOF

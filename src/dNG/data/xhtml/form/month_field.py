@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -21,8 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from .abstract_date_time_field import AbstractDateTimeField
 
 class MonthField(AbstractDateTimeField):
-#
-	"""
+    """
 "MonthField" provides an input field to enter a month and year.
 
 :author:     direct Netware Group et al.
@@ -32,36 +30,32 @@ class MonthField(AbstractDateTimeField):
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self, name = None):
-	#
-		"""
+    def __init__(self, name = None):
+        """
 Constructor __init__(MonthField)
 
 :param name: Form field name
 
 :since: v0.2.00
-		"""
+        """
 
-		AbstractDateTimeField.__init__(self, name)
+        AbstractDateTimeField.__init__(self, name)
 
-		self.input_type_flags = (AbstractDateTimeField.TYPE_YEAR
-		                         | AbstractDateTimeField.TYPE_MONTH
-		                        )
-	#
+        self.input_type_flags = (AbstractDateTimeField.TYPE_YEAR
+                                 | AbstractDateTimeField.TYPE_MONTH
+                                )
+    #
 
-	def get_type(self):
-	#
-		"""
+    def get_type(self):
+        """
 Returns the field type.
 
 :return: (str) Field type
 :since:  v0.2.00
-		"""
+        """
 
-		return "month"
-	#
+        return "month"
+    #
 #
-
-##j## EOF

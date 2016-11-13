@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -21,8 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from .textarea_field import TextareaField
 
 class FormTagsTextareaField(TextareaField):
-#
-	"""
+    """
 "FormTagsTextareaField" provides a textarea field with FormTags.
 
 :author:     direct Netware Group et al.
@@ -32,24 +30,21 @@ class FormTagsTextareaField(TextareaField):
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def _get_content(self):
-	#
-		"""
+    def _get_content(self):
+        """
 Returns the field content.
 
 :return: (str) Field content
 :since:  v0.2.00
-		"""
+        """
 
-		_return = TextareaField._get_content(self)
+        _return = TextareaField._get_content(self)
 
-		_return = _return.replace("[", "&#91;")
-		_return = _return.replace("]", "&#93;")
+        _return = _return.replace("[", "&#91;")
+        _return = _return.replace("]", "&#93;")
 
-		return _return
-	#
+        return _return
+    #
 #
-
-##j## EOF

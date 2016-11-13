@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -24,8 +23,7 @@ from dNG.data.xml_parser import XmlParser
 from .abstract_field import AbstractField
 
 class HiddenField(AbstractField):
-#
-	"""
+    """
 "HiddenField" provides a hidden input field.
 
 :author:     direct Netware Group et al.
@@ -35,67 +33,61 @@ class HiddenField(AbstractField):
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def _check(self):
-	#
-		"""
+    def _check(self):
+        """
 Executes checks if the field value is valid.
 
 :return: (bool) True if all checks are passed
 :since:  v0.2.00
-		"""
+        """
 
-		_return = AbstractField._check(self)
-		if (_return): _return = (self.value is not None)
+        _return = AbstractField._check(self)
+        if (_return): _return = (self.value is not None)
 
-		return _return
-	#
+        return _return
+    #
 
-	def _get_content(self):
-	#
-		"""
+    def _get_content(self):
+        """
 Returns the field content.
 
 :return: (str) Field content
 :since:  v0.2.00
-		"""
+        """
 
-		return Formatting.escape(AbstractField._get_content(self))
-	#
+        return Formatting.escape(AbstractField._get_content(self))
+    #
 
-	def get_type(self):
-	#
-		"""
+    def get_type(self):
+        """
 Returns the field type.
 
 :return: (str) Field type
 :since:  v0.2.00
-		"""
+        """
 
-		return "hidden"
-	#
+        return "hidden"
+    #
 
-	def render(self):
-	#
-		"""
+    def render(self):
+        """
 Renders the given field.
 
 :return: (str) Valid XHTML form field definition
 :since:  v0.2.00
-		"""
+        """
 
-		hidden_attributes = { "type": "hidden",
-		                      "name": Formatting.escape(self.name),
-		                      "value": self._get_content()
-		                    }
+        hidden_attributes = { "type": "hidden",
+                              "name": Formatting.escape(self.name),
+                              "value": self._get_content()
+                            }
 
-		return XmlParser().dict_to_xml_item_encoder({ "tag": "input",
-		                                              "attributes": hidden_attributes
-		                                            },
-		                                            strict_standard_mode = False
-		                                           )
-	#
+        return XmlParser().dict_to_xml_item_encoder({ "tag": "input",
+                                                      "attributes": hidden_attributes
+                                                    },
+                                                    strict_standard_mode = False
+                                                   )
+    #
 #
-
-##j## EOF

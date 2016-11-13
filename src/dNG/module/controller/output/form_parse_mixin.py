@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -23,8 +22,7 @@ from dNG.data.xhtml.form.renderer import Renderer
 from dNG.data.xhtml.form.view import View
 
 class FormParseMixin(object):
-#
-	"""
+    """
 The "FormParseMixin" is used to parse and render a context form instance.
 
 :author:     direct Netware Group et al.
@@ -34,33 +32,29 @@ The "FormParseMixin" is used to parse and render a context form instance.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def _parse_context_form(self):
-	#
-		"""
+    def _parse_context_form(self):
+        """
 Parses, renders and returns the context form.
 
 :return: (str) Valid XHTML form
 :since:  v0.2.00
-		"""
+        """
 
-		if (not isinstance(self.context.get("object"), View)): raise TranslatableException("core_unknown_error")
+        if (not isinstance(self.context.get("object"), View)): raise TranslatableException("core_unknown_error")
 
-		renderer = Renderer()
-		renderer.set_data(self.context['object'].get_data())
-		if (self.response.is_supported("html_theme")): renderer.set_oset(self.response.get_oset())
+        renderer = Renderer()
+        renderer.set_data(self.context['object'].get_data())
+        if (self.response.is_supported("html_theme")): renderer.set_oset(self.response.get_oset())
 
-		_return = renderer.render()
+        _return = renderer.render()
 
-		if ("url_parameters" in self.context):
-		#
-			button_title = self.context.get("button_title", "core_continue")
-			_return += (renderer.render_submit_button(button_title) if (_return == "") else "\n{0}".format(renderer.render_submit_button(button_title)))
-		#
+        if ("url_parameters" in self.context):
+            button_title = self.context.get("button_title", "core_continue")
+            _return += (renderer.render_submit_button(button_title) if (_return == "") else "\n{0}".format(renderer.render_submit_button(button_title)))
+        #
 
-		return _return
-	#
+        return _return
+    #
 #
-
-##j## EOF

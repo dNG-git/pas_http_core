@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -25,8 +24,7 @@ from dNG.runtime.value_exception import ValueException
 from .service_list_mixin import ServiceListMixin
 
 class ServiceList(ServiceListMixin, AbstractHttpController):
-#
-	"""
+    """
 "ServiceList" is a navigation element providing links to other services.
 
 :author:     direct Netware Group et al.
@@ -36,24 +34,21 @@ class ServiceList(ServiceListMixin, AbstractHttpController):
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def execute_render(self):
-	#
-		"""
+    def execute_render(self):
+        """
 Action for "render"
 
 :since: v0.2.00
-		"""
+        """
 
-		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
+        if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
-		if ("css_sprite" in self.context): self._add_options_block_css_sprite(self.context['css_sprite'])
+        if ("css_sprite" in self.context): self._add_options_block_css_sprite(self.context['css_sprite'])
 
-		if ("file" in self.context): self.set_action_result(self.render_service_list_file(self.context['file']))
-		elif (isinstance(self.context.get("entries"), list)): self.set_action_result(self.render_service_list_entries(self.context['entries']))
-		else: raise ValueException("Missing service list to render")
-	#
+        if ("file" in self.context): self.set_action_result(self.render_service_list_file(self.context['file']))
+        elif (isinstance(self.context.get("entries"), list)): self.set_action_result(self.render_service_list_entries(self.context['entries']))
+        else: raise ValueException("Missing service list to render")
+    #
 #
-
-##j## EOF

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -23,8 +22,7 @@ from dNG.data.text.input_filter import InputFilter
 from .text_field import TextField
 
 class EMailField(TextField):
-#
-	"""
+    """
 "EMailField" provides an e-mail input field.
 
 :author:     direct Netware Group et al.
@@ -34,54 +32,48 @@ class EMailField(TextField):
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def _check(self):
-	#
-		"""
+    def _check(self):
+        """
 Executes checks if the field value is valid.
 
 :return: (bool) True if all checks are passed
 :since:  v0.2.00
-		"""
+        """
 
-		_return = TextField._check(self)
-		if (_return): _return = self._check_format()
+        _return = TextField._check(self)
+        if (_return): _return = self._check_format()
 
-		return _return
-	#
+        return _return
+    #
 
-	def _check_format(self):
-	#
-		"""
+    def _check_format(self):
+        """
 Checks if the field value has the expected format.
 
 :return: (bool) True if all checks are passed
 :since:  v0.2.00
-		"""
+        """
 
-		error_data = None
+        error_data = None
 
-		if (len(self.value) > 0 and InputFilter.filter_email_address(self.value) == ""):
-		#
-			error_data = "format_invalid"
-		#
+        if (len(self.value) > 0 and InputFilter.filter_email_address(self.value) == ""):
+            error_data = "format_invalid"
+        #
 
-		if (error_data is not None): self.error_data = error_data
-		return (error_data is None)
-	#
+        if (error_data is not None): self.error_data = error_data
+        return (error_data is None)
+    #
 
-	def get_type(self):
-	#
-		"""
+    def get_type(self):
+        """
 Returns the field type.
 
 :return: (str) Field type
 :since:  v0.2.00
-		"""
+        """
 
-		return "email"
-	#
+        return "email"
+    #
 #
-
-##j## EOF

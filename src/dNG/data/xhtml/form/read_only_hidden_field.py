@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -22,8 +21,7 @@ from .hidden_field import HiddenField
 from .read_only_field_mixin import ReadOnlyFieldMixin
 
 class ReadOnlyHiddenField(HiddenField, ReadOnlyFieldMixin):
-#
-	"""
+    """
 "ReadOnlyHiddenField" provides a non-replaceable hidden input field.
 
 :author:     direct Netware Group et al.
@@ -33,21 +31,18 @@ class ReadOnlyHiddenField(HiddenField, ReadOnlyFieldMixin):
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self, name = None):
-	#
-		"""
+    def __init__(self, name = None):
+        """
 Constructor __init__(ReadOnlyHiddenField)
 
 :param name: Form field name
 
 :since: v0.2.00
-		"""
+        """
 
-		HiddenField.__init__(self, name)
-		ReadOnlyFieldMixin.__init__(self)
-	#
+        HiddenField.__init__(self, name)
+        ReadOnlyFieldMixin.__init__(self)
+    #
 #
-
-##j## EOF

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -25,8 +24,7 @@ from dNG.module.controller.abstract_http import AbstractHttp as AbstractHttpCont
 from .options_block_mixin import OptionsBlockMixin
 
 class OptionsBar(OptionsBlockMixin, AbstractHttpController):
-#
-	"""
+    """
 An "OptionsBar" contains of several options formatted with title and
 optional image.
 
@@ -37,68 +35,61 @@ optional image.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def execute_render(self, _id = None):
-	#
-		"""
+    def execute_render(self, _id = None):
+        """
 Renders an options bar.
 
 :since: v0.2.00
-		"""
+        """
 
-		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
+        if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
-		self.set_action_result(self._render_options_bar_links())
-	#
+        self.set_action_result(self._render_options_bar_links())
+    #
 
-	def _get_rendered_options_bar_links(self, links):
-	#
-		"""
+    def _get_rendered_options_bar_links(self, links):
+        """
 Returns a list of rendered links for the options bar.
 
 :return: (list) Links for the options bar
 :since:  v0.2.00
-		"""
+        """
 
-		_return = [ ]
+        _return = [ ]
 
-		if (isinstance(links, list)):
-		#
-			for link in links: _return.append(self.render_options_block_link(link))
-		#
+        if (isinstance(links, list)):
+            for link in links: _return.append(self.render_options_block_link(link))
+        #
 
-		return _return
-	#
+        return _return
+    #
 
-	def _render_options_bar_links(self, _id = None):
-	#
-		"""
+    def _render_options_bar_links(self, _id = None):
+        """
 Returns rendered XHTML for the options bar.
 
 :return: (str) Options bar XHTML
 :since:  v0.2.00
-		"""
+        """
 
-		_return = ""
+        _return = ""
 
-		rendered_links = self._get_rendered_options_bar_links(self.context.get("entries"))
+        rendered_links = self._get_rendered_options_bar_links(self.context.get("entries"))
 
-		if (len(rendered_links) > 0):
-		#
-			nav_attributes = { "tag": "nav",
-			                   "attributes": { "class": "pageoptionsbar" }
-			                 }
+        if (len(rendered_links) > 0):
+            nav_attributes = { "tag": "nav",
+                               "attributes": { "class": "pageoptionsbar" }
+                             }
 
-			if (_id is not None): nav_attributes['attributes']['id'] = _id
+            if (_id is not None): nav_attributes['attributes']['id'] = _id
 
-			_return = "{0}<ul><li>{1}</li></ul></nav>".format(XmlParser().dict_to_xml_item_encoder(nav_attributes, False),
-			                                                  "</li><li>".join(rendered_links)
-			                                                 )
-		#
+            _return = "{0}<ul><li>{1}</li></ul></nav>".format(XmlParser().dict_to_xml_item_encoder(nav_attributes, False),
+                                                              "</li><li>".join(rendered_links)
+                                                             )
+        #
 
-		return _return
-	#
+        return _return
+    #
 #
-
-##j## EOF

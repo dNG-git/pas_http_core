@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -23,8 +22,7 @@ import re
 from dNG.data.text.form_tags_encoder import FormTagsEncoder as _FormTagsEncoder
 
 class FormTagsEncoder(_FormTagsEncoder):
-#
-	"""
+    """
 Encodes data as well as some typical structured e-mail text elements and
 validates FormTags.
 
@@ -35,26 +33,23 @@ validates FormTags.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def process(self, content):
-	#
-		"""
+    def process(self, content):
+        """
 Process the given content.
 
 :param content: Raw content
 
 :return: (str) FormTags encoded content
 :since:  v0.2.00
-		"""
+        """
 
-		content = re.sub("/(.+?)/", "[i]\\1[/i]", content)
-		content = re.sub("\\*(.+?)\\*", "[b]\\1[/b]", content)
-		content = re.sub("-(.+?)-", "[s]\\1[/s]", content)
-		content = re.sub("\\_(.+?)\\_", "[u]\\1[/u]", content)
+        content = re.sub("/(.+?)/", "[i]\\1[/i]", content)
+        content = re.sub("\\*(.+?)\\*", "[b]\\1[/b]", content)
+        content = re.sub("-(.+?)-", "[s]\\1[/s]", content)
+        content = re.sub("\\_(.+?)\\_", "[u]\\1[/u]", content)
 
-		return _FormTagsEncoder.process(content)
-	#
+        return _FormTagsEncoder.process(content)
+    #
 #
-
-##j## EOF

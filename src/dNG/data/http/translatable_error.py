@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -21,8 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from dNG.data.translatable_exception import TranslatableException
 
 class TranslatableError(TranslatableException):
-#
-	"""
+    """
 This exception is used for non-critical, translatable error messages.
 Non-critical errors are usually expected like wrong entity IDs.
 
@@ -33,11 +31,10 @@ Non-critical errors are usually expected like wrong entity IDs.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self, l10n_id, http_code = 200, value = None, _exception = None):
-	#
-		"""
+    def __init__(self, l10n_id, http_code = 200, value = None, _exception = None):
+        """
 Constructor __init__(TranslatableError)
 
 :param l10n_id: L10n translatable key (prefixed with "errors_")
@@ -46,27 +43,24 @@ Constructor __init__(TranslatableError)
 :param _exception: Inner exception
 
 :since: v0.2.00
-		"""
+        """
 
-		TranslatableException.__init__(self, l10n_id, value, _exception)
+        TranslatableException.__init__(self, l10n_id, value, _exception)
 
-		self.http_code = http_code
-		"""
+        self.http_code = http_code
+        """
 HTTP error code
-		"""
-	#
+        """
+    #
 
-	def get_http_code(self):
-	#
-		"""
+    def get_http_code(self):
+        """
 Return the HTTP error code.
 
 :return: (int) HTTP error code
 :since:  v0.2.00
-		"""
+        """
 
-		return self.http_code
-	#
+        return self.http_code
+    #
 #
-
-##j## EOF

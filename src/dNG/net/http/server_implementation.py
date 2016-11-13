@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -23,8 +22,7 @@ from dNG.data.settings import Settings
 from dNG.module.named_loader import NamedLoader
 
 class ServerImplementation(object):
-#
-	"""
+    """
 "ServerImplementation" is a factory for the configured, implementing HTTP
 aware instance.
 
@@ -35,49 +33,44 @@ aware instance.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	@staticmethod
-	def get_class():
-	#
-		"""
+    @staticmethod
+    def get_class():
+        """
 Returns an HTTP server class based on the configuration set.
 
 :return: (object) HTTP server class
 :since:  v0.2.00
-		"""
+        """
 
-		# pylint: disable=broad-except
+        # pylint: disable=broad-except
 
-		_return = None
+        _return = None
 
-		Settings.read_file("{0}/settings/pas_http.json".format(Settings.get("path_data")))
-		implementation_class_name = Settings.get("pas_http_server_implementation", "Standalone")
+        Settings.read_file("{0}/settings/pas_http.json".format(Settings.get("path_data")))
+        implementation_class_name = Settings.get("pas_http_server_implementation", "Standalone")
 
-		try: _return = NamedLoader.get_class("dNG.net.http.Server{0}".format(implementation_class_name))
-		except Exception as handled_exception:
-		#
-			LogLine.error(handled_exception, context = "pas_http_site")
-			LogLine.warning("pas.http.core use fallback after an exception occurred while instantiating the HTTP implementation", context = "pas_http_site")
-		#
+        try: _return = NamedLoader.get_class("dNG.net.http.Server{0}".format(implementation_class_name))
+        except Exception as handled_exception:
+            LogLine.error(handled_exception, context = "pas_http_site")
+            LogLine.warning("pas.http.core use fallback after an exception occurred while instantiating the HTTP implementation", context = "pas_http_site")
+        #
 
-		if (_return == None): _return = NamedLoader.get_class("dNG.net.http.ServerStandalone")
-		return _return
-	#
+        if (_return == None): _return = NamedLoader.get_class("dNG.net.http.ServerStandalone")
+        return _return
+    #
 
-	@staticmethod
-	def get_instance(*args, **kwargs):
-	#
-		"""
+    @staticmethod
+    def get_instance(*args, **kwargs):
+        """
 Returns an HTTP server instance based on the configuration set.
 
 :return: (object) HTTP server implementation
 :since:  v0.2.00
-		"""
+        """
 
-		implementation_class = ServerImplementation.get_class()
-		return implementation_class(*args, **kwargs)
-	#
+        implementation_class = ServerImplementation.get_class()
+        return implementation_class(*args, **kwargs)
+    #
 #
-
-##j## EOF

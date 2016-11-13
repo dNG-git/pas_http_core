@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -21,8 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from .form_tags_renderer import FormTagsRenderer
 
 class FormTagsSanitizer(FormTagsRenderer):
-#
-	"""
+    """
 Sanitizes FormTags data.
 
 :author:     direct Netware Group et al.
@@ -32,10 +30,10 @@ Sanitizes FormTags data.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	_change_match_center = FormTagsRenderer._change_plain_content
-	"""
+    _change_match_center = FormTagsRenderer._change_plain_content
+    """
 Change data according to the "center" tag.
 
 :param tag_definition: Matched tag definition
@@ -46,11 +44,10 @@ Change data according to the "center" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	def _change_match_code(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match_code(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the "code" tag.
 
 :param tag_definition: Matched tag definition
@@ -61,23 +58,22 @@ Change data according to the "code" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		_return = data[data_position:tag_end_position]
+        _return = data[data_position:tag_end_position]
 
-		if (len(_return) > 0 and "[" in _return):
-		#
-			self.null_byte_markup = True
+        if (len(_return) > 0 and "[" in _return):
+            self.null_byte_markup = True
 
-			_return = _return.replace("[", "\x00#91;")
-			_return = _return.replace("]", "\x00#93;")
-		#
+            _return = _return.replace("[", "\x00#91;")
+            _return = _return.replace("]", "\x00#93;")
+        #
 
-		return _return
-	#
+        return _return
+    #
 
-	_change_match_highlight = FormTagsRenderer._change_plain_content
-	"""
+    _change_match_highlight = FormTagsRenderer._change_plain_content
+    """
 Change data according to the "highlight" tag.
 
 :param tag_definition: Matched tag definition
@@ -88,10 +84,10 @@ Change data according to the "highlight" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	_change_match_justify = FormTagsRenderer._change_plain_content
-	"""
+    _change_match_justify = FormTagsRenderer._change_plain_content
+    """
 Change data according to the "justify" tag.
 
 :param tag_definition: Matched tag definition
@@ -102,10 +98,10 @@ Change data according to the "justify" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	_change_match_right = FormTagsRenderer._change_plain_content
-	"""
+    _change_match_right = FormTagsRenderer._change_plain_content
+    """
 Change data according to the "right" tag.
 
 :param tag_definition: Matched tag definition
@@ -116,10 +112,10 @@ Change data according to the "right" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	_change_match_title = FormTagsRenderer._change_plain_content
-	"""
+    _change_match_title = FormTagsRenderer._change_plain_content
+    """
 Change data according to the "title" tag.
 
 :param tag_definition: Matched tag definition
@@ -130,21 +126,18 @@ Change data according to the "title" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	def process(self, content):
-	#
-		"""
+    def process(self, content):
+        """
 Process the given content.
 
 :param content: Raw content
 
 :return: (str) FormTags encoded content
 :since:  v0.2.00
-		"""
+        """
 
-		return self.render(content)
-	#
+        return self.render(content)
+    #
 #
-
-##j## EOF

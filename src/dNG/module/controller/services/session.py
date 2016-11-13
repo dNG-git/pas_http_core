@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -27,8 +26,7 @@ try: from dNG.data.session.implementation import Implementation as _Session
 except ImportError: _Session = None
 
 class Session(AbstractHttpController):
-#
-	"""
+    """
 Service for "s=session"
 The "Form" class implements the form view.
 
@@ -39,32 +37,28 @@ The "Form" class implements the form view.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def execute_api_ping(self):
-	#
-		"""
+    def execute_api_ping(self):
+        """
 Action for "api_ping"
 
 :since: v0.2.00
-		"""
+        """
 
-		if (not self.response.is_supported("dict_result_renderer")): raise IOException("Unsupported response object for action")
-		uuid = InputFilter.filter_control_chars(self.request.get_dsd("uuid"))
+        if (not self.response.is_supported("dict_result_renderer")): raise IOException("Unsupported response object for action")
+        uuid = InputFilter.filter_control_chars(self.request.get_dsd("uuid"))
 
-		session = (self.request.get_session() if (self.request.is_supported("session")) else None)
+        session = (self.request.get_session() if (self.request.is_supported("session")) else None)
 
-		if (session is None):
-		#
-			if (uuid is None or _Session is None): raise TranslatableException("core_unsupported_command", 400)
-			session = _Session.load(uuid, False)
-		#
+        if (session is None):
+            if (uuid is None or _Session is None): raise TranslatableException("core_unsupported_command", 400)
+            session = _Session.load(uuid, False)
+        #
 
-		if (session is None): raise TranslatableException("core_access_denied", 403)
+        if (session is None): raise TranslatableException("core_access_denied", 403)
 
-		session.save()
-		self.response.set_result({ "expires_in": int(session.get_timeout()) })
-	#
+        session.save()
+        self.response.set_result({ "expires_in": int(session.get_timeout()) })
+    #
 #
-
-##j## EOF

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -24,8 +23,7 @@ from .abstract_form_tags import AbstractFormTags
 from .content_link_renderer import ContentLinkRenderer
 
 class FormTagsRenderer(AbstractFormTags):
-#
-	"""
+    """
 The OSet parser takes a template string to render the output.
 
 :author:     direct Netware Group et al.
@@ -35,30 +33,28 @@ The OSet parser takes a template string to render the output.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	# pylint: disable=unused-argument
+    # pylint: disable=unused-argument
 
-	def __init__(self):
-	#
-		"""
+    def __init__(self):
+        """
 Constructor __init__(FormTagsRenderer)
 
 :since: v0.2.00
-		"""
+        """
 
-		AbstractFormTags.__init__(self)
+        AbstractFormTags.__init__(self)
 
-		self.null_byte_markup = False
-		"""
+        self.null_byte_markup = False
+        """
 NULL-bytes are used to mark special markup. They should be removed after
 processing is completed.
-		"""
-	#
+        """
+    #
 
-	def _change_plain_content(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_plain_content(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to only contain the plain content.
 
 :param tag_definition: Matched tag definition
@@ -69,13 +65,13 @@ Change data according to only contain the plain content.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		return data[data_position:tag_end_position]
-	#
+        return data[data_position:tag_end_position]
+    #
 
-	_change_match_b = _change_plain_content
-	"""
+    _change_match_b = _change_plain_content
+    """
 Change data according to the "b" tag.
 
 :param tag_definition: Matched tag definition
@@ -86,11 +82,10 @@ Change data according to the "b" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	def _change_match_box(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match_box(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the "box" tag.
 
 :param tag_definition: Matched tag definition
@@ -101,16 +96,16 @@ Change data according to the "box" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		_return = data[data_position:tag_end_position]
-		if (len(_return) > 0): _return = "---\n{0}\n---".format(_return)
+        _return = data[data_position:tag_end_position]
+        if (len(_return) > 0): _return = "---\n{0}\n---".format(_return)
 
-		return _return
-	#
+        return _return
+    #
 
-	_change_match_center = _change_plain_content
-	"""
+    _change_match_center = _change_plain_content
+    """
 Change data according to the "center" tag.
 
 :param tag_definition: Matched tag definition
@@ -121,11 +116,10 @@ Change data according to the "center" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	def _change_match_code(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match_code(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the "code" tag.
 
 :param tag_definition: Matched tag definition
@@ -136,24 +130,23 @@ Change data according to the "code" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		_return = data[data_position:tag_end_position]
+        _return = data[data_position:tag_end_position]
 
-		if (len(_return) > 0 and "[" in _return):
-		#
-			self.null_byte_markup = True
+        if (len(_return) > 0 and "[" in _return):
+            self.null_byte_markup = True
 
-			_return = _return.replace("[", "\x00#91;")
-			_return = _return.replace("]", "\x00#93;")
-			_return = _return = "---\n{0}\n---".format(_return)
-		#
+            _return = _return.replace("[", "\x00#91;")
+            _return = _return.replace("]", "\x00#93;")
+            _return = _return = "---\n{0}\n---".format(_return)
+        #
 
-		return _return
-	#
+        return _return
+    #
 
-	_change_match_color = _change_plain_content
-	"""
+    _change_match_color = _change_plain_content
+    """
 Change data according to the "color" tag.
 
 :param tag_definition: Matched tag definition
@@ -164,10 +157,10 @@ Change data according to the "color" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	_change_match_del = _change_plain_content
-	"""
+    _change_match_del = _change_plain_content
+    """
 Change data according to the "del" tag.
 
 :param tag_definition: Matched tag definition
@@ -178,11 +171,10 @@ Change data according to the "del" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	def _change_match_highlight(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match_highlight(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the "highlight" tag.
 
 :param tag_definition: Matched tag definition
@@ -193,21 +185,20 @@ Change data according to the "highlight" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		_return = data[data_position:tag_end_position]
+        _return = data[data_position:tag_end_position]
 
-		if (len(_return) > 0):
-		#
-			tag_params = FormTagsRenderer.parse_tag_parameters("highlight", data, tag_position, data_position)
-			if ("width" in tag_params): _return = "---\n{0}\n---".format(_return)
-		#
+        if (len(_return) > 0):
+            tag_params = FormTagsRenderer.parse_tag_parameters("highlight", data, tag_position, data_position)
+            if ("width" in tag_params): _return = "---\n{0}\n---".format(_return)
+        #
 
-		return _return
-	#
+        return _return
+    #
 
-	_change_match_i = _change_plain_content
-	"""
+    _change_match_i = _change_plain_content
+    """
 Change data according to the "i" tag.
 
 :param tag_definition: Matched tag definition
@@ -218,11 +209,10 @@ Change data according to the "i" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	def _change_match_img(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match_img(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the "img" tag.
 
 :param tag_definition: Matched tag definition
@@ -233,24 +223,23 @@ Change data according to the "img" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		_return = ""
+        _return = ""
 
-		tag_params = FormTagsRenderer.parse_tag_parameters("img", data, tag_position, data_position)
-		url = data[data_position:tag_end_position]
+        tag_params = FormTagsRenderer.parse_tag_parameters("img", data, tag_position, data_position)
+        url = data[data_position:tag_end_position]
 
-		if (len(url) > 0 and "title" in tag_params):
-		#
-			img_text = ("- {0} ({1}) -" if ("align" in tag_params) else "{0} ({1})")
-			_return = img_text.format(tag_params['title'], url)
-		#
+        if (len(url) > 0 and "title" in tag_params):
+            img_text = ("- {0} ({1}) -" if ("align" in tag_params) else "{0} ({1})")
+            _return = img_text.format(tag_params['title'], url)
+        #
 
-		return _return
-	#
+        return _return
+    #
 
-	justify = _change_plain_content
-	"""
+    justify = _change_plain_content
+    """
 Change data according to the "justify" tag.
 
 :param tag_definition: Matched tag definition
@@ -261,10 +250,10 @@ Change data according to the "justify" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	_change_match_left = _change_plain_content
-	"""
+    _change_match_left = _change_plain_content
+    """
 Change data according to the "left" tag.
 
 :param tag_definition: Matched tag definition
@@ -275,11 +264,10 @@ Change data according to the "left" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	def _change_match_link(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match_link(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the "link" tag.
 
 :param tag_definition: Matched tag definition
@@ -290,24 +278,23 @@ Change data according to the "link" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		_return = data[data_position:tag_end_position]
+        _return = data[data_position:tag_end_position]
 
-		if (len(_return) > 0):
-		#
-			renderer = ContentLinkRenderer()
-			if (self.datalinker_main_id is not None): renderer.set_datalinker_main_id(self.datalinker_main_id)
-			tag_params = FormTagsRenderer.parse_tag_parameters("link", data, tag_position, data_position)
+        if (len(_return) > 0):
+            renderer = ContentLinkRenderer()
+            if (self.datalinker_main_id is not None): renderer.set_datalinker_main_id(self.datalinker_main_id)
+            tag_params = FormTagsRenderer.parse_tag_parameters("link", data, tag_position, data_position)
 
-			_return = renderer.render(_return, tag_params)
-		#
+            _return = renderer.render(_return, tag_params)
+        #
 
-		return _return
-	#
+        return _return
+    #
 
-	_change_match_margin = _change_plain_content
-	"""
+    _change_match_margin = _change_plain_content
+    """
 Change data according to the "margin" tag.
 
 :param tag_definition: Matched tag definition
@@ -318,10 +305,10 @@ Change data according to the "margin" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	_change_match_right = _change_plain_content
-	"""
+    _change_match_right = _change_plain_content
+    """
 Change data according to the "right" tag.
 
 :param tag_definition: Matched tag definition
@@ -332,10 +319,10 @@ Change data according to the "right" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	_change_match_s = _change_plain_content
-	"""
+    _change_match_s = _change_plain_content
+    """
 Change data according to the "s" tag.
 
 :param tag_definition: Matched tag definition
@@ -346,10 +333,10 @@ Change data according to the "s" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	_change_match_size = _change_plain_content
-	"""
+    _change_match_size = _change_plain_content
+    """
 Change data according to the "size" tag.
 
 :param tag_definition: Matched tag definition
@@ -360,11 +347,10 @@ Change data according to the "size" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	def _change_match_title(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match_title(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the "title" tag.
 
 :param tag_definition: Matched tag definition
@@ -375,13 +361,13 @@ Change data according to the "title" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		return "\n===\n{0}\n===\n".format(data[data_position:tag_end_position])
-	#
+        return "\n===\n{0}\n===\n".format(data[data_position:tag_end_position])
+    #
 
-	_change_match_u = _change_plain_content
-	"""
+    _change_match_u = _change_plain_content
+    """
 Change data according to the "u" tag.
 
 :param tag_definition: Matched tag definition
@@ -392,11 +378,10 @@ Change data according to the "u" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-	"""
+    """
 
-	def _change_match_url(self, data, tag_position, data_position, tag_end_position):
-	#
-		"""
+    def _change_match_url(self, data, tag_position, data_position, tag_end_position):
+        """
 Change data according to the "url" tag.
 
 :param tag_definition: Matched tag definition
@@ -407,47 +392,41 @@ Change data according to the "url" tag.
 
 :return: (str) Converted data
 :since:  v0.2.00
-		"""
+        """
 
-		_return = ""
+        _return = ""
 
-		re_result = re.match("^\\[url=(\\w+:.*)?\\]", data[tag_position:data_position])
-		enclosed_data = ""
-		url = None
+        re_result = re.match("^\\[url=(\\w+:.*)?\\]", data[tag_position:data_position])
+        enclosed_data = ""
+        url = None
 
-		if (re_result is not None and len(re_result.group(1)) > 0):
-		#
-			enclosed_data = data[data_position:tag_end_position]
-			url = re_result.group(1)
-		#
-		else: url = data[data_position:tag_end_position]
+        if (re_result is not None and len(re_result.group(1)) > 0):
+            enclosed_data = data[data_position:tag_end_position]
+            url = re_result.group(1)
+        else: url = data[data_position:tag_end_position]
 
-		if (url is not None): _return = ("{0} ({1})".format(enclosed_data, url) if (len(enclosed_data) > 0) else url)
+        if (url is not None): _return = ("{0} ({1})".format(enclosed_data, url) if (len(enclosed_data) > 0) else url)
 
-		return _return
-	#
+        return _return
+    #
 
-	def render(self, content):
-	#
-		"""
+    def render(self, content):
+        """
 Renders the given FormTags content.
 
 :param content: FormTags content
 
 :return: (str) Rendered content
 :since:  v0.2.00
-		"""
+        """
 
-		_return = self._parse(content)
+        _return = self._parse(content)
 
-		if (self.null_byte_markup):
-		#
-			_return = _return.replace("\x00#91;", "[")
-			_return = _return.replace("\x00#93;", "]")
-		#
+        if (self.null_byte_markup):
+            _return = _return.replace("\x00#91;", "[")
+            _return = _return.replace("\x00#93;", "]")
+        #
 
-		return _return
-	#
+        return _return
+    #
 #
-
-##j## EOF

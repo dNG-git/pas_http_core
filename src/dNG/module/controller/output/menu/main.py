@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -25,8 +24,7 @@ from dNG.module.controller.output.filter_links_mixin import FilterLinksMixin
 from dNG.module.controller.output.options_block_mixin import OptionsBlockMixin
 
 class Main(FilterLinksMixin, OptionsBlockMixin, AbstractHttpController):
-#
-	"""
+    """
 The "Main" menu class implements a main menu based on the "mainmenu" link
 store.
 
@@ -37,42 +35,37 @@ store.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def execute_render(self):
-	#
-		"""
+    def execute_render(self):
+        """
 Action for "render"
 
 :since: v0.2.00
-		"""
+        """
 
-		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
+        if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
-		rendered_links = self._get_rendered_links()
-		if (len(rendered_links) > 0): self.set_action_result("<nav class='pagemainmenu'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
-	#
+        rendered_links = self._get_rendered_links()
+        if (len(rendered_links) > 0): self.set_action_result("<nav class='pagemainmenu'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
+    #
 
-	def _get_rendered_links(self, file_path_name = None, include_image = True):
-	#
-		"""
+    def _get_rendered_links(self, include_image = True):
+        """
 Returns a list of rendered links for the main menu.
 
 :return: (list) Links for the main menu
 :since:  v0.2.00
-		"""
+        """
 
-		_return = [ ]
+        _return = [ ]
 
-		links = Link.get_store("mainmenu")
+        links = Link.get_store("mainmenu")
 
-		if (links is not None):
-		#
-			for link in self._filter_links(links): _return.append(self.render_options_block_link(link, include_image))
-		#
+        if (links is not None):
+            for link in self._filter_links(links): _return.append(self.render_options_block_link(link, include_image))
+        #
 
-		return _return
-	#
+        return _return
+    #
 #
-
-##j## EOF

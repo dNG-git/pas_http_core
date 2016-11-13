@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -34,8 +33,7 @@ from dNG.data.xhtml.link import Link
 from .module import Module
 
 class Http(Module):
-#
-	"""
+    """
 Service for "m=output;s=http"
 
 :author:     direct Netware Group et al.
@@ -45,85 +43,76 @@ Service for "m=output;s=http"
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self):
-	#
-		"""
+    def __init__(self):
+        """
 Constructor __init__(Http)
 
 :since: v0.2.00
-		"""
+        """
 
-		Module.__init__(self)
+        Module.__init__(self)
 
-		self.error_messages = responses
-		"""
+        self.error_messages = responses
+        """
 Extendable list of standard HTTP error codes
-		"""
-	#
+        """
+    #
 
-	def execute_done(self):
-	#
-		"""
+    def execute_done(self):
+        """
 Action for "done"
 
 :since: v0.2.00
-		"""
+        """
 
-		if (not isinstance(self.request, AbstractInnerRequest)): raise TranslatableException("pas_http_core_400", 400)
+        if (not isinstance(self.request, AbstractInnerRequest)): raise TranslatableException("pas_http_core_400", 400)
 
-		parameters_chained = self.request.get_parameters_chained()
-		is_parameters_chained_valid = ("title" in parameters_chained and "message" in parameters_chained)
+        parameters_chained = self.request.get_parameters_chained()
+        is_parameters_chained_valid = ("title" in parameters_chained and "message" in parameters_chained)
 
-		if (not is_parameters_chained_valid): raise TranslatableException("pas_http_core_500")
+        if (not is_parameters_chained_valid): raise TranslatableException("pas_http_core_500")
 
-		l10n = (L10n.get_instance(parameters_chained['lang'])
-		        if ("lang" in parameters_chained) else
-		        L10n.get_instance()
-		       )
+        l10n = (L10n.get_instance(parameters_chained['lang'])
+                if ("lang" in parameters_chained) else
+                L10n.get_instance()
+               )
 
-		L10n.init("core", l10n.get_lang())
+        L10n.init("core", l10n.get_lang())
 
-		content = { "title": parameters_chained['title'],
-		            "title_task_done": l10n.get("core_title_task_done"),
-		            "message": parameters_chained['message']
-		          }
+        content = { "title": parameters_chained['title'],
+                    "title_task_done": l10n.get("core_title_task_done"),
+                    "message": parameters_chained['message']
+                  }
 
-		if ("target_iline" in parameters_chained):
-		#
-			content['link_title'] = l10n.get("core_continue")
+        if ("target_iline" in parameters_chained):
+            content['link_title'] = l10n.get("core_continue")
 
-			target_iline = re.sub("\\_\\_\\w+\\_\\_", "", parameters_chained['target_iline'])
-			content['link_url'] = Link().build_url(Link.TYPE_RELATIVE_URL, { "__query__": target_iline })
-		#
+            target_iline = re.sub("\\_\\_\\w+\\_\\_", "", parameters_chained['target_iline'])
+            content['link_url'] = Link().build_url(Link.TYPE_RELATIVE_URL, { "__query__": target_iline })
+        #
 
-		self.response.init()
-		self.response.set_title(parameters_chained['title'])
-		self.response.add_oset_content("core.done", content)
-	#
+        self.response.init()
+        self.response.set_title(parameters_chained['title'])
+        self.response.add_oset_content("core.done", content)
+    #
 
-	def execute_error(self):
-	#
-		"""
+    def execute_error(self):
+        """
 Action for "error"
 
 :since: v0.2.00
-		"""
+        """
 
-		code = InputFilter.filter_int(self.request.get_dsd("code", "500"))
+        code = InputFilter.filter_int(self.request.get_dsd("code", "500"))
 
-		if (L10n.is_defined("errors_pas_http_core_{0:d}".format(code))):
-		#
-			if (self.response.is_supported("headers")): self.response.set_header("HTTP/1.1", ("HTTP/1.1 {0:d} {1}".format(code, self.error_messages[code]) if (code in self.error_messages) else "HTTP/1.1 500 Internal Server Error"), True)
-			self.response.handle_critical_error("pas_http_core_{0:d}".format(code))
-		#
-		else:
-		#
-			if (self.response.is_supported("headers")): self.response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
-			self.response.handle_critical_error("core_unknown_error")
-		#
-	#
+        if (L10n.is_defined("errors_pas_http_core_{0:d}".format(code))):
+            if (self.response.is_supported("headers")): self.response.set_header("HTTP/1.1", ("HTTP/1.1 {0:d} {1}".format(code, self.error_messages[code]) if (code in self.error_messages) else "HTTP/1.1 500 Internal Server Error"), True)
+            self.response.handle_critical_error("pas_http_core_{0:d}".format(code))
+        else:
+            if (self.response.is_supported("headers")): self.response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+            self.response.handle_critical_error("core_unknown_error")
+        #
+    #
 #
-
-##j## EOF

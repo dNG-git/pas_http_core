@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -24,8 +23,7 @@ from dNG.data.text.l10n import L10n
 from .options_bar import OptionsBar
 
 class OptionsButton(OptionsBar):
-#
-	"""
+    """
 An "OptionsButton" contains of several options formatted with title and
 optional image as a context menu of an option button.
 
@@ -36,35 +34,32 @@ optional image as a context menu of an option button.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def execute_render(self):
-	#
-		"""
+    def execute_render(self):
+        """
 Renders the options button.
 
 :since: v0.2.00
-		"""
+        """
 
-		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
+        if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
-		_id = "pas_http_core_{0:d}_{1:d}".format(id(self.context), id(self))
+        _id = "pas_http_core_{0:d}_{1:d}".format(id(self.context), id(self))
 
-		rendered_content = """
+        rendered_content = """
 {0}<script type="text/javascript"><![CDATA[
 require([ "djt/OverlayButton.min" ], function(OverlayButton) {{
-	new OverlayButton({{
-		id: "{1}",
-		button_content: "{2}",
-		OverlayButton_class: "pageoptionsbar_button",
-		OverlayButton_widget_class: "pageoptionsbar_widget"
-	}});
+    new OverlayButton({{
+        id: "{1}",
+        button_content: "{2}",
+        OverlayButton_class: "pageoptionsbar_button",
+        OverlayButton_widget_class: "pageoptionsbar_widget"
+    }});
 }});
 ]]></script>
-		""".format(self._render_options_bar_links(_id), _id, L10n.get("pas_http_core_additional_options"))
+        """.format(self._render_options_bar_links(_id), _id, L10n.get("pas_http_core_additional_options"))
 
-		self.set_action_result(rendered_content)
-	#
+        self.set_action_result(rendered_content)
+    #
 #
-
-##j## EOF

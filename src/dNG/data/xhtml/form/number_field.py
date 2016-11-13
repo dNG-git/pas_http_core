@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -22,8 +21,7 @@ from .abstract_field import AbstractField
 from .text_field import TextField
 
 class NumberField(TextField):
-#
-	"""
+    """
 "NumberField" provides a number input field.
 
 :author:     direct Netware Group et al.
@@ -33,34 +31,30 @@ class NumberField(TextField):
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def _check(self):
-	#
-		"""
+    def _check(self):
+        """
 Executes checks if the field value is valid.
 
 :return: (bool) True if all checks are passed
 :since:  v0.2.00
-		"""
+        """
 
-		_return = AbstractField._check(self)
-		if (_return): _return = self._check_range()
+        _return = AbstractField._check(self)
+        if (_return): _return = self._check_range()
 
-		return _return
-	#
+        return _return
+    #
 
-	def get_type(self):
-	#
-		"""
+    def get_type(self):
+        """
 Returns the field type.
 
 :return: (str) Field type
 :since:  v0.2.00
-		"""
+        """
 
-		return "number"
-	#
+        return "number"
+    #
 #
-
-##j## EOF

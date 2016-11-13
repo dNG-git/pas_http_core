@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -22,8 +21,7 @@ from dNG.data.text.tag_parser.rewrite_mixin import RewriteMixin
 from dNG.data.xhtml.formatting import Formatting
 
 class RewriteSafeXhtmlMixin(RewriteMixin):
-#
-	"""
+    """
 This tag parser mixin provides support for rewrite statements to generate
 safe XHTML compliant output.
 
@@ -34,11 +32,10 @@ safe XHTML compliant output.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def render_rewrite_safe_xhtml(self, source, key):
-	#
-		"""
+    def render_rewrite_safe_xhtml(self, source, key):
+        """
 Renders the content for safe (escaped) XHTML output.
 
 :param source: Source for rewrite
@@ -46,11 +43,9 @@ Renders the content for safe (escaped) XHTML output.
 
 :return: (str) Rendered XHTML content
 :since:  v0.2.00
-		"""
+        """
 
-		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_safe_xhtml({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
-		return Formatting.escape(self.render_rewrite(source, key))
-	#
+        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_safe_xhtml({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
+        return Formatting.escape(self.render_rewrite(source, key))
+    #
 #
-
-##j## EOF

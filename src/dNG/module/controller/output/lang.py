@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -26,8 +25,7 @@ from dNG.module.controller.abstract_http import AbstractHttp as AbstractHttpCont
 from dNG.runtime.io_exception import IOException
 
 class Lang(AbstractHttpController):
-#
-	"""
+    """
 The "Lang" class provides access to the language files.
 
 :author:     direct Netware Group et al.
@@ -37,37 +35,33 @@ The "Lang" class provides access to the language files.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def execute_api_get(self):
-	#
-		"""
+    def execute_api_get(self):
+        """
 Action for "api_get"
 
 :since: v0.2.00
-		"""
+        """
 
-		if (not self.response.is_supported("dict_result_renderer")): raise IOException("Unsupported response object for action")
-		lang_request = self.request.get_dsd("lang_request")
+        if (not self.response.is_supported("dict_result_renderer")): raise IOException("Unsupported response object for action")
+        lang_request = self.request.get_dsd("lang_request")
 
-		lang = L10n.get_default_lang()
-		lang_request_list = lang_request.split(" ")
+        lang = L10n.get_default_lang()
+        lang_request_list = lang_request.split(" ")
 
-		instance = L10nInstance(lang)
+        instance = L10nInstance(lang)
 
-		for file_id in lang_request_list:
-		#
-			relative_file_path_name = InputFilter.filter_file_path(L10n.get_relative_file_path_name(file_id))
-			file_path_name = "{0}/{1}/{2}.json".format(Settings.get("path_lang"), lang, relative_file_path_name)
+        for file_id in lang_request_list:
+            relative_file_path_name = InputFilter.filter_file_path(L10n.get_relative_file_path_name(file_id))
+            file_path_name = "{0}/{1}/{2}.json".format(Settings.get("path_lang"), lang, relative_file_path_name)
 
-			instance.read_file(file_path_name, True)
-		#
+            instance.read_file(file_path_name, True)
+        #
 
-		self.response.init(True)
-		self.response.set_content_dynamic(False)
-		self.response.set_expires_relative(+3600)
-		self.response.set_result(instance)
-	#
+        self.response.init(True)
+        self.response.set_content_dynamic(False)
+        self.response.set_expires_relative(+3600)
+        self.response.set_result(instance)
+    #
 #
-
-##j## EOF

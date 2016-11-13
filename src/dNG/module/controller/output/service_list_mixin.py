@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -24,8 +23,7 @@ from .filter_links_mixin import FilterLinksMixin
 from .options_block_mixin import OptionsBlockMixin
 
 class ServiceListMixin(FilterLinksMixin, OptionsBlockMixin):
-#
-	"""
+    """
 The "ServiceListMixin" provides a standardized list of services view.
 
 :author:     direct Netware Group et al.
@@ -35,68 +33,61 @@ The "ServiceListMixin" provides a standardized list of services view.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def _get_rendered_service_list_links(self, links):
-	#
-		"""
+    def _get_rendered_service_list_links(self, links):
+        """
 Returns a list of rendered links for the service menu.
 
 :return: (list) Links for the service menu
 :since:  v0.2.00
-		"""
+        """
 
-		_return = [ ]
+        _return = [ ]
 
-		if (isinstance(links, list)):
-		#
-			links = self._filter_links(links)
-			for link in links: _return.append(self.render_options_block_link(link))
-		#
+        if (isinstance(links, list)):
+            links = self._filter_links(links)
+            for link in links: _return.append(self.render_options_block_link(link))
+        #
 
-		return _return
-	#
+        return _return
+    #
 
-	def render_service_list_entries(self, entries):
-	#
-		"""
+    def render_service_list_entries(self, entries):
+        """
 Renders the given service list entries.
 
 :param entries: Service list entries
 
 :since: v0.2.00
-		"""
+        """
 
-		_return = ""
+        _return = ""
 
-		rendered_links = self._get_rendered_service_list_links(entries)
-		if (len(rendered_links) > 0): _return = "<nav class='pageoptionsblock pageservicelist'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links))
+        rendered_links = self._get_rendered_service_list_links(entries)
+        if (len(rendered_links) > 0): _return = "<nav class='pageoptionsblock pageservicelist'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links))
 
-		return _return
-	#
+        return _return
+    #
 
-	def render_service_list_file(self, file_path_name):
-	#
-		"""
+    def render_service_list_file(self, file_path_name):
+        """
 Renders the content of the given service list file.
 
 :param file_path_name: Service list file path
 
 :since: v0.2.00
-		"""
+        """
 
-		_return = ""
+        _return = ""
 
-		json_data = JsonFileContent.read(file_path_name)
+        json_data = JsonFileContent.read(file_path_name)
 
-		if (type(json_data) is list):
-		#
-			rendered_links = self._get_rendered_service_list_links(json_data)
-			if (len(rendered_links) > 0): _return = "<nav class='pageoptionsblock pageservicelist'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links))
-		#
+        if (type(json_data) is list):
+            rendered_links = self._get_rendered_service_list_links(json_data)
+            if (len(rendered_links) > 0): _return = "<nav class='pageoptionsblock pageservicelist'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links))
+        #
 
-		return _return
-	#
+        return _return
+    #
 #
-
-##j## EOF

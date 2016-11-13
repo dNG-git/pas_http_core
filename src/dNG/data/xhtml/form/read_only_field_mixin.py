@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -19,8 +18,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 """
 
 class ReadOnlyFieldMixin(object):
-#
-	"""
+    """
 The "ReadOnlyFieldMixin" prevents any submitted value to override the
 pre-defined content.
 
@@ -31,20 +29,17 @@ pre-defined content.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def _set_form_value(self, form):
-	#
-		"""
+    def _set_form_value(self, form):
+        """
 Sets the field value based on the given form.
 
 :param form: Form
 
 :since: v0.2.00
-		"""
+        """
 
-		pass
-	#
+        pass
+    #
 #
-
-##j## EOF

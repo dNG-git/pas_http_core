@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -24,8 +23,7 @@ from .form_tags_encoder import FormTagsEncoder
 from .form_tags_renderer import FormTagsRenderer
 
 class FormTags(object):
-#
-	"""
+    """
 The static methods of this XHTML FormTags class are used for default
 rendering purposes within an "article" tag or similar block level element.
 
@@ -36,28 +34,26 @@ rendering purposes within an "article" tag or similar block level element.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	@staticmethod
-	def encode(content):
-	#
-		"""
+    @staticmethod
+    def encode(content):
+        """
 Encode XHTML FormTags and some typical (X)HTML statements.
 
 :param content: Content containing XHTML FormTags or (X)HTML statements
 
 :return: (str) FormTags encoded data
 :since:  v0.2.00
-		"""
+        """
 
-		encoder = FormTagsEncoder()
-		return encoder.process(content)
-	#
+        encoder = FormTagsEncoder()
+        return encoder.process(content)
+    #
 
-	@staticmethod
-	def render(content, block_encoding_supported = True, main_id = None):
-	#
-		"""
+    @staticmethod
+    def render(content, block_encoding_supported = True, main_id = None):
+        """
 Render FormTags as XHTML output and set given restrictions.
 
 :param content: FormTags encoded data
@@ -66,31 +62,28 @@ Render FormTags as XHTML output and set given restrictions.
 
 :return: (str) Rendered content
 :since:  v0.2.00
-		"""
+        """
 
-		renderer = FormTagsRenderer()
-		renderer.set_xhtml_title_top_level(2)
-		if (not block_encoding_supported): renderer.set_blocks_supported(block_encoding_supported)
-		if (main_id is not None): renderer.set_datalinker_main_id(main_id)
+        renderer = FormTagsRenderer()
+        renderer.set_xhtml_title_top_level(2)
+        if (not block_encoding_supported): renderer.set_blocks_supported(block_encoding_supported)
+        if (main_id is not None): renderer.set_datalinker_main_id(main_id)
 
-		return renderer.render(content)
-	#
+        return renderer.render(content)
+    #
 
-	@staticmethod
-	def sanitize(content):
-	#
-		"""
+    @staticmethod
+    def sanitize(content):
+        """
 Removes all FormTags from the given content
 
 :param content: FormTags encoded data
 
 :return: (str) Sanitized content
 :since:  v0.2.00
-		"""
+        """
 
-		sanitizer = FormTagsSanitizer()
-		return sanitizer.process(content)
-	#
+        sanitizer = FormTagsSanitizer()
+        return sanitizer.process(content)
+    #
 #
-
-##j## EOF

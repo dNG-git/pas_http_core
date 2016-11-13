@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -23,8 +22,7 @@ import re
 from .link import Link
 
 class ContentLinkRenderer(object):
-#
-	"""
+    """
 The link renderer parses and renders internal links to DataLinker and other
 sources.
 
@@ -35,53 +33,48 @@ sources.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self):
-	#
-		"""
+    def __init__(self):
+        """
 Constructor __init__(ContentLinkRenderer)
 
 :since: v0.2.00
-		"""
+        """
 
-		self.datalinker_main_id = None
-		"""
+        self.datalinker_main_id = None
+        """
 DataLinker main ID for tags
-		"""
-	#
+        """
+    #
 
-	def _get_link_parameters(self, data):
-	#
-		"""
+    def _get_link_parameters(self, data):
+        """
 Returns a dict of parameters to be used with a Link instance.
 
 :param data: Link definition
 
 :return: (dict) Link parameters
 :since:  v0.2.00
-		"""
+        """
 
-		_return = { }
+        _return = { }
 
-		if ("id" in data): _return = { "m": "datalinker", "a": "related", "dsd": { "oid": data['id'] } }
-		elif ("link" in data and data['link'] == "params"):
-		#
-			if ("m" in data): _return['m'] = data['m']
-			if ("s" in data): _return['s'] = data['s'].replace("+", " ")
-			if ("a" in data): _return['a'] = data['a']
-			if ("dsd" in data): _return['dsd'] = re.sub("\\_\\_\\w+\\\\_\\_", "", data['dsd'])
-		#
-		elif ("tag" in data
-		      and self.datalinker_main_id is not None
-		     ): _return = { "m": "datalinker", "a": "related", "dsd": { "otag": data['tag'], "omid": self.datalinker_main_id } }
+        if ("id" in data): _return = { "m": "datalinker", "a": "related", "dsd": { "oid": data['id'] } }
+        elif ("link" in data and data['link'] == "params"):
+            if ("m" in data): _return['m'] = data['m']
+            if ("s" in data): _return['s'] = data['s'].replace("+", " ")
+            if ("a" in data): _return['a'] = data['a']
+            if ("dsd" in data): _return['dsd'] = re.sub("\\_\\_\\w+\\\\_\\_", "", data['dsd'])
+        elif ("tag" in data
+              and self.datalinker_main_id is not None
+             ): _return = { "m": "datalinker", "a": "related", "dsd": { "otag": data['tag'], "omid": self.datalinker_main_id } }
 
-		return _return
-	#
+        return _return
+    #
 
-	def render(self, content, data):
-	#
-		"""
+    def render(self, content, data):
+        """
 Renders a link ready for output.
 
 :param content: Content data
@@ -89,19 +82,18 @@ Renders a link ready for output.
 
 :return: (str) Rendered content
 :since:  v0.2.00
-		"""
+        """
 
-		if ("type" in data): link_type = (data['type'] if (type(data['type']) is int) else Link.get_type_int(data['type']))
-		else: link_type = Link.TYPE_RELATIVE_URL
+        if ("type" in data): link_type = (data['type'] if (type(data['type']) is int) else Link.get_type_int(data['type']))
+        else: link_type = Link.TYPE_RELATIVE_URL
 
-		link_parameters = self._get_link_parameters(data)
+        link_parameters = self._get_link_parameters(data)
 
-		return (self._render(content, link_type, link_parameters) if (len(link_parameters) > 0) else content)
-	#
+        return (self._render(content, link_type, link_parameters) if (len(link_parameters) > 0) else content)
+    #
 
-	def _render(self, content, link_type, link_parameters):
-	#
-		"""
+    def _render(self, content, link_type, link_parameters):
+        """
 Renders a link with the parsed parameters ready for output.
 
 :param content: Content data
@@ -110,23 +102,20 @@ Renders a link with the parsed parameters ready for output.
 
 :return: (str) Rendered content
 :since:  v0.2.00
-		"""
+        """
 
-		return "{0} ({1})".format(content, Link.get_preferred().build_url((Link.TYPE_ABSOLUTE_URL & link_type), link_parameters))
-	#
+        return "{0} ({1})".format(content, Link.get_preferred().build_url((Link.TYPE_ABSOLUTE_URL & link_type), link_parameters))
+    #
 
-	def set_datalinker_main_id(self, id_main):
-	#
-		"""
+    def set_datalinker_main_id(self, id_main):
+        """
 Sets the DataLinker main ID for tags.
 
 :param id_main: DataLinker main ID
 
 :since: v0.2.00
-		"""
+        """
 
-		self.datalinker_main_id = id_main
-	#
+        self.datalinker_main_id = id_main
+    #
 #
-
-##j## EOF

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -21,8 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from .translatable_error import TranslatableError
 
 class TranslatableException(TranslatableError):
-#
-	"""
+    """
 This exception takes a translatable messages for critical errors.
 
 :author:     direct Netware Group et al.
@@ -32,11 +30,10 @@ This exception takes a translatable messages for critical errors.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self, l10n_id, http_code = 500, value = None, _exception = None):
-	#
-		"""
+    def __init__(self, l10n_id, http_code = 500, value = None, _exception = None):
+        """
 Constructor __init__(TranslatableException)
 
 :param l10n_id: L10n translatable key (prefixed with "errors_")
@@ -45,10 +42,8 @@ Constructor __init__(TranslatableException)
 :param _exception: Inner exception
 
 :since: v0.2.00
-		"""
+        """
 
-		TranslatableError.__init__(self, l10n_id, http_code, value, _exception)
-	#
+        TranslatableError.__init__(self, l10n_id, http_code, value, _exception)
+    #
 #
-
-##j## EOF

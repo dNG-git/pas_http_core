@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -33,8 +32,7 @@ from dNG.module.named_loader import NamedLoader
 from .module import Module
 
 class Cache(Module):
-#
-	"""
+    """
 Service for "s=cache"
 
 :author:     direct Netware Group
@@ -44,115 +42,97 @@ Service for "s=cache"
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def execute_index(self):
-	#
-		"""
+    def execute_index(self):
+        """
 Action for "index"
 
 :since: v0.2.00
-		"""
+        """
 
-		dfile = InputFilter.filter_file_path(self.request.get_dsd("dfile", ""))
+        dfile = InputFilter.filter_file_path(self.request.get_dsd("dfile", ""))
 
-		file_path_name = ""
+        file_path_name = ""
 
-		self.response.set_header("X-Robots-Tag", "noindex")
+        self.response.set_header("X-Robots-Tag", "noindex")
 
-		if (dfile is not None and dfile != ""):
-		#
-			file_path_name = path.abspath("{0}/mmedia/{1}".format(Settings.get("path_data"), dfile))
+        if (dfile is not None and dfile != ""):
+            file_path_name = path.abspath("{0}/mmedia/{1}".format(Settings.get("path_data"), dfile))
 
-			if (path.exists(file_path_name) and os.access(file_path_name, os.R_OK)):
-			#
-				if (file_path_name.endswith(".paslink.url")):
-				#
-					file_content = FileContent.read(file_path_name)
-					if (file_content is not None): file_content = path.normpath(file_content)
+            if (path.exists(file_path_name) and os.access(file_path_name, os.R_OK)):
+                if (file_path_name.endswith(".paslink.url")):
+                    file_content = FileContent.read(file_path_name)
+                    if (file_content is not None): file_content = path.normpath(file_content)
 
-					file_path_name = (""
-					                  if (file_content is None or (not path.exists(file_content)) or (not os.access(file_content, os.R_OK))) else
-					                  file_content
-					                 )
-				#
-			#
-			else: file_path_name = ""
-		#
+                    file_path_name = (""
+                                      if (file_content is None or (not path.exists(file_content)) or (not os.access(file_content, os.R_OK))) else
+                                      file_content
+                                     )
+                #
+            else: file_path_name = ""
+        #
 
-		is_last_modified_supported = (Settings.get("pas_http_cache_modification_check", True))
-		is_modified = True
-		is_valid = False
-		last_modified_on_server = 0
+        is_last_modified_supported = (Settings.get("pas_http_cache_modification_check", True))
+        is_modified = True
+        is_valid = False
+        last_modified_on_server = 0
 
-		if (file_path_name != ""):
-		#
-			is_valid = True
+        if (file_path_name != ""):
+            is_valid = True
 
-			if (is_last_modified_supported and self.request.get_header("If-Modified-Since") is not None):
-			#
-				last_modified_on_client = RfcBasics.get_rfc7231_timestamp(self.request.get_header("If-Modified-Since").split(";")[0])
+            if (is_last_modified_supported and self.request.get_header("If-Modified-Since") is not None):
+                last_modified_on_client = RfcBasics.get_rfc7231_timestamp(self.request.get_header("If-Modified-Since").split(";")[0])
 
-				if (last_modified_on_client > -1):
-				#
-					last_modified_on_server = int(os.stat(file_path_name).st_mtime)
+                if (last_modified_on_client > -1):
+                    last_modified_on_server = int(os.stat(file_path_name).st_mtime)
 
-					if (last_modified_on_server <= last_modified_on_client):
-					#
-						is_modified = False
-						self.response.set_content_dynamic(False)
+                    if (last_modified_on_server <= last_modified_on_client):
+                        is_modified = False
+                        self.response.set_content_dynamic(False)
 
-						self.response.init(True)
-						self.response.set_header("HTTP/1.1", "HTTP/1.1 304 Not Modified", True)
-						self.response.set_expires_relative(+63072000)
-						self.response.set_last_modified(last_modified_on_server)
+                        self.response.init(True)
+                        self.response.set_header("HTTP/1.1", "HTTP/1.1 304 Not Modified", True)
+                        self.response.set_expires_relative(+63072000)
+                        self.response.set_last_modified(last_modified_on_server)
 
-						self.response.set_raw_data("")
-					#
-				#
-			#
-		#
+                        self.response.set_raw_data("")
+                    #
+                #
+            #
+        #
 
-		if (is_valid and is_modified):
-		#
-			re_tsc_result = re.search("\\.tsc\\.(min\\.)?(css|js|svg)$", file_path_name, re.I)
+        if (is_valid and is_modified):
+            re_tsc_result = re.search("\\.tsc\\.(min\\.)?(css|js|svg)$", file_path_name, re.I)
 
-			self.response.set_content_dynamic(re_tsc_result is not None)
-			self.response.init(True)
+            self.response.set_content_dynamic(re_tsc_result is not None)
+            self.response.init(True)
 
-			if (is_last_modified_supported):
-			#
-				if (last_modified_on_server < 1): last_modified_on_server = int(os.stat(file_path_name).st_mtime)
-				self.response.set_last_modified(last_modified_on_server)
-			#
+            if (is_last_modified_supported):
+                if (last_modified_on_server < 1): last_modified_on_server = int(os.stat(file_path_name).st_mtime)
+                self.response.set_last_modified(last_modified_on_server)
+            #
 
-			if (re_tsc_result is not None):
-			#
-				file_extension = re_tsc_result.group(2)
+            if (re_tsc_result is not None):
+                file_extension = re_tsc_result.group(2)
 
-				if (file_extension == "css"): self.response.set_header("Content-Type", "text/css")
-				elif (file_extension == "js"): self.response.set_header("Content-Type", "text/javascript")
-				elif (file_extension == "svg"): self.response.set_header("Content-Type", "text/svg+xml")
+                if (file_extension == "css"): self.response.set_header("Content-Type", "text/css")
+                elif (file_extension == "js"): self.response.set_header("Content-Type", "text/javascript")
+                elif (file_extension == "svg"): self.response.set_header("Content-Type", "text/svg+xml")
 
-				parser = MmediaParser()
-				self.response.set_raw_data(parser.render(file_path_name))
-			#
-			else:
-			#
-				self.response.set_expires_relative(+63072000)
+                parser = MmediaParser()
+                self.response.set_raw_data(parser.render(file_path_name))
+            else:
+                self.response.set_expires_relative(+63072000)
 
-				streamer = NamedLoader.get_instance("dNG.data.streamer.File", False)
+                streamer = NamedLoader.get_instance("dNG.data.streamer.File", False)
 
-				if (streamer is None): self.response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
-				else: Streaming.handle_url(self.request, streamer, "file:///{0}".format(file_path_name), self.response)
-			#
-		#
-		elif (not is_valid):
-		#
-			if (self.log_handler is not None): self.log_handler.warning("#echo(__FILEPATH__)# -Cache.execute_index()- reporting: Failed opening {0} - file not readable", dfile, context = "pas_http_core")
-			self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
-		#
-	#
+                if (streamer is None): self.response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+                else: Streaming.handle_url(self.request, streamer, "file:///{0}".format(file_path_name), self.response)
+            #
+        elif (not is_valid):
+            if (self.log_handler is not None): self.log_handler.warning("#echo(__FILEPATH__)# -Cache.execute_index()- reporting: Failed opening {0} - file not readable", dfile, context = "pas_http_core")
+            self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+        #
+    #
 #
-
-##j## EOF

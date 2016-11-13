@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -23,8 +22,7 @@ from dNG.data.binary import Binary
 from .abstract_encapsulated import AbstractEncapsulated
 
 class HttpWsgi1(AbstractEncapsulated):
-#
-	"""
+    """
 WSGI 1.0 compliant streamer.
 
 :author:     direct Netware Group et al.
@@ -34,11 +32,10 @@ WSGI 1.0 compliant streamer.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def read(self, n = None):
-	#
-		"""
+    def read(self, n = None):
+        """
 Reads from the current streamer session.
 
 :param n: How many bytes to read from the current position (0 means until
@@ -46,12 +43,10 @@ Reads from the current streamer session.
 
 :return: (bytes) Data; Empty byte string if EOF
 :since:  v0.2.00
-		"""
+        """
 
-		_return = AbstractEncapsulated.read(self, n)
-		if (_return is None): _return = Binary.BYTES_TYPE()
-		return _return
-	#
+        _return = AbstractEncapsulated.read(self, n)
+        if (_return is None): _return = Binary.BYTES_TYPE()
+        return _return
+    #
 #
-
-##j## EOF

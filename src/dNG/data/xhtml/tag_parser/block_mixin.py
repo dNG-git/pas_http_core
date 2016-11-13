@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -24,8 +23,7 @@ from dNG.module.named_loader import NamedLoader
 from dNG.runtime.exception_log_trap import ExceptionLogTrap
 
 class BlockMixin(MappedElementMixin, SourceValueMixin):
-#
-	"""
+    """
 This tag parser mixin provides support for blocks of subelements.
 
 :author:     direct Netware Group et al.
@@ -35,11 +33,10 @@ This tag parser mixin provides support for blocks of subelements.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def render_block(self, action, source_key = None, source = None, key = None):
-	#
-		"""
+    def render_block(self, action, source_key = None, source = None, key = None):
+        """
 Checks and renders the block statement.
 
 :param data: Element template data
@@ -49,30 +46,26 @@ Checks and renders the block statement.
 
 :return: (str) Rewritten statement if successful
 :since:  v0.2.00
-		"""
+        """
 
-		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_block()- (#echo(__LINE__)#)", self, context = "pas_tag_parser")
-		_return = ""
+        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_block()- (#echo(__LINE__)#)", self, context = "pas_tag_parser")
+        _return = ""
 
-		with ExceptionLogTrap("pas_tag_parser"):
-		#
-			content = (None if (source_key is None) else self.get_source_value(source, key))
-			if (not isinstance(content, dict)): content = self.content
+        with ExceptionLogTrap("pas_tag_parser"):
+            content = (None if (source_key is None) else self.get_source_value(source, key))
+            if (not isinstance(content, dict)): content = self.content
 
-			action_definition = action.split(".")
-			action = action_definition.pop()
-			service = ".".join(action_definition)
+            action_definition = action.split(".")
+            action = action_definition.pop()
+            service = ".".join(action_definition)
 
-			if (NamedLoader.is_defined("dNG.module.controller.{0}".format(service))):
-			#
-				instance = NamedLoader.get_instance("dNG.module.controller.{0}".format(service))
-				instance.set_action(action, content)
-				_return = instance.execute()
-			#
-		#
+            if (NamedLoader.is_defined("dNG.module.controller.{0}".format(service))):
+                instance = NamedLoader.get_instance("dNG.module.controller.{0}".format(service))
+                instance.set_action(action, content)
+                _return = instance.execute()
+            #
+        #
 
-		return _return
-	#
+        return _return
+    #
 #
-
-##j## EOF

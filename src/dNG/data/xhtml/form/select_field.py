@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -24,8 +23,7 @@ from .abstract_select_field import AbstractSelectField
 from .choices_mixin import ChoicesMixin
 
 class SelectField(ChoicesMixin, AbstractSelectField):
-#
-	"""
+    """
 "SelectField" provides a selectbox to select one option.
 
 :author:     direct Netware Group et al.
@@ -35,66 +33,60 @@ class SelectField(ChoicesMixin, AbstractSelectField):
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self, name = None):
-	#
-		"""
+    def __init__(self, name = None):
+        """
 Constructor __init__(SelectField)
 
 :param name: Form field name
 
 :since: v0.2.00
-		"""
+        """
 
-		AbstractSelectField.__init__(self, name)
-		ChoicesMixin.__init__(self)
-	#
+        AbstractSelectField.__init__(self, name)
+        ChoicesMixin.__init__(self)
+    #
 
-	def _check(self):
-	#
-		"""
+    def _check(self):
+        """
 Executes checks if the field value is valid.
 
 :return: (bool) True if all checks are passed
 :since:  v0.2.00
-		"""
+        """
 
-		_return = AbstractSelectField._check(self)
-		if (_return): _return = self._check_values_selected_size(1)
+        _return = AbstractSelectField._check(self)
+        if (_return): _return = self._check_values_selected_size(1)
 
-		return _return
-	#
+        return _return
+    #
 
-	def load_definition(self, field_definition):
-	#
-		"""
+    def load_definition(self, field_definition):
+        """
 Loads the field configuration from the given definition.
 
 :param field_definition: Field definition dict
 
 :since: v0.2.00
-		"""
+        """
 
-		AbstractSelectField.load_definition(self, field_definition)
+        AbstractSelectField.load_definition(self, field_definition)
 
-		self.set_choices(field_definition['choices'])
-	#
+        self.set_choices(field_definition['choices'])
+    #
 
-	def _validate_definition(self, field_definition):
-	#
-		"""
+    def _validate_definition(self, field_definition):
+        """
 Validates that all relevant values are present for this field type.
 
 :param field_definition: Field definition dict
 
 :since: v0.2.00
-		"""
+        """
 
-		AbstractSelectField._validate_definition(self, field_definition)
+        AbstractSelectField._validate_definition(self, field_definition)
 
-		if ("choices" not in field_definition): raise TypeException("'choices' is missing in the given form field definition")
-	#
+        if ("choices" not in field_definition): raise TypeException("'choices' is missing in the given form field definition")
+    #
 #
-
-##j## EOF

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -24,8 +23,7 @@ from dNG.data.text.l10n import L10n
 from .rewrite_mixin import RewriteMixin
 
 class RewriteDateTimeMixin(RewriteMixin):
-#
-	"""
+    """
 This tag parser mixin provides support for rewrite statements to generate
 formatted date and time strings.
 
@@ -36,11 +34,10 @@ formatted date and time strings.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def render_rewrite_date_time(self, source, key, _type):
-	#
-		"""
+    def render_rewrite_date_time(self, source, key, _type):
+        """
 Renders a date and time string based on the given presentation type.
 
 :param source: Source for rewrite
@@ -49,21 +46,18 @@ Renders a date and time string based on the given presentation type.
 
 :return: (str) Rendered content
 :since:  v0.2.00
-		"""
+        """
 
-		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time({1}, {2})- (#echo(__LINE__)#)", self, key, _type, context = "pas_tag_parser")
-		_return = L10n.get("core_unknown")
+        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time({1}, {2})- (#echo(__LINE__)#)", self, key, _type, context = "pas_tag_parser")
+        _return = L10n.get("core_unknown")
 
-		timestamp = self.get_source_value(source, key)
+        timestamp = self.get_source_value(source, key)
 
-		if (timestamp is not None):
-		#
-			# TODO: Timezone from session
-			_return = DateTime.format_l10n(_type, int(timestamp))
-		#
+        if (timestamp is not None):
+            # TODO: Timezone from session
+            _return = DateTime.format_l10n(_type, int(timestamp))
+        #
 
-		return _return
-	#
+        return _return
+    #
 #
-
-##j## EOF

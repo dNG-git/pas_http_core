@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -25,8 +24,7 @@ from dNG.data.xhtml.oset.file_parser import FileParser
 from dNG.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 
 class NotificationBox(AbstractHttpController):
-#
-	"""
+    """
 "NotificationBox" is an interactive element showing server as well as client
 side notifications.
 
@@ -37,62 +35,57 @@ side notifications.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def _render_notification(self, data):
-	#
-		"""
+    def _render_notification(self, data):
+        """
 Renders a notification.
 
 :param data: Notification data to render
 
 :return: (str) XHTML notification
 :since:  v0.2.00
-		"""
+        """
 
-		_return = ""
+        _return = ""
 
-		if ("type" in data and "message" in data):
-		#
-			if (data['type'] == NotificationStore.TYPE_COMPLETED_INFO): css_class = "pagenotification_info pagenotification_completed_info"
-			elif (data['type'] == NotificationStore.TYPE_ERROR): css_class = "pagenotification_error"
-			elif (data['type'] == NotificationStore.TYPE_INFO): css_class = "pagenotification_info"
+        if ("type" in data and "message" in data):
+            if (data['type'] == NotificationStore.TYPE_COMPLETED_INFO): css_class = "pagenotification_info pagenotification_completed_info"
+            elif (data['type'] == NotificationStore.TYPE_ERROR): css_class = "pagenotification_error"
+            elif (data['type'] == NotificationStore.TYPE_INFO): css_class = "pagenotification_info"
 
-			content = { "css_class": css_class,
-			            "id": "pas_http_core_{0:d}_{1:d}".format(id(self), id(data)),
-			            "type": NotificationStore.get_type_string(data['type']),
-			            "message": FormTags.render(data['message'], block_encoding_supported = False),
-			          }
+            content = { "css_class": css_class,
+                        "id": "pas_http_core_{0:d}_{1:d}".format(id(self), id(data)),
+                        "type": NotificationStore.get_type_string(data['type']),
+                        "message": FormTags.render(data['message'], block_encoding_supported = False),
+                      }
 
-			if (data['type'] == NotificationStore.TYPE_COMPLETED_INFO): content['auto_close'] = True
+            if (data['type'] == NotificationStore.TYPE_COMPLETED_INFO): content['auto_close'] = True
 
-			parser = FileParser()
-			parser.set_oset(self.response.get_oset())
-			_return = parser.render("core.notification", content)
-		#
+            parser = FileParser()
+            parser.set_oset(self.response.get_oset())
+            _return = parser.render("core.notification", content)
+        #
 
-		return _return
-	#
+        return _return
+    #
 
-	def execute_render(self):
-	#
-		"""
+    def execute_render(self):
+        """
 Action for "render"
 
 :since: v0.2.00
-		"""
+        """
 
-		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
+        if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
-		notifications = NotificationStore.get_instance().export()
-		rendered_notification_box = "<div class='pagenotification_box pagenotification_site_box' id='pas_http_site_notification_box'>"
+        notifications = NotificationStore.get_instance().export()
+        rendered_notification_box = "<div class='pagenotification_box pagenotification_site_box' id='pas_http_site_notification_box'>"
 
-		for notification_data in notifications: rendered_notification_box += self._render_notification(notification_data)
+        for notification_data in notifications: rendered_notification_box += self._render_notification(notification_data)
 
-		rendered_notification_box += "</div>"
+        rendered_notification_box += "</div>"
 
-		self.set_action_result(rendered_notification_box)
-	#
+        self.set_action_result(rendered_notification_box)
+    #
 #
-
-##j## EOF

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -32,8 +31,7 @@ from dNG.data.xhtml.link import Link
 from .module import Module
 
 class Contentfile(Module):
-#
-	"""
+    """
 Service for "s=contentfile"
 
 :author:     direct Netware Group et al.
@@ -43,69 +41,64 @@ Service for "s=contentfile"
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def execute_index(self):
-	#
-		"""
+    def execute_index(self):
+        """
 Action for "index"
 
 :since: v0.2.00
-		"""
+        """
 
-		self.execute_view()
-	#
+        self.execute_view()
+    #
 
-	def execute_view(self):
-	#
-		"""
+    def execute_view(self):
+        """
 Action for "view"
 
 :since: v0.2.00
-		"""
+        """
 
-		cid = InputFilter.filter_file_path(self.request.get_dsd("cid", ""))
+        cid = InputFilter.filter_file_path(self.request.get_dsd("cid", ""))
 
-		source_iline = InputFilter.filter_control_chars(self.request.get_dsd("source", "")).strip()
+        source_iline = InputFilter.filter_control_chars(self.request.get_dsd("source", "")).strip()
 
-		L10n.init("pas_http_core_contentfile")
+        L10n.init("pas_http_core_contentfile")
 
-		Settings.read_file("{0}/settings/pas_http_contentfiles.json".format(Settings.get("path_data")))
+        Settings.read_file("{0}/settings/pas_http_contentfiles.json".format(Settings.get("path_data")))
 
-		contentfiles = Settings.get("pas_http_contentfiles_list", { })
-		if (type(contentfiles) is not dict): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
+        contentfiles = Settings.get("pas_http_contentfiles_list", { })
+        if (type(contentfiles) is not dict): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
 
-		if (source_iline != ""):
-		#
-			if (self.response.is_supported("html_css_files")): self.response.add_theme_css_file("mini_default_sprite.min.css")
+        if (source_iline != ""):
+            if (self.response.is_supported("html_css_files")): self.response.add_theme_css_file("mini_default_sprite.min.css")
 
-			Link.set_store("servicemenu",
-			               Link.TYPE_RELATIVE_URL,
-			               L10n.get("core_back"),
-			               { "__query__": re.sub("\\_\\_\\w+\\_\\_", "", source_iline) },
-			               icon = "mini-default-back",
-			               priority = 7
-			              )
-		#
+            Link.set_store("servicemenu",
+                           Link.TYPE_RELATIVE_URL,
+                           L10n.get("core_back"),
+                           { "__query__": re.sub("\\_\\_\\w+\\_\\_", "", source_iline) },
+                           icon = "mini-default-back",
+                           priority = 7
+                          )
+        #
 
-		if (cid not in contentfiles
-		    or "title" not in contentfiles[cid]
-		    or "filepath" not in contentfiles[cid]
-		   ): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
+        if (cid not in contentfiles
+            or "title" not in contentfiles[cid]
+            or "filepath" not in contentfiles[cid]
+           ): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
 
-		file_content = FileContent.read(contentfiles[cid]['filepath'])
-		if (file_content is None): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
+        file_content = FileContent.read(contentfiles[cid]['filepath'])
+        if (file_content is None): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
 
-		if (path.splitext(contentfiles[cid]['filepath'])[1].lower() == ".ftg"): file_content = FormTags.render(file_content)
+        if (path.splitext(contentfiles[cid]['filepath'])[1].lower() == ".ftg"): file_content = FormTags.render(file_content)
 
-		content = { "title": contentfiles[cid]['title'],
-		            "content": file_content
-		          }
+        content = { "title": contentfiles[cid]['title'],
+                    "content": file_content
+                  }
 
-		self.response.init()
-		self.response.set_title(contentfiles[cid]['title'])
-		self.response.add_oset_content("core.simple_content", content)
-	#
+        self.response.init()
+        self.response.set_title(contentfiles[cid]['title'])
+        self.response.add_oset_content("core.simple_content", content)
+    #
 #
-
-##j## EOF

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -24,8 +23,7 @@ from dNG.module.controller.abstract_http import AbstractHttp as AbstractHttpCont
 from dNG.module.controller.output.options_block_mixin import OptionsBlockMixin
 
 class Service(OptionsBlockMixin, AbstractHttpController):
-#
-	"""
+    """
 The "Service" menu class implements a service menu based on the
 "servicemenu" link store.
 
@@ -36,56 +34,50 @@ The "Service" menu class implements a service menu based on the
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def execute_render_primary(self):
-	#
-		"""
+    def execute_render_primary(self):
+        """
 Action for "render_primary"
 
 :since: v0.2.00
-		"""
+        """
 
-		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
+        if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
-		rendered_links = self._get_rendered_links()
-		if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_p'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
-	#
+        rendered_links = self._get_rendered_links()
+        if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_p'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
+    #
 
-	def execute_render_secondary(self):
-	#
-		"""
+    def execute_render_secondary(self):
+        """
 Action for "render_secondary"
 
 :since: v0.2.00
-		"""
+        """
 
-		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
+        if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
 
-		rendered_links = self._get_rendered_links(False)
-		if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_s'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
-	#
+        rendered_links = self._get_rendered_links(False)
+        if (len(rendered_links) > 0): self.set_action_result("<nav class='pageservicemenu pageservicemenu_s'><ul><li>{0}</li></ul></nav>".format("</li><li>".join(rendered_links)))
+    #
 
-	def _get_rendered_links(self, include_image = True):
-	#
-		"""
+    def _get_rendered_links(self, include_image = True):
+        """
 Returns a list of rendered links for the service menu.
 
 :return: (list) Links for the service menu
 :since:  v0.2.00
-		"""
+        """
 
-		_return = [ ]
+        _return = [ ]
 
-		links = Link.get_store("servicemenu")
+        links = Link.get_store("servicemenu")
 
-		if (links is not None):
-		#
-			for link in links: _return.append(self.render_options_block_link(link, include_image))
-		#
+        if (links is not None):
+            for link in links: _return.append(self.render_options_block_link(link, include_image))
+        #
 
-		return _return
-	#
+        return _return
+    #
 #
-
-##j## EOF

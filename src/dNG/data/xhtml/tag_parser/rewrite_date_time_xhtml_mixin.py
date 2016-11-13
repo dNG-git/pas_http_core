@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -24,8 +23,7 @@ from dNG.data.text.tag_parser.rewrite_date_time_mixin import RewriteDateTimeMixi
 from dNG.data.xml_parser import XmlParser
 
 class RewriteDateTimeXhtmlMixin(RewriteDateTimeMixin):
-#
-	"""
+    """
 This tag parser mixin provides support for rewrite statements to generate
 formatted date and time XHTML tagged strings.
 
@@ -36,11 +34,10 @@ formatted date and time XHTML tagged strings.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def render_rewrite_date_time_xhtml(self, source, key, _type):
-	#
-		"""
+    def render_rewrite_date_time_xhtml(self, source, key, _type):
+        """
 Renders a date and time XHTML 5 tag based on the given presentation type.
 
 :param source: Source for rewrite
@@ -49,24 +46,21 @@ Renders a date and time XHTML 5 tag based on the given presentation type.
 
 :return: (str) Rewritten statement if successful
 :since:  v0.2.00
-		"""
+        """
 
-		if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time_xhtml({1}, {2})- (#echo(__LINE__)#)", self, key, _type, context = "pas_tag_parser")
-		_return = L10n.get("core_unknown")
+        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time_xhtml({1}, {2})- (#echo(__LINE__)#)", self, key, _type, context = "pas_tag_parser")
+        _return = L10n.get("core_unknown")
 
-		timestamp = self.get_source_value(source, key)
+        timestamp = self.get_source_value(source, key)
 
-		if (timestamp is not None):
-		#
-			time_attributes = { "tag": "time", "attributes": { "datetime": "{0}+00:00".format(RfcBasics.get_iso8601_datetime(timestamp)) } }
+        if (timestamp is not None):
+            time_attributes = { "tag": "time", "attributes": { "datetime": "{0}+00:00".format(RfcBasics.get_iso8601_datetime(timestamp)) } }
 
-			_return = "{0}{1}</time>".format(XmlParser().dict_to_xml_item_encoder(time_attributes, False),
-			                                 self.render_rewrite_date_time(source, key, _type)
-			                                )
-		#
+            _return = "{0}{1}</time>".format(XmlParser().dict_to_xml_item_encoder(time_attributes, False),
+                                             self.render_rewrite_date_time(source, key, _type)
+                                            )
+        #
 
-		return _return
-	#
+        return _return
+    #
 #
-
-##j## EOF

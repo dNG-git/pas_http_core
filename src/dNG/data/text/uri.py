@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -26,8 +25,7 @@ except ImportError: from urllib import quote_plus, unquote_plus
 from .input_filter import InputFilter
 
 class Uri(object):
-#
-	"""
+    """
 "Uri" provides basic URI decoding / encoding methods.
 
 :author:     direct Netware Group et al.
@@ -37,40 +35,36 @@ class Uri(object):
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	@staticmethod
-	def decode_query_value(data):
-	#
-		"""
+    @staticmethod
+    def decode_query_value(data):
+        """
 Decode special characters from a RFC 2396 compliant URI.
 
 :param data: Input string
 
 :return: (str) Decoded string
 :since:  v0.2.00
-		"""
+        """
 
-		data = unquote_plus(data)
-		return InputFilter.filter_control_chars(data).strip()
-	#
+        data = unquote_plus(data)
+        return InputFilter.filter_control_chars(data).strip()
+    #
 
-	@staticmethod
-	def encode_query_value(data):
-	#
-		"""
+    @staticmethod
+    def encode_query_value(data):
+        """
 Encode special characters for a RFC 2396 compliant URI.
 
 :param data: Input string
 
 :return: (str) Encoded string
 :since:  v0.2.00
-		"""
+        """
 
-		if (not isinstance(data, str)): data = str(data)
-		data = InputFilter.filter_control_chars(data).strip()
-		return quote_plus(data, "")
-	#
+        if (not isinstance(data, str)): data = str(data)
+        data = InputFilter.filter_control_chars(data).strip()
+        return quote_plus(data, "")
+    #
 #
-
-##j## EOF

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -21,8 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from dNG.module.controller.abstract_http import AbstractHttp as AbstractHttpController
 
 class Module(AbstractHttpController):
-#
-	"""
+    """
 Module for "services"
 
 :author:     direct Netware Group
@@ -32,9 +30,7 @@ Module for "services"
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	pass
+    pass
 #
-
-##j## EOF

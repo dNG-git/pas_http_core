@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -21,8 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from dNG.runtime.instance_lock import InstanceLock
 
 class VirtualConfig(object):
-#
-	"""
+    """
 Virtual paths are used to run service actions for URIs not calling the
 controller directly.
 
@@ -33,89 +31,78 @@ controller directly.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	_lock = InstanceLock()
-	"""
+    _lock = InstanceLock()
+    """
 Thread safety lock
-	"""
-	_virtuals = [ ]
-	"""
+    """
+    _virtuals = [ ]
+    """
 List with registered virtual paths
-	"""
+    """
 
-	@staticmethod
-	def get_config(path):
-	#
-		"""
+    @staticmethod
+    def get_config(path):
+        """
 Return the config for the given virtual path.
 
 :param path: Virtual path to check
 
 :return: (dict) Config if matched; None otherwise
 :since:  v0.2.00
-		"""
+        """
 
-		_return = None
+        _return = None
 
-		if (len(path) > 0):
-		#
-			with VirtualConfig._lock:
-			#
-				path = path.lower()
+        if (len(path) > 0):
+            with VirtualConfig._lock:
+                path = path.lower()
 
-				for virtual_path_config in VirtualConfig._virtuals:
-				#
-					if (path.startswith(virtual_path_config['path'])):
-					#
-						_return = virtual_path_config['config']
-						break
-					#
-				#
-			#
-		#
+                for virtual_path_config in VirtualConfig._virtuals:
+                    if (path.startswith(virtual_path_config['path'])):
+                        _return = virtual_path_config['config']
+                        break
+                    #
+                #
+            #
+        #
 
-		return _return
-	#
+        return _return
+    #
 
-	@staticmethod
-	def isset_virtual_path(path):
-	#
-		"""
+    @staticmethod
+    def isset_virtual_path(path):
+        """
 Returns true if the given virtual path is already defined.
 
 :param path: Virtual path
 
 :return: (bool) True if found
 :since:  v0.2.00
-		"""
+        """
 
-		_return = False
+        _return = False
 
-		if (len(path) > 0):
-		#
-			with VirtualConfig._lock:
-			#
-				path = path.lower()
+        if (len(path) > 0):
+            with VirtualConfig._lock:
+                path = path.lower()
 
-				for virtual_path_config in VirtualConfig._virtuals:
-				#
-					if (path.startswith(virtual_path_config['path'])):
-					#
-						_return = True
-						break
-					#
-				#
-			#
-		#
+                for virtual_path_config in VirtualConfig._virtuals:
+                    if (path.startswith(virtual_path_config['path'])):
+                        _return = True
+                        break
+                    #
+                #
+            #
+        #
 
-		return _return
-	#
+        return _return
+    #
 
-	@staticmethod
-	def set_virtual_path(path, config, setup_callback = None):
-	#
-		"""
+    @staticmethod
+    def set_virtual_path(path, config, setup_callback = None):
+        """
 Set the config for the given virtual path.
 
 :param path: Virtual path
@@ -123,43 +110,36 @@ Set the config for the given virtual path.
 :param setup_callback: Alternative request setup function
 
 :since: v0.2.00
-		"""
+        """
 
-		if (setup_callback is not None): config['setup_callback'] = setup_callback
-		path_normalized = path.lower()
+        if (setup_callback is not None): config['setup_callback'] = setup_callback
+        path_normalized = path.lower()
 
-		if ("_path_prefix" not in config): config['_path_prefix'] = path_normalized
-		virtual_config = { "path": path_normalized, "config": config }
+        if ("_path_prefix" not in config): config['_path_prefix'] = path_normalized
+        virtual_config = { "path": path_normalized, "config": config }
 
-		with VirtualConfig._lock: VirtualConfig._virtuals.append(virtual_config)
-	#
+        with VirtualConfig._lock: VirtualConfig._virtuals.append(virtual_config)
+    #
 
-	@staticmethod
-	def unset_virtual_path(path):
-	#
-		"""
+    @staticmethod
+    def unset_virtual_path(path):
+        """
 Remove the config for the given virtual path.
 
 :param path: Virtual path
 
 :since: v0.2.00
-		"""
+        """
 
-		with VirtualConfig._lock:
-		#
-			index = 0
+        with VirtualConfig._lock:
+            index = 0
 
-			for virtual_config in VirtualConfig._virtuals:
-			#
-				if (path == virtual_config['path']):
-				#
-					VirtualConfig._virtuals.pop(index)
-					break
-				#
-				else: index += 1
-			#
-		#
-	#
+            for virtual_config in VirtualConfig._virtuals:
+                if (path == virtual_config['path']):
+                    VirtualConfig._virtuals.pop(index)
+                    break
+                else: index += 1
+            #
+        #
+    #
 #
-
-##j## EOF
