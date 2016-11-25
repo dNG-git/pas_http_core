@@ -81,9 +81,11 @@ Relative URLs like "index.py?..."
 Generates absolute URLs based on the "__virtual__" path parameter.
     """
 
-    """n// NOTE
+    """
+---i---
 Inherited TYPE_* constants should start at 1 << 16.
-    NOTE_END //n"""
+---i---
+    """
 
     def __init__(self, scheme = None, host = None, port = None, path = None):
         """
