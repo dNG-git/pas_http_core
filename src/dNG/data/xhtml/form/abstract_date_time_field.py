@@ -46,23 +46,23 @@ fields.
     """
 Input type flag for years
     """
-    TYPE_MONTH = 2
+    TYPE_MONTH = 1 << 1
     """
 Input type flag for months
     """
-    TYPE_WEEK = 4
+    TYPE_WEEK = 1 << 2
     """
 Input type flag for week numbers (W__)
     """
-    TYPE_DAY = 8
+    TYPE_DAY = 1 << 3
     """
 Input type flag for days
     """
-    TYPE_DATE = 11
+    TYPE_DATE = 1 | 1 << 1 | 1 << 3
     """
 Input type flag for years, month and days
     """
-    TYPE_TIME = 16
+    TYPE_TIME = 1 << 4
     """
 Input type flag for times
     """

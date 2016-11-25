@@ -41,11 +41,11 @@ check).
     """
 Only recommended for separate encryption operations
     """
-    PASSWORD_MD5 = 2
+    PASSWORD_MD5 = 1 << 1
     """
 MD5 encoded password
     """
-    PASSWORD_WITH_REPETITION = 4
+    PASSWORD_WITH_REPETITION = 1 << 2
     """
 Password input repetition
     """

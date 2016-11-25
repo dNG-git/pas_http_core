@@ -56,30 +56,34 @@ class Link(Uri):
     """
 Absolute URLs like "http://localhost/index.py?..."
     """
-    TYPE_BASE_PATH = 8
+    TYPE_BASE_PATH = 1 << 3
     """
 Generates URLs to the base path of this application.
     """
-    TYPE_OPTICAL = 16
+    TYPE_OPTICAL = 1 << 4
     """
 Optical URLs are used to show the target address.
     """
-    TYPE_PARAMETER_LESS = 64
+    TYPE_PARAMETER_LESS = 1 << 6
     """
 Generated URL will not handle parameters
     """
-    TYPE_PREDEFINED_URL = 4
+    TYPE_PREDEFINED_URL = 1 << 2
     """
 Predefined URL
     """
-    TYPE_RELATIVE_URL = 2
+    TYPE_RELATIVE_URL = 1 << 1
     """
 Relative URLs like "index.py?..."
     """
-    TYPE_VIRTUAL_PATH = 32
+    TYPE_VIRTUAL_PATH = 1 << 5
     """
 Generates absolute URLs based on the "__virtual__" path parameter.
     """
+
+    """n// NOTE
+Inherited TYPE_* constants should start at 1 << 16.
+    NOTE_END //n"""
 
     def __init__(self, scheme = None, host = None, port = None, path = None):
         """

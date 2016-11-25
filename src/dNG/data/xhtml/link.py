@@ -38,19 +38,19 @@ class Link(_Link):
 
     # pylint: disable=arguments-differ
 
-    TYPE_FORM_FIELDS = 256
+    TYPE_FORM_FIELDS = 1 << 17
     """
 Hidden input fields
     """
-    TYPE_FORM_URL = 128
+    TYPE_FORM_URL = 1 << 16
     """
 Form action URL
     """
-    TYPE_JS_REQUIRED = 1024
+    TYPE_JS_REQUIRED = 1 << 19
     """
 JavaScript is required
     """
-    TYPE_QUERY_STRING = 512
+    TYPE_QUERY_STRING = 1 << 18
     """
 Generate the query string
     """

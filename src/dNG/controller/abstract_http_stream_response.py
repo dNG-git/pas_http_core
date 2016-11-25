@@ -43,12 +43,12 @@ A HTTP aware stream response.
              Mozilla Public License, v. 2.0
     """
 
-    STREAM_DIRECT = 2
+    STREAM_DIRECT = 1 << 1
     """
 Do not set Transfer-Encoding but output content directly as soon as it is
 available.
     """
-    STREAM_CHUNKED = 4
+    STREAM_CHUNKED = 1 << 2
     """
 Set Transfer-Encoding to chunked and encode output.
     """
