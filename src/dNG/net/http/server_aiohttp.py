@@ -20,7 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 # pylint: disable=import-error
 
 from aiohttp.wsgi import WSGIServerHttpProtocol
-import asyncio
+from asyncio import get_event_loop
 import socket
 
 from dNG.controller.http_wsgi1_request import HttpWsgi1Request
@@ -71,15 +71,21 @@ Configures the server
         listener_host = Settings.get("pas_http_aiohttp_server_host", self.socket_hostname)
         self.port = int(Settings.get("pas_http_aiohttp_server_port", 8080))
 
-        if (listener_host == ""):
-            listener_host = ("::" if (hasattr(socket, "has_ipv6") and socket.has_ipv6) else "0.0.0.0")
-            self.host = Settings.get("pas_http_server_preferred_hostname", self.socket_hostname)
-        else: self.host = listener_host
+        asyncio_server_kwargs = { "port": self.port }
 
-        if (self.log_handler is not None): self.log_handler.info("pas.http.core aiohttp server starts at '{0}:{1:d}'", self.host, self.port, context = "pas_http_core")
+        if (listener_host == ""): self.host = Settings.get("pas_http_server_preferred_hostname", self.socket_hostname)
+        else:
+            asyncio_server_kwargs['host'] = listener_host
+            self.host = listener_host
+        #
 
-        self.asyncio_loop = asyncio.get_event_loop()
-        self.server = self.asyncio_loop.create_server(lambda: WSGIServerHttpProtocol(HttpWsgi1Request), listener_host, self.port)
+        if (self.log_handler is not None): self.log_handler.info("pas.http.core aiohttp server starts at '{0}:{1:d}'", listener_host, self.port, context = "pas_http_core")
+
+        self.asyncio_loop = get_event_loop()
+        aio_wsgi_factory = lambda: WSGIServerHttpProtocol(HttpWsgi1Request, loop = self.asyncio_loop)
+
+        self.server = self.asyncio_loop.create_server(aio_wsgi_factory, **asyncio_server_kwargs)
+        self.asyncio_loop.create_task(self.server)
 
         """
 Configure common paths and settings
@@ -111,9 +117,11 @@ Stop the server
 
         if (self.server is not None):
             self.server.close()
+            self.server.wait_closed()
             self.server = None
 
             self.asyncio_loop.stop()
+            self.asyncio_loop.close()
             self.asyncio_loop = None
         #
 
