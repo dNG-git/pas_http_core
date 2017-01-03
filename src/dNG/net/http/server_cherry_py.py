@@ -72,7 +72,7 @@ Configures the server
         self.port = int(Settings.get("pas_http_cherrypy_server_port", 8080))
 
         if (listener_host == ""):
-            listener_host = ("::" if (hasattr(socket, "has_ipv6") and socket.has_ipv6) else "0.0.0.0")
+            listener_host = ("::" if (getattr(socket, "has_ipv6", False)) else "0.0.0.0")
             self.host = Settings.get("pas_http_server_preferred_hostname", self.socket_hostname)
         else: self.host = listener_host
 
