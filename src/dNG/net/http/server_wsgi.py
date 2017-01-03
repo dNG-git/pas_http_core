@@ -28,7 +28,6 @@ from dNG.plugins.hook import Hook
 from .abstract_server import AbstractServer
 
 class ServerWsgi(AbstractServer):
-#
     """
 "ServerWsgi" takes requests from WSGI aware servers.
 

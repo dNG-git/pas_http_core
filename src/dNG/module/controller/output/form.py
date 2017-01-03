@@ -98,8 +98,8 @@ Action for "render"
             form += """
 <script type="text/javascript"><![CDATA[
 require([ "pas/HttpJsonApiRequest.min" ], function(HttpJsonApiRequest) {{
-var hjapi_request = new HttpJsonApiRequest();
-hjapi_request.init_ping({{ id: "pas.Form.ping.{0}", endpoint: "pas/form/ping/1.0/{0}", delay: 60 }});
+    var hjapi_request = new HttpJsonApiRequest();
+    hjapi_request.init_ping({{ id: "pas.Form.ping.{0}", endpoint: "pas/form/ping/1.0/{0}", delay: 60 }});
 }});
 ]]></script>
             """.format(form_id).strip()
