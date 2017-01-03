@@ -211,7 +211,7 @@ Return all DSD parameters received.
 :since:  v0.2.00
         """
 
-        return self.dsd
+        return self.dsd.copy()
     #
 
     def get_header(self, name):
@@ -236,7 +236,7 @@ Returns the request headers as dict.
 :since:  v0.2.00
         """
 
-        return self.headers
+        return self.headers.copy()
     #
 
     def get_lang(self):
