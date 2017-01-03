@@ -384,9 +384,6 @@ Sets a header.
 :since: v0.2.00
         """
 
-        # pylint: disable=maybe-no-member
-        # pylint doesn't work well with value being of type mixed
-
         if (self.headers_sent): raise IOException("Headers are already sent")
         name = name.upper()
 
