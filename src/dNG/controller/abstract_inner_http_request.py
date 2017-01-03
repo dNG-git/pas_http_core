@@ -17,6 +17,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+from dNG.runtime.type_exception import TypeException
+
 from .abstract_http_mixin import AbstractHttpMixin
 from .abstract_inner_request import AbstractInnerRequest
 
@@ -89,28 +91,29 @@ Returns the associated session.
                )
     #
 
-    def init(self, request):
+    def init(self, connection_or_request):
         """
-Initializes default values from the original request.
+Initializes default values from the a connection or request instance.
 
-:param request: (object) Request instance
+:param connection_or_request: (object) Connection or request instance
 
 :since: v0.2.00
         """
 
-        AbstractInnerRequest.init(self, request)
+        if (not isinstance(connection_or_request, AbstractHttpMixin)): raise TypeException("Request instance given is invalid")
+        AbstractInnerRequest.init(self, connection_or_request)
 
-        self.parent_request = request._get_parent_request()
-        if (self.parent_request is None): self.parent_request = request
+        self.parent_request = connection_or_request._get_parent_request()
+        if (self.parent_request is None): self.parent_request = connection_or_request
 
-        if (request.is_supported("accepted_formats")): self.accepted_formats = request.get_accepted_formats()
-        if (request.is_supported("compression")): self.compression_formats = request.get_compression_formats()
-        if (request.is_supported("headers")): self.headers = request.get_headers()
-        self.lang = request.get_lang()
-        self.lang_default = request.get_lang_default()
-        if (request.is_supported("type")): self.type = request.get_type()
+        if (connection_or_request.is_supported("accepted_formats")): self.accepted_formats = connection_or_request.get_accepted_formats()
+        if (connection_or_request.is_supported("compression")): self.compression_formats = connection_or_request.get_compression_formats()
+        if (connection_or_request.is_supported("headers")): self.headers = connection_or_request.get_headers()
+        self.lang = connection_or_request.get_lang()
+        self.lang_default = connection_or_request.get_lang_default()
+        if (connection_or_request.is_supported("type")): self.type = connection_or_request.get_type()
 
-        self.set_script_path_name(request.get_script_path_name())
+        self.set_script_path_name(connection_or_request.get_script_path_name())
     #
 
     def set_session(self, session):
