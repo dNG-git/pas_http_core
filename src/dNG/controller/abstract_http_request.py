@@ -284,7 +284,26 @@ found.
         response.handle_critical_error("core_unsupported_command")
     #
 
-    def init(self):
+    def _handle_upgrade(self, virtual_path_name, stream_response):
+        """
+Handles an intercepted HTTP upgrade request.
+
+:return: (bool) True if handled successfully
+:since:  v0.2.00
+        """
+
+        return (True
+                if (Hook.call("dNG.pas.http.Request.handleUpgrade",
+                              request = self,
+                              virtual_request_path_name = virtual_path_name,
+                              stream_response = stream_response
+                             )
+                   ) else
+                False
+               )
+    #
+
+    def _init_request(self):
         """
 Do preparations for request handling.
 
