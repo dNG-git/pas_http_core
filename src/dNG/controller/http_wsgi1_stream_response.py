@@ -18,13 +18,12 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 """
 
 from dNG.data.binary import Binary
-from dNG.data.streamer.http_compressed import HttpCompressed as HttpCompressedStreamer
+from dNG.data.streamer.abstract import Abstract as AbstractStreamer
 from dNG.data.streamer.http_wsgi1 import HttpWsgi1 as HttpWsgi1Streamer
-from dNG.runtime.iterator import Iterator
 
-from .abstract_http_stream_response import AbstractHttpStreamResponse
+from .abstract_http_cgi_stream_response import AbstractHttpCgiStreamResponse
 
-class HttpWsgi1StreamResponse(Iterator, AbstractHttpStreamResponse):
+class HttpWsgi1StreamResponse(AbstractHttpCgiStreamResponse):
     """
 This stream response instance will write all data to the underlying WSGI 1.0
 implementation.
@@ -48,7 +47,7 @@ Constructor __init__(HttpWsgi1StreamResponse)
 :since: v0.2.00
         """
 
-        AbstractHttpStreamResponse.__init__(self)
+        AbstractHttpCgiStreamResponse.__init__(self)
 
         self.wsgi_file_wrapper = wsgi_file_wrapper
         """
@@ -62,8 +61,6 @@ The WSGI header response callback
         """
 The WSGI response writer callback
         """
-
-        self.stream_mode_supported |= AbstractHttpStreamResponse.STREAM_DIRECT
     #
 
     def __iter__(self):
@@ -74,49 +71,11 @@ python.org: Return an iterator object.
 :since:  v0.2.00
         """
 
-        _return = self
+        _return = AbstractHttpCgiStreamResponse.__iter__(self)
 
-        if (self.streamer is not None and self.wsgi_file_wrapper is not None):
-            if (self.compressor is not None):
-                streamer = HttpCompressedStreamer(self.streamer, self.compressor)
-                self.compressor = None
-            else: streamer = self.streamer
-
-            streamer = HttpWsgi1Streamer(streamer)
-            _return = self.wsgi_file_wrapper(streamer)
-        #
-
-        return _return
-    #
-
-    def __next__(self):
-        """
-python.org: Return the next item from the container.
-
-:return: (bytes) Response data
-:since:  v0.2.00
-        """
-
-        _return = None
-
-        if (self.active and (not self.headers_only)):
-            """
-This iterator is only called for uncompressed data.
-            """
-
-            if (self.streamer is not None):
-                _return = (None if (self.streamer.is_eof()) else self.streamer.read())
-                if (_return is not None): _return = self._prepare_output_data(_return)
-            elif (self.data is not None):
-                _return = self.data
-                self.data = None
-            #
-        #
-
-        if (_return is None):
-            self.finish()
-            raise StopIteration()
-        #
+        if (isinstance(_return, AbstractStreamer)
+            and self.wsgi_file_wrapper is not None
+           ): _return = self.wsgi_file_wrapper(HttpWsgi1Streamer(_return))
 
         return _return
     #
@@ -142,7 +101,7 @@ Finish transmission and cleanup resources.
         """
 
         if (self.active):
-            AbstractHttpStreamResponse.finish(self)
+            AbstractHttpCgiStreamResponse.finish(self)
             self.wsgi_write = None
         #
     #
@@ -193,6 +152,8 @@ Writes the given data.
         """
 
         # pylint: disable=broad-except
+
+        if (not self.headers_sent): self.send_headers()
 
         try:
             if (self.active and (not self.headers_only) and self.wsgi_write is not None):
