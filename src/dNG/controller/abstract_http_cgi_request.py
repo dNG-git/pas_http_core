@@ -122,7 +122,7 @@ Handles CGI environment compliant headers.
                                              )
                         ): self.set_header(header_name, cgi_env[key])
                 elif (key == "CONTENT_LENGTH" or key == "CONTENT_TYPE"): self.set_header(key.replace("_", "-"), cgi_env[key])
-                elif (key == "PATH_INFO"): self.virtual_path_name = cgi_env[key]
+                elif (key == "PATH_INFO"): self.virtual_path_name = cgi_env.get("SCRIPT_NAME", "") + cgi_env[key]
                 elif (key == "QUERY_STRING"): self.query_string = cgi_env[key]
                 elif (key == "REMOTE_ADDR" and self.client_host is None): self.client_host = cgi_env[key]
                 elif (key == "REMOTE_HOST"): self.client_host = cgi_env[key]
