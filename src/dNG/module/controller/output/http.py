@@ -108,10 +108,19 @@ Action for "error"
         code = InputFilter.filter_int(self.request.get_dsd("code", "500"))
 
         if (L10n.is_defined("errors_pas_http_core_{0:d}".format(code))):
-            if (self.response.is_supported("headers")): self.response.set_header("HTTP/1.1", ("HTTP/1.1 {0:d} {1}".format(code, self.error_messages[code]) if (code in self.error_messages) else "HTTP/1.1 500 Internal Server Error"), True)
+            if (self.response.is_supported("headers")):
+                self.response.set_header("HTTP",
+                                         ("HTTP/2.0 {0:d} {1}".format(code, self.error_messages[code])
+                                          if (code in self.error_messages) else
+                                          "HTTP/2.0 500 Internal Server Error"
+                                         ),
+                                         True
+                                        )
+            #
+
             self.response.handle_critical_error("pas_http_core_{0:d}".format(code))
         else:
-            if (self.response.is_supported("headers")): self.response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+            if (self.response.is_supported("headers")): self.response.set_header("HTTP", "HTTP/2.0 500 Internal Server Error", True)
             self.response.handle_critical_error("core_unknown_error")
         #
     #

@@ -92,7 +92,7 @@ Action for "index"
                         self.response.set_content_dynamic(False)
 
                         self.response.init(True)
-                        self.response.set_header("HTTP/1.1", "HTTP/1.1 304 Not Modified", True)
+                        self.response.set_header("HTTP", "HTTP/2.0 304 Not Modified", True)
                         self.response.set_expires_relative(+63072000)
                         self.response.set_last_modified(last_modified_on_server)
 
@@ -127,12 +127,12 @@ Action for "index"
 
                 streamer = NamedLoader.get_instance("dNG.data.streamer.File", False)
 
-                if (streamer is None): self.response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+                if (streamer is None): self.response.set_header("HTTP", "HTTP/2.0 500 Internal Server Error", True)
                 else: Streaming.handle_url(self.request, streamer, "file:///{0}".format(file_path_name), self.response)
             #
         elif (not is_valid):
             if (self.log_handler is not None): self.log_handler.warning("#echo(__FILEPATH__)# -Cache.execute_index()- reporting: Failed opening {0} - file not readable", dfile, context = "pas_http_core")
-            self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+            self.response.set_header("HTTP", "HTTP/2.0 404 Not Found", True)
         #
     #
 #

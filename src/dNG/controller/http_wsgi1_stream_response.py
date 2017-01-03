@@ -124,7 +124,7 @@ Sends the prepared response headers.
                 header_value = str(filtered_headers[header_name])
                 header_name = headers_indexed[header_name]
 
-                if (header_name == "HTTP/1.1"): http_status_line = header_value[9:]
+                if (header_name == "HTTP"): http_status_line = header_value[9:]
                 else: headers.append(( header_name, header_value ))
             elif (type(filtered_headers[header_name]) is list):
                 for header_list_value in filtered_headers[header_name]:

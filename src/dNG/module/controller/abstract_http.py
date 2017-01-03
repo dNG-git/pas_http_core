@@ -127,7 +127,7 @@ Raises the executable method not found error.
 :since: v0.2.00
         """
 
-        if (self.primary_action and self.response.is_supported("headers")): self.response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+        if (self.primary_action and self.response.is_supported("headers")): self.response.set_header("HTTP", "HTTP/2.0 404 Not Found", True)
         raise TranslatableException("core_unsupported_command", value = "Identified action '{0}' is not supported".format(self.action))
     #
 

@@ -118,7 +118,7 @@ Handles a WSGI compliant resource request.
 
             # Died before output
             if (not self._stream_response.are_headers_sent()):
-                self._stream_response.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+                self._stream_response.set_header("HTTP", "HTTP/2.0 500 Internal Server Error", True)
                 self._stream_response.send_data("Internal Server Error")
             #
         #

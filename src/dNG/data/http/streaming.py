@@ -83,7 +83,7 @@ Uses the given streamer if all prerequisites are met.
                 #
 
                 if (is_valid):
-                    response.set_header("HTTP/1.1", "HTTP/1.1 206 Partial Content", True)
+                    response.set_header("HTTP", "HTTP/2.0 206 Partial Content", True)
                     response.set_header("Content-Length", 1 + (range_end - range_start))
                     response.set_header("Content-Range", "bytes {0:d}-{1:d}/{2:d}".format(range_start, range_end, streamer_size))
 
@@ -109,7 +109,7 @@ Uses the given streamer and URL if all prerequisites are met.
         if (not isinstance(streamer, AbstractStreamer)): raise TranslatableException("pas_http_core_400")
         if (not isinstance(response, AbstractHttpResponse)): raise TranslatableException("pas_http_core_500")
 
-        if (streamer is None): response.set_header("HTTP/1.1", "HTTP/1.1 501 Not Implemented", True)
+        if (streamer is None): response.set_header("HTTP", "HTTP/2.0 501 Not Implemented", True)
         elif (streamer.open_url(url)):
             if (response.get_header("Content-Type") is None):
                 url_ext = path.splitext(url)[1]
@@ -124,6 +124,6 @@ Uses the given streamer and URL if all prerequisites are met.
             #
 
             Streaming.handle(request, streamer, response)
-        else: response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+        else: response.set_header("HTTP", "HTTP/2.0 404 Not Found", True)
     #
 #

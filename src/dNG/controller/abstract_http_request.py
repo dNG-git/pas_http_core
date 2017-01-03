@@ -280,7 +280,7 @@ found.
 :since: v0.2.00
         """
 
-        if (response.is_supported("headers")): response.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+        if (response.is_supported("headers")): response.set_header("HTTP", "HTTP/2.0 404 Not Found", True)
         response.handle_critical_error("core_unsupported_command")
     #
 

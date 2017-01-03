@@ -361,7 +361,11 @@ Sends the prepared response.
             self._init_theme_renderer()
             if (self.title is not None): self.theme_renderer.set_title(self.title)
 
-            is_xhtml_supported = ("application/xhtml+xml" in self.stream_response.get_accepted_formats())
+            accepted_formats = self.stream_response.get_accepted_formats()
+
+            is_xhtml_supported = ("application/xhtml+xml" in accepted_formats
+                                  or len(accepted_formats) == 1 and accepted_formats[0] == "*/*"
+                                 )
 
             if (not is_xhtml_supported):
                 self.stream_response.set_compression(False)
@@ -388,8 +392,8 @@ occurred if they are not sent and all buffers are "None".
             self.content = ""
 
             if (self.errors is None):
-                header = self.get_header("HTTP/1.1", True)
-                if (header is None): self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+                header = self.get_header("HTTP", True)
+                if (header is None): self.set_header("HTTP", "HTTP/2.0 500 Internal Server Error", True)
 
                 error = { "title": L10n.get("core_title_error_critical"),
                           "message": (L10n.get("errors_core_unknown_error") if (header is None) else header)

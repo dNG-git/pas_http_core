@@ -245,18 +245,18 @@ send.
 
         is_critical = True
 
-        if (self.get_header("HTTP/1.1", True) is None):
-            self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+        if (self.get_header("HTTP", True) is None):
+            self.set_header("HTTP", "HTTP/2.0 500 Internal Server Error", True)
 
             if (isinstance(exception, HttpTranslatableError)):
                 code = exception.get_http_code()
                 is_critical = isinstance(exception, HttpTranslatableException)
 
-                if (code == 200): self.set_header("HTTP/1.1", "HTTP/1.1 200 OK", True)
-                elif (code == 400): self.set_header("HTTP/1.1", "HTTP/1.1 400 Bad Request", True)
-                elif (code == 402): self.set_header("HTTP/1.1", "HTTP/1.1 402 Payment Required", True)
-                elif (code == 403): self.set_header("HTTP/1.1", "HTTP/1.1 403 Forbidden", True)
-                elif (code == 404): self.set_header("HTTP/1.1", "HTTP/1.1 404 Not Found", True)
+                if (code == 200): self.set_header("HTTP", "HTTP/2.0 200 OK", True)
+                elif (code == 400): self.set_header("HTTP", "HTTP/2.0 400 Bad Request", True)
+                elif (code == 402): self.set_header("HTTP", "HTTP/2.0 402 Payment Required", True)
+                elif (code == 403): self.set_header("HTTP", "HTTP/2.0 403 Forbidden", True)
+                elif (code == 404): self.set_header("HTTP", "HTTP/2.0 404 Not Found", True)
             #
         #
 
@@ -336,8 +336,10 @@ Redirect the requesting client to the given URL.
 
         if (not self.initialized): self.init()
 
-        if (self.expires <= time()): self.set_header("HTTP/1.1", "HTTP/1.1 307 Temporary Redirect", True)
-        else: self.set_header("HTTP/1.1", "HTTP/1.1 303 See Other", True)
+        if (self.content_is_dynamic
+            or self.expires <= time()
+           ): self.set_header("HTTP", "HTTP/2.0 307 Temporary Redirect", True)
+        else: self.set_header("HTTP", "HTTP/2.0 303 See Other", True)
 
         self.set_header("Location", url)
     #
@@ -349,6 +351,7 @@ Resets all cached values.
 :since: v0.2.00
         """
 
+        self.content_is_dynamic = False
         self.data = None
         self.errors = None
         self.expires = 0

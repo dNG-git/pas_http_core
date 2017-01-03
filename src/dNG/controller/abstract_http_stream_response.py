@@ -19,6 +19,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 from time import time
 from zlib import compressobj
+import re
 
 from dNG.data.binary import Binary
 from dNG.data.gzip import Gzip
@@ -102,7 +103,7 @@ True if headers are sent
         """
 HTTP result code
         """
-        self.http_version = 1.1
+        self.http_version = 2
         """
 HTTP request version
         """
@@ -387,14 +388,25 @@ Sets a header.
         if (self.headers_sent): raise IOException("Headers are already sent")
         name = name.upper()
 
-        if (name_as_key and name == "HTTP/1.1"):
+        if (name_as_key and name == "HTTP"):
             http_values = value.split(" ", 2)
-            if (len(http_values) == 3): self.set_http_code(int(http_values[1]))
 
-            if (self.http_version == 1):
-                if (value == "HTTP/1.1 203 Non-Authoritative Information"): value = "HTTP/1.1 200 OK"
-                elif (value == "HTTP/1.1 303 See Other"): value = "HTTP/1.1 302 Found"
-                elif (value == "HTTP/1.1 307 Temporary Redirect"): value = "HTTP/1.1 302 Found"
+            if (len(http_values) == 3):
+                self.set_http_code(int(http_values[1]))
+
+                if (self.http_version % 1 == 0): http_version = "{0:d}.0".format(self.http_version)
+                else: http_version = str(self.http_version)
+
+                if (self.http_version == 1):
+                    if (http_values[2] == "Non-Authoritative Information"): value = "HTTP/2.0 200 OK"
+                    elif (http_values[2] == "See Other"): value = "HTTP/2.0 302 Found"
+                    elif (http_values[2] == "Temporary Redirect"): value = "HTTP/2.0 302 Found"
+                #
+
+                value = re.sub("HTTP/\\d\\.\\d (\\d+ .+)$",
+                               "HTTP/{0} \\1".format(http_version),
+                               value
+                              )
             #
         #
 
@@ -423,7 +435,7 @@ Sets a header.
         """
 Sets the HTTP response code.
 
-:param http_version: HTTP code
+:param http_code: HTTP code
 
 :since: v0.2.00
         """
@@ -440,6 +452,7 @@ Sets the HTTP protocol version.
 :since: v0.2.00
         """
 
+        if (type(http_version) not in ( int, float )): http_version = float(http_version)
         self.http_version = http_version
     #
 

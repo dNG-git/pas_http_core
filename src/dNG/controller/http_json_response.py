@@ -67,8 +67,8 @@ Sends the prepared response.
         elif (not self.are_headers_sent()):
             self.init(False, True)
 
-            header = self.get_header("HTTP/1.1", True)
-            if (header is None): self.set_header("HTTP/1.1", "HTTP/1.1 500 Internal Server Error", True)
+            header = self.get_header("HTTP", True)
+            if (header is None): self.set_header("HTTP", "HTTP/2.0 500 Internal Server Error", True)
 
             if (self.errors is None):
                 error_result = { "error": { "title": L10n.get("core_title_error"),
