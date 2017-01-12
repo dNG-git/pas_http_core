@@ -140,8 +140,11 @@ Renders a link.
                 _return = xml_parser.dict_to_xml_item_encoder({ "tag": "a", "attributes": link_attributes }, False)
             #
 
-            l10n_title_id = "title_{0}".format(self.request.get_lang())
-            title = (data[l10n_title_id] if (l10n_title_id in data) else data['title'])
+            if ("title_l10n" in data and L10n.is_defined(data['title_l10n'])): title = L10n.get(data['title_l10n'])
+            else:
+                l10n_title_id = "title_{0}".format(self.request.get_lang())
+                title = (data[l10n_title_id] if (l10n_title_id in data) else data['title'])
+            #
 
             if (include_image):
                 if ("icon" in data): _return += self._render_options_block_icon(data['icon'], title)
@@ -150,9 +153,16 @@ Renders a link.
 
             _return += "{0}".format(XHtmlFormatting.escape(title))
 
-            l10n_description_id = "description_{0}".format(self.request.get_lang())
-            description = (data[l10n_description_id] if (l10n_description_id in data) else None)
-            if (description is None and "description" in data): description = data['description']
+            description = None
+
+            if ("description_l10n" in data and L10n.is_defined(data['description_l10n'])): description = L10n.get(data['description_l10n'])
+            else:
+                l10n_description_id = "description_{0}".format(self.request.get_lang())
+
+                if (l10n_description_id in data): description = data[l10n_description_id]
+                elif ("description" in data): description = data['description']
+            #
+
             if (description is not None): _return += "<br />\n{0}".format(FormTags.render(description))
 
             if (is_js_required):
