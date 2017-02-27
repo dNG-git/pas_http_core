@@ -131,7 +131,7 @@ Handles CGI environment compliant headers.
                 elif (key == "REQUEST_URI"):
                     request_data = cgi_env[key].split("?", 1)
 
-                    if (self.virtual_path_name is None): self.virtual_path_name = request_data[0]
+                    if (self.virtual_path_name == ""): self.virtual_path_name = request_data[0]
 
                     if (self.query_string is None
                         and len(request_data) > 1
