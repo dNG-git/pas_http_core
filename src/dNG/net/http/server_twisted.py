@@ -21,8 +21,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 from dNG.controller.http_wsgi1_request import HttpWsgi1Request
 from dNG.data.settings import Settings
-from dNG.module.named_loader import NamedLoader
 from dNG.runtime.exception_log_trap import ExceptionLogTrap
+from dNG.runtime.named_loader import NamedLoader
 
 from twisted.internet import reactor
 from twisted.internet.endpoints import serverFromString
@@ -41,7 +41,7 @@ class ServerTwisted(AbstractServer):
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -50,7 +50,7 @@ class ServerTwisted(AbstractServer):
         """
 Constructor __init__(ServerTwisted)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         AbstractServer.__init__(self)
@@ -84,7 +84,7 @@ Twisted reactor instance
         """
 Configures the server
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         listener_host = Settings.get("pas_http_twisted_server_host", self.socket_hostname)
@@ -104,7 +104,7 @@ Configures the server
         self.thread_pool = ThreadPool()
         self.thread_pool.start()
 
-        if (self.log_handler is not None): self.log_handler.info("pas.http.core Twisted server starts at '{0}:{1:d}'", listener_host, self.port, context = "pas_http_core")
+        if (self._log_handler is not None): self._log_handler.info("pas.http.core Twisted server starts at '{0}:{1:d}'", listener_host, self.port, context = "pas_http_core")
 
         server = serverFromString(self.reactor, server_description)
         server.listen(Site(WSGIResource(reactor, self.thread_pool, HttpWsgi1Request)))
@@ -120,7 +120,7 @@ Configure common paths and settings
         """
 Runs the server
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         self.reactor.startRunning(installSignalHandlers = False)
@@ -135,7 +135,7 @@ Stop the server
 :param last_return: The return value from the last hook called.
 
 :return: (mixed) Return value
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         if (self.thread_pool is not None):

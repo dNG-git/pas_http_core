@@ -31,7 +31,7 @@ from dNG.data.xhtml.tag_parser.rewrite_date_time_xhtml_mixin import RewriteDateT
 from dNG.data.xhtml.tag_parser.rewrite_form_tags_xhtml_mixin import RewriteFormTagsXhtmlMixin
 from dNG.data.xhtml.tag_parser.rewrite_safe_xhtml_mixin import RewriteSafeXhtmlMixin
 from dNG.data.xhtml.tag_parser.rewrite_user_xhtml_mixin import RewriteUserXhtmlMixin
-from dNG.module.named_loader import NamedLoader
+from dNG.runtime.named_loader import NamedLoader
 
 class Parser(BlockMixin,
              EachMixin,
@@ -49,7 +49,7 @@ The OSet parser takes a template string to render the output.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -58,7 +58,7 @@ The OSet parser takes a template string to render the output.
         """
 Constructor __init__(Parser)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         AbstractTagParser.__init__(self)
@@ -74,7 +74,7 @@ Constructor __init__(Parser)
         """
 Content cache for OSet template replacements
         """
-        self.log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
+        self._log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
         """
 The LogHandler is called whenever debug messages should be logged or errors
 happened.
@@ -92,7 +92,7 @@ Change data according to the matched tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[:tag_position]
@@ -100,7 +100,7 @@ Change data according to the matched tag.
         data_closed = data[self._find_tag_end_position(data, tag_end_position):]
 
         if (tag_definition['tag'] == "block"):
-            re_result = re.match("^\\[block(:(\\w+):([\\w\\.]+)){0,1}\\]", data[tag_position:data_position])
+            re_result = re.match("^\\[block(:(\\w+):([\\w.]+))?\\]", data[tag_position:data_position])
 
             if (re_result is not None):
                 if (re_result.group(1) is not None):
@@ -111,12 +111,12 @@ Change data according to the matched tag.
                 if (source is None): _return += self.render_block(data[data_position:tag_end_position])
                 elif (source == "content"): _return += self.render_block(data[data_position:tag_end_position], "content", self._update_mapped_element("content", self.content), key)
                 elif (source == "settings"):
-                    runtime_settings_dict = AbstractResponse.get_instance().get_runtime_settings()
+                    runtime_settings_dict = AbstractResponse.get_instance().runtime_settings
                     _return += self.render_block(data[data_position:tag_end_position], "settings", self._update_mapped_element("settings", runtime_settings_dict), key)
                 #
             #
         elif (tag_definition['tag'] == "each"):
-            re_result = re.match("^\\[each:(\\w+):([\\w\\.]+):([\\w\\.]+)\\]", data[tag_position:data_position])
+            re_result = re.match("^\\[each:(\\w+):([\\w.]+):([\\w.]+)\\]", data[tag_position:data_position])
 
             source = (None if (re_result is None) else re_result.group(1))
 
@@ -126,12 +126,12 @@ Change data according to the matched tag.
 
                 if (source == "content"): _return += self.render_each(data[data_position:tag_end_position], "content", self._update_mapped_element("content", self.content), key, mapping_key)
                 elif (source == "settings"):
-                    runtime_settings_dict = AbstractResponse.get_instance().get_runtime_settings()
+                    runtime_settings_dict = AbstractResponse.get_instance().runtime_settings
                     _return += self.render_each(data[data_position:tag_end_position], "settings", self._update_mapped_element("settings", runtime_settings_dict), key, mapping_key)
                 #
             #
         elif (tag_definition['tag'] == "if"):
-            re_result = re.match("^\\[if:(\\w+):([\\w\\.]+)(\\s*)(\\!=|==)(.*?)\\]", data[tag_position:data_position])
+            re_result = re.match("^\\[if:(\\w+):([\\w.]+)(\\s*)(!=|==)(.*?)\\]", data[tag_position:data_position])
 
             source = (None if (re_result is None) else re_result.group(1))
 
@@ -143,9 +143,9 @@ Change data according to the matched tag.
                 if (source == "content"): _return += self.render_if_condition(self._update_mapped_element("content", self.content), key, operator, value, data[data_position:tag_end_position])
                 elif (source == "request"):
                     request = AbstractRequest.get_instance()
-                    _return += self.render_if_condition({ 'lang': request.get_lang() } , key, operator, value, data[data_position:tag_end_position])
+                    _return += self.render_if_condition({ 'lang': request.lang } , key, operator, value, data[data_position:tag_end_position])
                 elif (source == "settings"):
-                    runtime_settings_dict = AbstractResponse.get_instance().get_runtime_settings()
+                    runtime_settings_dict = AbstractResponse.get_instance().runtime_settings
                     _return += self.render_if_condition(self._update_mapped_element("settings", runtime_settings_dict), key, operator, value, data[data_position:tag_end_position])
                 #
             #
@@ -163,7 +163,7 @@ Change data according to the matched tag.
             elif (source == "l10n"): _return += self.render_rewrite(self._update_mapped_element("l10n", L10n.get_dict()), key)
             elif (source == "safe_content"): _return += self.render_rewrite_safe_xhtml(self._update_mapped_element("content", self.content), key)
             elif (source == "settings"):
-                runtime_settings_dict = AbstractResponse.get_instance().get_runtime_settings()
+                runtime_settings_dict = AbstractResponse.get_instance().runtime_settings
                 _return += self.render_rewrite(self._update_mapped_element("settings", runtime_settings_dict), key)
             elif (source == "timestamp"):
                 re_result = re.match("^\\[rewrite:timestamp:([\\w]+)\\]", data[tag_position:data_position])
@@ -186,7 +186,7 @@ Check if a possible tag match is a false positive.
 :param data: Data starting with the possible tag
 
 :return: (dict) Matched tag definition; None if false positive
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = None
@@ -200,13 +200,13 @@ Check if a possible tag match is a false positive.
             data_match = data[1:1 + len(tag)]
 
             if (data_match == "block"):
-                re_result = re.match("^\\[block(:\\w+:[\\w\\.]+){0,1}\\]", data)
+                re_result = re.match("^\\[block(:\\w+:[\\w.]+)?\\]", data)
                 if (re_result is not None): _return = { "tag": "block", "tag_end": "[/block]", "type": "top_down" }
             elif (data_match == "each"):
-                re_result = re.match("^\\[each:\\w+:[\\w\\.]+:[\\w\\.]+\\]", data)
+                re_result = re.match("^\\[each:\\w+:[\\w.]+:[\\w.]+\\]", data)
                 if (re_result is not None): _return = { "tag": "each", "tag_end": "[/each]", "type": "top_down" }
             elif (data_match == "if"):
-                re_result = re.match("^\\[if:\\w+:[\\w\\.]+\\s*(\\!=|==).*?\\]", data)
+                re_result = re.match("^\\[if:\\w+:[\\w.]+\\s*(!=|==).*?\\]", data)
                 if (re_result is not None): _return = { "tag": "if", "tag_end": "[/if]", "type": "top_down" }
             elif (data_match == "link"):
                 re_result = re.match("^\\[link:(.+)\\]", data)
@@ -243,10 +243,10 @@ Renders content ready for output from the given OSet template.
 :param content: Content object
 
 :return: (str) Rendered content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render()- (#echo(__LINE__)#)", self, context = "pas_http_core")
+        if (self._log_handler is not None): self._log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render()- (#echo(__LINE__)#)", self, context = "pas_http_core")
 
         self.content = content
         return self._parse(template_data)

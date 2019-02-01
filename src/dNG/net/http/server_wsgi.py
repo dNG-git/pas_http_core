@@ -22,8 +22,8 @@ from time import time
 
 from dNG.controller.http_wsgi1_request import HttpWsgi1Request
 from dNG.data.settings import Settings
-from dNG.module.named_loader import NamedLoader
 from dNG.plugins.hook import Hook
+from dNG.runtime.named_loader import NamedLoader
 
 from .abstract_server import AbstractServer
 
@@ -35,7 +35,7 @@ class ServerWsgi(AbstractServer):
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -47,7 +47,7 @@ class ServerWsgi(AbstractServer):
         """
 Constructor __init__(ServerWsgi)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         self.cache_instance = NamedLoader.get_singleton("dNG.data.cache.Content", False)
@@ -70,11 +70,11 @@ Timestamp of service initialisation
         Hook.register_weakref("dNG.pas.Status.getTimeStarted", self.get_time_started)
         Hook.register_weakref("dNG.pas.Status.getUptime", self.get_uptime)
 
-        if (self.log_handler is not None):
+        if (self._log_handler is not None):
         #
-            Hook.set_log_handler(self.log_handler)
-            NamedLoader.set_log_handler(self.log_handler)
-            self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.__init__()- (#echo(__LINE__)#)", self, context = "pas_http_core")
+            Hook.set_log_handler(self._log_handler)
+            NamedLoader.set_log_handler(self._log_handler)
+            self._log_handler.debug("#echo(__FILEPATH__)# -{0!r}.__init__()- (#echo(__LINE__)#)", self, context = "pas_http_core")
         #
 
         Hook.call("dNG.pas.Status.onStartup")
@@ -91,7 +91,7 @@ Destructor __del__(ServerWsgi)
 Ensure that references are freed for GC. Some implementations like Apache's
 mod_wsgi may already have removed globals at this stage.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         if (Hook is not None): Hook.free()
@@ -103,7 +103,7 @@ mod_wsgi may already have removed globals at this stage.
 python.org: Return an iterator object.
 
 :return: (object) Iterator object
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         http_wsgi1_request = self.http_wsgi1_request
@@ -121,7 +121,7 @@ python.org: Return an iterator object.
         """
 Configures the server
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         Settings.read_file("{0}/settings/pas_core.json".format(Settings.get("path_data")), True)
@@ -139,7 +139,7 @@ Returns the time (timestamp) this service had been initialized.
 :param last_return: The return value from the last hook called.
 
 :return: (int) Unix timestamp
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self.time_started
@@ -153,7 +153,7 @@ Returns the time in seconds since this service had been initialized.
 :param last_return: The return value from the last hook called.
 
 :return: (int) Uptime in seconds
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return int(floor(time() - self.time_started))

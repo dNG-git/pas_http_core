@@ -19,8 +19,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 from dNG.data.text.tag_parser.mapped_element_mixin import MappedElementMixin
 from dNG.data.text.tag_parser.source_value_mixin import SourceValueMixin
-from dNG.module.named_loader import NamedLoader
 from dNG.runtime.exception_log_trap import ExceptionLogTrap
+from dNG.runtime.named_loader import NamedLoader
 
 class BlockMixin(MappedElementMixin, SourceValueMixin):
     """
@@ -30,7 +30,7 @@ This tag parser mixin provides support for blocks of subelements.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -45,25 +45,28 @@ Checks and renders the block statement.
 :param key: Key in source for comparison
 
 :return: (str) Rewritten statement if successful
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_block()- (#echo(__LINE__)#)", self, context = "pas_tag_parser")
+        if (self._log_handler is not None): self._log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_block()- (#echo(__LINE__)#)", self, context = "pas_http_core")
         _return = ""
 
-        with ExceptionLogTrap("pas_tag_parser"):
+        with ExceptionLogTrap("pas_http_core"):
             content = (None if (source_key is None) else self.get_source_value(source, key))
             if (not isinstance(content, dict)): content = self.content
+
+            instance = None
 
             action_definition = action.split(".")
             action = action_definition.pop()
             service = ".".join(action_definition)
 
-            if (NamedLoader.is_defined("dNG.module.controller.{0}".format(service))):
-                instance = NamedLoader.get_instance("dNG.module.controller.{0}".format(service))
-                instance.set_action(action, content)
-                _return = instance.execute()
+            if (NamedLoader.is_defined("dNG.module.{0}".format(service))):
+                instance = NamedLoader.get_instance("dNG.module.{0}".format(service))
+                if (not instance.is_supported("result_generator")): instance = None
             #
+
+            if (instance is not None): _return = next(instance.init_generator_executable(action, content))
         #
 
         return _return

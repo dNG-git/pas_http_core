@@ -26,7 +26,7 @@ from dNG.data.text.tag_parser.rewrite_mixin import RewriteMixin
 from dNG.data.xhtml.form_tags_renderer import FormTagsRenderer
 from dNG.data.xhtml.link import Link
 from dNG.data.xml_parser import XmlParser
-from dNG.module.named_loader import NamedLoader
+from dNG.runtime.named_loader import NamedLoader
 
 try: from dNG.database.nothing_matched_exception import NothingMatchedException
 except ImportError: from dNG.runtime.value_exception import ValueException as NothingMatchedException
@@ -40,7 +40,7 @@ safe XHTML compliant output.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -49,7 +49,7 @@ safe XHTML compliant output.
         """
 Constructor __init__(RewriteUserXhtmlMixin)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         RewriteMixin.__init__(self)
@@ -64,10 +64,10 @@ Returns the user profile instance for the given user ID.
 :param user_value: User value from TagParser
 
 :return: (object) User profile instance; None if not found
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}._get_user_profile()- (#echo(__LINE__)#)", self, context = "pas_tag_parser")
+        if (self._log_handler is not None): self._log_handler.debug("#echo(__FILEPATH__)# -{0!r}._get_user_profile()- (#echo(__LINE__)#)", self, context = "pas_tag_parser")
         _return = None
 
         user_profile_class = NamedLoader.get_class("dNG.data.user.Profile")
@@ -93,7 +93,7 @@ Renders a XHTML based author user bar with avatar, user name and link.
 :param key: Key in source for rewrite
 
 :return: (str) Rendered XHTML content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._render_rewrite_user_xhtml_bar(source, key, "author")
@@ -108,10 +108,10 @@ Renders a XHTML based user bar with avatar, user name and link.
 :param bar_type: User bar type
 
 :return: (str) Rendered XHTML content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_bar({1}, {2})- (#echo(__LINE__)#)", self, key, bar_type, context = "pas_tag_parser")
+        if (self._log_handler is not None): self._log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_bar({1}, {2})- (#echo(__LINE__)#)", self, key, bar_type, context = "pas_tag_parser")
 
         user_bar_data = self.get_source_value(source, key)
         user_profile = self._get_user_profile(user_bar_data)
@@ -162,10 +162,10 @@ Renders the user name and link to the profile.
 :param key: Key in source for rewrite
 
 :return: (str) Rendered XHTML content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_link({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
+        if (self._log_handler is not None): self._log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_link({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
         _return = L10n.get("core_unknown_entity")
 
         user_profile = self._get_user_profile(self.get_source_value(source, key))
@@ -205,7 +205,7 @@ Renders a XHTML based publisher user bar with avatar, user name and link.
 :param key: Key in source for rewrite
 
 :return: (str) Rendered XHTML content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._render_rewrite_user_xhtml_bar(source, key, "publisher")
@@ -219,10 +219,10 @@ Renders a XHTML based publisher user bar with avatar, user name and link.
 :param key: Key in source for rewrite
 
 :return: (str) Rendered XHTML content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_signature_box({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
+        if (self._log_handler is not None): self._log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_user_xhtml_signature_box({1})- (#echo(__LINE__)#)", self, key, context = "pas_tag_parser")
         _return = ""
 
         signature = ""
