@@ -27,7 +27,7 @@ This exception takes a translatable messages for critical errors.
 :copyright:  direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -41,7 +41,7 @@ Constructor __init__(TranslatableException)
 :param value: Exception message value
 :param _exception: Inner exception
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         TranslatableError.__init__(self, l10n_id, http_code, value, _exception)

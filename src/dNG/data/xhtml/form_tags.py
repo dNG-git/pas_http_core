@@ -31,7 +31,7 @@ rendering purposes within an "article" tag or similar block level element.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -44,7 +44,7 @@ Encode XHTML FormTags and some typical (X)HTML statements.
 :param content: Content containing XHTML FormTags or (X)HTML statements
 
 :return: (str) FormTags encoded data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         encoder = FormTagsEncoder()
@@ -61,7 +61,7 @@ Render FormTags as XHTML output and set given restrictions.
 :param main_id: DataLinker MainID for tag based links between pages
 
 :return: (str) Rendered content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         renderer = FormTagsRenderer()
@@ -80,7 +80,7 @@ Removes all FormTags from the given content
 :param content: FormTags encoded data
 
 :return: (str) Sanitized content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         sanitizer = FormTagsSanitizer()

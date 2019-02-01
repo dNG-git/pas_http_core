@@ -30,7 +30,7 @@ The OSet parser takes a template string to render the output.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -41,7 +41,7 @@ The OSet parser takes a template string to render the output.
         """
 Constructor __init__(FormTagsRenderer)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         AbstractFormTags.__init__(self)
@@ -64,7 +64,7 @@ Change data according to only contain the plain content.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return data[data_position:tag_end_position]
@@ -81,7 +81,7 @@ Change data according to the "b" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
     """
 
     def _change_match_box(self, data, tag_position, data_position, tag_end_position):
@@ -95,7 +95,7 @@ Change data according to the "box" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -115,7 +115,7 @@ Change data according to the "center" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
     """
 
     def _change_match_code(self, data, tag_position, data_position, tag_end_position):
@@ -129,7 +129,7 @@ Change data according to the "code" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -156,7 +156,7 @@ Change data according to the "color" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
     """
 
     _change_match_del = _change_plain_content
@@ -170,7 +170,7 @@ Change data according to the "del" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
     """
 
     def _change_match_highlight(self, data, tag_position, data_position, tag_end_position):
@@ -184,7 +184,7 @@ Change data according to the "highlight" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -208,7 +208,7 @@ Change data according to the "i" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
     """
 
     def _change_match_img(self, data, tag_position, data_position, tag_end_position):
@@ -222,7 +222,7 @@ Change data according to the "img" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = ""
@@ -249,7 +249,7 @@ Change data according to the "justify" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
     """
 
     _change_match_left = _change_plain_content
@@ -263,7 +263,7 @@ Change data according to the "left" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
     """
 
     def _change_match_link(self, data, tag_position, data_position, tag_end_position):
@@ -277,7 +277,7 @@ Change data according to the "link" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -304,7 +304,7 @@ Change data according to the "margin" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
     """
 
     _change_match_right = _change_plain_content
@@ -318,7 +318,7 @@ Change data according to the "right" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
     """
 
     _change_match_s = _change_plain_content
@@ -332,7 +332,7 @@ Change data according to the "s" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
     """
 
     _change_match_size = _change_plain_content
@@ -346,7 +346,7 @@ Change data according to the "size" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
     """
 
     def _change_match_title(self, data, tag_position, data_position, tag_end_position):
@@ -360,7 +360,7 @@ Change data according to the "title" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return "\n===\n{0}\n===\n".format(data[data_position:tag_end_position])
@@ -377,7 +377,7 @@ Change data according to the "u" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
     """
 
     def _change_match_url(self, data, tag_position, data_position, tag_end_position):
@@ -391,7 +391,7 @@ Change data according to the "url" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = ""
@@ -417,7 +417,7 @@ Renders the given FormTags content.
 :param content: FormTags content
 
 :return: (str) Rendered content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = self._parse(content)

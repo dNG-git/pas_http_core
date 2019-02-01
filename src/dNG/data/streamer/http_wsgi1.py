@@ -29,7 +29,7 @@ WSGI 1.0 compliant streamer.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -42,7 +42,7 @@ Reads from the current streamer session.
           EOF)
 
 :return: (bytes) Data; Empty byte string if EOF
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = AbstractEncapsulated.read(self, n)

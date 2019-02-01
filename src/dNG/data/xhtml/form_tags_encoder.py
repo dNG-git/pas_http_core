@@ -30,7 +30,7 @@ FormTags.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -196,7 +196,7 @@ Change data according to the "color" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = ""
@@ -222,7 +222,7 @@ Check if a possible tag match is a valid "color" tag that needs to be changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False

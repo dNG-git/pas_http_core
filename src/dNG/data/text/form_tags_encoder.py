@@ -29,7 +29,7 @@ Encodes data and validates FormTags.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -45,7 +45,7 @@ Change data according to the "box" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = ""
@@ -82,7 +82,7 @@ Change data according to the "highlight" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = ""
@@ -115,7 +115,7 @@ Change data according to the "hr" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = ""
@@ -141,7 +141,7 @@ Change data according to the "margin" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = ""
@@ -169,7 +169,7 @@ Change data according to the "size" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = ""
@@ -195,7 +195,7 @@ Check if a possible tag match is a valid "b" tag that needs to be changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -208,7 +208,7 @@ Check if a possible tag match is a valid "box" tag that needs to be changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
@@ -231,7 +231,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -245,7 +245,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -259,7 +259,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -272,7 +272,7 @@ Check if a possible tag match is a valid "del" tag that needs to be changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -286,7 +286,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -300,7 +300,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         tag_element_end_position = self._find_tag_end_position(data, 10)
@@ -320,7 +320,7 @@ Check if a possible tag match is a valid "hr" tag that needs to be changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return (re.match("^\\[hr=(\\d+)\\]", data) is not None)
@@ -333,7 +333,7 @@ Check if a possible tag match is a valid "i" tag that needs to be changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -346,7 +346,7 @@ Check if a possible tag match is a valid "img" tag that needs to be changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -360,7 +360,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -374,7 +374,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -388,7 +388,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -401,7 +401,7 @@ Check if a possible tag match is a valid "list" tag that needs to be changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -415,7 +415,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return (re.match("^\\[margin=(\\d+)\\]", data) is not None)
@@ -429,7 +429,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -443,7 +443,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -456,7 +456,7 @@ Check if a possible tag match is a valid "s" tag that needs to be changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -470,7 +470,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return (re.match("^\\[size=(\\d+)\\]", data) is not None)
@@ -484,7 +484,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -497,7 +497,7 @@ Check if a possible tag match is a valid "u" tag that needs to be changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -511,7 +511,7 @@ changed.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if change required
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False
@@ -524,7 +524,7 @@ Process the given content.
 :param content: Raw content
 
 :return: (str) FormTags encoded content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._parse(content)

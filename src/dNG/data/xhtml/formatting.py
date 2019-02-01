@@ -43,7 +43,7 @@ class Formatting(object):
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -56,7 +56,7 @@ Escapes given data for (X)HTML output.
 :param data: Input string
 
 :return: (str) Output string
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return html_escape(Binary.str(data), True)
@@ -72,13 +72,13 @@ the browser does not support XHTML we need to switch to a legacy HTML
 :param data: Output content
 
 :return: (str) Converted output content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         data = re.sub("\\s*<\\?(.*?)\\?>\\s*", "", data, flags = re.S)
         data = re.sub("\\s*/\\s*>", ">", data)
-        data = re.sub("<meta\\s+http\\-equiv=(.)Content\\-Type(.)\\s+content=(.)application/xhtml\\+xml(.)", "<meta http-equiv=\\1Content-Type\\2 content=\\3text/html\\4", data, flags = (re.I | re.S))
-        data = re.sub("<\\!\\[CDATA\\[(.*?)\\]\\]>", "<!--\\1-->", data, flags = (re.I | re.S))
+        data = re.sub("<meta\\s+http-equiv=(.)Content-Type(.)\\s+content=(.)application/xhtml\\+xml(.)", "<meta http-equiv=\\1Content-Type\\2 content=\\3text/html\\4", data, flags = (re.I | re.S))
+        data = re.sub("<!\\[CDATA\\[(.*?)\\]\\]>", "<!--\\1-->", data, flags = (re.I | re.S))
 
         return data
     #
@@ -91,7 +91,7 @@ Unescapes given (X)HTML data.
 :param data: Input string
 
 :return: (str) Output string
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         data = Binary.str(data)
