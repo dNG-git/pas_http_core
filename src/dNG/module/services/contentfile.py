@@ -27,18 +27,17 @@ from dNG.data.text.input_filter import InputFilter
 from dNG.data.text.l10n import L10n
 from dNG.data.xhtml.form_tags import FormTags
 from dNG.data.xhtml.link import Link
+from dNG.module.http import Http as HttpModule
 
-from .module import Module
-
-class Contentfile(Module):
+class Contentfile(HttpModule):
     """
-Service for "s=contentfile"
+Service for "/services/contentfile"
 
 :author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -47,22 +46,22 @@ Service for "s=contentfile"
         """
 Action for "index"
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
-        self.execute_view()
+        self.get_view()
     #
 
-    def execute_view(self):
+    def get_view(self):
         """
 Action for "view"
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
-        cid = InputFilter.filter_file_path(self.request.get_dsd("cid", ""))
+        cid = InputFilter.filter_file_path(self.request.get_parameter("cid", ""))
 
-        source_iline = InputFilter.filter_control_chars(self.request.get_dsd("source", "")).strip()
+        source_iline = InputFilter.filter_control_chars(self.request.get_parameter("source", "")).strip()
 
         L10n.init("pas_http_core_contentfile")
 
@@ -72,7 +71,7 @@ Action for "view"
         if (type(contentfiles) is not dict): raise TranslatableError("pas_http_core_contentfile_cid_invalid", 404)
 
         if (source_iline != ""):
-            if (self.response.is_supported("html_css_files")): self.response.add_theme_css_file("mini_default_sprite.min.css")
+            if (self.response.is_supported("html_css_files")): self.response.add_theme_css_file("mini_default_sprite.css")
 
             Link.set_store("servicemenu",
                            Link.TYPE_RELATIVE_URL,
@@ -98,7 +97,8 @@ Action for "view"
                   }
 
         self.response.init()
-        self.response.set_title(contentfiles[cid]['title'])
+        self.response.page_title = contentfiles[cid]['title']
+
         self.response.add_oset_content("core.simple_content", content)
     #
 #
