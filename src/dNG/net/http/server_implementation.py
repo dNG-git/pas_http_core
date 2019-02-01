@@ -19,7 +19,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 from dNG.data.logging.log_line import LogLine
 from dNG.data.settings import Settings
-from dNG.module.named_loader import NamedLoader
+from dNG.runtime.named_loader import NamedLoader
+from dNG.runtime.not_implemented_class import NotImplementedClass
 
 class ServerImplementation(object):
     """
@@ -30,18 +31,21 @@ aware instance.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
 
     @staticmethod
-    def get_class():
+    def get_class(is_not_implemented_class_aware = False):
         """
 Returns an HTTP server class based on the configuration set.
 
+:param is_not_implemented_class_aware: True to return
+       "dNG.runtime.NotImplementedClass" instead of None
+
 :return: (object) HTTP server class
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         # pylint: disable=broad-except
@@ -58,6 +62,8 @@ Returns an HTTP server class based on the configuration set.
         #
 
         if (_return == None): _return = NamedLoader.get_class("dNG.net.http.ServerStandalone")
+        if (_return is None and is_not_implemented_class_aware): _return = NotImplementedClass
+
         return _return
     #
 
@@ -67,10 +73,10 @@ Returns an HTTP server class based on the configuration set.
 Returns an HTTP server instance based on the configuration set.
 
 :return: (object) HTTP server implementation
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        implementation_class = ServerImplementation.get_class()
+        implementation_class = ServerImplementation.get_class(True)
         return implementation_class(*args, **kwargs)
     #
 #
