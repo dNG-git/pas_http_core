@@ -24,34 +24,34 @@ from dNG.data.file import File
 from dNG.data.text.l10n import L10n
 from dNG.data.text.tag_parser.abstract import Abstract as AbstractTagParser
 from dNG.data.text.tag_parser.rewrite_mixin import RewriteMixin
-from dNG.module.named_loader import NamedLoader
 from dNG.runtime.io_exception import IOException
+from dNG.runtime.named_loader import NamedLoader
 
-class MmediaParser(RewriteMixin, AbstractTagParser):
+class AssetParser(RewriteMixin, AbstractTagParser):
     """
-Parses files in the "mmedia" directory to set configured values and replace
+Parses files in the "assets" directory to set configured values and replace
 language placeholders.
 
 :author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
 
     def __init__(self):
         """
-Constructor __init__(MmediaParser)
+Constructor __init__(AssetParser)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         AbstractTagParser.__init__(self)
 
         self.cache_instance = NamedLoader.get_singleton("dNG.data.cache.Content", False)
-        self.log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
+        self._log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
     #
 
     def _change_match(self, tag_definition, data, tag_position, data_position, tag_end_position):
@@ -65,7 +65,7 @@ Change data according to the matched tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[:tag_position]
@@ -78,7 +78,7 @@ Change data according to the matched tag.
 
             if (source == "l10n"): _return += self.render_rewrite(L10n.get_dict(), key)
             else:
-                runtime_settings_dict = AbstractResponse.get_instance().get_runtime_settings()
+                runtime_settings_dict = AbstractResponse.get_instance().runtime_settings
                 _return += self.render_rewrite(runtime_settings_dict, key)
             #
         #
@@ -95,7 +95,7 @@ Check if a possible tag match is a false positive.
 :param data: Data starting with the possible tag
 
 :return: (dict) Matched tag definition; None if false positive
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = None
@@ -121,23 +121,23 @@ Check if a possible tag match is a false positive.
 
     def render(self, file_path_name):
         """
-Renders content ready for output from the given "mmedia" file.
+Renders content ready for output from the given "asset" file.
 
-:param file_path_name: mmedia file path and name
+:param file_path_name: Asset file path and name
 
-:return: (str) Rendered "mmedia" file
-:since:  v0.2.00
+:return: (str) Rendered "asset" file
+:since:  v1.0.0
         """
 
-        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, file_path_name, context = "pas_http_core")
+        if (self._log_handler is not None): self._log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, file_path_name, context = "pas_http_core")
 
         file_obj = File()
-        if (not file_obj.open(file_path_name, True, "r")): raise IOException("Failed to open mmedia file '{0}'".format(file_path_name))
+        if (not file_obj.open(file_path_name, True, "r")): raise IOException("Failed to open asset file '{0}'".format(file_path_name))
 
         file_content = file_obj.read()
         file_obj.close()
 
-        if (file_content is None): raise IOException("Failed to read mmedia file '{0}'".format(file_path_name))
+        if (file_content is None): raise IOException("Failed to read asset file '{0}'".format(file_path_name))
 
         return self._parse(file_content)
     #

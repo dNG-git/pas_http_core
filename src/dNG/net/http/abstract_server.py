@@ -20,11 +20,11 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from socket import error as socket_error
 from socket import getaddrinfo, gethostname, getfqdn
 
-from dNG.data.http.virtual_config import VirtualConfig
+from dNG.data.http.virtual_route import VirtualRoute
 from dNG.data.settings import Settings
 from dNG.data.text.link import Link
-from dNG.module.named_loader import NamedLoader
 from dNG.plugins.hook import Hook
+from dNG.runtime.named_loader import NamedLoader
 from dNG.runtime.not_implemented_exception import NotImplementedException
 from dNG.runtime.thread import Thread
 
@@ -36,7 +36,7 @@ class AbstractServer(Thread):
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -47,7 +47,7 @@ class AbstractServer(Thread):
         """
 Constructor __init__(AbstractServer)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         Thread.__init__(self)
@@ -56,7 +56,7 @@ Constructor __init__(AbstractServer)
         """
 Configured server host
         """
-        self.log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
+        self._log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
         """
 The LogHandler is called whenever debug messages should be logged or errors
 happened.
@@ -87,7 +87,7 @@ Socket server hostname
         """
 Configures the server
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         site_version = Settings.get("pas_http_site_version", "")
@@ -101,10 +101,10 @@ Configures the server
         else: Settings.set("x_pas_http_base_url", None)
 
         Settings.set("x_pas_http_session_uuid", "")
-        Settings.set("x_pas_http_path_mmedia_versioned", "/data/mmedia/{0}".format(site_version))
+        Settings.set("x_pas_http_path_assets_versioned", "/data/assets/{0}".format(site_version))
 
-        VirtualConfig.set_virtual_path("/data/mmedia/{0}/".format(site_version), { "s": "cache", "path": "dfile" })
-        VirtualConfig.set_virtual_path("/data/mmedia/", { "s": "cache", "path": "dfile" })
+        VirtualRoute.set("/data/assets/{0}/".format(site_version), { "s": "cache", "path_parameter_key": "dfile" })
+        VirtualRoute.set("/data/assets/", { "s": "cache", "path_parameter_key": "dfile" })
 
         Hook.call("dNG.pas.http.Server.onConfigured", server = self)
     #
@@ -117,7 +117,7 @@ Returns the configured server host.
 :param last_return: The return value from the last hook called.
 
 :return: (mixed) Return value
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return (self.host if (last_return is None) else last_return)
@@ -131,7 +131,7 @@ Returns the configured server port.
 :param last_return: The return value from the last hook called.
 
 :return: (mixed) Return value
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return (self.port if (last_return is None) else last_return)
@@ -145,7 +145,7 @@ Start the server
 :param last_return: The return value from the last hook called.
 
 :return: (mixed) Return value
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         self._configure()
@@ -159,7 +159,7 @@ Start the server
         """
 Runs the server
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         raise NotImplementedException()
@@ -173,7 +173,7 @@ Stop the server
 :param last_return: The return value from the last hook called.
 
 :return: (mixed) Return value
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         Hook.call("dNG.pas.http.Server.onShutdown", server = self)

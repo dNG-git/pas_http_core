@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="[rewrite:l10n]lang_charset[/rewrite]" ?><!DOCTYPE html SYSTEM "about:legacy-compat">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="[rewrite:l10n]lang_iso_domain[/rewrite]">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="[rewrite:l10n]lang_iso_domain[/rewrite]"[if:content:app_cache_manifest != ] manifest="[rewrite:content]app_cache_manifest[/rewrite]"[/if]>
 
 <head>
 <title>[if:settings:pas_http_site_title != ][rewrite:settings]pas_http_site_title[/rewrite] • [/if][rewrite:content]page_title[/rewrite]</title>
-[if:content:head_canonical_url != ]<link rel="canonical" href="[rewrite:content]head_canonical_url[/rewrite]" />[/if]
-[if:content:head_canonical_url != ]<meta name="description" content="[rewrite:content]head_page_description[/rewrite]" />[/if]
+[if:content:canonical_url != ]<link rel="canonical" href="[rewrite:content]canonical_url[/rewrite]" />[/if]
+[if:content:page_description != ]<meta name="description" content="[rewrite:content]page_description[/rewrite]" />[/if]
+[if:content:app_web_manifest != ]<link rel="manifest" href="[rewrite:content]app_web_manifest[/rewrite]" />[/if]
 <meta name="author" content="[if:settings:pas_http_site_author == ]direct Netware Group[/if][if:settings:pas_http_site_author != ][rewrite:settings]pas_http_site_author[/rewrite][/if]" />
 <meta name="creator" content="direct PAS" />
-<meta name="viewport" content="initial-scale=1" />
+<meta name="viewport" content="initial-scale=1, shrink-to-fit=no" />
 <style type="text/css"><![CDATA[
 div, p, td, th { cursor: default }
 
@@ -18,8 +19,14 @@ a:link, a:visited, a:focus { text-decoration: underline }
 a:active, a:hover, a:focus { color: #000000; text-decoration: none }
 
 body {
-	margin: 0; padding: 0 14%; background-color: #eaeaea; border-top: 28px solid #375a9d;
-	font-family: "Nimbus Sans L", "Lucida Grande", "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet MS", Helvetica, Verdana, Arial, sans-serif; font-size: 90%; font-style: normal; line-height: normal; font-weight: normal; color: #202020
+    display: flex; flex-direction: column; min-height: 100vh; box-sizing: border-box; margin: 0; padding: 0 14%; background-color: #eaeaea; border-top: 28px solid #375a9d;
+    background-image: -moz-linear-gradient(#eaeaea 0%, #d8deeb 100%);
+    background-image: -ms-linear-gradient(#eaeaea 0%, #d8deeb 100%);
+    background-image: -o-linear-gradient(#eaeaea 0%, #d8deeb 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #eaeaea), color-stop(1, #d8deeb));
+    background-image: -webkit-linear-gradient(#eaeaea 0%, #d8deeb 100%);
+    background-image: linear-gradient(#eaeaea 0%, #d8deeb 100%);
+    font-family: "Nimbus Sans L", "Lucida Grande", "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet MS", Helvetica, Verdana, Arial, sans-serif; font-size: 90%; font-style: normal; line-height: normal; font-weight: normal; color: #202020
 }
 
 form { margin: 0; padding: 0 }
@@ -33,14 +40,16 @@ h5 { font-size: 1.55em }
 h6, summary { font-size: 1.50em }
 
 header {
-	overflow: auto; overflow-y: hidden; margin: -32px -12px 0 -12px; padding: 10px; background-color: #193879; border-width: 0 1px 1px 1px; border-style: solid; border-color: #ffffff; box-shadow: 0 0 12px rgba(55, 90, 157, 0.8);
-	background-image: -moz-linear-gradient(#193879 0%, #375a9d 100%);
-	background-image: -ms-linear-gradient(#193879 0%, #375a9d 100%);
-	background-image: -o-linear-gradient(#193879 0%, #375a9d 100%);
-	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #193879), color-stop(1, #375a9d));
-	background-image: -webkit-linear-gradient(#193879 0%, #375a9d 100%);
-	background-image: linear-gradient(#193879 0%, #375a9d 100%)
+    overflow: auto; overflow-y: hidden; margin: -32px -12px 0 -12px; padding: 10px; background-color: #193879; border-width: 0 1px 1px 1px; border-style: solid; border-color: #ffffff; box-shadow: 0 0 12px rgba(55, 90, 157, 0.8);
+    background-image: -moz-linear-gradient(#193879 0%, #375a9d 100%);
+    background-image: -ms-linear-gradient(#193879 0%, #375a9d 100%);
+    background-image: -o-linear-gradient(#193879 0%, #375a9d 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #193879), color-stop(1, #375a9d));
+    background-image: -webkit-linear-gradient(#193879 0%, #375a9d 100%);
+    background-image: linear-gradient(#193879 0%, #375a9d 100%)
 }
+
+html { min-height: 100vh }
 
 img { border: none }
 
@@ -52,102 +61,89 @@ td, th { padding: 0 }
 td:first-child, th:first-child { border-left: none }
 td:last-child, th:last-child { border-right: none }
 
-.designcopyright {
-	clear: both; margin: 0 -4px -4px -4px; padding: 2px 8px 0 8px; border-top: 1px solid #375a9d;
-	background-image: -moz-linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(90, 90, 90, 0.15) 100%);
-	background-image: -ms-linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(90, 90, 90, 0.15) 100%);
-	background-image: -o-linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(90, 90, 90, 0.15) 100%);
-	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255, 255, 255, 0)), color-stop(1, rgba(90, 90, 90, 0.15)));
-	background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(90, 90, 90, 0.15) 100%);
-	background-image: linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(90, 90, 90, 0.15) 100%);
-	text-align: center; font-size: 0.75em; color: #375a9d
+.simple-copyright {
+    clear: both; padding: 1em 8px 1em 8px; border-width: 1px 1px 0 1px; border-style: solid; border-color: #fafafa;
+    background-image: -moz-linear-gradient(rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%);
+    background-image: -ms-linear-gradient(rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%);
+    background-image: -o-linear-gradient(rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255, 255, 255, 0.8)), color-stop(1, rgba(255, 255, 255, 0.5)));
+    background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%);
+    text-align: center; font-size: 0.75em; color: #375a9d
 }
 
-.designcopyright a, .designcopyright a:link, .designcopyright a:active, .designcopyright a:visited, .designcopyright a:hover, .designcopyright a:focus { color: #202020 }
+.simple-copyright a, .simple-copyright a:link, .simple-copyright a:active, .simple-copyright a:visited, .simple-copyright a:hover, .simple-copyright a:focus { color: #202020 }
 
-.designmainblock {
-	padding: 4px; background-color: #fdfdfd; border-width: 0 1px 1px 1px; border-style: solid; border-color: #193879; box-shadow: 0 0 12px rgba(55, 90, 157, 0.3);
-	text-align: left; vertical-align: middle
+.simple-content-block {
+    flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;
+    text-align: left; vertical-align: middle
 }
 
-.designpage { margin: 4px }
+.simple-page { margin: 4px; padding: 1em; background-color: #fdfdfd; border: 1px solid #d8deeb; box-shadow: 0 0 12px rgba(55, 90, 157, 0.3) }
 
-.designtitle {
-	display: inline-block; float: right; padding: 4px 2px 2px 10px;
-	text-align: right; font-size: 1.8em; font-weight: bold; color: #fafafa
+.simple-title {
+    display: inline-block; float: right; padding: 0.5em 2px 0.1em 10px;
+    text-align: right; font-size: 1.8em; font-weight: bold; color: #fafafa
 }
 
 @media only screen and (max-width: 352px) {
-	body { padding: 0 4px; border-top-width: 7px }
-	header { margin: -1px -1px 0 -1px; padding: 1px }
+    body { padding: 0 4px; border-top-width: 7px }
+    header { margin: -1px -1px 0 -1px; padding: 1px }
 
-	.designcopyright { padding: 1px 1px 0 1px }
-	.designmainblock { margin: -8px 0 }
+    .simple-copyright { padding: 1px 1px 0 1px }
+    .simple-content-block { margin: -8px 0 }
 }
 
 @media only screen and (max-width: 672px) {
-	header { text-align: center }
+    header { text-align: center }
 
-	.designtitle {
-		display: block; float: initial; padding: 2px 0 2px 0;
-		text-align: center; font-size: 1.4em
-	}
+    .simple-title {
+        display: block; float: initial; padding: 2px 0 2px 0;
+        text-align: center; font-size: 1.4em
+    }
 }
 
 @media only screen and (min-width: 352px) and (max-width: 992px) {
-	body { padding: 0 5% }
+    body { padding: 0 5% }
 
-	.designcopyright { padding: 1px 3px 0 3px }
+    .simple-copyright { padding: 1px 3px 0 3px }
 }
 
 @media only screen and (max-width: 992px) {
-	.designcopyright { margin: 0 -2px -2px -2px }
-	.designmainblock { padding: 2px }
+    .simple-copyright { margin: 0 -2px -2px -2px }
+    .simple-content-block { padding: 2px }
 }
 
 @media only screen and (min-width: 672px) and (max-width: 992px) {
-	.designtitle {
-		padding-top: 6px;
-		font-size: 1.6em
-	}
+    .simple-title {
+        padding-top: 6px;
+        font-size: 1.6em
+    }
 }
 ]]></style>
 [each:content:css_files:file]
-<link href="[rewrite:settings]x_pas_http_path_mmedia_versioned[/rewrite]/[rewrite:content]css_files.file.name[/rewrite]" rel="stylesheet" type="text/css" />
+<link href="[rewrite:settings]x_pas_http_path_assets_versioned[/rewrite]/[rewrite:content]css_files.file.name[/rewrite]" rel="stylesheet" type="text/css" />
 [/each]
-<script src="[rewrite:settings]x_pas_http_path_mmedia_versioned[/rewrite]/pas/config.tsc.min.js?lang=[rewrite:l10n]lang_code[/rewrite];theme=[rewrite:settings]x_pas_http_theme[/rewrite];uuid=[rewrite:settings]x_pas_http_session_uuid[/rewrite]" type="text/javascript"></script>
 [each:content:js_files:file]
-<script src="[rewrite:settings]x_pas_http_path_mmedia_versioned[/rewrite]/[rewrite:content]js_files.file.name[/rewrite]" type="text/javascript"></script>
+<script src="[rewrite:settings]x_pas_http_path_assets_versioned[/rewrite]/[rewrite:content]js_files.file.name[/rewrite]" type="text/javascript"[if:content:js_files.file.async == 1] async="async"[/if]></script>
 [/each]
 </head>
 
-<body><div class="designmainblock">
-	<header>
+<body><div class="simple-content-block">
+    <header>
 [if:settings:pas_http_site_title_xhtml != ]
-		<div class="designtitle">[rewrite:settings]pas_http_site_title_xhtml[/rewrite]</div>
+        <div class="simple-title">[rewrite:settings]pas_http_site_title_xhtml[/rewrite]</div>
 [/if][if:settings:pas_http_site_title_xhtml == ]
-		<div class="designtitle"><i>direct</i> Netware Group</div>
+        <div class="simple-title"><i>direct</i> Netware Group</div>
 [/if]
-[block:settings:pas_http_site_menu_main]output.menu.File.render[/block]
-	</header>
-	<div class="designpage">
-[block]output.menu.Service.render_primary[/block]
-[block]output.NotificationBox.render[/block]
-		<main>
+    </header>
+    <div class="simple-page">
+        <main>
 [rewrite:content]page_content[/rewrite]
-		</main>
-[block]output.menu.Service.render_secondary[/block]
-	</div>
-	<footer class="designcopyright">&#169; <i>direct</i> Netware Group - All rights reserved</footer>
+        </main>
+    </div>
+    <footer class="simple-copyright">&#169; <i>direct</i> Netware Group - All rights reserved</footer>
 </div>
-[if:settings:x_pas_http_session_uuid != ]
-<script type="text/javascript"><![CDATA[
-require([ "pas/HttpJsonApiRequest.min" ], function(HttpJsonApiRequest) {
-	var hjapi_request = new HttpJsonApiRequest();
-	hjapi_request.init_ping({ id: "pas.Session.ping", endpoint: "pas/session/ping/1.0/", delay: 10 });
-});
-]]></script>
-[/if]
 </body>
 
 </html>
