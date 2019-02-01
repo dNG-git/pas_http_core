@@ -23,9 +23,9 @@ import os
 from dNG.data.file import File
 from dNG.data.settings import Settings
 from dNG.data.text.l10n import L10n
-from dNG.module.named_loader import NamedLoader
 from dNG.runtime.exception_log_trap import ExceptionLogTrap
 from dNG.runtime.io_exception import IOException
+from dNG.runtime.named_loader import NamedLoader
 from dNG.runtime.type_exception import TypeException
 
 from .parser import Parser
@@ -38,7 +38,7 @@ The OSet file parser takes a file to render the output.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -49,7 +49,7 @@ The OSet file parser takes a file to render the output.
         """
 Constructor __init__(FileParser)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         Parser.__init__(self)
@@ -58,7 +58,7 @@ Constructor __init__(FileParser)
         """
 Cache instance
         """
-        self.oset = None
+        self._oset = None
         """
 OSet requested
         """
@@ -66,6 +66,31 @@ OSet requested
         """
 Path to the osets directory
         """
+    #
+
+    @property
+    def oset(self):
+        """
+Returns the OSet requested.
+
+:return: (str) OSet requested
+:since:  v1.0.0
+        """
+
+        return self._oset
+    #
+
+    @oset.setter
+    def oset(self, oset):
+        """
+Sets the OSet to use.
+
+:param oset: OSet requested
+
+:since: v1.0.0
+        """
+
+        self._oset = oset
     #
 
     def render(self, template_name, content, default = None):
@@ -76,10 +101,10 @@ Renders content ready for output from the given OSet template.
 :param content: Content object
 
 :return: (str) Rendered content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, template_name, context = "pas_http_core")
+        if (self._log_handler is not None): self._log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render({1})- (#echo(__LINE__)#)", self, template_name, context = "pas_http_core")
         _return = ("<span>{0}</span>".format(L10n.get("errors_pas_http_core_oset_not_viewable")) if (default is None) else default)
 
         with ExceptionLogTrap("pas_http_core"):
@@ -114,17 +139,5 @@ Renders content ready for output from the given OSet template.
         #
 
         return _return
-    #
-
-    def set_oset(self, oset):
-        """
-Sets the OSet to use.
-
-:param oset: OSet requested
-
-:since: v0.2.00
-        """
-
-        self.oset = oset
     #
 #

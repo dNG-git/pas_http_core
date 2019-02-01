@@ -31,7 +31,7 @@ The OSet parser takes a template string to render the output.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -47,7 +47,7 @@ Known tags used for en- and decoding.
         """
 Constructor __init__(FormTagsRenderer)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         AbstractFormTags.__init__(self)
@@ -70,6 +70,107 @@ First level available for [title].
         """
     #
 
+    @property
+    def match_definition_box(self):
+        """
+Returns the "box" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "box", "tag_end": "[/box]", "newlines_before_block": 1, "newlines_after_block": 1 }
+    #
+
+    @property
+    def match_definition_center(self):
+        """
+Returns the "center" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "center", "tag_end": "[/center]", "newlines_before_block": 1, "newlines_after_block": 1 }
+    #
+
+    @property
+    def match_definition_code(self):
+        """
+Returns the "code" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "code",
+                 "tag_end": "[/code]",
+                 "type": "top_down",
+                 "newlines_before_block": 1,
+                 "newlines_after_block": 1
+               }
+    #
+
+    @property
+    def match_definition_highlight(self):
+        """
+Returns the "highlight" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "highlight", "tag_end": "[/highlight]", "newlines_before_block": 1, "newlines_after_block": 1 }
+    #
+
+    @property
+    def match_definition_justify(self):
+        """
+Returns the "justify" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "justify", "tag_end": "[/justify]", "newlines_before_block": 1, "newlines_after_block": 1 }
+    #
+
+    @property
+    def match_definition_left(self):
+        """
+Returns the "left" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "left", "tag_end": "[/left]", "newlines_before_block": 1, "newlines_after_block": 1 }
+    #
+
+    @property
+    def match_definition_title(self):
+        """
+Returns the "title" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "title", "tag_end": "[/title]", "newlines_before_block": 2, "newlines_after_block": 2 }
+    #
+
+    @property
+    def match_definition_nobr(self):
+        """
+Returns the "nobr" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "nobr", "type": "simple" }
+    #
+
     def _change_match_b(self, data, tag_position, data_position, tag_end_position):
         """
 Change data according to the "b" tag.
@@ -81,7 +182,7 @@ Change data according to the "b" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         enclosed_data = data[data_position:tag_end_position]
@@ -99,7 +200,7 @@ Change data according to the "box" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -117,7 +218,7 @@ Change data according to the "box" tag.
             css_classes = (" {0}".format(" ".join(css_classes_list)) if (len(css_classes_list) > 0) else "")
             css_style = (' style="{0}"'.format("; ".join(css_styles)) if (len(css_styles) > 0) else "")
 
-            _return = '<div class="pagecontent_box{0}"{1}>{2}</div>[nobr]'.format(css_classes, css_style, _return)
+            _return = '<div class="pagecontent_box{0}"{1}>{2}</div>'.format(css_classes, css_style, _return)
         #
 
         return _return
@@ -134,7 +235,7 @@ Change data according to the "center" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -142,8 +243,8 @@ Change data according to the "center" tag.
         if (self.is_block_encoding_supported and len(_return) > 0):
             tag_params = FormTagsRenderer.parse_tag_parameters("center", data, tag_position, data_position)
 
-            if ("box" in tag_params): _return = "<div style='text-align: center'><div class='pagecontent_box' style='display: inline-block; width: {0}'>{1}</div></div>[nobr]".format(tag_params['box'], _return)
-            else: _return = "<div class='pagecontent_box' style='text-align: center'>{0}</div>[nobr]".format(_return)
+            if ("box" in tag_params): _return = "<div style='text-align: center'><div class='pagecontent_box' style='display: inline-block; width: {0}'>{1}</div></div>".format(tag_params['box'], _return)
+            else: _return = "<div class='pagecontent_box' style='text-align: center'>{0}</div>".format(_return)
         #
 
         return _return
@@ -160,7 +261,7 @@ Change data according to the "code" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -185,7 +286,7 @@ Change data according to the "color" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -209,7 +310,7 @@ Change data according to the "del" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         enclosed_data = data[data_position:tag_end_position]
@@ -227,7 +328,7 @@ Change data according to the "highlight" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -236,7 +337,7 @@ Change data according to the "highlight" tag.
             tag_params = FormTagsRenderer.parse_tag_parameters("highlight", data, tag_position, data_position)
             css_style = (' style="width: {0}"'.format(tag_params['box']) if ("box" in tag_params) else "")
 
-            _return = "<div class='pagecontent_box pagecontent_highlight_box'{0}>{1}</div>[nobr]".format(css_style, _return)
+            _return = "<div class='pagecontent_box pagecontent_highlight_box'{0}>{1}</div>".format(css_style, _return)
         #
 
         return _return
@@ -253,7 +354,7 @@ Change data according to the "i" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         enclosed_data = data[data_position:tag_end_position]
@@ -271,7 +372,7 @@ Change data according to the "img" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = ""
@@ -308,7 +409,7 @@ Change data according to the "justify" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -324,7 +425,7 @@ Change data according to the "justify" tag.
                 css_style = "width: {0}; ".format(tag_params['box'])
             #
 
-            _return = '<div{0} style="{1}text-align: justify">{2}</div>[nobr]'.format(css_classes, css_style, _return)
+            _return = '<div{0} style="{1}text-align: justify">{2}</div>'.format(css_classes, css_style, _return)
         #
 
         return _return
@@ -341,7 +442,7 @@ Change data according to the "left" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -354,7 +455,7 @@ Change data according to the "left" tag.
                             "style='text-align: left'"
                            )
 
-            _return = '<div {0}>{1}</div>[nobr]'.format(element_code, _return)
+            _return = '<div {0}>{1}</div>'.format(element_code, _return)
         #
 
         return _return
@@ -371,7 +472,7 @@ Change data according to the "link" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -398,7 +499,7 @@ Change data according to the "list" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = ""
@@ -432,7 +533,7 @@ Change data according to the "margin" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -456,7 +557,7 @@ Change data according to the "nobr" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return (data[7 + tag_position:] if (data[6 + tag_position:7 + tag_position] == "\n") else data[6 + tag_position:])
@@ -473,7 +574,7 @@ Change data according to the "quote" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -494,7 +595,7 @@ Change data according to the "right" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -524,7 +625,7 @@ Change data according to the "s" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         enclosed_data = data[data_position:tag_end_position]
@@ -542,7 +643,7 @@ Change data according to the "size" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -566,7 +667,7 @@ Change data according to the "title" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = data[data_position:tag_end_position]
@@ -592,7 +693,7 @@ Change data according to the "title" tag.
                 elif (tag_params['clear'] == "right"): element_code = " style='clear: right'"
             #
 
-            _return = "<h{0:d}{1}>{2}</h{0:d}>[nobr]".format(subtitle_level, element_code, _return)
+            _return = "<h{0:d}{1}>{2}</h{0:d}>".format(subtitle_level, element_code, _return)
         #
 
         return _return
@@ -609,7 +710,7 @@ Change data according to the "u" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         enclosed_data = data[data_position:tag_end_position]
@@ -627,7 +728,7 @@ Change data according to the "url" tag.
 :param tag_end_position: Starting position of the closing tag
 
 :return: (str) Converted data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         re_result = re.match("^\\[url=(\\w+:.*)?\\]", data[tag_position:data_position])
@@ -656,21 +757,10 @@ Check if a possible tag match is a valid "nobr" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._check_match_simple_tag("nobr", data)
-    #
-
-    def _get_match_definition_nobr(self):
-        """
-Returns the "nobr" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "nobr", "type": "simple" }
     #
 
     def render(self, content):
@@ -680,7 +770,7 @@ Renders the given FormTags content.
 :param content: FormTags content
 
 :return: (str) Rendered content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         if (not self.is_xhtml_allowed): content = Formatting.escape(content)
@@ -698,7 +788,7 @@ Sets if block level elements are allowed.
 
 :param supported: True if block level elements are allowed
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         self.is_block_encoding_supported = supported
@@ -710,7 +800,7 @@ Sets the DataLinker main ID for tags.
 
 :param id_main: DataLinker main ID
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         self.datalinker_main_id = id_main
@@ -722,7 +812,7 @@ Sets if (X)HTML encoding is allowed.
 
 :param allowed: True if (X)HTML encoding is allowed
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         self.is_xhtml_allowed = allowed
@@ -734,7 +824,7 @@ Sets the first level available for [title].
 
 :param level: First level available
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         self.xhtml_title_top_level = level

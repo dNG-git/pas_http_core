@@ -19,7 +19,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 import re
 
-from dNG.module.named_loader import NamedLoader
+from dNG.runtime.named_loader import NamedLoader
 
 from .tag_parser.abstract import Abstract as AbstractTagParser
 
@@ -31,7 +31,7 @@ Abstract parser to handle FormTags.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -56,40 +56,288 @@ Known tags used for en- and decoding.
         """
 Constructor __init__(AbstractFormTags)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         AbstractTagParser.__init__(self)
 
-        self.log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
-        """
-The LogHandler is called whenever debug messages should be logged or errors
-happened.
-        """
+        self._log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
     #
 
-    def _change_match(self, tag_definition, data, tag_position, data_position, tag_end_position):
+    @property
+    def match_definition_b(self):
         """
-Change data according to the matched tag.
+Returns the "b" tag definition for the parser.
 
-:param tag_definition: Matched tag definition
-:param data: Data to be parsed
-:param tag_position: Tag starting position
-:param data_position: Data starting position
-:param tag_end_position: Starting position of the closing tag
-
-:return: (str) Converted data
-:since:  v0.2.00
+:return: (dict) Tag definition
+:since:  v1.0.0
         """
 
-        _return = data[:tag_position]
+        return { "tag": "b", "tag_end": "[/b]" }
+    #
 
-        method = (getattr(self, "_change_match_{0}".format(tag_definition['tag'])) if (hasattr(self, "_change_match_{0}".format(tag_definition['tag']))) else None)
+    @property
+    def match_definition_box(self):
+        """
+Returns the "box" tag definition for the parser.
 
-        if (method is not None): _return += method(data, tag_position, data_position, tag_end_position)
-        if ("type" not in tag_definition or tag_definition['type'] != "simple"): _return += data[self._find_tag_end_position(data, tag_end_position):]
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
 
-        return _return
+        return { "tag": "box", "tag_end": "[/box]" }
+    #
+
+    @property
+    def match_definition_center(self):
+        """
+Returns the "center" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "center", "tag_end": "[/center]" }
+    #
+
+    @property
+    def match_definition_code(self):
+        """
+Returns the "code" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "code", "tag_end": "[/code]", "type": "top_down" }
+    #
+
+    @property
+    def match_definition_color(self):
+        """
+Returns the "color" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "color", "tag_end": "[/color]" }
+    #
+
+    @property
+    def match_definition_del(self):
+        """
+Returns the "del" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "del", "tag_end": "[/del]" }
+    #
+
+    @property
+    def match_definition_face(self):
+        """
+Returns the "face" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "face", "tag_end": "[/face]" }
+    #
+
+    @property
+    def match_definition_highlight(self):
+        """
+Returns the "highlight" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "highlight", "tag_end": "[/highlight]" }
+    #
+
+    @property
+    def match_definition_hr(self):
+        """
+Returns the "hr" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "hr", "type": "simple" }
+    #
+
+    @property
+    def match_definition_i(self):
+        """
+Returns the "i" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "i", "tag_end": "[/i]" }
+    #
+
+    @property
+    def match_definition_img(self):
+        """
+Returns the "img" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "img", "tag_end": "[/img]" }
+    #
+
+    @property
+    def match_definition_justify(self):
+        """
+Returns the "justify" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "justify", "tag_end": "[/justify]" }
+    #
+
+    @property
+    def match_definition_left(self):
+        """
+Returns the "left" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "left", "tag_end": "[/left]" }
+    #
+
+    @property
+    def match_definition_link(self):
+        """
+Returns the "link" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "link", "tag_end": "[/link]" }
+    #
+
+    @property
+    def match_definition_list(self):
+        """
+Returns the "list" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "list", "tag_end": "[/list]" }
+    #
+
+    @property
+    def match_definition_quote(self):
+        """
+Returns the "quote" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "quote", "tag_end": "[/quote]" }
+    #
+
+    @property
+    def match_definition_margin(self):
+        """
+Returns the "quote" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "margin", "tag_end": "[/margin]" }
+    #
+
+    @property
+    def match_definition_right(self):
+        """
+Returns the "right" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "right", "tag_end": "[/right]" }
+    #
+
+    @property
+    def match_definition_s(self):
+        """
+Returns the "s" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "s", "tag_end": "[/s]" }
+    #
+
+    @property
+    def match_definition_size(self):
+        """
+Returns the "size" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "size", "tag_end": "[/size]" }
+    #
+
+    @property
+    def match_definition_title(self):
+        """
+Returns the "title" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "title", "tag_end": "[/title]" }
+    #
+
+    @property
+    def match_definition_u(self):
+        """
+Returns the "u" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "u", "tag_end": "[/u]" }
+    #
+
+    @property
+    def match_definition_url(self):
+        """
+Returns the "url" tag definition for the parser.
+
+:return: (dict) Tag definition
+:since:  v1.0.0
+        """
+
+        return { "tag": "url", "tag_end": "[/url]" }
     #
 
     def _check_match(self, data):
@@ -99,7 +347,7 @@ Check if a possible tag match is a false positive.
 :param data: Data starting with the possible tag
 
 :return: (dict) Matched tag definition; None if false positive
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = None
@@ -112,8 +360,8 @@ Check if a possible tag match is a false positive.
             data_match = data[1:1 + len(tag)]
 
             if (data_match == tag):
-                method = (getattr(self, "_check_match_{0}".format(tag)) if (hasattr(self, "_check_match_{0}".format(tag))) else None)
-                if (method is not None and method(data)): _return = getattr(self, "_get_match_definition_{0}".format(tag))()
+                method = getattr(self, "_check_match_{0}".format(tag), None)
+                if (method is not None and method(data)): _return = getattr(self, "match_definition_{0}".format(tag))()
             #
 
             i += 1
@@ -129,7 +377,7 @@ Check if a possible tag match is a valid "b" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._check_match_simple_tag("b", data)
@@ -142,7 +390,7 @@ Check if a possible tag match is a valid "box" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
@@ -155,7 +403,12 @@ Check if a possible tag match is a valid "box" tag.
             _return = (data[:5] == "[box:")
             if (_return and "align" in tag_params): _return = (tag_params['align'].lower() in ( "left", "center", "right" ))
             if (_return and "clear" in tag_params): _return = (tag_params['clear'].lower() in ( "both", "left", "right" ))
-            if (_return and "width" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['width']) or AbstractFormTags.check_size_px(tag_params['width'], 50))
+
+            if (_return and "width" in tag_params):
+                _return = (AbstractFormTags.check_size_percent(tag_params['width'])
+                           or AbstractFormTags.check_size_px(tag_params['width'], 50)
+                          )
+            #
         else: _return = (data[:5] == "[box]")
 
         return _return
@@ -168,7 +421,7 @@ Check if a possible tag match is a valid "center" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
@@ -177,7 +430,12 @@ Check if a possible tag match is a valid "center" tag.
 
         if (tag_element_end_position > 8):
             tag_params = AbstractFormTags.parse_tag_parameters("center", data, 0, tag_element_end_position)
-            if (data[:8] == "[center:" and "box" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['box']) or AbstractFormTags.check_size_px(tag_params['box'], 50))
+
+            if (data[:8] == "[center:" and "box" in tag_params):
+                _return = (AbstractFormTags.check_size_percent(tag_params['box'])
+                           or AbstractFormTags.check_size_px(tag_params['box'], 50)
+                          )
+            #
         else: _return = (data[:8] == "[center]")
 
         return _return
@@ -190,7 +448,7 @@ Check if a possible tag match is a valid "code" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._check_match_simple_tag("code", data)
@@ -203,7 +461,7 @@ Check if a possible tag match is a valid "color" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return (re.match("^\\[color=#[0-9a-f]{6}\\]", data) is not None)
@@ -216,7 +474,7 @@ Check if a possible tag match is a valid "del" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._check_match_simple_tag("del", data)
@@ -229,7 +487,7 @@ Check if a possible tag match is a valid "face" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return False # TODO: Implement me
@@ -242,7 +500,7 @@ Check if a possible tag match is a valid "highlight" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
@@ -251,7 +509,12 @@ Check if a possible tag match is a valid "highlight" tag.
 
         if (tag_element_end_position > 11):
             tag_params = AbstractFormTags.parse_tag_parameters("highlight", data, 0, tag_element_end_position)
-            if (data[:11] == "[highlight:" and "width" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['width']) or AbstractFormTags.check_size_px(tag_params['width'], 50))
+
+            if (data[:11] == "[highlight:" and "width" in tag_params):
+                _return = (AbstractFormTags.check_size_percent(tag_params['width'])
+                           or AbstractFormTags.check_size_px(tag_params['width'], 50)
+                          )
+            #
         else: _return = (data[:11] == "[highlight]")
 
         return _return
@@ -264,7 +527,7 @@ Check if a possible tag match is a valid "hr" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._check_match_simple_tag("hr", data)
@@ -277,7 +540,7 @@ Check if a possible tag match is a valid "i" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._check_match_simple_tag("i", data)
@@ -290,7 +553,7 @@ Check if a possible tag match is a valid "img" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
@@ -301,8 +564,18 @@ Check if a possible tag match is a valid "img" tag.
             tag_params = AbstractFormTags.parse_tag_parameters("img", data, 0, tag_element_end_position)
 
             _return = (data[:5] == "[img:")
-            if (_return and "width" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['width']) or AbstractFormTags.check_size_px(tag_params['width']))
-            if (_return and "height" in tag_params): _return = (AbstractFormTags.check_size_percent(tag_params['height']) or AbstractFormTags.check_size_px(tag_params['height']))
+
+            if (_return and "width" in tag_params):
+                _return = (AbstractFormTags.check_size_percent(tag_params['width'])
+                           or AbstractFormTags.check_size_px(tag_params['width'])
+                          )
+            #
+
+            if (_return and "height" in tag_params):
+                _return = (AbstractFormTags.check_size_percent(tag_params['height'])
+                           or AbstractFormTags.check_size_px(tag_params['height'])
+                          )
+            #
         else: _return = (data[:5] == "[img]")
 
         return _return
@@ -315,7 +588,7 @@ Check if a possible tag match is a valid "justify" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._check_match_simple_tag("justify", data)
@@ -328,7 +601,7 @@ Check if a possible tag match is a valid "left" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._check_match_simple_tag("left", data)
@@ -341,7 +614,7 @@ Check if a possible tag match is a valid "link" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
@@ -368,7 +641,7 @@ Check if a possible tag match is a valid "list" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
@@ -390,7 +663,7 @@ Check if a possible tag match is a valid "margin" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
@@ -412,7 +685,7 @@ Check if a possible tag match is a valid "quote" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._check_match_simple_tag("quote", data)
@@ -425,7 +698,7 @@ Check if a possible tag match is a valid "right" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._check_match_simple_tag("right", data)
@@ -438,7 +711,7 @@ Check if a possible tag match is a valid "s" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._check_match_simple_tag("s", data)
@@ -451,7 +724,7 @@ Check if a possible tag matches the given expected, simple tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return (data[:len(tag) + 2] == "[{0}]".format(tag))
@@ -464,7 +737,7 @@ Check if a possible tag match is a valid "size" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
@@ -473,7 +746,10 @@ Check if a possible tag match is a valid "size" tag.
 
         if (re_result is not None):
             value = re_result.group(1)
-            _return = (AbstractFormTags.check_size_percent(value, 60, 500) or AbstractFormTags.check_size_px(value, _max = 80))
+
+            _return = (AbstractFormTags.check_size_percent(value, 60, 500)
+                       or AbstractFormTags.check_size_px(value, _max = 80)
+                      )
         #
 
         return _return
@@ -486,7 +762,7 @@ Check if a possible tag match is a valid "title" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
@@ -510,7 +786,7 @@ Check if a possible tag match is a valid "i" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._check_match_simple_tag("u", data)
@@ -523,263 +799,10 @@ Check if a possible tag match is a valid "url" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return (re.match("^(\\[url=\\w+:.*\\]|\\[url\\]\\w+:.*)", data) is not None)
-    #
-
-    def _get_match_definition_b(self):
-        """
-Returns the "b" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "b", "tag_end": "[/b]" }
-    #
-
-    def _get_match_definition_box(self):
-        """
-Returns the "box" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "box", "tag_end": "[/box]" }
-    #
-
-    def _get_match_definition_center(self):
-        """
-Returns the "center" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "center", "tag_end": "[/center]" }
-    #
-
-    def _get_match_definition_code(self):
-        """
-Returns the "code" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "code", "tag_end": "[/code]", "type": "top_down" }
-    #
-
-    def _get_match_definition_color(self):
-        """
-Returns the "color" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "color", "tag_end": "[/color]" }
-    #
-
-    def _get_match_definition_del(self):
-        """
-Returns the "del" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "del", "tag_end": "[/del]" }
-    #
-
-    def _get_match_definition_face(self):
-        """
-Returns the "face" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "face", "tag_end": "[/face]" }
-    #
-
-    def _get_match_definition_highlight(self):
-        """
-Returns the "highlight" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "highlight", "tag_end": "[/highlight]" }
-    #
-
-    def _get_match_definition_hr(self):
-        """
-Returns the "hr" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "hr", "type": "simple" }
-    #
-
-    def _get_match_definition_i(self):
-        """
-Returns the "i" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "i", "tag_end": "[/i]" }
-    #
-
-    def _get_match_definition_img(self):
-        """
-Returns the "img" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "img", "tag_end": "[/img]" }
-    #
-
-    def _get_match_definition_justify(self):
-        """
-Returns the "justify" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "justify", "tag_end": "[/justify]" }
-    #
-
-    def _get_match_definition_left(self):
-        """
-Returns the "left" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "left", "tag_end": "[/left]" }
-    #
-
-    def _get_match_definition_link(self):
-        """
-Returns the "link" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "link", "tag_end": "[/link]" }
-    #
-
-    def _get_match_definition_list(self):
-        """
-Returns the "list" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "list", "tag_end": "[/list]" }
-    #
-
-    def _get_match_definition_quote(self):
-        """
-Returns the "quote" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "quote", "tag_end": "[/quote]" }
-    #
-
-    def _get_match_definition_margin(self):
-        """
-Returns the "quote" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "margin", "tag_end": "[/margin]" }
-    #
-
-    def _get_match_definition_right(self):
-        """
-Returns the "right" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "right", "tag_end": "[/right]" }
-    #
-
-    def _get_match_definition_s(self):
-        """
-Returns the "s" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "s", "tag_end": "[/s]" }
-    #
-
-    def _get_match_definition_size(self):
-        """
-Returns the "size" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "size", "tag_end": "[/size]" }
-    #
-
-    def _get_match_definition_title(self):
-        """
-Returns the "title" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "title", "tag_end": "[/title]" }
-    #
-
-    def _get_match_definition_u(self):
-        """
-Returns the "u" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "u", "tag_end": "[/u]" }
-    #
-
-    def _get_match_definition_url(self):
-        """
-Returns the "url" tag definition for the parser.
-
-:return: (dict) Tag definition
-:since:  v0.2.00
-        """
-
-        return { "tag": "url", "tag_end": "[/url]" }
     #
 
     @staticmethod
@@ -790,7 +813,7 @@ Check if a possible tag match is a valid "center" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _type = type(value)
@@ -810,13 +833,13 @@ Check if a possible tag match is a valid "center" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
 
-        if (value[-1:] == "%"):
-            if (AbstractFormTags.RE_NUMBER.match(value[:-1]) is not None): _return = AbstractFormTags._check_number(int(value[:-1]), _min, _max)
+        if (value[-1:] == "%" and AbstractFormTags.RE_NUMBER.match(value[:-1]) is not None):
+            _return = AbstractFormTags._check_number(int(value[:-1]), _min, _max)
         #
 
         return _return
@@ -830,13 +853,13 @@ Check if a possible tag match is a valid "center" tag.
 :param data: Data starting with the possible tag
 
 :return: (bool) True if valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
 
-        if (value[-2:] == "px"):
-            if (AbstractFormTags.RE_NUMBER.match(value[:-2]) is not None): _return = AbstractFormTags._check_number(int(value[:-2]), _min, _max)
+        if (value[-2:] == "px" and AbstractFormTags.RE_NUMBER.match(value[:-2]) is not None):
+            _return = AbstractFormTags._check_number(int(value[:-2]), _min, _max)
         #
 
         return _return

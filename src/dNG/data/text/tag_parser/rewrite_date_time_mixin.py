@@ -31,7 +31,7 @@ formatted date and time strings.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -45,10 +45,10 @@ Renders a date and time string based on the given presentation type.
 :param _type: Presentation type
 
 :return: (str) Rendered content
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        if (self.log_handler is not None): self.log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time({1}, {2})- (#echo(__LINE__)#)", self, key, _type, context = "pas_tag_parser")
+        if (self._log_handler is not None): self._log_handler.debug("#echo(__FILEPATH__)# -{0!r}.render_rewrite_date_time({1}, {2})- (#echo(__LINE__)#)", self, key, _type, context = "pas_tag_parser")
         _return = L10n.get("core_unknown")
 
         timestamp = self.get_source_value(source, key)

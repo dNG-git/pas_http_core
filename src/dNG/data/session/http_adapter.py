@@ -25,7 +25,7 @@ from dNG.controller.abstract_http_response import AbstractHttpResponse
 from dNG.data.binary import Binary
 from dNG.data.settings import Settings
 from dNG.data.text.tmd5 import Tmd5
-from dNG.module.named_loader import NamedLoader
+from dNG.runtime.named_loader import NamedLoader
 
 from .abstract_adapter import AbstractAdapter
 
@@ -38,35 +38,51 @@ protocol specific functionality.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
 
+    def __init__(self, session):
+        """
+Constructor __init__(HttpAdapter)
+
+:param session: Session instance
+
+:since: v1.0.0
+        """
+
+        AbstractAdapter.__init__(self, session)
+
+        self.supported_features['cookie'] = True
+    #
+
+    @property
     def is_persistent(self):
         """
 Returns true if the uuID session is set persistently at the client.
 
 :return: (bool) True if set
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return (self.session.get("uuids.passcode") is not None)
     #
 
+    @property
     def is_valid(self):
         """
 Returns true if the defined session is valid.
 
 :return: (bool) True if session is valid
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = False
 
         passcode = self.session.get("uuids.passcode")
 
-        if (not self.session.is_persistent()): _return = True
+        if (not self.session.is_persistent): _return = True
         elif (passcode is not None):
             cookie_passcode = None
             request = NamedLoader.get_singleton("dNG.controller.AbstractHttpRequest", False)
@@ -77,7 +93,7 @@ Returns true if the defined session is valid.
 
                 if (uuids_cookie is not None):
                     cookie_data = uuids_cookie.split(":", 1)
-                    if (cookie_data[0] == self.session.get_uuid()): cookie_passcode = cookie_data[1]
+                    if (cookie_data[0] == self.session.uuid): cookie_passcode = cookie_data[1]
                 #
             #
 
@@ -101,19 +117,45 @@ Returns true if the defined session is valid.
         return _return
     #
 
+    @property
+    def persist_to_cookie(self):
+        """
+Returns true if a cookie is used to store the uuID.
+
+:return: (bool) True to use a cookie
+:since:  v1.0.0
+        """
+
+        return (self.session.get("uuids.passcode_timeout") is not None)
+    #
+
+    @persist_to_cookie.setter
+    def persist_to_cookie(self, mode = True):
+        """
+Sets if a cookie is used to store the uuID.
+
+:param mode: True to use a cookie
+
+:since: v1.0.0
+        """
+
+        if (not mode): self.session.unset("uuids.passcode_timeout")
+        elif (self.session.get("uuids.passcode") is None): self.session.set("uuids.passcode_timeout", 0)
+    #
+
     def load(self):
         """
 Uses protocol specific functionality to load additional information of an
 session.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         passcode_timeout = self.session.get("uuids.passcode_timeout")
 
-        if (passcode_timeout is None): self.session.set_timeout()
+        if (passcode_timeout is None): self.session.timeout = None
         else:
-            self.session.set_timeout(int(Settings.get("pas_session_uuids_passcode_session_time", 604800)))
+            self.session.timeout = int(Settings.get("pas_session_uuids_passcode_session_time", 604800))
             if (passcode_timeout < time()): self._renew_passcode()
         #
     #
@@ -123,7 +165,7 @@ session.
 Saves changes of the uuIDs instance.
 
 :return: (bool) True on success
-:since: v0.2.00
+:since: v1.0.0
         """
 
         passcode = self.session.get("uuids.passcode")
@@ -150,13 +192,13 @@ Saves changes of the uuIDs instance.
 Saves changes of the uuIDs instance.
 
 :return: (bool) True on success
-:since: v0.2.00
+:since: v1.0.0
         """
 
         passcode_timeout = self.session.get("uuids.passcode_timeout")
 
         if (passcode_timeout is not None):
-            self.session.set_timeout(int(Settings.get("pas_session_uuids_passcode_session_time", 604800)))
+            self.session.timeout = int(Settings.get("pas_session_uuids_passcode_session_time", 604800))
             if (passcode_timeout < time()): self._renew_passcode()
 
             is_passcode_changed = False
@@ -173,9 +215,9 @@ Saves changes of the uuIDs instance.
 
             if (is_passcode_changed):
                 passcode_hashed = Tmd5.hash(self.session.get("uuids.passcode"))
-                response.set_cookie("uuids", "{0}:{1}".format(self.session.get_uuid(), passcode_hashed))
+                response.set_cookie("uuids", "{0}:{1}".format(self.session.uuid, passcode_hashed))
             #
-        elif (not self.is_persistent()):
+        elif (not self.is_persistent):
             instance = NamedLoader.get_singleton("dNG.controller.AbstractHttpRequest", False)
 
             if (instance is not None and instance.get_cookie("uuids") is not None):
@@ -187,25 +229,13 @@ Saves changes of the uuIDs instance.
         return True
     #
 
-    def set_cookie(self, mode = True):
-        """
-Sets a cookie to store the uuID.
-
-:param mode: True to use a cookie
-
-:since: v0.2.00
-        """
-
-        if (mode and self.session.get("uuids.passcode") is None): self.session.set("uuids.passcode_timeout", 0)
-    #
-
     @staticmethod
     def get_uuid():
         """
 Returns the uuID.
 
 :return: (str) Unique user identification; None if unknown
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         instance = NamedLoader.get_singleton("dNG.controller.AbstractHttpRequest", False)
