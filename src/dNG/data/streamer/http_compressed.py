@@ -19,6 +19,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 from dNG.data.binary import Binary
 from dNG.data.settings import Settings
+from dNG.runtime.io_exception import IOException
 
 from .abstract_encapsulated import AbstractEncapsulated
 
@@ -30,10 +31,18 @@ Compressing streamer based on the given compressor.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
+
+    _FILE_WRAPPED_METHODS = ( "close",
+                              "is_url_supported",
+                              "open_url",
+                              "seek",
+                              "set_range",
+                              "tell"
+                            )
 
     def __init__(self, streamer, compressor):
         """
@@ -42,7 +51,7 @@ Constructor __init__(HttpCompressed)
 :param streamer: Encapsulated streamer instance
 :param compressor: Compression object
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         AbstractEncapsulated.__init__(self, streamer)
@@ -52,7 +61,7 @@ Constructor __init__(HttpCompressed)
 Compression function
         """
 
-        self.set_io_chunk_size(int(Settings.get("pas_global_io_chunk_size_local_network", 1048576)))
+        self.io_chunk_size = int(Settings.get("pas_global_io_chunk_size_local_network", 1048576))
     #
 
     def read(self, n = None):
@@ -63,10 +72,11 @@ Reads from the current streamer session.
           EOF)
 
 :return: (bytes) Data; None if EOF
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        _return = AbstractEncapsulated.read(self, n)
+        if (self._wrapped_resource is None): raise IOException("Wrapped resource not available for reading with {0!r}".format(self))
+        _return = self._wrapped_resource.read(n)
 
         is_data_uncompressed = (self.compressor is not None)
 
@@ -80,7 +90,7 @@ Reads from the current streamer session.
                 _return = self.compressor.compress(Binary.bytes(_return))
 
                 # Feed compressor object with data until it returns at least one byte
-                if (len(_return) < 1): _return = AbstractEncapsulated.read(self, n)
+                if (len(_return) < 1): _return = self._wrapped_resource.read(self.io_chunk_size)
                 else: is_data_uncompressed = False
             #
         #

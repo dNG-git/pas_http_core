@@ -19,8 +19,10 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 # pylint: disable=import-error,no-name-in-module
 
-from collections import Mapping
 import re
+
+try: from collections.abc import Mapping
+except ImportError: from collections import Mapping
 
 try: from urllib.parse import parse_qsl
 except ImportError: from urlparse import parse_qsl
@@ -39,7 +41,7 @@ supported.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -57,7 +59,7 @@ Body type ID
         """
 Constructor __init__(Urlencoded)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         Data.__init__(self)
@@ -77,7 +79,7 @@ python.org: Called to implement evaluation of self[key].
 :param key: Value key
 
 :return: (mixed) Value
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         if (self.parsed_data is None): self.parse()
@@ -89,7 +91,7 @@ python.org: Called to implement evaluation of self[key].
 python.org: Return an iterator object.
 
 :return: (object) Iterator object
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         if (self.parsed_data is None): self.parse()
@@ -101,7 +103,7 @@ python.org: Return an iterator object.
 python.org: Called to implement the built-in function len().
 
 :return: (int) Length of the object
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         if (self.parsed_data is None): self.parse()
@@ -112,7 +114,7 @@ python.org: Called to implement the built-in function len().
         """
 Initializes internal variables for reading from input.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         Data._init_read(self)
@@ -124,15 +126,15 @@ Initializes internal variables for reading from input.
         """
 Parses the content of the request body.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
-        byte_buffer = Data.get(self)
+        byte_buffer = self.get_buffer()
 
         field_arrays = { }
 
         parsed_fields = ([ ]
-                         if (byte_buffer is None or byte_buffer.get_size() < 1) else
+                         if (byte_buffer is None or byte_buffer.size < 1) else
                          parse_qsl(Binary.str(byte_buffer.read()), True, True)
                         )
 

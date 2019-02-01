@@ -35,7 +35,7 @@ Multi-dimensional arrays are not supported.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -53,7 +53,7 @@ Body type ID
         """
 Constructor __init__(MultipartFormData)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         Multipart.__init__(self)
@@ -75,7 +75,7 @@ python.org: Called to implement evaluation of self[key].
 :param key: Value key
 
 :return: (mixed) Value
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         if (self.parsed_data is None): self.parse()
@@ -87,7 +87,7 @@ python.org: Called to implement evaluation of self[key].
 python.org: Return an iterator object.
 
 :return: (object) Iterator object
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         if (self.parsed_data is None): self.parse()
@@ -99,7 +99,7 @@ python.org: Return an iterator object.
 python.org: Called to implement the built-in function len().
 
 :return: (int) Length of the object
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         if (self.parsed_data is None): self.parse()
@@ -110,7 +110,7 @@ python.org: Called to implement the built-in function len().
         """
 Initializes internal variables for reading from input.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         Multipart._init_read(self)
@@ -122,7 +122,7 @@ Initializes internal variables for reading from input.
         """
 Parses the content of the request body.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         Multipart.parse(self)
@@ -171,14 +171,14 @@ Parses the content of the request body.
         """
 Parses a part entry.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         form_entry_name = None
         file_name = None
 
-        if ("CONTENT-DISPOSITION" in part['headers']):
-            for content_disposition_option in Header.get_field_list_dict(part['headers']['CONTENT-DISPOSITION'], ";", "="):
+        if ("content-disposition" in part['headers']):
+            for content_disposition_option in Header.get_field_list_dict(part['headers']['content-disposition'], ";", "="):
                 if (type(content_disposition_option) is dict):
                     content_disposition_option_key = content_disposition_option['key'].lower()
 
@@ -189,18 +189,18 @@ Parses a part entry.
         #
 
         if (form_entry_name is None): raise IOException("Invalid MIME part detected for 'multipart/form-data'")
-        is_content_type_defined = ("CONTENT-TYPE" in part['headers'])
+        is_content_type_defined = ("content-type" in part['headers'])
         part_data = None
 
         if (is_content_type_defined or file_name is not None):
             if (file_name is None): file_name = ""
 
-            if (file_name != "" or part['data'].get_size() > 0):
+            if (file_name != "" or part['data'].size > 0):
                 part_data = UploadedFile()
 
-                if (is_content_type_defined): part_data.set_client_content_type(part['headers']['CONTENT-TYPE'])
-                part_data.set_client_file_name(file_name)
-                part_data.set_file(part['data'])
+                if (is_content_type_defined): part_data.client_content_type = part['headers']['content-type']
+                part_data.client_file_name = file_name
+                part_data.file = part['data']
             #
         else: part_data = Binary.str(part['data'].read())
 

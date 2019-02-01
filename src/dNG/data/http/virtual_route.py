@@ -17,9 +17,14 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+import re
+
+from dNG.data.binary import Binary
+from dNG.data.text.input_filter import InputFilter
+from dNG.data.text.uri import Uri
 from dNG.runtime.instance_lock import InstanceLock
 
-class VirtualConfig(object):
+class VirtualRoute(object):
     """
 Virtual paths are used to run service actions for URIs not calling the
 controller directly.
@@ -28,9 +33,18 @@ controller directly.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
+    """
+
+    RE_DSD_PLUS_SPAM_CHAR = re.compile("(\\+){3,}")
+    """
+RegExp to find more than 3 plus characters in a row
+    """
+    RE_PLUS_ENCODED_CHAR = re.compile("%2b", re.I)
+    """
+RegExp to find URL-encoded plus characters
     """
 
     _lock = InstanceLock()
@@ -50,17 +64,27 @@ Return the config for the given virtual path.
 :param path: Virtual path to check
 
 :return: (dict) Config if matched; None otherwise
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = None
 
+        path = Binary.str(path)
+
         if (len(path) > 0):
-            with VirtualConfig._lock:
+            with VirtualRoute._lock:
+                is_fully_qualified_name = (path[-1:] == "$")
+
+                if (is_fully_qualified_name): path = path[:-1]
                 path = path.lower()
 
-                for virtual_path_config in VirtualConfig._virtuals:
-                    if (path.startswith(virtual_path_config['path'])):
+                for virtual_path_config in VirtualRoute._virtuals:
+                    if (is_fully_qualified_name):
+                        if (path == virtual_path_config['path']):
+                            _return = virtual_path_config['config']
+                            break
+                        #
+                    elif (path.startswith(virtual_path_config['path'])):
                         _return = virtual_path_config['config']
                         break
                     #
@@ -72,36 +96,54 @@ Return the config for the given virtual path.
     #
 
     @staticmethod
-    def isset_virtual_path(path):
+    def is_defined(path):
         """
 Returns true if the given virtual path is already defined.
 
 :param path: Virtual path
 
 :return: (bool) True if found
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        _return = False
+        return (VirtualRoute.get_config(path) is not None)
+    #
 
-        if (len(path) > 0):
-            with VirtualConfig._lock:
-                path = path.lower()
+    @staticmethod
+    def parse_dsd(dsd):
+        """
+DSD stands for dynamic service data and should be used for transfering IDs for
+news, topics, ... Take care for injection attacks!
 
-                for virtual_path_config in VirtualConfig._virtuals:
-                    if (path.startswith(virtual_path_config['path'])):
-                        _return = True
-                        break
-                    #
-                #
-            #
+:param dsd: DSD string for parsing
+
+:return: (dict) Parsed DSD
+:since:  v1.0.0
+        """
+
+        dsd = InputFilter.filter_control_chars(dsd)
+
+        if ("+" not in dsd and VirtualRoute.RE_PLUS_ENCODED_CHAR.search(dsd) is not None): dsd = Uri.decode_query_value(dsd)
+        elif (" " in dsd): dsd = Uri.encode_query_value(dsd)
+
+        dsd = VirtualRoute.RE_DSD_PLUS_SPAM_CHAR.sub("++", dsd)
+
+        dsd_list = dsd.split("++")
+        _return = { }
+
+        for dsd in dsd_list:
+            dsd_element = dsd.strip().split("+", 1)
+
+            if (len(dsd_element) > 1):
+                _return[dsd_element[0]] = InputFilter.filter_control_chars(Uri.decode_query_value(dsd_element[1]))
+            elif (len(dsd_element[0]) > 0): _return[dsd_element[0]] = ""
         #
 
         return _return
     #
 
     @staticmethod
-    def set_virtual_path(path, config, setup_callback = None):
+    def set(path, config, setup_callback = None):
         """
 Set the config for the given virtual path.
 
@@ -109,7 +151,7 @@ Set the config for the given virtual path.
 :param config: Config dict
 :param setup_callback: Alternative request setup function
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         if (setup_callback is not None): config['setup_callback'] = setup_callback
@@ -118,25 +160,25 @@ Set the config for the given virtual path.
         if ("_path_prefix" not in config): config['_path_prefix'] = path_normalized
         virtual_config = { "path": path_normalized, "config": config }
 
-        with VirtualConfig._lock: VirtualConfig._virtuals.append(virtual_config)
+        with VirtualRoute._lock: VirtualRoute._virtuals.append(virtual_config)
     #
 
     @staticmethod
-    def unset_virtual_path(path):
+    def unset(path):
         """
 Remove the config for the given virtual path.
 
 :param path: Virtual path
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
-        with VirtualConfig._lock:
+        with VirtualRoute._lock:
             index = 0
 
-            for virtual_config in VirtualConfig._virtuals:
+            for virtual_config in VirtualRoute._virtuals:
                 if (path == virtual_config['path']):
-                    VirtualConfig._virtuals.pop(index)
+                    VirtualRoute._virtuals.pop(index)
                     break
                 else: index += 1
             #

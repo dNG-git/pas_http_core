@@ -31,7 +31,7 @@ class HttpWsgi1Request(AbstractHttpCgiRequest):
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -43,7 +43,7 @@ Constructor __init__(HttpWsgi1Request)
 :param wsgi_env: WSGI environment
 :param wsgi_header_response: WSGI header response callback
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         # pylint: disable=broad-except
@@ -65,7 +65,7 @@ The WSGI stream response instance
 python.org: Return an iterator object.
 
 :return: (object) Iterator object
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return iter(self._stream_response)
@@ -78,17 +78,17 @@ Handles a WSGI compliant resource request.
 :param wsgi_env: WSGI environment
 :param wsgi_header_response: WSGI header response callback
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
-        self.server_host = Settings.get("pas_http_server_forced_hostname")
-        self.server_port = Settings.get("pas_http_server_forced_port")
+        self._server_host = Settings.get("pas_http_server_forced_hostname")
+        self._server_port = Settings.get("pas_http_server_forced_port")
 
         self._handle_host_definition_headers(wsgi_env, [ "HTTP_HOST" ])
 
         if (self.server_host is None):
-            self.server_host = Settings.get("pas_http_server_preferred_hostname")
-            if (self.server_port is None): self.server_port = Settings.get("pas_http_server_preferred_port")
+            self._server_host = Settings.get("pas_http_server_preferred_hostname")
+            if (self._server_port is None): self._server_port = Settings.get("pas_http_server_preferred_port")
         #
 
         self._handle_cgi_headers(wsgi_env)
@@ -100,24 +100,24 @@ Handles a WSGI compliant resource request.
 
         try:
             re_object = HttpWsgi1Request.RE_SERVER_PROTOCOL_VERSION.match(wsgi_env.get("SERVER_PROTOCOL", ""))
-            if (re_object is not None): self._stream_response.set_http_version(re_object.group(1))
+            if (re_object is not None): self._stream_response.http_version = float(re_object.group(1))
 
             self.body_fp = wsgi_env['wsgi.input']
 
             scheme_header = Settings.get("pas_http_server_scheme_header", "")
-            self.server_scheme = (wsgi_env['wsgi.url_scheme'] if (scheme_header == "") else wsgi_env.get(scheme_header.upper().replace("-", "_")))
+            self._server_scheme = (wsgi_env['wsgi.url_scheme'] if (scheme_header == "") else wsgi_env.get(scheme_header.lower().replace("-", "_")))
 
             if (self.script_path_name is None): self.script_path_name = ""
 
             if (not (self.get_header("Upgrade") is not None
-                     and self._handle_upgrade(self.virtual_path_name, self._stream_response)
+                     and self._handle_upgrade(self._virtual_path_name, self._stream_response)
                     )
                ): self.execute()
         except Exception as handled_exception:
-            if (self.log_handler is not None): self.log_handler.error(handled_exception, "pas_http_core")
+            if (self._log_handler is not None): self._log_handler.error(handled_exception, "pas_http_core")
 
             # Died before output
-            if (not self._stream_response.are_headers_sent()):
+            if (not self._stream_response.are_headers_sent):
                 self._stream_response.set_header("HTTP", "HTTP/2.0 500 Internal Server Error", True)
                 self._stream_response.send_data("Internal Server Error")
             #
@@ -129,7 +129,7 @@ Handles a WSGI compliant resource request.
 Initializes the matching stream response instance.
 
 :return: (object) Stream response object
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return self._stream_response

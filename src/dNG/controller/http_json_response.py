@@ -17,8 +17,13 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+try: from collections.abc import Mapping, Sequence
+except ImportError: from collections import Mapping, Sequence
+
+from dNG.data.binary import Binary
 from dNG.data.json_resource import JsonResource
 from dNG.data.text.l10n import L10n
+from dNG.runtime.value_exception import ValueException
 
 from .abstract_http_response import AbstractHttpResponse
 
@@ -30,7 +35,7 @@ The following class implements the response object for JSON data.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -39,70 +44,107 @@ The following class implements the response object for JSON data.
         """
 Constructor __init__(HttpJsonResponse)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         AbstractHttpResponse.__init__(self)
 
-        self.supported_features['dict_result_renderer'] = True
+        self.supported_features['dict_result_data'] = True
+    #
+
+    @property
+    def data(self):
+        """
+Returns buffered data to be transmitted.
+
+:return: (bytes) Data to be send
+:since:  v1.0.0
+        """
+
+        return Binary.bytes(JsonResource().data_to_json(self.result))
+    #
+
+    @property
+    def result(self):
+        """
+Sets the response result to be send JSON encoded.
+
+:param result: Result data
+
+:since: v1.0.0
+        """
+
+        return ({ } if (self.raw_data is None) else self.raw_data)
+    #
+
+    @result.setter
+    def result(self, result):
+        """
+Sets the response result to be send JSON encoded.
+
+:param result: Result data
+
+:since: v1.0.0
+        """
+
+        if ((not isinstance(result, Mapping)) and (not isinstance(result, Sequence))): raise ValueException("Result data type given is invalid")
+        self.raw_data = result
+    #
+
+    def _prepare_error_response(self):
+        """
+Prepares an error response.
+
+:since: v1.0.0
+        """
+
+        errors = self.errors
+        self.reset()
+
+        if (not self.are_headers_sent):
+            self.init(False, True)
+
+            header = self.get_header("HTTP", True)
+            if (header is None): self.set_header("HTTP", "HTTP/2.0 500 Internal Server Error", True)
+        #
+
+        self.result = ({ "error": { "title": L10n.get("core_title_error"),
+                                    "message": (L10n.get("errors_core_unknown_error")
+                                                if (header is None) else
+                                                header
+                                               )
+                                  }
+                       }
+                       if (errors is None) else
+                       { "error": ({ "messages": errors }
+                                   if (len(errors) > 1) else
+                                   errors[0]
+                                  )
+                       }
+                      )
     #
 
     def send(self):
         """
 Sends the prepared response.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
-        if (self.data is not None or self.stream_response.is_streamer_set()):
+        if (self.errors is not None): self._prepare_error_response()
+
+        if (self.raw_data is not None or self.stream_response.is_streamer_set):
             if (not self.initialized): self.init()
 
-            if (self.get_content_type() is None):
-                self.set_content_type("application/json; charset={0}".format(self.charset))
+            if (self.content_type is None):
+                self.content_type = "application/json; charset={0}".format(self.charset)
             #
 
             self.send_headers()
-
-            if (self.data is not None): AbstractHttpResponse.send(self)
-        elif (not self.are_headers_sent()):
-            self.init(False, True)
-
-            header = self.get_header("HTTP", True)
-            if (header is None): self.set_header("HTTP", "HTTP/2.0 500 Internal Server Error", True)
-
-            if (self.errors is None):
-                error_result = { "error": { "title": L10n.get("core_title_error"),
-                                            "message": (L10n.get("errors_core_unknown_error")
-                                                        if (header is None) else
-                                                        header
-                                                       )
-                                          }
-                               }
-
-                self.set_result(error_result)
-            else:
-                error_result = { "error": ({ "messages": self.errors }
-                                           if (len(self.errors) > 1) else
-                                           self.errors[0]
-                                          )
-                               }
-
-                self.set_result(error_result)
-            #
-
+            AbstractHttpResponse.send(self)
+        else:
+            self._prepare_error_response()
             self.send()
         #
-    #
-
-    def set_result(self, result):
-        """
-Sets the response result to be send JSON encoded.
-
-:param result: Result data
-
-:since: v0.2.00
-        """
-
-        self.data = JsonResource().data_to_json(result)
     #
 #

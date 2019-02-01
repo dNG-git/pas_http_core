@@ -17,8 +17,10 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from collections import Mapping
 import re
+
+try: from collections.abc import Mapping
+except ImportError: from collections import Mapping
 
 from dNG.data.binary import Binary
 from dNG.data.byte_buffer import ByteBuffer
@@ -39,7 +41,7 @@ class Multipart(Mapping, Data):
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -48,7 +50,7 @@ class Multipart(Mapping, Data):
     """
 Boundary prefix
     """
-    RE_MIME_BOUNDARY = re.compile(Binary.bytes("(^|\r\n)\\-\\-(\S{1,994})(\r\n.+?\r\n|\\-\\-)(?=\r\n|$)"), re.S)
+    RE_MIME_BOUNDARY = re.compile(Binary.bytes("(^|\r\n)--(\S{1,994})(\r\n.+?\r\n|--)(?=\r\n|$)"), re.S)
     """
 RegEx to identify opening and closing MIME boundaries
     """
@@ -61,7 +63,7 @@ Body type ID
         """
 Constructor __init__(Multipart)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         Data.__init__(self)
@@ -97,7 +99,7 @@ python.org: Called to implement evaluation of self[key].
 :param key: Value key
 
 :return: (mixed) Value
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         if (self.parts is None): self.parse()
@@ -109,7 +111,7 @@ python.org: Called to implement evaluation of self[key].
 python.org: Return an iterator object.
 
 :return: (object) Iterator object
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         if (self.parts is None): self.parse()
@@ -121,7 +123,7 @@ python.org: Return an iterator object.
 python.org: Called to implement the built-in function len().
 
 :return: (int) Length of the object
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         if (self.parts is None): self.parse()
@@ -133,7 +135,7 @@ python.org: Called to implement the built-in function len().
 Checks if a given MIME part ID is a false positive.
 
 :return: (bool) True if valid MIME part ID
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return (mime_part_id in self.pending_mime_parts)
@@ -145,7 +147,7 @@ Handles data received.
 
 :param data: Data read from input
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         data = self._decompress(data)
@@ -237,7 +239,7 @@ Handles MIME part header.
 :param mime_part_id: MIME part ID
 :param data: Data read from input
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         if (mime_part_id not in self.pending_mime_parts): raise IOException("Invalid MIME part received")
@@ -249,8 +251,8 @@ Handles MIME part header.
 
         content_transfer_encoding = ""
 
-        if ("CONTENT-TRANSFER-ENCODING" in part['headers']):
-            content_transfer_encoding = part['headers']['CONTENT-TRANSFER-ENCODING'].strip()
+        if ("content-transfer-encoding" in part['headers']):
+            content_transfer_encoding = part['headers']['content-transfer-encoding'].strip()
         #
 
         if (content_transfer_encoding == "base64"): part['data'] = Base64Decoder(self.pending_received_data)
@@ -265,7 +267,7 @@ Handles MIME part header.
 :param mime_part_id: MIME part ID
 :param data: Data read from input
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         mime_headers = Header.get_headers(Binary.str(data))
@@ -290,7 +292,7 @@ Handles MIME part header.
         """
 Initializes internal variables for reading from input.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         Data._init_read(self)
@@ -303,14 +305,14 @@ Initializes internal variables for reading from input.
         """
 Parses the content of the request body.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         if (self.headers is None): raise ValueException("Request body can't be read without HTTP headers")
 
-        if ("CONTENT-TYPE" not in self.headers): raise IOException("Content-Type not specified")
+        if ("content-type" not in self.headers): raise IOException("CONTENT-TYPE not specified")
 
-        for content_type_option in Header.get_field_list_dict(self.headers['CONTENT-TYPE'], ";", "="):
+        for content_type_option in Header.get_field_list_dict(self.headers['content-type'], ";", "="):
             if (type(content_type_option) is dict
                 and content_type_option['key'].lower() == "boundary"
                ): self.pending_mime_parts.append(content_type_option['value'])

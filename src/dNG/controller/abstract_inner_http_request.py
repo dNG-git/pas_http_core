@@ -30,7 +30,7 @@ This abstract class contains HTTP methods for inner requests.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -39,56 +39,72 @@ This abstract class contains HTTP methods for inner requests.
         """
 Constructor __init__(AbstractInnerHttpRequest)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         AbstractInnerRequest.__init__(self)
         AbstractHttpMixin.__init__(self)
 
-        self.accepted_formats = None
+        self._accepted_formats = None
         """
 Formats the client accepts
         """
-        self.compression_formats = None
+        self._compression_formats = None
         """
 Compression formats the client accepts
         """
     #
 
-    def get_accepted_formats(self):
+    @property
+    def accepted_formats(self):
         """
 Returns the formats the client accepts.
 
 :return: (list) Accepted formats
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        return self.accepted_formats
+        return self._accepted_formats
     #
 
-    def get_compression_formats(self):
+    @property
+    def compression_formats(self):
         """
 Returns the compression formats the client accepts.
 
 :return: (list) Compression formats supported
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        return self.compression_formats
+        return self._compression_formats
     #
 
-    def get_session(self):
+    @property
+    def session(self):
         """
 Returns the associated session.
 
 :return: (object) Session instance
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         return (None
-                if (self.parent_request is None) else
-                self.parent_request.get_session()
+                if (self._parent_request is None) else
+                self._parent_request.session
                )
+    #
+
+    @session.setter
+    def session(self, session):
+        """
+Sets the associated session.
+
+:param session: (object) Session instance
+
+:since: v1.0.0
+        """
+
+        if (self._parent_request is not None): self._parent_request.set_session(session)
     #
 
     def init(self, connection_or_request):
@@ -97,35 +113,44 @@ Initializes default values from the a connection or request instance.
 
 :param connection_or_request: (object) Connection or request instance
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         if (not isinstance(connection_or_request, AbstractHttpMixin)): raise TypeException("Request instance given is invalid")
         AbstractInnerRequest.init(self, connection_or_request)
 
-        self.parent_request = connection_or_request._get_parent_request()
-        if (self.parent_request is None): self.parent_request = connection_or_request
+        self._parent_request = connection_or_request._parent_request
+        if (self._parent_request is None): self._parent_request = connection_or_request
 
-        if (connection_or_request.is_supported("accepted_formats")): self.accepted_formats = connection_or_request.get_accepted_formats()
-        if (connection_or_request.is_supported("compression")): self.compression_formats = connection_or_request.get_compression_formats()
-        if (connection_or_request.is_supported("headers")): self.headers = connection_or_request.get_headers()
-        self.lang = connection_or_request.get_lang()
-        self.lang_default = connection_or_request.get_lang_default()
-        if (connection_or_request.is_supported("type")): self.type = connection_or_request.get_type()
+        if (connection_or_request.is_supported("accepted_formats")): self._accepted_formats = connection_or_request.accepted_formats
+        if (connection_or_request.is_supported("compression")): self._compression_formats = connection_or_request.compression_formats
+        if (connection_or_request.is_supported("headers")): self._headers = connection_or_request.headers
+        self._lang = connection_or_request.lang
+        self._lang_default = connection_or_request.lang_default
+        if (connection_or_request.is_supported("type")): self._type = connection_or_request.type
 
-        self.set_script_path_name(connection_or_request.get_script_path_name())
+        self.script_path_name = connection_or_request.script_path_name
     #
 
-    def set_session(self, session):
+    def prepare_body_instance(self, request_body_instance = None, content_type_expected = None):
         """
-Sets the associated session.
+Returns a configured RequestBody instance to be read by the Request
+implementation.
 
-:param session: (object) Session instance
+:param request_body_instance: RequestBody instance to be configured
+:param content_type_expected: Expected Content-Type header if any to use the
+                              RequestBody instance.
 
-:since: v0.2.00
+:return: (object) Configured RequestBody instance
+:since:  v1.0.0
         """
 
-        if (self.parent_request is not None): self.parent_request.set_session(session)
+        parent_request = self._parent_request
+
+        return (None
+                if (parent_request is None) else
+                parent_request.prepare_body_instance(request_body_instance, content_type_expected)
+               )
     #
 
     def _supports_accepted_formats(self):
@@ -133,10 +158,10 @@ Sets the associated session.
 Returns false if accepted formats can not be identified.
 
 :return: (bool) True if accepted formats are identified.
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        return (self.accepted_formats is not None)
+        return (self._accepted_formats is not None)
     #
 
     def _supports_compression(self):
@@ -144,9 +169,9 @@ Returns false if accepted formats can not be identified.
 Returns false if supported compression formats can not be identified.
 
 :return: (bool) True if compression formats are identified.
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        return (self.compression_formats is not None)
+        return (self._compression_formats is not None)
     #
 #

@@ -17,13 +17,17 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
+from collections import OrderedDict
 from time import time
 from zlib import decompressobj, MAX_WBITS
 
+try: from dNG.data.brotli_decompressor import BrotliDecompressor
+except ImportError: BrotliDecompressor = None
+
 from dNG.data.byte_buffer import ByteBuffer
+from dNG.data.http.chunked_reader_mixin import ChunkedReaderMixin
 from dNG.data.settings import Settings
 from dNG.data.supports_mixin import SupportsMixin
-from dNG.net.http.chunked_reader_mixin import ChunkedReaderMixin
 from dNG.runtime.io_exception import IOException
 from dNG.runtime.value_exception import ValueException
 
@@ -35,7 +39,7 @@ The class "Data" implements method to read the request body.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -51,37 +55,37 @@ Body type ID
         """
 Constructor __init__(Data)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         ChunkedReaderMixin.__init__(self)
         SupportsMixin.__init__(self)
 
-        self.decompressors = None
-        """
-List of decompressors
-        """
-        self.headers = None
-        """
-Dictionary with request headers
-        """
-        self.input_chunk_encoded = False
+        self._chunk_encoded = False
         """
 True if the input is "chunked" encoded (and the size is unknown).
         """
-        self.input_ptr = None
+        self.decompressors = OrderedDict()
+        """
+List of decompressors
+        """
+        self._headers = None
+        """
+Dictionary with request headers
+        """
+        self._input_ptr = None
         """
 Input pointer
         """
-        self.input_size = -1
+        self._size = -1
         """
 Input size in bytes if known
         """
-        self.received_data = None
+        self._received_data = None
         """
 Received file-like data object
         """
-        self.received_data_size = 0
+        self._received_size = 0
         """
 Size of the file-like data object
         """
@@ -93,7 +97,7 @@ Allowed size in bytes of the request body
         """
 Timeout for each network read
         """
-        self.timeout = int(Settings.get("pas_http_site_request_body_timeout", 7200))
+        self._timeout = int(Settings.get("pas_http_site_request_body_timeout", 7200))
         """
 Absolute timeout to receive the request body
         """
@@ -108,69 +112,211 @@ Absolute timeout to receive the request body
         if (self.socket_data_timeout < 1): self.socket_data_timeout = int(Settings.get("pas_global_socket_data_timeout", 30))
     #
 
+    @property
+    def buffer(self):
+        """
+Returns the raw request body data.
+
+:return: (bytes) Request body data
+:since:  v1.0.0
+        """
+
+        return self.get_buffer()
+    #
+
+    @property
+    def chunk_encoded(self):
+        """
+Returns true if input data is "chunk" encoded.
+
+:return: (bool) True if "chunked" input mode is activated
+:since:  v1.0.0
+        """
+
+        return self._chunk_encoded
+    #
+
+    @chunk_encoded.setter
+    def chunk_encoded(self, chunk_encoded):
+        """
+Reads "chunked" encoded content if set to true.
+
+:param chunk_encoded: True to active the "chunked" encoded mode
+
+:since: v1.0.0
+        """
+
+        self._chunk_encoded = chunk_encoded
+    #
+
+    @property
+    def compression(self):
+        """
+Returns the list of input compression algorithms used.
+
+:return: (list) Input compression algorithms used
+:since:  v1.0.0
+        """
+
+        return list(self.decompressors)
+    #
+
+    @compression.setter
+    def compression(self, algorithms):
+        """
+Sets the input compression algorithms used.
+
+:param algorithms: Input compression algorithms used
+
+:since: v1.0.0
+        """
+
+        algorithms = (algorithms if (type(algorithms) is list) else [ algorithms ])
+        self.decompressors.clear()
+
+        for algorithm in algorithms:
+            if (BrotliDecompressor is not None and algorithm == "br"): self.decompressors['br'] = BrotliDecompressor()
+            elif (algorithm == "gzip"): self.decompressors['gzip'] = decompressobj(16 + MAX_WBITS)
+            elif (algorithm == "deflate"): self.decompressors['deflate'] = decompressobj(MAX_WBITS)
+        #
+    #
+
+    @property
+    def headers(self):
+        """
+Returns the input request body relevant request headers.
+
+:return: (dict) Headers dict
+:since:  v1.0.0
+        """
+
+        return ({ } if (self._headers is None) else self._headers)
+    #
+
+    @headers.setter
+    def headers(self, headers):
+        """
+Sets the input request body relevant request headers.
+
+:param headers: Headers dict
+
+:since: v1.0.0
+        """
+
+        self._headers = headers
+    #
+
+    @property
+    def input_ptr(self):
+        """
+Returns the file-like input pointer used to read the request body from.
+
+:return: (object) File-like instance
+:since:  v1.0.0
+        """
+
+        return self._input_ptr
+    #
+
+    @input_ptr.setter
+    def input_ptr(self, input_ptr):
+        """
+Sets the file-like input pointer used to read the request body from.
+
+:param input_ptr: File-like instance
+
+:since: v1.0.0
+        """
+
+        self._input_ptr = input_ptr
+    #
+
+    @property
+    def size(self):
+        """
+Returns the input size read.
+
+:return: (int) Size in bytes
+:since:  v1.0.0
+        """
+
+        return self._received_size
+    #
+
+    @size.setter
+    def size(self, _bytes):
+        """
+Sets the expected input size.
+
+:param _bytes: Size in bytes
+
+:since: v1.0.0
+        """
+
+        self._size = _bytes
+    #
+
+    @property
+    def timeout(self):
+        """
+Returns the absolute timeout to receive the request body.
+
+:return: Timeout in seconds
+:since:  v1.0.0
+        """
+
+        return self._timeout
+    #
+
+    @timeout.setter
+    def timeout(self, timeout):
+        """
+Sets the absolute timeout to receive the request body.
+
+:param timeout: Timeout in seconds
+
+:since: v1.0.0
+        """
+
+        self._timeout = timeout
+    #
+
     def _decompress(self, data):
         """
 Decompresses incoming data.
 
 :param data: Data read from input
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         _return = (data if (self.decompressors is None) else None)
         raw_data = data
 
         if (self.decompressors is not None):
-            for decompressor in self.decompressors: raw_data = (decompressor.flush() if (data is None) else decompressor.decompress(raw_data))
+            for decompressor_name in self.decompressors:
+                decompressor = self.decompressors[decompressor_name]
+                raw_data = (decompressor.flush() if (data is None) else decompressor.decompress(raw_data))
+            #
+
             _return = raw_data
         #
 
         return _return
     #
 
-    def define_input_chunk_encoded(self, chunk_encoded):
-        """
-Reads "chunked" encoded content if set to true.
-
-:param chunk_encoded: True to active the "chunked" encoded mode
-
-:since: v0.2.00
-        """
-
-        self.input_chunk_encoded = chunk_encoded
-    #
-
-    def define_input_compression(self, algorithms):
-        """
-Defines the input compression algorithms used.
-
-:param algorithms: Input compression algorithms used
-
-:since: v0.2.00
-        """
-
-        algorithms = (algorithms if (type(algorithms) is list) else [ algorithms ])
-        self.decompressors = [ ]
-
-        for algorithm in algorithms:
-            if (algorithm == "deflate"): self.decompressors.append(decompressobj(MAX_WBITS))
-            elif (algorithm == "gzip"): self.decompressors.append(decompressobj(16 + MAX_WBITS))
-            else: raise ValueException("Unsupported compression definition '{0}' given".format(algorithm))
-        #
-    #
-
-    def get(self, timeout = None):
+    def get_buffer(self, timeout = None):
         """
 Returns the raw request body data.
 
 :param timeout: Read timeout in seconds
 
 :return: (str) Request body data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         self.read(timeout)
-        return self.received_data
+        return self._received_data
     #
 
     def _handle_data(self, data):
@@ -179,15 +325,15 @@ Handles data received.
 
 :param data: Data read from input
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         data = self._decompress(data)
 
         if (data is not None):
-            self.received_data_size += len(data)
-            if (self.received_size_max > 0 and self.received_data_size > self.received_size_max): raise ValueException("Input size exceeds allowed limit")
-            self.received_data.write(data)
+            self._received_size += len(data)
+            if (self.received_size_max > 0 and self._received_size > self.received_size_max): raise ValueException("Input size exceeds allowed limit")
+            self._received_data.write(data)
         #
     #
 
@@ -195,11 +341,11 @@ Handles data received.
         """
 Initializes internal variables for reading from input.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
-        self.received_data = ByteBuffer()
-        self.received_data_size = 0
+        self._received_data = ByteBuffer()
+        self._received_size = 0
     #
 
     def read(self, timeout = None):
@@ -208,18 +354,21 @@ Reads the request body data and fills the buffer.
 
 :param timeout: Read timeout in seconds
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         # pylint: disable=raising-bad-type
 
-        if (self.input_ptr is not None):
-            if (hasattr(self.input_ptr, "settimeout")): self.input_ptr.settimeout(self.socket_data_timeout)
-
+        if (self._input_ptr is not None):
             self._init_read()
 
+            if (hasattr(self._input_ptr, "settimeout")):
+                if (timeout is None): timeout = self.timeout
+                self._input_ptr.settimeout(min(self.socket_data_timeout, timeout))
+            #
+
             try: self._read(self._handle_data, timeout)
-            finally: self.input_ptr = None
+            finally: self._input_ptr = None
         #
     #
 
@@ -230,21 +379,22 @@ Reads data until the body has been received or timeout occurs.
 :param read_callback: Callback used to handle data read
 :param timeout: Read timeout in seconds
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         if (timeout is None): timeout = self.timeout
+        is_chunk_encoded = self.chunk_encoded
 
-        if (self.input_size < 0 and (not self.input_chunk_encoded)): raise IOException("Input size and expected first chunk size are unknown")
+        if (self.size < 0 and (not is_chunk_encoded)): raise IOException("Input size and expected first chunk size are unknown")
 
-        if (self.input_chunk_encoded): self._read_chunked_data(self.input_ptr.read, read_callback, timeout = timeout)
+        if (is_chunk_encoded): self._read_chunked_data(self._input_ptr.read, read_callback, timeout = timeout)
         else:
             timeout_time = time() + timeout
-            size_unread = self.input_size
+            size_unread = self._size
 
             while (size_unread > 0 and time() < timeout_time):
                 part_size = (16384 if (size_unread > 16384) else size_unread)
-                part_data = self.input_ptr.read(part_size)
+                part_data = self._input_ptr.read(part_size)
                 part_size = (0 if (part_data is None) else len(part_data))
 
                 if (part_size < 1): raise IOException("Input pointer could not be read before socket timeout occurred")
@@ -258,54 +408,6 @@ Reads data until the body has been received or timeout occurs.
             if (size_unread > 0): raise IOException("Timeout occured before EOF")
         #
 
-        if (self.decompressors is not None): read_callback(None)
-    #
-
-    def set_headers(self, headers):
-        """
-Sets the relevant request headers.
-
-:param headers: Header dict
-
-:since: v0.2.00
-        """
-
-        self.headers = headers
-    #
-
-    def set_input_ptr(self, input_ptr):
-        """
-Sets the file-like input pointer used to read the request body from.
-
-:param instance: File-like instance
-
-:since: v0.2.00
-        """
-
-        self.input_ptr = input_ptr
-    #
-
-    def set_input_size(self, _bytes):
-        """
-Sets the expected input size.
-
-:param _bytes: Size in bytes
-
-:since: v0.2.00
-        """
-
-        self.input_size = _bytes
-    #
-
-    def set_timeout(self, timeout):
-        """
-Sets the absolute timeout to receive the request body.
-
-:param timeout: Timeout in seconds
-
-:since: v0.2.00
-        """
-
-        self.timeout = timeout
+        if (len(self.decompressors) > 0): read_callback(None)
     #
 #

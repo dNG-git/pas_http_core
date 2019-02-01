@@ -32,7 +32,7 @@ implementation.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -44,7 +44,7 @@ Constructor __init__(HttpWsgi1StreamResponse)
 :param wsgi_header_response: WSGI header response callback
 :param wsgi_file_wrapper: The WSGI file wrapper callback
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         AbstractHttpCgiStreamResponse.__init__(self)
@@ -68,7 +68,7 @@ The WSGI response writer callback
 python.org: Return an iterator object.
 
 :return: (object) Iterator object
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = AbstractHttpCgiStreamResponse.__iter__(self)
@@ -87,7 +87,7 @@ the server or gateway must call that method upon completion of the current
 request, whether the request was completed normally, or terminated early due
 to an error.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         self.finish()
@@ -97,7 +97,7 @@ to an error.
         """
 Finish transmission and cleanup resources.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         if (self.active):
@@ -110,7 +110,7 @@ Finish transmission and cleanup resources.
         """
 Sends the prepared response headers.
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         http_status_line = "200 OK"
@@ -124,7 +124,7 @@ Sends the prepared response headers.
                 header_value = str(filtered_headers[header_name])
                 header_name = headers_indexed[header_name]
 
-                if (header_name == "HTTP"): http_status_line = header_value[9:]
+                if (header_name == "http"): http_status_line = header_value[9:]
                 else: headers.append(( header_name, header_value ))
             elif (type(filtered_headers[header_name]) is list):
                 for header_list_value in filtered_headers[header_name]:
@@ -148,7 +148,7 @@ Writes the given data.
 
 :param data: Data to be send
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         # pylint: disable=broad-except
@@ -156,7 +156,7 @@ Writes the given data.
         if (not self.headers_sent): self.send_headers()
 
         try:
-            if (self.active and (not self.headers_only) and self.wsgi_write is not None):
+            if (self.active and (not self.send_only_headers) and self.wsgi_write is not None):
                 data = Binary.bytes(data)
                 self.wsgi_write(data)
             #

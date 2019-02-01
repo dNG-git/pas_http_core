@@ -28,15 +28,15 @@ class UploadedFile(FileLikeCopyMixin, FileLikeWrapperMixin):
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
 
-    _FILE_WRAPPED_METHODS = ( "get_size",
-                              "read",
+    _FILE_WRAPPED_METHODS = ( "read",
                               "readline",
                               "seek",
+                              "size",
                               "tell"
                             )
 
@@ -44,90 +44,108 @@ class UploadedFile(FileLikeCopyMixin, FileLikeWrapperMixin):
         """
 Constructor __init__(UploadedFile)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         FileLikeCopyMixin.__init__(self)
         FileLikeWrapperMixin.__init__(self)
 
-        self.client_content_type = None
+        self._client_content_type = None
         """
 The client supplied content type.
         """
-        self.client_file_name = None
+        self._client_file_name = None
         """
 The client supplied file name.
         """
     #
 
-    def get_client_content_type(self):
+    @property
+    def client_content_type(self):
         """
 Returns the client supplied content type.
 
 :return: Client content type
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        return self.client_content_type
+        return self._client_content_type
     #
 
-    def get_client_file_name(self):
-        """
-Returns the client supplied file name.
-
-:return: Client file name
-:since:  v0.2.00
-        """
-
-        return self.client_file_name
-    #
-
-    def is_eof(self):
-        """
-Checks if the uploaded file has reached EOF.
-
-:return: (bool) True if EOF
-:since:  v0.2.00
-        """
-
-        if (self._wrapped_resource is None): _return = True
-        elif (hasattr(self._wrapped_resource, "is_eof")): _return = self._wrapped_resource.is_eof()
-        else: _return = (self.tell() == self.get_size())
-
-        return _return
-    #
-
-    def set_client_content_type(self, content_type):
+    @client_content_type.setter
+    def client_content_type(self, content_type):
         """
 Sets the client supplied content type.
 
 :param file_name: Client content type
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
-        self.client_content_type = content_type
+        self._client_content_type = content_type
     #
 
-    def set_client_file_name(self, file_name):
+    @property
+    def client_file_name(self):
+        """
+Returns the client supplied file name.
+
+:return: Client file name
+:since:  v1.0.0
+        """
+
+        return self._client_file_name
+    #
+
+    @client_file_name.setter
+    def client_file_name(self, file_name):
         """
 Sets the client supplied file name.
 
 :param file_name: Client file name
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
-        self.client_file_name = file_name
+        self._client_file_name = file_name
     #
 
-    def set_file(self, resource):
+    @property
+    def is_eof(self):
+        """
+Checks if the uploaded file has reached EOF.
+
+:return: (bool) True if EOF
+:since:  v1.0.0
+        """
+
+        if (self._wrapped_resource is None): _return = True
+        elif (hasattr(self._wrapped_resource, "is_eof")): _return = self._wrapped_resource.is_eof
+        else: _return = (self.size == self.tell())
+
+        return _return
+    #
+
+    @property
+    def file(self):
+        """
+Returns the file-like resource to be used.
+
+:return: (object) File-like resource
+:since:  v1.0.0
+        """
+
+        return self._wrapped_resource
+    #
+
+    @file.setter
+    def file(self, resource):
         """
 Sets the file-like resource to be used.
 
 :param resource: File-like resource
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         self._set_wrapped_resource(resource)

@@ -31,7 +31,7 @@ implementation.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -40,7 +40,7 @@ implementation.
         """
 Constructor __init__(HttpWsgi1StreamResponse)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         AbstractHttpStreamResponse.__init__(self)
@@ -53,13 +53,14 @@ Constructor __init__(HttpWsgi1StreamResponse)
 python.org: Return an iterator object.
 
 :return: (object) Iterator object
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        if (not self.headers_sent): self.send_headers()
         _return = self
 
-        if (self.streamer is not None):
+        if (not self.headers_sent): self.send_headers()
+
+        if ((not self.send_only_headers) and self.streamer is not None):
             if (self.compressor is not None):
                 _return = HttpCompressedStreamer(self.streamer, self.compressor)
                 self.compressor = None
@@ -74,22 +75,22 @@ python.org: Return an iterator object.
 python.org: Return the next item from the container.
 
 :return: (bytes) Response data
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         _return = None
 
-        if (self.active and (not self.headers_only)):
+        if (self.active and (not self.send_only_headers)):
             """
 This iterator is only called for uncompressed data.
             """
 
             if (self.streamer is not None):
-                _return = (None if (self.streamer.is_eof()) else self.streamer.read())
+                _return = (None if (self.streamer.is_eof) else self.streamer.read())
                 if (_return is not None): _return = self._prepare_output_data(_return)
-            elif (self.data is not None):
-                _return = self.data
-                self.data = None
+            elif (self._data is not None):
+                _return = self._data
+                self._data = None
             #
         #
 

@@ -18,9 +18,10 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 """
 
 from dNG.data.binary import Binary
-from dNG.net.http.chunked_reader_mixin import ChunkedReaderMixin
 
-class ChunkedMixin(object):
+from .chunked_reader_mixin import ChunkedReaderMixin
+
+class ChunkedWriterMixin(object):
     """
 This response mixin provides the "chunkify()" method.
 
@@ -28,7 +29,7 @@ This response mixin provides the "chunkify()" method.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -38,7 +39,7 @@ This response mixin provides the "chunkify()" method.
 Returns the formats the client accepts.
 
 :return: (list) Accepted formats
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
         data = Binary.bytes(data)
