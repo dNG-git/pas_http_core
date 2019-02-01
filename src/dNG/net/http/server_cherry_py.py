@@ -19,13 +19,13 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 # pylint: disable=import-error
 
-from cherrypy import config, log
-from cherrypy.wsgiserver import CherryPyWSGIServer
 import socket
+
+import cherrypy
 
 from dNG.controller.http_wsgi1_request import HttpWsgi1Request
 from dNG.data.settings import Settings
-from dNG.module.named_loader import NamedLoader
+from dNG.plugins.hook import Hook
 from dNG.runtime.exception_log_trap import ExceptionLogTrap
 
 from .abstract_server import AbstractServer
@@ -38,7 +38,7 @@ class ServerCherryPy(AbstractServer):
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -47,25 +47,19 @@ class ServerCherryPy(AbstractServer):
         """
 Constructor __init__(ServerCherryPy)
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         AbstractServer.__init__(self)
 
-        self.server = None
-        """
-cherrypy server
-        """
-
-        log_handler = NamedLoader.get_singleton("dNG.data.logging.LogHandler", False)
-        if (log_handler is not None): log_handler.add_logger("{0}.error.{1}".format(log.logger_root, log.appid))
+        if (self._log_handler is not None): self._log_handler.add_logger("{0}.error.{1}".format(cherrypy.log.logger_root, cherrypy.log.appid))
     #
 
     def _configure(self):
         """
 Configures the server
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         listener_host = Settings.get("pas_http_cherrypy_server_host", self.socket_hostname)
@@ -76,18 +70,18 @@ Configures the server
             self.host = Settings.get("pas_http_server_preferred_hostname", self.socket_hostname)
         else: self.host = listener_host
 
-        config.update({ "response.stream": True })
+        cherrypy.config.update({ "server.socket_host": listener_host,
+                                 "server.socket_port": self.port,
+                                 "server.thread_pool": Settings.get("pas_http_cherrypy_server_threads", 10),
+                                 "response.stream": True,
+                                 "response.timeout": Settings.get("pas_http_cherrypy_response_timeout", 600),
+                                 "log.screen": False
+                               })
 
-        if (self.log_handler is not None): self.log_handler.info("pas.http.core cherrypy server starts at '{0}:{1:d}'", listener_host, self.port, context = "pas_http_core")
+        if (self._log_handler is not None): self._log_handler.info("pas.http.core cherrypy server starts at '{0}:{1:d}'", listener_host, self.port, context = "pas_http_core")
 
-        listener_data = ( listener_host, self.port )
-        threads = Settings.get("pas_http_cherrypy_server_threads", 10)
-
-        self.server = CherryPyWSGIServer(listener_data,
-                                         HttpWsgi1Request,
-                                         numthreads = threads,
-                                         server_name = self.host
-                                        )
+        cherrypy.engine.subscribe("exit", self.on_exit_event)
+        cherrypy.tree.graft(HttpWsgi1Request)
 
         """
 Configure common paths and settings
@@ -96,14 +90,27 @@ Configure common paths and settings
         AbstractServer._configure(self)
     #
 
+    def on_exit_event(self):
+        """
+Stop the application on CherryPy's request.
+
+:since:  v1.0.0
+        """
+
+        Hook.call("dNG.pas.Status.stop")
+    #
+
     def run(self):
         """
 Runs the server
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
-        with ExceptionLogTrap("pas_http_core"): self.server.start()
+        with ExceptionLogTrap("pas_http_core"):
+            cherrypy.engine.start()
+            cherrypy.engine.block()
+        #
     #
 
     def stop(self, params = None, last_return = None):
@@ -114,10 +121,12 @@ Stop the server
 :param last_return: The return value from the last hook called.
 
 :return: (mixed) Return value
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        if (self.server is not None): self.server.stop()
+        cherrypy.engine.unsubscribe("exit", self.on_exit_event)
+        if (cherrypy.engine.state != cherrypy.engine.states.EXITING): cherrypy.engine.exit()
+
         return AbstractServer.stop(self, params, last_return)
     #
 #
