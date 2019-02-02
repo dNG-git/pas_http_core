@@ -26,16 +26,6 @@ https://www.direct-netware.de/redirect?licenses;mpl2
         </exec>
     </target>
 
-    <target name="compile.pas.js" description="Compile data.js ${ant.project.name}">
-        <exec executable="python">
-            <arg file="${jsBuilder.filePathName}" />
-            <arg value="--filetype=${jsBuilder.fileTypes}" />
-            <arg value="--include=${pas.basedir}/data/" />
-            <arg value="--strip_prefix=${pas.basedir}/" />
-            <arg value="--output_dirs_chmod=0755" />
-        </exec>
-    </target>
-
     <target name="compile.pas.src" description="Compile src.py ${ant.project.name}">
         <exec executable="python">
             <arg file="${pyBuilder.filePathName}" />
