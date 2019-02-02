@@ -1,7 +1,0 @@
-<div class="pageform_element pageform_button_field">
-	<input id="[rewrite:content]id[/rewrite]" type="[rewrite:content]type[/rewrite]" value="[rewrite:content]title[/rewrite]" class="pageform_button" />
-</div><script type="text/javascript"><![CDATA[
-require([ "djt/XHtml5FormElement.min" ], function(XHtml5FormElement) {
-	new XHtml5FormElement({ id: "[rewrite:content]id[/rewrite]", type: "button" });
-});
-]]></script>

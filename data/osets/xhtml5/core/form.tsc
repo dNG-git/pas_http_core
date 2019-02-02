@@ -1,4 +1,0 @@
-<article>
-	<h1>[rewrite:content]title[/rewrite]</h1>
-[block:content:form]output.Form.render[/block]
-</article>

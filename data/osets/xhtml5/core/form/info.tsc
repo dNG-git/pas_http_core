@@ -1,9 +1,0 @@
-<div class="pageform_element">
-	<span class="pageform_label"><strong>[rewrite:content]title[/rewrite]</strong>:</span>
-	<div class="pageform_field">
-		<p>[rewrite:content]value[/rewrite]</p>
-[if:content:error_message != ]
-		<p class="pageform_error">[rewrite:content]error_message[/rewrite]</p>
-[/if]
-	</div>
-</div>
