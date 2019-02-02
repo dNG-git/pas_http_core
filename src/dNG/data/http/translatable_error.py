@@ -28,7 +28,7 @@ Non-critical errors are usually expected like wrong entity IDs.
 :copyright:  direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: core
-:since:      v0.2.00
+:since:      v1.0.0
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
@@ -42,25 +42,42 @@ Constructor __init__(TranslatableError)
 :param value: Exception message value
 :param _exception: Inner exception
 
-:since: v0.2.00
+:since: v1.0.0
         """
 
         TranslatableException.__init__(self, l10n_id, value, _exception)
 
-        self.http_code = http_code
+        self._http_code = http_code
         """
 HTTP error code
         """
+        self._http_message = None
+        """
+HTTP error message
+        """
     #
 
-    def get_http_code(self):
+    @property
+    def http_code(self):
         """
 Return the HTTP error code.
 
 :return: (int) HTTP error code
-:since:  v0.2.00
+:since:  v1.0.0
         """
 
-        return self.http_code
+        return self._http_code
+    #
+
+    @property
+    def http_message(self):
+        """
+Returns the HTTP error message.
+
+:return: (str) HTTP error message
+:since:  v1.0.0
+        """
+
+        return self._http_message
     #
 #
